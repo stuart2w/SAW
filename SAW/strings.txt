@@ -1,0 +1,2082 @@
+# Lines starting with "#" are ignored by the software and don't need to be translated
+# Everything to the left of the = must not be changed; this is the code used by the software to identify each line
+# A few lines contain %0 which is a marker telling the software where to insert a name or filename.  The %0 should be left in the translated version
+# A few lines contain %=XYZ% where XYZ is identifier of another line in this file.  The text for that identifier is substituted in place of
+# %=XYZ%.  This is done automatically as the file is loaded; you can replace the %=XYZ% with the actual text, or create new substitutions.
+# A small number of lines have part of the text enclosed in ((double brackets)).  In this case the ((  )) marks a clickable link within the text
+# The translated text must contain (( )) but it doesn't necessarily need to be the same words
+
+# The & character indicates the accelerator key which can used in association with Alt to select
+# an item in a dialog or menu.  The character following the & is the shortcut.  The & does not appear on screen
+# So "OK = &OK" means Alt+O is the accelerator key for OK buttons.
+# It is necessary to ensure all keys within one dialog or menu are different.  Therefore the letter which
+# is underlined will be different in each language.  For an initial translation it is best to omit the &
+# completely from the translation, and if desired, add them back at the end.
+# Not all text items contain "&" - only items which can be selected on screen.
+
+# Generic / miscellaneous
+App = SAW
+OK = &OK
+Cancel = &Cancel
+Close = &Close
+Empty_Text = (Start typing...)
+mm = mm
+cm = cm
+pt = pt
+# next 2 are short forms for Width and Height, when showing rectangle (X=... Y=... W=... H=...)
+Width_Abbrev = W
+Height_Abbrev = H
+Width = Width
+Height = Heigth
+inch = inches
+#The next one is deliberately blank
+GridSquare = 
+GridSquare_Name = grid squares
+Yes = &Yes
+No = &No
+Off = &Off
+Search = Search
+List_MoveUp = up the list
+List_MoveDown = down the list
+User_User = Standard user
+User_Teacher = Editor
+N_Selected = %0 selected
+Language = Language
+Filename = Filename
+ID = ID
+
+#Activities
+Activity_Default = Complete
+Activity_Palette = (Popup palette editing)
+
+Delete = Delete
+Welcome = Welcome to %=App%
+# %0 is a number...
+New_Document = (Untitled %0)
+Preview_Unavailable = No preview available for this file
+# This next one must be shorter...
+No_Preview = No Preview
+Teacher_Mode = Teacher mode
+Rename = Rename
+
+# Some of the special folder names in Windows, which I can't find how to retrieve automatically
+Desktop = Desktop
+My_Documents = My Documents
+My_Computer = My Computer
+My_Network_Places = My Network Places
+Entire_Network = Entire Network
+My_Favourites = My Favourites
+
+# Shape/tool names
+Shape_Selector = Selection pointer
+Shape_SelectionBox = Selection box
+Shape_Line = Line
+Shape_Orthogonal = Vertical/Horizontal line
+Shape_Arrow = Arrow
+Shape_Square = Square
+Shape_Rectangle = Rectangle
+Shape_OrthogonalRectangle = Orthogonal Rectangle
+Shape_Parallelogram = Parallelogram
+Shape_Triangle = Triangle
+Shape_Isosceles = Isosceles triangle
+Shape_Equilateral = Equilateral triangle
+Shape_Polygon = Regular polygon
+Shape_IrregularPolygon = Irregular polygon
+Shape_Arc = Arc
+Shape_Circle = Circle
+Shape_Ellipse = Ellipse
+Shape_Semicircle = Semicircle
+Shape_FreeText = Simple text
+Shape_Image = Imported image
+Shape_Marker = Marker
+Shape_PolyLine = Multiple connected lines
+Shape_Pencil = Curve drawn free hand
+Shape_ClosedCurve = Closed curve
+Shape_Connector = Connector
+Shape_IndependentPolyPath = Complex shape
+Shape_Label = Text in Shape
+Shape_Curve = Curve
+Shape_TextLine = Text at any angle
+Shape_Group = Grouped shapes
+Shape_UserSocket = Socket (connection point for grouped shapes)
+Shape_Button = Button
+Shape_Container = Container
+Shape_Flow = Flow layout container
+
+Info_Radius = Radius
+Info_Distance = Distance
+Info_Length = Length
+Info_TotalLength = Total length
+Info_Perimeter = Perimeter
+Info_Angle = Angle
+Info_MajorAxis = Major axis
+Info_MinorAxis = Minor axis
+Info_Edge = Edge
+Info_EqualEdge = Equal sides
+Info_OddEdge = Other side
+Info_Edges = Edges
+Info_Sides = Sides
+Info_Direction = Direction: 
+
+# File types...
+# NOTE: the | and ; are part of the system syntax and must be maintained.
+# The second part after | is the list of file endings for Windows to include, don't change the list without good reason!
+Filter_Image1 = Image files|*.bmp;*.jpg;*.jpeg;*.png;*.gif
+Filter_Image2 = Image files|*.bmp;*.gif;*.jpeg;*.png;*.wmf;*.emf;*.jpg;*.svg
+
+# Items specific to the menu
+Menu_File = &File
+Menu_Edit = &Edit
+Menu_ExportPage = E&xport page...
+Menu_Recent = R&ecent files...
+Menu_EditMode = &Edit mode
+
+Menu_Select = &Select item...
+Menu_Alignment = &Align...
+Menu_QuickTransform = &Quick transform...
+
+Menu_Page = &Page
+Menu_PageNext = Go to &next page
+Menu_PageCreateNext = Create &another page
+Menu_PageInsert = &Insert a new page...
+Menu_After = &after this one
+Menu_Before = &before this one
+Menu_PageMove = &Move this page...
+
+Menu_Options = Op&tions
+Menu_SnapGrid = Snap to &grid
+Menu_SnapShape = Snap to existing &items
+Menu_SnapAngle = S&nap to 15°
+Menu_SnapOff = &Don't snap
+Menu_Settings = &Edit settings...
+# %0 is replaced by the name of the currently selected activity
+Menu_Activity = Activity = %0
+
+Menu_Help = &Help
+Menu_About = &About %=App%...
+Menu_Update = &Check for updates...
+Menu_ReportProblem = Report a problem...
+Menu_Manual = Manual
+
+#Actions, mostly on the menu, but could be elsewhere
+Verb_NewDocument = &New
+Verb_Open = &Open...
+Verb_Save = &Save
+Verb_SaveAs = Save &as...
+Verb_SaveAsWorksheet = Save as &worksheet...
+Verb_SaveIntoMenu = Save into user's menu
+Verb_Print = &Print...
+Verb_PrintDirectly = Print &directly
+Verb_PrintPreview = Print pre&view...
+Verb_ExportEMF = Export as Windows &EMF file
+Verb_ExportPNG = Export as &PNG image
+Verb_ExportJPEG = Export as &JPEG image
+Verb_ExportPageAsDocument = E&xport as separate %=App% file
+Verb_ImportImage = Add i&mage to page from file
+Verb_Start = &Back to menu
+Verb_Quit = &Quit
+Verb_CloseDocument = Close document
+Verb_ExportSVG = Export as &SVG image
+#Generic edits
+Verb_Undo = &Undo
+Verb_Redo = &Redo
+Verb_Paste = &Paste
+Verb_Cut = Cu&t
+Verb_Copy = &Copy
+
+#Object edits...
+Verb_Group = &Group
+Verb_Ungroup = U&ngroup
+Verb_BringFront = Bring to &front
+Verb_SendBack = Send to &back
+Verb_BringFrontOneStep = Bring forwards one place
+Verb_SendBackOneStep = Send back one place
+Menu_FrontBack = Move in front of/behind
+Verb_Texture = Fill with te&xture...
+Verb_Merge = &Merge selection into single outline
+Verb_AlignLeft = Align &left edges
+Verb_AlignCentre = Align centres &horizontally
+Verb_AlignRight = Align &right edges
+Verb_AlignTop = Align &top edges
+Verb_AlignMiddle = Align centres &vertically
+Verb_AlignBottom = Align &bottom edges
+Verb_EqualiseWidth = Make items same &width
+Verb_EqualiseHeight = Make items same h&eight
+Verb_SmallestWidth = Make widths equal to smallest
+Verb_LargestWidth = Make widths equal to largest
+Verb_SmallestHeight = Make heights equal to smallest
+Verb_LargestHeight = Make heights equal to largest
+Verb_SpreadHorizontal = &Spread items out horizontally
+Verb_SpreadVertical = Sprea&d items out vertically
+Verb_FlipHorizontal = Flip &horizontally
+Verb_FlipVertical = Flip &vertically
+Verb_RotateRight = Rotate &right 90°
+Verb_RotateLeft = Rotate &left 90°
+Verb_TextSmaller = Make text smaller
+Verb_TextLarger = Make text larger
+Verb_TidyAngle = Align: tidy &angle
+Verb_TidyGrid = Align with &grid
+Verb_TidyShape = Align with other items
+Verb_NudgeLeft = Move selection left
+Verb_NudgeRight = Move selection right
+Verb_NudgeUp = Move selection up
+Verb_NudgeDown = Move selection down
+Verb_DoubleClick = Custom action
+Verb_QuickAddButtons = Add buttons...
+Verb_FreeTextToTextLine = Change to Text at any angle
+
+#Vertex editing/advanced graphics
+Verb_AddVertex = Add corner here
+Verb_RemoveVertex = Remove corner
+Verb_ConvertToLine = Change section to straight line
+Verb_ConvertToBezier = Change section to curve
+Verb_SmoothVertex = Use smooth curve at this corner
+Verb_CornerVertex = Use sharp angle at this corner
+Verb_ConvertToPath = Convert to advanced graphics
+
+#pages...
+Verb_PageNext = Go to &next page
+Verb_PageCreateNext = Create &another page
+Verb_PageDuplicate = Create a copy of this page
+Verb_PagePrevious = Go to &previous page
+Verb_PageDelete = &Delete current page
+Verb_PageClear = C&lear page
+Verb_EditPaper = &Edit grid and background...
+Verb_PageSize = Change page si&ze...
+Verb_Delete = D&elete selection
+Verb_PageMoveDown = Move page do&wn list
+Verb_PageMoveUp = Move page u&p list
+Verb_PageInsertBefore = &Insert new page before current
+Verb_PageInsertAfter = I&nsert new page after current
+Verb_SetOrigin = Set &origin...
+
+#options...
+Verb_ZoomIn = &Zoom in
+Verb_ZoomOut = Z&oom out
+Verb_Zoom100 = Display at &100%
+Verb_ZoomPage = Fit entire &page on screen
+Verb_ZoomWidth = Fit width of page, scroll &vertically
+Verb_ConfigDocument = Edit settings for &document only
+Verb_ConfigUser = Edit settings for &user
+Menu_ConfigTeacher = Edit settings for &teacher
+Verb_UserUser = &User mode
+Verb_UserTeacher = &Teacher mode
+Verb_FullScreen = &Full-screen view on/off
+Verb_StoreStylesAsDefault = Store style selection as document de&faults
+Verb_StoreStylesAsUserDefault = Store style selection as user de&faults
+Verb_ClearDefaultStyles = &Clear default style selection
+Verb_ResetPalettes = Reset position of palettes
+Verb_CM = Change display to centimetres
+Verb_MM = Change display to millimetres
+Verb_ToggleInstructions = Show/Hide instructions
+Verb_TogglePrompts = Show/Hide prompts at bottom of screen
+Verb_ToggleTransformCopyMove = Toggle between copy and move for transformations
+
+#interaction with main drawing area...
+Verb_Choose = Choose
+Verb_ChooseExisting = Choose
+Verb_Complete = Complete
+Verb_Cancel = Cancel
+Verb_Increment = Increment
+Verb_Decrement = Decrement
+Verb_Up = Move cursor up
+Verb_Right = Move cursor right
+Verb_Down = Move cursor down
+Verb_Left = Move cursor left
+Verb_MouseSmallStep = Small step
+Verb_MouseMediumStep = Medium step
+Verb_MouseLargeStep = Large step
+Verb_MovePalette = Move current palette
+Verb_ResizePalette = Resize current palette
+Verb_SelectAll = Select &all
+Verb_SelectNone = &Clear selection
+Verb_SelectNext = Select &next item
+Verb_SelectPrevious = Select &previous item
+Verb_PageUp = Page up
+Verb_PageDown = Page down
+Verb_ScrollUp = Scroll up
+Verb_ScrollDown = Scroll down
+Verb_ScrollLeft = Scroll left
+Verb_ScrollRight = Scroll right
+
+Action_Snap_Off = Cursor snapping off
+Action_Snap_Grid = Grid snap
+Action_Snap_Shape = Shape snap
+Action_Snap_Angle = Constrain to 15°
+Action_ShowGrid = Show grid
+Action_SimulateKey = Press key combination...
+Action_TypeCharacter = Type character...
+Action_TypeSymbol = Type symbol
+Action_TypeText = Type text...
+
+#Intrinsic from shapes
+Add_Text = Add text to item
+Edit_Text = Type text
+Edit_Text_Popup = Edit text in pop-up editor...
+
+# From the main screen palettes (and other styling places = ParameterSupport.GetParameterTypeName)
+Palette_LineColour = Line colour
+Palette_TextStyle = Text style
+Palette_ChooseFont = Choose...
+Palette_LineStyle = Line style
+Palette_Width = width only
+Palette_Width_Wide = width - wide lines
+Palette_FillColour = Fill colour
+Palette_FillPattern = Fill Pattern
+Palette_PointStyle = Point style
+Marker_Size = Point size
+Font_Size = Font size
+Line_Width = Line width
+Line_Pattern = Dot/dash pattern
+Text_Alignment = Horizontal text alignment
+Text_VerticalAlignment = Vertical text alignment
+Palette_Numbers = Numbers
+Arrowhead_Type = Arrowhead style
+Arrowhead_Size = Arrowhead size
+Palette_Arrowheads = Arrowheads
+Arrowhead_Start = Start
+Arrowhead_End = End
+Palette_Drop = Insert here
+Palette_Drop_New_Column = Create new column
+Palette_Reset_Done = All palettes reset to their default positions for the current user. 
+Custom_Style_Value = Other...
+Palette_Tool = Tools palette
+Palette_ScrollZoom = Scroll and Zoom
+Palette_DocumentOutline = Document outline
+
+# From the main screen advanced palettes
+Palette_Sockets = Sockets
+Sockets_FixedExit = Specify direction
+Sockets_AutoExit = Automatic direction
+Sockets_Connector = Use for connecting lines
+Sockets_ShapeSnap = Use for snap-to-shape
+# M, F for male and female - need to be abbreviated to 2 or 3 characters at most
+Sockets_M = M
+Sockets_F = F
+Sockets_IgnoreGender = Ignore
+Sockets_Classification = Socket type:
+Advanced_Alignment = Alignment
+Advanced_Transform = Quick transform
+
+# Other start screen items
+Use_Last_File = Open last file (%0)
+
+# Other main screen stuff
+Describe_PageList = Page previews
+Describe_ColourPicture = Change colour
+Info_PageBounds = Page bounds:
+Intro_NoImage = No image
+
+# (These shouldn't be made much longer than the longest one in English, or the text might not fit in the available space)
+Hover_Snap_Off = Click to turn off snapping
+Hover_Snap_Grid = Click to turn grid snap on or off
+Hover_Snap_Shape = Click to turn "Snap to existing shapes" on or off
+Hover_Snap_Angle = Click to turn "Snap to 15°" on or off
+Hover_Snap_Off_Explain = This turns off grid snapping and similar options.  When you place items they will appear exactly where the cursor is.
+Hover_Snap_Grid_Explain = When placing items they will be aligned with the grid (Select "%=Verb_EditPaper%" on the %=Menu_Page% menu to change the grid)
+Hover_Snap_Shape_Explain = When placing items, the system will try and place items so that they touch - if you click near an existing corner or line the position will be adjusted onto the corner or line.
+Hover_Snap_Angle_Explain = When placing items or lines, they can be placed in any position, but will be tidied up so that they are horizontal or vertical or at 15°, 30°, 45°, 60° or 75°.  Moving items is restricted to horizontal/vertical.
+Hover_MouseStep_Small = Mouse step: Small
+Hover_MouseStep_Medium = Mouse step: Medium
+Hover_MouseStep_Large = Mouse step: Large
+Hover_MouseStep_Change = This is how fast the mouse moves when you press the arrow keys.  Click to change.
+
+# Names for style values.  Colours are the ones in the Palette, reading left to right, top to bottom
+Colour_0 = Black
+Colour_1 = White
+Colour_2 = Grey
+Colour_3 = Red
+Colour_4 = Orange
+Colour_5 = Yellow
+Colour_6 = Cyan
+Colour_7 = Standard Blue
+Colour_8 = Faded Blue
+Colour_9 = Dark Blue
+Colour_10 = Magenta
+Colour_11 = Peach
+Colour_12 = Tan
+Colour_13 = Bright Green
+Colour_14 = Faded Green
+Colour_15 = Dark Green
+Colour_16 = Brown
+Colour_17 = None/Invisible
+Colour_Custom = Custom colour
+Line_Solid = Solid
+Line_Dash = Dash
+Line_Dot = Dot
+Line_DashDot = DashDot
+Line_DashDotDot = DashDotDot
+Hatch_Solid = Solid
+Hatch_Empty = Empty
+Hatch_Vertical = Vertical lines
+Hatch_Horizontal = Horizontal lines
+Hatch_ForwardDiagonal = Forward diagonal
+Hatch_BackwardDiagonal = Backward diagonal
+Hatch_Cross = Cross
+Hatch_DiagonalCross = Diagonal cross
+Marker_0 = Plus
+Marker_1 = Cross
+Marker_2 = Square
+Marker_3 = Circle
+Marker_4 = Triangle
+Align_Left = Left
+Align_Right = Right
+Align_Centre = Centre
+Align_Top = Top
+Align_Middle = Middle
+Align_Bottom = Bottom
+Arrowhead_None = None
+Arrowhead_Version4 = Simple V, wide
+Arrowhead_SimpleSolid = Simple solid triangle
+Arrowhead_VMedium = Simple V, hollow
+
+#Popup messages, questions and generic validation, errors
+Confirm_ClearPage = Are you sure you want to delete everything on this page?
+Confirm_DeletePage = Are you sure you want to delete this page and everything on it?
+Number_Required = You must enter a valid number here
+Invalid_NumberFormat = This format is not valid
+Confirm_DiscardNew = The current document will be lost.  Do you want to save it first?
+# The filename is inserted in place of %0 ...
+Confirm_DiscardExisting = Do you want to save your changes to "%0" first?
+Cannot_Resize = One or more of the selected items is a special shape which cannot be resized
+Cannot_Resize_Zero = Cannot resize items with zero width/height
+Cannot_Reflect = One or more of the selected items cannot be reflected
+Cannot_Rotate = One or more of the selected items cannot be rotated
+File_Too_New = This file was created by a newer version of the software and cannot be opened by this version.  At least version %0 is required to open this.
+File_TooOld = This file was created by an early prototype version of the software, and cannot be read by this version.  Please load the file into version 1 and save it again in order to upgrade it.
+File_Too_Old_Save = This file contains new features, which can be saved in file versions compatible with older versions of SAW.  Please save the file using the regular Save option.
+File_Wrong_Not_Document = This file is not a %=App% document, and cannot be loaded into %=App% in this way.
+File_Missing = Cannot find file: %0
+File_Cannot_Load = Could not load file.  Error = %0
+Paste_Failed = Could not paste the data in the clipboard; either the data is corrupt or is not a format which is supported by %=App%
+Save_Failed = There was an error saving the file: %0
+Recent_Not_Found = Cannot find this file (%0).  Has it been moved, renamed or deleted since it was last used?
+Recent_Failed = Failed to open file, with error: %0
+Downloading = Downloading
+Download_Progress = Download progress
+Cannot_Save_Palette = This is a popup palette within the settings.  It is automatically saved with the settings.  Use %=Verb_SaveAs% to export a copy as a separate file on disk.
+Container_Mismatch = This action is not possible when the selected items within different containers.
+NewDocument_CopySettings = The current document has some custom settings.  Do you want to use the same settings in the new document?
+Print_Error = Could not print:
+Export_Image = Save image
+Hide_Prompts_Click = Prompts area hidden for current document.  You can show it again and hide it by pressing '%0'.
+Config_Save_Failed = There was an error saving settings - changes to the settings might not be restored when the software is restarted.  The actual error message is below.  (Further errors will not be reported until software is restarted).
+WMF_in_SVG = Cannot produce SVG for anything containing WMF format images.
+
+# Dialogs
+# Colours
+Colours_Title = Colours
+Colours_Transparent = Transparent colours
+Colours_More = More colours
+
+# Revise text
+Revise_Text = Revise text
+Revise_Text_Prompt = Make corrections to text:
+
+# Font dialogue
+Font_Title = Change font
+Font_Label = Font:
+Font_Sample = Sample
+Font_Bold = Bold
+Font_Italic = Italic
+Font_Strikeout = Strikeout
+Font_Underline = Underline
+Font_Size = Size:
+
+#Texture
+Texture_Document = Used in this document
+Texture_System = System
+Texture_Load = Load picture from disc...
+
+# Grid and background dialog
+Paper_NoRun = The grid is only shown when editing, not when the set is running
+Paper_Title = Alter grid and background
+Paper_Type = Grid:
+Paper_Plain = Plain
+Paper_Square = Squared
+Paper_Graph = Graph
+Paper_Draw = Draw grid
+Paper_Dotted = Draw dotted
+Paper_Size = Grid Size
+Paper_XSize = Grid Size (X)
+Paper_YSize = Grid Size (Y)
+Paper_GraphInterval = Number of subdivisions
+Paper_Sample = Sample
+Paper_GridColour = Grid colour
+Paper_Colour = Background colour
+Paper_Appearance = Appearance
+Paper_Print_Background = Include background when printing
+Paper_PageSize = Page Size
+Paper_BackgroundImage = Add image...
+Paper_ChangeBackgroundImage = Change image...
+Paper_RemoveImage = Remove image...
+Paper_ImageHeader = Background image
+Paper_BackgroundMode = Positioning mode for background:
+Paper_BackgroundLockAR = Buttons will relate to background - match content positioning to background
+Paper_BackgroundNoLockHeader = Or if background is decorative select how it is positioned if it doesn't fit the page:
+Paper_BackgroundStretch = Stretch and distort
+Paper_BackgroundFitWithin = Fit within page
+Paper_BackgroundFitOutside = Fit covering page
+Paper_BackgroundCentre = Centre
+Paper_BackgroundTile = Repeat
+Paper_MatchImageSize = Would you like to change the size of the page to exactly match the size of the image?
+Paper_BigDots = Big dots
+NewPage_Background_Title = Background image
+NewPage_Background_Prompt = The current page has a background image.  Do you want to use this for the new page?
+NewPage_Background_Same = Use the same image
+NewPage_Background_Blank = Don't use any background image on the new page
+NewPage_Background_Other = Select a different file to use as the background for the new page
+NewPage_Background_NoneFound = Could not extract images from any pages in the document
+ChoosePage_Title = Select page
+ChoosePage_Prompt = Please select which page to use from the document
+ChoosePage_Page = Page %0 of %1
+ChoosePage_Failed = Cannot load image for page
+
+
+# Page size dialog
+PageSize_Title = Change page size
+PageSize_Width = Width
+PageSize_Height = Height
+PageSize_Equal = Use the same page size for all pages in the set (recommended)
+PageSize_Insufficient = Note: The current contents of the document will not fit within the selected page size.  If you press OK any items which are completely outside the new page size will be moved back within the smaller page.  Anything which is on the edge of the page, and partially visible will not be moved.
+ScreenWorksheet_PaperSize = Screen worksheet
+
+#Error report
+Error_Title = Error report
+Error_Oops = Ooops!
+Error_Label = There has been an error.  Can we send an automatic error report to help fix this?  This will include the document currently being worked on (if any), your current settings, licence information and a screenshot of the %=App% screen.
+Error_Send = &Send
+Error_Question = &Please enter any information which might help us reproduce this problem.  And/or please enter an email address if you don't mind us contacting you if we cannot reproduce the problem
+Error_Sent = Report sent successfully
+Error_Failed = Failed to send error report
+Error_Quit = &Quit software
+Error_ProblemLabel = This will send an automated error report to the server.  Please describe the problem below, and include your email address if you want a reply.  The error report will include the current document and a screenshot of the current screen.
+Error_Message = Error message: 
+
+# Stamp and other image selectors
+ResourceImage_Heading = These are the icons built into the software.  Many are available in multiple sizes; use the options below to display only images of (approximately) a given size
+ResourceImage_All = All
+
+
+# Software update
+Update_Title = Check for updates...
+Update_Current = Current version:
+Update_Latest = Latest version available:
+Update_Contacting = Contacting server...
+Update_Contact_Failed = Could not contact server: 
+Update_Latest_Installed = The latest version is already installed
+Update_Newer_Available = A newer version is available
+Update_Download_Install = Download and install %0
+Update_Newer_Manual = A newer version is available, but cannot be installed automatically.  Please download the installer from the website
+Update_Show_Website = Go to website for download
+Update_Installation_Damaged = The latest version is installed, but one or more files are incorrect.  Use the button below to reinstall.
+Update_Reinstall = Download necessary files and re-install
+Update_Checking_Files = Checking which files need to be downloaded...
+Update_Cancelled = Cancelled
+Update_Verifying = Verifying downloaded files
+# Both of the next ones are used for progress updates.  The first shows the number of files done, the second the amount of memory
+Update_Files = %0 files of %1
+Update_Size = %0 of %1
+# (mb, kb etc are automatically added - these can be translated)
+Update_Verify_Failed = Verification of downloaded files failed: %0 files are missing or incorrect.  Installation cannot proceed.
+Update_Retries = Retries: 
+Update_Retrying = Retrying
+Update_Download_Failed = Download failed.  Delay before retrying: 
+Update_Install_Starting = %=App% will now close and start the installation.  Please follow any on-screen prompts...
+Update_Check_Failed = Failed to check current installation: 
+Update_Version_Fetch_Failed = Failed to get version index file from server:  
+Update_Downloading = Downloading files...
+Start_Update_Available = There is an update to the software available.  Click here to upgrade.
+Update_Restart = After downloading the new version, please ensure that you close this software before running the installer.  The installer cannot update the software while it is still running!
+Update_Warn = NOTE: The software is out of date, and should be upgraded using the "%=Menu_Update%" option on the "%=Menu_Help%" menu.
+
+
+#installer screen
+Install_Title = %=App% update
+Install_Explain = Installing version %0
+Install_Complete_Errors = Installation is complete, but failed to copy %0 files.  This can be caused by security limitations, especially if you are using the Vista or Windows 7. 
+Install_Verify_Wrong = Verification failed.  All the files were copied, but the resulting installation does not match the requirement in the index.  Please contact support.
+Install_Permissions = Permissions test failed - this update is prohibited from making some changes within the folder containing the software.  Installation will probably fail.  If this computer is part of a large organisation, please contact your IT department.
+Install_Start = Start
+Install_NoDirect = This cannot be run directly;  please use %=App% to start the update.  To install manually please download the latest installer from the website.
+
+
+#Button editing screen
+Button_Edit = Edit button...
+Button_Title = Button
+Button_Style = Style to use:
+Button_IsShared = This style is shared between buttons, and changes made here affect all buttons using this style
+Button_IsCustom = Changes made here affect only this button
+Button_MakeShared = Make this available for other buttons
+Button_MakeCustom = Change so that this button uses its own style
+Button_Style_Default_Action = User default (action buttons)
+Button_Style_Default_Selection = User default (selection buttons)
+Button_Style_EditDefault = This button uses the user's default style.  The button's appearance may change between different users - and may be different in the editor (which uses teacher mode).  ((Click here)) to edit the default for the current user.
+Button_Normal = Normal
+Button_Highlight = Highlight/Mouse over
+Button_Selected = Selected/Pressed
+Button_BackgroundType = Type of background:
+Button_CustomName = (Custom)
+Button_Border = Border
+Button_Background = Background
+Button_Simple = Adjustable border and colour
+Button_Picture = Custom images
+Button_Tool = White rounded button
+Button_Glass = 3D glass button
+Button_Windows = Windows button
+Button_TextColour = Text colour
+Button_Style_Background = Background Style
+Button_SoftwareLabel = This style of button background is built into the software, and is not adjustable.
+Button_SoftwareSample = Sample:
+Button_Content = Content
+Button_EditingState = Appearance when:
+Button_ContentExplain = The button can display an image, text or both
+Button_ContentHint = Hint: if the button will perform a standard function, it is best to select the Action first - that will automatically select a default image or text
+Button_Text = Text:
+Button_Image = Image:
+Button_ImageRemove = Remove
+Button_ImageFromDisc = Add from disc...
+Button_ImageFromStamps = Add from stamps...
+Button_ImageFromInclusive = Inclusive library...
+Button_ImageFromResource = %=App% Software image...
+Button_TextRatio = Text proportion:
+Button_NoImage = (No image)
+Button_RatioDefault = Default
+Button_Superimpose = Image fills button, behind text
+Button_StyleNameTitle = Name for style
+Button_StyleNamePrompt = Please enter a name for this style.  This name will appear in the list when selecting the style to use on another button.
+Button_StyleNameUsed = This name is already used by a different style in this document.  Please enter a different name so that the styles can be distinguished.
+Button_Rectangular = Rectangular
+Button_Rounded = Rounded rectangle
+Button_Elliptical = Ellipse
+Button_CustomPrompt = Different images are used for each button state (%=Button_Normal%, %=Button_Highlight% and %=Button_Selected%).  It is possible - but not required! - to add several images of different sizes, to reduce pixelation when the image is scaled.
+Button_ImageIndex = Displaying image %0 of %1.
+Button_ImageNone = No images yet loaded.  Use the button to add one...
+Button_ImageLoad = Add image from disc
+Button_ImageRemove = Remove this image
+Button_PreviewPrompt = Click-and-drag the bottom right of the preview to view it at different sizes.  Double-click to reset.
+Button_Use9Slice = Use 9-slice scaling
+Button_9SliceEditPrompt = Drag the red lines to adjust the scaling boundaries.
+Button_SliceEdit = Edit
+Button_SlicePreview = Preview
+Button_Copy9Slice = Copy to other button states
+Button_Action = Action
+Button_ActionPrompt = The action performed when the user clicks/selects this:
+Button_DisplayFromAction = Automatically set the image and/or text based on the selected action
+Button_SelectedAction = Selected:
+Button_ActionKeyAuto = Use key which types the text displayed on button
+Button_ActionCharacterAuto = Type text on button
+Button_UserStyle_Title = Edit default button style
+Button_UserStyle_Header = Default button style for: %0
+
+Button_AddButtons_Add = Add button
+Button_AddButtons_Header = Select from functions below and click on '%=Button_AddButtons_Add%' to add a button performing that function with the default icon or text.
+Button_AddButtons_Press = Press key:
+Button_AddButtons_Text = Enter text:
+
+Flow_Settings = Flow container settings
+Flow_Direction = Direction in which to place contents:
+# The values below (ones with 2 underscores) can be only a little longer than the longest English one in each group
+Flow_Direction_Right = Left to right
+Flow_Direction_Left = Right to left
+Flow_Direction_RightThenDown = Left to right from top left, then down
+Flow_Direction_LeftThenDown = Right to left from top right, then down
+Flow_Direction_RightThenUp = Left to right from bottom left, then up
+Flow_Direction_LeftThenUp = Right to left from bottom right, then up
+Flow_Direction_Up = Upwards
+Flow_Direction_Down = Downwards
+Flow_Direction_UpThenRight = Upwards from bottom left, then right
+Flow_Direction_DownThenRight = Downwards from top left, then right
+Flow_Direction_UpThenLeft = Upwards from bottom right, then left
+Flow_Direction_DownThenLeft = Downwards from top right, then left
+Flow_Overflow = If there are too many items to fit within the container:
+Flow_Overflow_Overflow = Items will be placed outside the container
+Flow_Overflow_Hide = Items which do not completely fit will not be displayed
+Flow_Overflow_Clip = Items will be displayed up to the edge of the container only, possibly displaying partial items
+Flow_Padding = Padding to leave within edge of container (mm)
+Flow_ShapeSeparation = Space to leave between items (mm)
+Flow_DragWithin = Allow items to be rearranged by dragging within the container
+Container_ShowHighlight = Show highlight when dropping items into the container
+Flow_Alignment = Alignment within each row/column:
+Flow_Vertical_Near = Left
+Flow_Vertical_Center = Centre
+Flow_Vertical_Far = Right
+Flow_Horizontal_Near = Top
+Flow_Horizontal_Center = Centre
+Flow_Horizontal_Far = Bottom
+
+# Document outline
+Page_N = Page %0
+Document_Outline = Document outline
+Outline_Search = Search:
+
+# error report
+OpError_Title = Error report
+OpError_Prompt = There were some problems performing this operation.  This usually means that some content will not be included in the output or not displayed accurately.  The errors are listed below.  Do you want to continue?
+Continue = Continue
+
+# Edit configuration
+Config_Title = Edit settings
+Config_Introduction = Introduction
+Config_Overridden = Note: changes to this setting here can be stored, but will have no CURRENT effect as this has been specified in another configuration which takes priority (e.g. in current document).  Changes here might take effect in different contexts (eg when viewing a different document)
+Config_DescriptionLeft = Editing settings for:
+Config_System = System default
+Config_Search_Tooltip = Type to search; press enter to cycle through results
+
+Config_Activity_Icon = Icon
+Config_Activity_Icon_Change = Change
+Config_Activity_Icon_Note = The icon should be square and about 100*100 - 200*200 pixels.
+Config_Activity_Export = Export file for this activity
+Config_Activity_Create = Create new activity based upon settings and any custom items in the current document.
+Config_Activity_Age = Nominal age for activity (use 4-7 for Infant, 7-11 for Junior, 11-18 for Senior, blank for all ages)
+
+Config_ShapesTools = Shapes and Tools
+Config_IncludeShape = Use this shape:
+Config_ShapeDefault = Not specified here
+Config_ShapeOverridden = Note: switching this shape on or off here will have no effect as it has been switched on or off in another configuration which takes priority (e.g. in current document)
+Config_Default = Use default
+Config_Specify = Specify:
+Config_Standard = Standard Mode
+Config_Advanced = Advanced Mode
+Config_AllShapes = Change all shapes
+Config_Show = Show
+Config_Hide = Hide
+Config_ShowAll = Show all
+Config_HideAll = Hide all
+Config_DefaultAll = Use default selection
+Config_AvailableShapes = All available shapes and tools:
+Config_PalettesChoose = Choose which...
+Config_PalettesActive = [active]
+Config_PalettesNote = The items marked with * usually appear automatically for pointer-only users when using certain tools.  You shouldn't generally force these to be displayed or hidden, although selecting which version to display is useful.
+
+Config_Sequence = Order of tools
+Config_SequenceTitle = This page adjusts the order in which the tools appear in the palette on the left.  Tools have a default sequence, but you can modify this and specify the exact order of some or all of the tools.  Tools for which the sequence is specified (left-hand box) appear first, any not listed (right-hand box), will appear at the end.
+Config_SequenceTeacher = The order of tools cannot be specified in teacher mode.  Only the user mode parts of the settings use this.  ((Change to user-only settings))
+Config_SequenceEnable = Specify the order of the tools
+Config_SequenceLeft = Display these tools first, in this order:
+Config_SequenceRight = Other tools: these will appear at the end in their default order
+Config_Drag = Drag the icons with the mouse to rearrange them
+
+Config_Keys = Keys
+Config_KeysTitle = Key assignments
+Config_Verbs = Commands
+Config_KeysDrawing = Mouse control and drawing area...
+Config_ShapeVerbs = Actions creating items
+Config_MouseControl = Moving the cursor
+Config_Scrolling = Scrolling
+Config_ShapeSelection = Selecting items
+Config_KeyPrompt = To assign a key, click in the left hand box and press its combination, then select the action to be performed on the right, and then press the button.
+Config_AssignKey = = Assign =
+Config_KeyNoAction = Select action below
+Config_PressKey = Press new key combination
+Config_ClearKey = Remove all functionality from this key
+Config_KeyPrevious = The function for this key has been assigned in another part of the configuration which takes priority (e.g. current document).  Changes made here will have no effect at the moment.
+Config_KeyCurrent = Current action for this key:
+Config_KeyNone = Nothing
+Config_KeyFocal = Warning: this key cannot be configured.  It is used for navigation throughout the software.
+Config_KeyReplaceWarning = This will remove the existing function ('%0') from the key.  Continue?
+Config_ActionCurrentKeys = Current key(s) for this:
+Config_SwitchToPalette = Select palette
+Config_SwitchToPalette_Other = Selecting other palettes
+Config_Keys_Styles = Styles and Palettes
+Config_Keys_Palettes = Colour selection functions
+Config_Keys_Palette_Refine = Choose similar colour
+Config_Keys_Palette_Transparent = Transparent colours
+Config_Keys_Snapping = Snapping modes
+Config_Keys_ResetAll = Reset all keys
+Config_Keys_ResetConfirm = This will remove all key assignments from this layer of the configuration.  System defaults may still apply.
+Config_Key_User_Warning = Note: keys assigned here will only apply in User mode and not Teacher mode.  Generally it is easier to keep key shortcuts the same in both modes.  To set up keys for both use the icons at the top of this screen to change to the settings which apply to both User and Teacher modes.
+Config_KeyRemoveExisting = Key '%0' currently performs this action.  Do you want to remove this key?  If you click No both keys will perform this action.
+Config_KeyNotAssigned = You have selected a key and action, but not pressed the button to assign the key.  Do you want to assign the key '%0' to do '%1'
+
+Config_Toolbar = Toolbar function buttons
+Config_ToolbarActions = Available actions:
+Config_ToolbarExisting = Current buttons:
+Config_ToolbarClear = Clear
+Config_ToolbarReset = Reset to default
+Config_ToolbarOnlyExplicit = Only ever include the buttons listed here.  Other buttons added in custom user settings/future versions should be ignored.
+
+Config_Display = Display settings
+Config_Units = Display measurements in: 
+Config_Low_Graphics = Lower quality (faster) graphics
+Config_Tooltips = Show pop-up tooltips on buttons (where applicable)
+Config_Key_Shortcuts = Display key shortcuts on screen
+Config_Default_Zoom = Size to display a document when first opened
+Config_Always_Click_Filled = Clicking inside a shape selects it even if it is not filled.
+Config_Smaller_Tools = Always use smaller buttons in shapes palette
+Config_Page_Size = Page size for new documents
+Menu_SelectionBounds = Display selection boundary
+Config_Display_Origin = Show page origin (if it has been moved)
+Config_Zoom150 = Display at 1&50%
+Config_ButtonStyle = Edit default appearance of buttons in palettes:
+Config_ButtonStyle_Action = Action buttons
+Config_ButtonStyle_Selection = Selection buttons
+
+Config_Editing = Editing in work area
+Config_SelectorAfterCreate = Automatically change to the selector tool after placing any shape on the page
+Config_Moving_Shadow = Display shadow outline when moving shapes
+Config_Advanced_Graphics = Use advanced graphics editing
+Config_Context_Menus = Right-clicking should show a popup menu if it has no other action
+Config_Windows_Colours = Refinement button in the colour panel should show the standard Windows colour chooser instead
+
+Config_Document = New document/ Loading document
+Config_Document_Title = Defaults for new documents or when loading a document
+Config_ActivityNewDocumentsTitle = Settings for new documents using this activity
+Config_Activity_Paper = Default grid and background...
+Config_Activity_PageSize = Default page size...
+Config_Activity_Snap = Grid snapping mode:
+
+Config_Shapes = Shape/Number settings
+Config_ShapesTitle = Behaviour of individual shapes
+Config_Radius_Step = When using +/- to adjust radius, change by:
+Config_Radius_Step_Note = Note: when using snap to grid, this will sometimes be ignored and the grid size used instead.
+
+Config_Features = Show/Hide...
+Config_FeaturesTitle = Show/hide parts of the screen
+Config_FeaturesExplain = You can hide parts of the normal screen.  This can be applied to the document if making a worksheet to focus on what is relevant.  It can also be used in the user settings to hide features which are too complex for a particular user.
+Config_FeaturesPalettes = Palettes
+Config_FeaturesOther = Other
+# some items on this section also contain text from the Palette_*** codes.  Those cannot contain & shortcut codes.
+Config_Advanced_Palette_Other = Other advanced palettes
+Config_DisplayPageList = Display pa&ge list
+Config_DisplayInfoMeasurement = Display info/measurements &line
+Config_DisplayPrompts = Display prompts at &bottom of screen
+Config_DisplayTools = Display &shapes/tools
+Config_DisplayToolbar = Display &toolbar at top of screen
+Config_DisplayToolbarSnap = ...Include Sn&apping mode
+Config_DisplayToolbarVerbs = ...Include funct&ion buttons
+Config_DisplayAdvancedColours = Display ad&vanced colour buttons
+Config_DisplayEditSettings = Display "%=Menu_Settings%" &entry on menu
+Config_PageListHiddenAutomatically = Note: the default for whether this is shown to the user depends on the document.  If a worksheet contains only one page and is protected, this is hidden by default.  The default is to show this if either the user can add pages or the document already contains more than one page.
+Config_DisplayTransformMoveCopy = Display &move/copy transformation option
+Config_DisplayMultipleDocumentTabs = Display t&abs allowing multiple documents to be open at once
+Config_MultipleDocumentWarning = Warning: Multiple documents are not accessible via keyboard control.  These are mainly intended for teachers making worksheets.
+Config_FeaturesAll = Set all:
+Config_AllOn = O&n
+Config_AllOff = O&ff
+Config_AllDefault = &Default
+Config_DisplayDefaultOff = Onl&y include items ticked here.  Items added in user settings/future versions will be ignored.
+
+Config_Speech = Speech
+Config_SpeechTitle = Synthesised speech
+Config_UseSpeech = Use speech
+Config_SpeechVoice = Voice:
+Config_SpeechVolume = Volume:
+Config_SpeechSpeed = Speed:
+Config_SpeechTest = Test
+Config_SpeechTestText = Testing, testing
+
+Config_Palettes = Custom Palettes
+Config_PalettesIntro = It is possible to make customised versions of the editing (styles) and popup palettes.
+Config_PalettesMultiDocument = Note: editing palettes requires that the '%=Config_DisplayMultipleDocumentTabs%' option must be switched on in the '%=Config_Features%' section.
+Config_PalettesMultiDocumentChange = Change this
+Config_PalettesUserSettings = You are currently viewing user only settings for the document (or activity).  Palettes should be created so that they are available in both user and teacher modes.  Please either ((Click here)) or click on the appropriate icon at the top of this screen to switch to the settings which affect both user and teacher modes.
+Config_PalettesExisting = Custom palettes:
+Config_PalettesCreate = Create new
+Config_PalettesDelete = Delete
+Config_PalettesDeleteConfirm = Are you sure you want to completely delete the definition of this palette?  If you want to stop it being displayed, it is better to change the display settings.  Note: deleting can only be done if the palette is part of the document settings; and even in this case it may be necessary to close and reopen the document to make the palette usable again.
+Config_PalettesDeleteEditingDocument = This cannot be deleted as it is currently being edited.   Please close the configuration screen, close this palette in the editor and then try again.
+Config_PalettesShowSystem = Show standard palettes
+Config_PalettesEditCopy = Edit a copy of this...
+
+#Items related to palette editing (either in main screen or config screen)
+Palette_CannotSwitchUser = Cannot switch to user mode while editing a palette.  Please select the document tab first.
+Palette_NA = This setting not applicable to custom palettes and cannot be changed
+Palette_BeingEdited = Being edited
+Palette_Edit = Edit contents...
+Palette_Hide = Hide
+Palette_Reset = Reset position
+Palette_HiddenMessage = The palette has been hidden for this document.  Which palettes are displayed by default can be changed in the user and/or activity settings.
+Palette_MultiDocumentChanged = Note: editing palettes requires that the multiple, tabbed document option is enabled in Teacher mode.  This has been switched on automatically.  It can be turned on or off via the '%=Config_DisplayMultipleDocumentTabs%' option int the '%=Config_Features%' section of the configuration.
+Palette_Scale = Size...
+Palette_Choose = Version...
+Palette_Smaller =  Make smaller
+Palette_Larger = Make larger
+
+Palette_RequestTitle = Please enter the title to display at the top of the palette
+Palette_RequestDescription = Please enter the main description to use in configuration list
+Palette_RequestSubTitle = Subtitle - optional (appears in brackets in the list)
+Palette_SubtitleExplain = (Having the name in 2 parts helps translate the standard palettes.  For a custom palettes it is not essential to use the subtitle)
+Palette_DescriptionDuplicate = This description is already used by a palette.  All palettes must have different names for this editing list (the title is displayed on the palettes can be the same however).  Please try again with a different description.
+Palette_InfoTitle = Palette details
+Palette_Purpose = Type of palette:
+Palette_DefaultSuffix = (standard)
+Palette_CreateFlow = Use flowing container so that buttons are automatically organised into lines
+Palette_Duplicate = When making a custom copy of a standard palette, you may want to leave the title in the first box the same.  It is however important to put a different description in the second or third boxes so that this version can be distinguished in the editing list.
+
+#Standard Palettes types
+Palette_Custom = Custom
+Palette_AutoSuffix = (Auto popup)
+Palette_Symbols = Symbols
+Palette_Keyboard = Pop-up keyboard
+
+# Keys.  These control the descriptions of keys configured to perform actions.
+# Note that the translation might not be a translation, it may need adjusting to a completely different item where keyboards differ.
+# if names of any keys do not appear in this list, the software is using the .net built-in name.  It will detect translations added here
+# if "Key_" is added to the beginning of the default name
+Key_ShiftModifier = Shift+
+Key_ControlModifier = Ctrl+
+Key_AltModifier = Alt+
+Key_ShiftModifier_Short = Sh+
+Key_ControlModifier_Short = ^
+Key_AltModifier_Short = Al+
+Key_Left = Left arrow
+Key_Up = Up arrow
+Key_Right = Right arrow
+Key_Down = Down arrow
+Key_Add = NumPad +
+Key_Subtract = NumPad -
+Key_Multiply = NumPad *
+Key_Divide = NumPad /
+Key_Tab = Tab
+Key_Oemcomma = Comma
+Key_OemPeriod = Full stop
+Key_Back = Backspace
+Key_Oem6 = ]
+Key_OemOpenBrackets = [
+Key_OemMinus = Minus sign
+Key_Oemplus = =
+Key_Oem1 = ;
+Key_Oemtilde = '
+Key_Oem7 = #
+Key_OemQuestion = ?
+Key_Oem5 = \
+Key_Oem8 = `
+Key_Next = PageDown
+Key_Decimal = NumPad .
+# raw modifiers only used in SAW
+Key_ShiftKey = Shift
+Key_ControlKey = Ctrl
+Key_Menu = Alt
+# these look like they should happen automatically, but sadly not as KeyConverter makes up something else for them
+Key_Insert = Insert
+Key_Delete = Delete
+Key_Capital = Caps Lock
+Key_Scroll = Scroll Lock
+Key_PgUp = Page up
+Key_LWin = Left Win key
+Key_RWin = Right Win key
+
+
+# Standard shape folders
+Folder_General = General
+Folder_Transformations = Transformations
+Folder_Painting = Painting
+Folder_Maths = Maths
+Folder_Polygons = Polygons
+Folder_Lines = Lines
+Folder_Circular = Circular
+Folder_Text = Text
+Folder_Measurements = Measurements
+Folder_Equation_Symbols = Maths symbols
+Folder_Special = Special purpose
+
+# Prompts
+Prompts_Cancel = Click right button
+Prompts_ChooseClick = Click left button
+Prompts_ChooseRelease = Release left button
+Prompts_Complete = Double-click left button
+#these versions are used if the mouse buttons are switched around in Windows
+Prompts_Cancel_Swapped = Click left button
+Prompts_ChooseClick_Swapped = Click right button
+Prompts_ChooseRelease_Swapped = Release right button
+Prompts_Complete_Swapped = Double-click right button
+Prompts_Key = Press %0
+Prompts_Increment = Press +
+Prompts_Decrement = Press -
+Prompts_Move = %Choose% to start moving the shape
+Prompts_Move_Snapped = Movement is restricted to horizontal or vertical because angle snapping is switched on.
+Prompts_CornerResize = %Choose% to start changing the size of the shape
+Prompts_StretchH = %Choose% to start stretching the shape horizontally
+Prompts_StretchV = %Choose% to start stretching the shape vertically
+Prompts_Rotate = %Choose% to start rotating the shape around the middle
+Prompts_MoveVertex_Independent = %Choose% to start moving this corner of the shape, without affecting the rest
+Prompts_MoveVertex = %Choose% to start moving this corner of the shape
+
+Prompts_Various_Cancel1 = %Cancel% to remove the previous point if it was placed incorrectly
+Prompts_CancelAll = %Cancel% to abandon the current shape and start over again
+Warning_Invisible = Warning!  The shape that you are drawing may not be visible; check the line and/or fill colour.
+
+Prompts_Line_Start = %Choose% to place one end of a new line
+Prompts_Line_Finish = %Choose% to place the other end of the line and complete the shape
+Prompts_InfiniteLine_Start = %Choose% to place one point on a new line
+Prompts_InfiniteLine_Finish = %Choose% to place a second point on the line and complete it
+Prompts_PolyLine_Start = %Choose% to place one end of a new line
+Prompts_PolyLine_Choose = %Choose% to place more points
+Prompts_PolyLine_Choose1 = %Choose% to place next point
+Prompts_PolyLine_Finish = %Complete% to place the final point on the line
+Prompts_IrregularPolygon_Start = %Choose% to place the first corner of a new shape
+Prompts_IrregularPolygon_Choose = %Choose% to place more points
+Prompts_IrregularPolygon_Choose1 = %Choose% to place next point
+Prompts_IrregularPolygon_Finish = %Complete% to place the final point.
+Prompts_Marker_Start = %Choose% to place a point
+
+Prompts_Curve_Start = %Choose% to place the start of the curve
+Prompts_Curve_Choose = %Choose% to place more points which the line passes through
+Prompts_Curve_Choose1 = %Choose% to place next point which the line passes through
+Prompts_Curve_Finish = %Complete% to place the final point and complete the shape
+Prompts_ClosedCurve_Start = %Choose% to place the first point which the shape passes through
+Prompts_ClosedCurve_Choose = %Choose% to place more points which the shape passes through
+Prompts_ClosedCurve_Choose1 = %Choose% to place next point which the shape passes through
+Prompts_ClosedCurve_Finish = %Complete% to place the final point and complete the shape
+Prompts_Pencil_Start = %Choose% at one end of the line to start drawing
+Prompts_Pencil_Finish = Move along the line to be drawn.  %Choose% at the other end to stop drawing
+Prompts_Pencil_FinishClose = If you finish near the start point the shape is automatically closed allowing it to be filled with colour
+Prompts_Pencil_Cancel = %Cancel% to rewind the mouse one point
+
+Prompts_BaseLine_Choose1 = %Choose% to place the other end of the first edge
+Prompts_BaseLine_Cancel1 = %Cancel% to unfix the end of the first line and reposition it
+Prompts_BaseLineFlip_Finish = %Choose% to choose which side of the first line to place the shape
+Prompts_Square_Start = %Choose% to place one corner of the square
+Prompts_Rectangle_Start = %Choose% to place one corner of the rectangle
+Prompts_Rectangle_Finish = %Choose% to set the width of the rectangle
+Prompts_OrthogonalRectangle_Start = %Choose% to place the top left of the rectangle
+Prompts_OrthogonalRectangle_Finish = %Choose% to place the bottom right of the rectangle and finish
+Prompts_Parallelogram_Start = %Choose% to place one corner of the parallelogram
+Prompts_Parallelogram_Finish = %Choose% to place the third corner, and complete the shape
+Prompts_Triangle_Start = %Choose% to place one corner of the triangle
+Prompts_Triangle_Finish = %Choose% to place the last corner of the triangle
+Prompts_Isosceles_Start = %Choose% to place one end of the odd edge
+Prompts_Isosceles_Choose1 = %Choose% to place the other end of the odd edge
+Prompts_Isosceles_Finish = %Choose% to set the size of the triangle
+Prompts_Equilateral_Start = %Choose% to place one corner of the triangle
+Prompts_Polygon_Start = %Choose% to place one corner of the polygon
+Prompts_Polygon_IncDec = %Increment% to increase the number of sides. %Decrement% to decrease the number of sides.
+
+Prompts_Circle_Start = %Choose% to place the centre of the circle
+Prompts_Circle_Finish = %Choose% to set the radius of the circle
+Prompts_Circle_Resize = %Choose% to start changing the size of the circle
+Prompts_Semicircle_Start = %Choose% to place one end of the straight edge
+Prompts_Ellipse_Start = %Choose% to place one end of the major axis
+Prompts_Ellipse_Choose = %Choose% to place the other end of the major axis
+Prompts_Ellipse_Finish = %Choose% to set the width of the ellipse
+Prompts_Ellipse_Cancel1 = %Cancel% to unfix the major axis and reposition it
+Prompts_FreeText_Start = %Choose% where you want the text to start
+Prompts_FreeText_Start_Centre = %Choose% where you want the top of the middle of the text to be
+Prompts_FreeText_Start_Right = %Choose% where you want the top right of the text to be
+Prompts_FreeText_Type = Type your text now
+Prompts_FreeText_Return = Press return to start a new line
+Prompts_FreeText_Finish = %Complete% to finish typing
+Prompts_FreeText_Finish_KeyboardUser = Press Escape to finish typing
+Prompts_TextLine_Start = %Choose% to place the top left of the text area
+Prompts_TextLine_Choose = %Choose% to place the top right of the text area
+Prompts_TextLine_Type = Type your text now
+Prompts_TextLine_Flow = The text will automatically start a new line when it reaches the right-hand side
+Prompts_TextLine_Finish = %Complete% to finish typing
+Prompts_Label_Start = %Choose% on the shape which you want to add text to
+
+Prompts_UserSocket_Start = %Choose% to place a socket
+Prompts_UserSocket_Start_2 = When a socket is included in a group, it becomes invisible and controls where connecting lines attach to the group and how the group shape-snaps.
+
+Prompts_Button_Start = %Choose% to place one corner of the button
+Prompts_Button_Complete = %Choose% to place the opposite corner of the button
+
+Prompts_SetOrigin = %Choose% to set the origin for the reported coordinates for this page
+Prompts_SetOrigin_Cancel = %Cancel% to cancel
+
+ConfigPrompt_Low_Graphics_On = On: Less smoothing (and animation) is used to make Splash! run better on a slow computer.
+ConfigPrompt_Low_Graphics_Off = Off: Splash! runs normally with full quality graphics.
+ConfigPrompt_Selection_Bounds_On = On: A bright red, dashed rectangle is drawn around the selected shape(s), in addition to the usual highlight
+ConfigPrompt_Selection_Bounds_Off = Off: Only the usual highlight is used (a yellow/orange glow around the lines of each shape)
+ConfigPrompt_SelectorAfterCreate = If this option is ticked, the selector tool is selected again after each shape which is placed on the page.
+ConfigPrompt_Moving_Shadow_On = On: Shapes being moved are shown semi-transparent, and with a shadow.
+ConfigPrompt_Moving_Shadow_Off = Off: Shapes being moved are shown semi-transparent, but without any shadow.
+ConfigPrompt_KeyShortcuts_On = On: Key equivalents are generally displayed on buttons and menus (some rare ones are only displayed if the Pointer-only-user option is selected)
+ConfigPrompt_KeyShortcuts_Off = Off: Key equivalents are never displayed on buttons or menus.  This may be appropriate for a user who has no keyboard usage.
+ConfigPrompt_Smaller_Tools = If this option is selected, the buttons in the tool palette on the left are always the smallest size.  Otherwise, larger buttons are used if not too many tools are available.
+ConfigPrompt_Display_Origin = If this option is selected, the location of the page origin (used when displaying coordinates at the bottom) is indicated, IF it has been moved (by using the menu: %=Menu_Page% > %=Verb_SetOrigin%).  If the origin is still at the bottom left, this option will have no effect.
+ConfigPrompt_Shape_Resize_On = On: Clickable areas are shown on the selected shape to resize, adjust or rotate it.
+ConfigPrompt_Shape_Resize_Off = Off: Only one clickable area is shown: to move the selected shape.  Shapes can only be resized or rotated using the separate transformation tools.
+ConfigPrompt_Allow_Drag_Placement_On = On: Clicking and dragging in the drawing area will place the first line/edge of a shape.
+ConfigPrompt_Allow_Drag_Placement_Off = Off: Clicking and dragging has no effect when placing new shapes.  The user must click at each position.  This option is better for users with less precise mouse/pointer control, who may accidentally click and drag.
+ConfigPrompt_Shapes_Menu = This option adds an extra menu beside "Edit' on the menu bar at the top of the screen.  This lists all of the tools in the tools palette on the left.  For some users this menu is easier to use via keyboard or switch access that the palette.
+ConfigPrompt_Show_InfoMeasurement = Show information line containing coordinates and measurements.
+ConfigPrompt_Show_PageList = Show thumbnails of pages in document, allowing the user to move between pages in multipage documents.
+ConfigPrompt_Show_Prompts = Show this information area at the bottom of the screen
+ConfigPrompt_Show_Tools = Show tools/shapes palette on the left
+ConfigPrompt_Show_Toolbar = Show the toolbar at the top of the screen
+ConfigPrompt_Show_Toolbar_SubText = If this is shown, various parts of it can be turned on and off separately...
+ConfigPrompt_Show_TransformCopy = When a transformation tool is selected show the choice between moving the original shape and making copies.  This appears at the bottom of the tools palette on the left.
+ConfigPrompt_Advanced_Colours = In colours palettes show the extra buttons which access further colours, select transparent colours, or change colour for each shape (the latter only in the Fill Colour palette)
+ConfigPrompt_Show_ToolbarUser = Show the buttons which switch between user and teacher mode.
+ConfigPrompt_Show_ToolbarUser_SubText = If these are switched off you can change mode using the keys control+T and control+U.  If the "%=Config_DisplayToolbar%" option is switched off then this is always hidden.
+ConfigPrompt_Show_ToolbarSnap = Show the buttons which switch grid-snapping, shape-snapping or angle-snapping on and off.
+ConfigPrompt_Show_ToolbarSnap_SubText = If the "%=Config_DisplayToolbar%" option is switched off then this is always hidden.
+ConfigPrompt_Show_ToolbarVerbs = Show the remaining function buttons on the toolbar.  Exactly which buttons appear here can be changed on the %=Config_Toolbar% page of the settings.
+ConfigPrompt_Show_ToolbarVerbs_SubText = If the "%=Config_DisplayToolbar%" option is switched off then this is always hidden.
+ConfigPrompt_Show_PointerButtons = These buttons only appear if the user is a pointer-only user.  For other users this setting is ignored.  They provide the equivalent of a keyboard user pressing space, plus and minus where there is no other equivalent.
+ConfigPrompt_Angle_45_On = 45° steps are used
+ConfigPrompt_Angle_45_Off = 15° steps are used
+ConfigPrompt_Advanced_Graphics = This option enables full vector graphics-style editing, with grab handles to adjust individual points on curves.  When off (the default) graphics editing is simplified.
+ConfigPrompt_Windows_Colours_On = ON: The button at the top right of colour palettes shows the standard Windows colour chooser
+ConfigPrompt_Windows_Colours_Off = OFF: This button shows the Splash screen which gives a choice between colours similar to the current colour
+
+Verb_Prompt_Choose = This is equivalent to clicking the left mouse button when placing shapes.
+Verb_Prompt_ChooseExisting = Choose
+Verb_Prompt_Complete = This is equivalent to double-clicking with the mouse when placing shapes.  For shapes with a variable number of points this completes the shape.
+Verb_Prompt_Cancel = This equivalent to clicking with the right mouse button when placing shapes.  It cancels the last part of the shape which was placed allowing it to be repositioned.  This has no effect once a shape has been completed.
+Verb_Prompt_Increment = This only applies to some shapes and increases the radius/value of the shape.  Equivalent to pressing the + key while placing a shape.
+Verb_Prompt_Decrement = This only applies to some shapes and decreases the radius/value of the shape.  Equivalent to pressing the - key while placing a shape.
+Verb_Prompt_MovePalette = This function only applies when the typing focus is in a popup palette.  This causes the arrow keys to move the palette around the screen.
+Verb_Prompt_ResizePalette = This function only applies when the typing focus is in a popup palette.  This causes the arrow keys to resize the palette.
+Verb_Prompt_Open = Loads a splash document from disc.
+Verb_Prompt_Save = Saves the current document to disc.  If it is already saved, it saved in the same place; if not, Splash will ask where to save it.
+Verb_Prompt_Print = Prints, with the print options screen allowing the printer and page range etc to be selected
+Verb_Prompt_PrintDirectly = Prints to the current printer without any further confirmation
+Verb_Prompt_Quit = Closes the %=App% Software completely
+Verb_Prompt_Start = Closes the drawing screen and returns to the user menu screen.
+Verb_Prompt_ExportPageAsDocument = This exports the current page only as a separate document.
+Verb_Prompt_DoubleClick = This performs the same function as double-clicking a shape with the mouse.  For most simple shapes this does nothing; for some more complex shapes this performs a function specific to the shape, such as opening the settings screen for the shape.
+Verb_Prompt_SpreadHorizontal = This spreads the 3 or more selected shapes out horizontally so that the centres of the shapes are equally spaced.  The shapes are not moved vertically.
+Verb_Prompt_SpreadVertical = This spreads the 3 or more selected shapes out vertically so that the centres of the shapes are equally spaced.  The shapes are not moved horizontally.
+
+###############
+
+App = SAW7
+Verb_ConfigUser = Edit &settings
+Palette_DocumentOutline = Selection set outline
+Document_Outline = Selection set outline
+Shape_SAWItem = Standard item
+Shape_Scriptable = Add scan button(s)
+Filter_Sound = Sound files|*.wav;*.mp3
+Palette_Main = SAW7 Toolbox
+Config_Keys = Keys in editor
+Config_KeysTitle = Key assignments in editor
+Save_SAW6 = Save SAW6 file
+SAW_IRM_SaveNote = Note: saving in IRM format is unlikely to be useful unless the file was originally imported from an IRM file; this will only save content that seems relevant and makes assumptions about the division between the header and lower panel which may be meaningless if this was not an IRM file.
+
+# run time
+SAW_Run_FocusWarning = SAW has typing focus.  Please select another application so that text output can be sent to it.
+SAW_Run_FocusTitle = Target application
+Script_Fail_Alternation = Failed to access alternation value in registry: %0
+Script_Fail_Desktop = Failed to load/save desktop file: %0
+Script_Fail_CannotFindPopup = Cannot find popup item 
+Script_Fail_MissingWordListItem = Cannot find item %0 four the word prediction list; it is not a standard item (other graphical elements cannot be used for this)
+Script_Obsolete = Command (%0) is obsolete and will do nothing in SAW7
+SAW_Run_NoHexNumpad = Cannot send key: typing this character can only be done using Alt and Numpad, but in hex format ("Alt" + "+" + "xxx").  However this is switched off by default in Windows, and only available if a (string) value, named "EnableHexNumpad" with the value "1" is added to the registry folder "HKEY_CURRENT_USER/Control Panel/Input Method".  After adding this value you must either reboot or log out the Windows user and log back in again
+SAW_Run_CloseConfirm = Really close SAW?
+SAW_Run_Return = Return to editor
+
+# editor
+SAW_FILE_UNRESOLVED_RESOURCE = Could not find the linked image/resource '%0'
+SAW_FILE_IMAGE_FAILED = Failed to load the linked image '%0' with error '%1'
+SAW_FILE_RESOURCE_FAILED = Failed to load the linked resource '%0' with error '%1'
+SAW_FILE_SAW6_CannotMixedScript = SAW6 will not run default commands since there are custom commands present (in SAW6 default scripts are ONLY used where the item script is empty)
+SAW_FILE_SAW6_Unsupported = Unsupported feature omitted when saving to SAW6 (%0)
+SAW_FILE_SAW6_OtherElement = Content other than standard buttons cannot be stored in SAW 6
+SAW_FILE_HASHSET = open selection set with ## parameter is not supported in SAW 7
+
+Menu_SAWSet = Selection set
+Menu_DefaultScripts = Default scripts...
+Verb_StartupScript = Edit start-up script
+Verb_DefaultItemScript = Edit default scripts for general items
+Verb_DefaultEscapeScript = Edit default scripts for escape items
+Verb_DefaultGroupScript = Edit default scripts for group items
+Verb_ShowPopup = Show popup
+Verb_HidePopup = Hide popup
+Verb_ShowAllPopups = Show all popups
+Verb_HideAllPopups = Hide all popups
+Verb_SetPromptItem = Set selected as prompt item
+Verb_ShowTextSelection = Show text
+Verb_ShowGraphicSelection = Show graphic
+Verb_HideTextSelection = Hide text
+Verb_HideGraphicSelection = Hide graphic
+Menu_ModifySelected = Update all selected...
+Verb_GridWizard = Grid wizard...
+Verb_ViewPredictionWords = View word prediction words...
+Verb_ExportAsText = Export in text format...
+Verb_EditItemBounds = Edit item bounds
+Verb_EditWindowBounds = Edit window bounds
+Verb_CopyScripts = Copy scripts
+Verb_CopyPresentation = Copy presentation
+Verb_CCFUpdate = Update using CCF
+Verb_LoadSettings = Load settings...
+Verb_SaveSettings = Save settings as...
+Verb_ImportIRM = Import IRM file...
+Verb_ExportIRM = Export IRM file...
+Verb_MakeChild = Make item a child of preceding item
+Verb_MoveOutOfContainer = Take out of containing item - becomes a sibling of current container
+
+SAW_Menu_Prompt = Choose between opening or creating a selection set
+SAW_Menu_Design = Design a new selection set
+SAW_Menu_Open = Open an existing selection set
+SAW_Menu_Sets = Selection sets
+SAW_Menu_Exit = Exit
+SAW_Menu_SettingsFile = Settings file
+# in the next the (( )) indicates the clickable part of it
+SAW_Menu_Update = An update is available.  ((Click here)) for details
+SAW_Menu_IRM = IRM file...
+
+SAW_Highlight = Highlight
+
+SAW_Edit_Bounds = Bounds
+SAW_Edit_Item = Edit properties
+SAW_Edit_Item_Multiple = Edit properties: multiple items
+SAW_Edit_Presentation = Presentation
+SAW_Edit_Style = Colour + Style
+SAW_Edit_Layout = Text Graphic Alignment
+SAW_Edit_Scripts = Scripts
+SAW_Edit_DisplayText = Display Text
+SAW_Edit_MultipleRestrictions = (Text, graphics and sound cannot be edited when multiple items are selected)
+SAW_Edit_LineSpacing = Line spacing:
+SAW_Edit_Show = Show?
+SAW_Edit_OnlyHighlight = (Only when visited)
+SAW_Edit_OutputText = Output Text
+SAW_Edit_MakeSame = Make same as Display?
+SAW_Edit_SpeechText = Speech Text
+SAW_Edit_SoundFile = Sound File
+SAW_Edit_Graphic = Graphic
+SAW_Edit_Browse = Browse
+SAW_Edit_HelpText = Help Text
+SAW_Edit_Help_IsOff = (Note: currently disabled in settings)
+SAW_Edit_Help_NoItem = (Note: no help display item has been set)
+SAW_Edit_Attributes = Attributes
+SAW_Edit_Popup = Popup
+SAW_Edit_WLCustom = Wordlist custom item
+SAW_Edit_ResetSwap = Reset Swap
+SAW_Edit_NotScanned = Not scanned
+SAW_Edit_Repeatable = Auto-repeatable
+SAW_Edit_EscapeItem = Escape Item
+SAW_Edit_Play = Play
+SAW_Edit_Stop = Stop
+SAW_Edit_Remove = Delete
+SAW_Edit_Nudge = Nudge position
+
+SAW_Edit_StylesDisabled = Note: the style selection currently has no effect since item styles are not enabled for the current user.
+SAW_Edit_StyleOverrides = Warning: the selections made below have no effect for the current user: item styles are enabled for this user and for this use the item will be displayed using the style selected, and not the settings below.
+SAW_Edit_ItemDisplayStyle = Style to use
+SAW_Edit_NormalColour = Normal colour
+SAW_Edit_HightlightColour = Highlight Colour
+SAW_Edit_NormalThickness = Normal Thickness
+SAW_Edit_HightlightThickness = Highlight Thickness
+SAW_Edit_BorderShape = Border shape
+SAW_Edit_None = None
+SAW_Edit_Thin = Thin
+SAW_Edit_Medium = Medium
+SAW_Edit_Thick = Thick
+SAW_Edit_ExtraThick = Extra Thick
+SAW_Edit_Preview = Show preview of:
+
+SAW_Edit_TextTop = Text above
+SAW_Edit_TextBottom = Text below
+SAW_Edit_TextLeft = Text left
+SAW_Edit_TextRight = Text right
+SAW_Edit_TextOverlay = Overlay
+SAW_Edit_TextRatio = Text/Graphic area split
+SAW_Edit_SmallerText = < Smaller text
+SAW_Edit_LargerText = Larger text >
+SAW_Edit_TextAlignment = Text alignment
+SAW_Edit_GraphicAlignment = Graphic alignment
+SAW_Edit_PreviewAlternate = Alternate
+
+SAW_Edit_RunDefault = Run default commands before these commands:
+SAW_Edit_CopyDefaults = Do you want to copy the default commands into your list so that you can choose which to keep?  If not, you will need to ensure your script does any necessary display and scan actions: the default scripts are mainly responsible for performing the scan iteration.
+SAW_Edit_RemoveDefaults = One or more of your commands is replicated in the default script.  Do you want to remove these duplicates from your list?
+SAW_Edit_NoDefaultVisit = Default script also has Visit=None
+SAW_Edit_DefaultVisitIs = '%0' from default script will be used
+SAW_Edit_DefaultInfo = The default commands are:
+SAW_Edit_Visit = Visit item:
+SAW_Edit_VisitItemID = Item ID:
+SAW_Edit_Up = Up
+SAW_Edit_Down = Down
+SAW_Edit_Add = Add
+SAW_Edit_Delete = Delete
+SAW_Edit_Reset = Clear
+SAW_Edit_ResetConfirm = Clear current scripts and reset to default?
+SAW_Edit_ScriptList = Edit as list
+SAW_Edit_ScriptText = Edit as text
+SAW_Edit_AbandonText = Abandon text changes
+SAW_Edit_Repeats = Custom repeat scripts...
+SAW_Edit_Timeout = Timeout: (0=none)
+SAW_Edit_TestRepeat = Test repetition
+SAW_Edit_VisitItemInvalid = 'Item ID' selected for Visit item does not exist.  Please either enter a valid ID, or select a different Visit item
+SAW_Edit_Automatic = Automatic
+
+SAW_Edit_GridWizard = Grid wizard
+SAW_Edit_Previous = < Prev
+SAW_Edit_Next = Next >
+SAW_Edit_Finish = Finish
+SAW_Edit_GridColumns = How many items should there be in each row of the grid?
+SAW_Edit_GridRows = How many rows in the grid?
+SAW_Edit_GridDefault = Use default settings
+SAW_Edit_GridDefault_Explain = Ticking this box will skip the other steps of the wizard and create the grid with default settings.
+SAW_Edit_GridOrder_Prompt = Now select which scanning mode will be used for the grid:
+SAW_Edit_GridOrder_Individual = Scan each item individually
+SAW_Edit_GridOrder_Rows = Scan rows of items (top to bottom)
+SAW_Edit_GridOrder_Columns = Scan columns of items (left to right)
+SAW_Edit_GridEscape1 = Do you want escape items added, and if you do, where should they go and what size should they be compared to other items in the grid?
+SAW_Edit_GridEscape_Where = Where should the escape items go?
+SAW_Edit_GridEscape_Start = Start of row
+SAW_Edit_GridEscape_End = End of row
+SAW_Edit_GridEscape_Both = Both ends
+SAW_Edit_GridEscape_None = None
+SAW_Edit_GridEscape_Size = And what should their relative size be?
+SAW_Edit_GridSpace_Header = Now you need to select the gaps that you need between individual items and between the rows/columns of items.  The spacing is in pixels.
+SAW_Edit_GridSpace_Label = Gap around each item
+
+SAW_ItemBounds = Item bounds
+SAW_ItemBounds_Set = Size of SAW window
+SAW_ItemBounds_Screen = Bounds of current screen
+SAW_ItemBounds_AdjustContents = Move and scale contents to match
+SAW_ItemBounds_ARLocked = Height cannot be adjusted as the aspect:ratio is locked to match the background image
+
+SAW_Edit_OS = Open Symbols
+SAW_Edit_OS_TooShort = At least %0 characters are required to search
+SAW_Edit_OS_Contacting = Contacting OpenSymbols API
+SAW_Edit_OS_Failed = Open Symbol search failed: 
+SAW_Edit_OS_NoneFound = No matching images found
+SAW_Edit_OS_TooMany = Search found %0 results;  only the first %1 will be displayed
+SAW_Edit_OS_SomeFailed = %0 images could not be displayed either due to errors either when downloading or rendering them
+SAW_Edit_OS_Library = Library: %0
+SAW_Edit_OS_Licence = Licence: %0
+
+#misc
+SAW_Edit_SetHelpConfirm = Set item '%0' as the location to display help text?
+
+SAW_AddCommand_Title = Add script command
+SAW_AddCommand_Prompt = Select the script that you want to add from the list on the left
+
+SAW_Desktop_Remove = Remove program
+SAW_Desktop_Failed = Failed to enumerate Windows' desktop
+SAW_Desktop_EditTitle = Review programs in desktop list
+SAW_Desktop_ProgramHeader = Program
+SAW_Desktop_PathHeader = Path
+SAW_Desktop = Desktop
+SAW_Desktop_Save = Save current desktop
+SAW_Desktop_Edit = Edit desktop file
+
+SAW_Visit_None = None
+SAW_Visit_Me = Me
+SAW_Visit_Next = Next
+SAW_Visit_Previous = Previous
+SAW_Visit_Up = Up
+SAW_Visit_Down = Down
+SAW_Visit_First = First
+SAW_Visit_Last = Last
+SAW_Visit_Item = Item
+SAW_Style_Output = Output items
+SAW_Style_Open = Open items
+SAW_Style_Group = Group items
+SAW_Style_NotScanned = Not scanned items
+SAW_Style_Help = Help items
+SAW_Style_Top = Top item
+SAW_Style_Escape = Escape items
+SAW_Style_Custom = Dont use styles
+SAW_ScriptType_Visit = Visit
+SAW_ScriptType_Select = Select
+SAW_ScriptType_Next = Next
+SAW_ScriptType_PreRepeat = PreRepeat
+SAW_ScriptType_Repeat = Repeat
+SAW_ScriptType_PostRepeat = PostRepeat
+
+# the part after the | must not change in this:
+SAW_Filter_Desktop = Desktop files|*.dsk
+
+SAW_Settings_Switches = Switches
+SAW_Settings_Mouse = Mouse/pointer
+SAW_Settings_1Switch = One switch
+SAW_Settings_2Switch = Two switches
+SAW_Settings_ScanType = Scan type
+SAW_Settings_NumberSwitches = Physical switches:
+SAW_Settings_PressSwitch = Press switch now:
+SAW_Settings_Input = Input settings
+SAW_Settings_ReverseSwitches = Reverse switches
+SAW_Settings_UseSwap = Use swap switches
+SAW_Settings_ShowHelp = Show help text
+SAW_Settings_SoundClick = Sound click
+SAW_Settings_RepeatPressStop = EC repeat scripts: press switch a second time to stop (otherwise hold switch to repeat and releasing it stops)
+SAW_Settings_Output = Output settings
+SAW_Settings_SendOutput = Select the types of output to send:
+SAW_Settings_Speech = Synthesised speech
+SAW_Settings_SpeechVisit = ... including on Visit
+SAW_Settings_WAV = Play WAV sounds
+SAW_Settings_SendApplication = Send text/keys to application
+SAW_Settings_OtherOutput = General options:
+SAW_Settings_HideTitle = Hide title when scanning
+SAW_Settings_HideTime = Hide SAW for this number of seconds after sending output (0 for don't hide)
+SAW_Settings_MouseMovement = Mouse movement
+SAW_Settings_MouseAndCaret = Mouse pointer and text caret movement is...
+SAW_Settings_Steps = Mouse movement steps:
+SAW_Settings_Pixels = pixels
+SAW_Settings_WaitMultiplier = Wait multiplier
+SAW_Settings_TestFine = Test fine (&Q)
+SAW_Settings_TestNormal = Test normal (&X)
+SAW_Settings_TestCoarse = Test coarse (&Y)
+SAW_Settings_Styles = Item styles
+SAW_Settings_StyleHeader = Item styles allow you to specify the appearance of different types of buttons.  You can choose between using these standardised styles for all buttons, or editing the appearance defined in the selection set for each button.  Even if these styles are used it is possible to set individual buttons to "custom style" so that they have an individual appearance.
+SAW_Settings_StyleOff = Use the appearance from the selection set
+SAW_Settings_StyleOn = Use the standard styles defined here for all buttons
+SAW_Settings_StyleHeader2 = The styling can be set differently for different types of buttons:
+SAW_Settings_EditStyle = Edit...
+SAW_Settings_StyleSample = Sample
+SAW_Settings_EditorView = Editor display
+SAW_Settings_Show_Toolbox = Show toolbox
+SAW_Settings_Show_Outline = Show selection set outline
+SAW_Settings_Show_InfoBar = Show info and status bar
+SAW_Settings_Show_Hidden = Show dotted border when editing for invisible items
+
+###################################
+Switch_AutoTwo = Auto-scan 2 Switch
+Switch_AutoSingle = 1-switch Auto Scan
+Switch_CriticalOverScan = Critical overscan
+Switch_DwellSelectWithCancel = Dwell Select Scan with Cancel
+Switch_DwellSelect = Dwell Select Scan
+Switch_ManualTwoSingleStep = Manual 2-switch scan (single step)
+Switch_ManualTwo = Manual 2-switch scan
+Switch_UserSingle = 1-switch User Scan
+Switch_DirectPointer = Direct input with mouse/pointer
+Switch_DwellPointer = Dwell select with mouse/pointer
+Switch_DwellAveragePointer = Dwell select with averaging
+
+Switch_Joystick = Joystick
+Switch_Keyboard = Keyboard
+Switch_Null = Unknown
+Switch_ButtonNumber = Button #%0
+Switch_Logic_RisingEdge = Rising edge filter
+Switch_Logic_Long = Long press filter
+Switch_Timing_AcceptanceTime = Acceptance time
+Switch_Timing_PostActivation = Post activation delay
+Switch_Timing_LongPress = Long press time
+Switch_Timing_ScanTime = Scan time
+Switch_Timing_FirstRepeat = First repeat
+Switch_Timing_SubsequentRepeat = Subsequent repeat
+Switch_Timing_DwellSelect = Dwell time
+Switch_Timing_CriticalReverse = Critical reverse time
+Switch_Timing_RestartExtraTime = Restart extra (%)
+
+############### script editing stuff
+SAW_CommandEdit_This = This item
+SAW_CommandEdit_Other = Other item, id:
+SAW_CommandEdit_InvalidID = Item ID is not valid
+SAW_CommandEdit_ApplicatonToOpen = Application to run
+SAW_CommandEdit_SetToOpen = Selection set to open
+SAW_CommandEdit_ApplicatonToSwitch = Application to activate
+SAW_CommandEdit_ApplicationToMove = Application whose window should be moved
+SAW_CommandEdit_ApplicatonUseOutput = Instead take file path from output field of item
+SAW_CommandEdit_ApplicationParams = Parameters
+SAW_CommandEdit_ApplicationAltParams = Alternate parameters
+SAW_CommandEdit_ApplicationAltID = Alternation ID
+SAW_CommandEdit_Running = Select running application...
+SAW_CommandEdit_DesktopFile = Select the desktop file to load/save
+SAW_CommandEdit_DesktopEmptyFile = The filename is required
+SAW_CommandEdit_DesktopMissingFile = Warning: this file does not exist
+SAW_CommandEdit_KeyDelay = Enter delay between keys in ms
+SAW_CommandEdit_BadDelay = Delay must be a number between 0 and 1000
+SAW_CommandEdit_Keystrokes = Enter keystrokes:
+SAW_CommandEdit_CaptureKeys = Capture and add all special keys pressed when typing in box above
+SAW_CommandEdit_AddKey = Add key...
+SAW_CommandEdit_KeyGIDEI = Use old, GIDEI, script format (not recommended)
+SAW_CommandEdit_KeyGroup_FN = F1-F12
+SAW_CommandEdit_KeyGroup_Modifiers = Modifiers
+SAW_CommandEdit_KeyGroup_Common = Common keys
+SAW_CommandEdit_KeyGroup_LocksSpecial = Lock keys and special
+SAW_CommandEdit_KeyGroup_Navigation = Navigation
+SAW_CommandEdit_KeyGroup_NumPad = Number pad
+SAW_CommandEdit_KeyGroup_Actions = Actions
+SAW_CommandEdit_KeyAction_Unlock = %0 unlock
+SAW_CommandEdit_KeyAction_Lock = %0 lock
+SAW_CommandEdit_KeyAction_On = %0 on
+SAW_CommandEdit_KeyAction_Off = %0 off
+SAW_CommandEdit_KeyAction_Repeat = Repeat character
+SAW_CommandEdit_KeyAction_Delay = Delay in ms
+SAW_CommandEdit_KeyAction_Press = Press+Release: %0
+SAW_CommandEdit_KeyAction_UnlockAll = Unlock all
+SAW_CommandEdit_KeyAction_HoldWin = Hold Win key
+SAW_CommandEdit_KeyFailed = Warning: processing this key list will fail: %0
+SAW_CommandEdit_KeyHeldOpen = Note: at the end of this script one or more keys (probably shift/ctrl/alt) are "held" down still.
+SAW_CommandEdit_Test = Test
+SAW_CommandEdit_SelectPosition = Select position
+SAW_CommandEdit_MoveToPrompt = Move the mouse to the desired position and click the left button to select, or right button to cancel.
+SAW_CommandEdit_NotNumber = Coordinate is not a valid number
+SAW_CommandEdit_Rows = Rows
+SAW_CommandEdit_Columns = Columns
+SAW_CommandEdit_BadGrid = Row and columns must be >=1
+SAW_CommandEdit_NeedsAutoRepeat = NOTE: this script will not currently function.  It requires that the "%=SAW_Edit_Repeatable%" box is ticked on the item
+SAW_CommandEdit_SelectPopup = Select the popup item to show/hide:
+SAW_CommandEdit_PopupThis = (This)
+SAW_CommandEdit_PopupExplain = Selecting "(this)" will affect the current item if it is a popup.  If not, it will affect the popup containing the current item.  The other items in the list are all popup items in the document.  If the item you want is not listed, it may be because the "Popup item" option isn't ticked on it.
+SAW_CommandEdit_PopupItem = Select the popup on which to execute the Select script:
+SAW_CommandEdit_ItemID = Item ID:
+SAW_CommandEdit_Time = Time
+SAW_CommandEdit_Seconds = seconds
+SAW_CommandEdit_WordlistID = ID of item prediction container:
+SAW_CommandEdit_BladeAlphabetical = Sort predictions alphabetically
+SAW_CommandEdit_BladeOmitPrevious = Omit words predicted last time
+SAW_CommandEdit_BladeSimple1Letter = Fixed predictions after 1 letter
+SAW_CommandEdit_BladeMinimum = Min length of words to predict
+SAW_CommandEdit_BladeMinGain = Min number of extra letters to predict
+SAW_CommandEdit_BladeCase = Case
+SAW_CommandEdit_BladePunctSpace = Spaces after punctuation
+SAW_CommandEdit_BladeLower = Lower
+SAW_CommandEdit_BladeUpper = Upper
+SAW_CommandEdit_BladeInitialUpper = InitialUpper
+SAW_CommandEdit_BladeNormal = Normal
+SAW_CommandEdit_BladeBoolean = Change the tick box to the indeterminate state to leave this setting unchanged:
+SAW_CommandEdit_BladeOther = Tick the box to include/exclude each of these settings:
+SAW_CommandEdit_ScrollPrompt = Select the direction to scroll:
+SAW_CommandEdit_SettingsFileNote = Note: old, SAW6 .ini files cannot be loaded or saved by SAW7.  The settings file must be saved from SAW7
+SAW_CommandEdit_MissingFilename = The filename must be provided
+SAW_CommandEdit_PageNumber = Page number:
+
+#######################################
+# script commands as used in editor
+Script_Command_NormalItem = normal item
+Script_Command_HighlightItem = highlight item
+Script_Command_FlashItem = flash item
+Script_Command_ExecItem = exec item
+Script_Command_SoundClick = sound click
+Script_Command_Beep = beep
+Script_Command_SpeakClipboard = speak clipboard text
+Script_Command_Keys = key
+Script_Command_KeyDelay = keydelay
+Script_Command_SlowKeys = slowkey
+Script_CommandPart_Say = say
+Script_CommandPart_Send = send
+Script_CommandPart_Print = print
+Script_CommandPart_SpeechText = speech text
+Script_CommandPart_DisplayText = display text
+Script_CommandPart_PromptText = prompt text
+Script_CommandPart_OutputText = output text
+Script_Command_DisplayPromptText = display prompt text
+Script_Command_WordListSet = wordlist set
+Script_Command_OpenApp = open application
+Script_Command_ParamApp = param application
+Script_Command_AlternateApp = alternate application
+Script_Command_SwitchToApp = switch to application
+Script_Command_CloseApp = close application
+Script_Command_OpenDesktop = open desktop
+Script_Command_SaveDesktop = save desktop
+Script_Command_Mouse_Up_Left = NW
+Script_Command_Mouse_Up = N
+Script_Command_Mouse_Up_Right = NE
+Script_Command_Mouse_Left = W
+Script_Command_Mouse_Right = E
+Script_Command_Mouse_Down_Left = SW
+Script_Command_Mouse_Down = S
+Script_Command_Mouse_Down_Right = SE
+Script_Command_MoveWindow = move
+Script_Command_MoveWindowTo = movewindow
+Script_Command_SizeWindow = size
+Script_Command_MouseSingle = single
+Script_Command_MouseSmall = fine
+Script_Command_MouseMedium = normal
+Script_Command_MouseLarge = coarse
+Script_Command_MouseContinuous = continuous
+Script_Command_MouseStep = step
+Script_Command_Mouse_IncSmall = inc fine
+Script_Command_Mouse_IncMedium = inc normal
+Script_Command_Mouse_IncLarge = inc coarse
+Script_Command_Mouse_DecSmall = dec fine
+Script_Command_Mouse_DecMedium = dec normal
+Script_Command_Mouse_DecLarge = dec coarse
+Script_Command_MouseMoveTo = move to
+Script_Command_GridScan = grid scan
+Script_Command_Copy = copy
+Script_Command_Cut = cut
+Script_Command_Paste = paste
+Script_Command_Undo = undo
+Script_Command_Clear = clear
+Script_Command_VScroll_Up = scroll up
+Script_Command_VScroll_Down = scroll down
+Script_Command_VScroll_PageUp = scroll page up
+Script_Command_VScroll_PageDown = scroll page down
+Script_Command_HScroll_Up = scroll left
+Script_Command_HScroll_Down = scroll right
+Script_Command_HScroll_PageUp = scroll page left
+Script_Command_HScroll_PageDown = scroll page right
+Script_Command_PopupShow = popup show
+Script_Command_PopupHide = popup hide
+Script_Command_PopupHide = popup hide
+Script_Command_PopupItem = popup item
+Script_Command_PopupLast = popup last
+Script_Command_PopupSave = popup save
+Script_Command_PopupRestore = popup restore
+Script_CommandPart_Visit = visit
+Script_Command_Restore_SAW = restore SAW
+Script_Command_Hide_SAW = hide SAW
+Script_Command_Minimize_SAW = minimize SAW
+Script_Command_Maximize_SAW = maximize SAW
+Script_Command_CloseSAW = close SAW
+Script_CommandPart_Top = top
+Script_CommandPart_Bottom = bottom
+Script_CommandPart_Left = left
+Script_CommandPart_Centre = centre
+Script_CommandPart_Right = right
+# not actually used, but included for completeness:
+Script_CommandPart_Middle = middle
+Script_Command_Move_Up = saw up
+Script_Command_Move_Down = saw down
+Script_Command_Move_Left = saw left
+Script_Command_Move_Right = saw right
+Script_Command_Size_Taller = taller
+Script_Command_Size_Wider = wider
+Script_Command_Size_Narrower = narrower
+Script_Command_Size_Shorter = shorter
+Script_Command_LoadSettings = load settings
+Script_Command_SaveSettings = save settings
+Script_Command_Output_Send = output to application
+Script_Command_Output_Say = output to speech
+Script_Command_Output_Play = output to sound
+Script_Command_SetHideSAW = set hide saw
+Script_CommandParam_On = on
+Script_CommandParam_Off = off
+Script_CommandPart_Inc = inc
+Script_CommandPart_Dec = dec
+Script_CommandPart_ScanTime = scan time
+Script_CommandPart_RestartTime = restart scan time
+Script_CommandPart_InputAccept = input acceptance time
+Script_CommandPart_PostAccept = post acceptance time
+Script_CommandPart_RepeatDelay = repeat delay
+Script_CommandPart_RepeatTime = repeat time
+Script_Command_PromptOnOff = prompt
+Script_Command_ClickSoundOnOff = set click
+Script_Command_Wait = wait
+Script_CommandPart_Above = above
+Script_CommandPart_Below = below
+Script_CommandPart_Left = left
+Script_CommandPart_Right = right
+Script_Command_DockWindow = dock window
+Script_Command_WordlistSet = wordlist set
+Script_Command_BladeSettings = blade settings
+Script_Command_WordlistSelect = wordlist select
+Script_Command_WordlistScroll = wordlist scroll
+Script_CommandPart_PageUp = pageup
+Script_CommandPart_PageDown = pagedown
+Script_CommandPart_Top = home
+Script_CommandPart_Bottom = end
+Script_Command_EditPredictionWords = edit word prediction words
+Script_Command_OpenSelectionSet = open selection set
+Script_Command_PreviousSet = previous set
+Script_Command_DDEExe = dde exe
+Script_Command_GotoPage = Goto page
+
+# command names for CmdKeysOut
+Script_Command_UsingKeys_SELECT_PREV = select previous application
+Script_Command_UsingKeys_SEL_NEXT = select next application
+Script_Command_UsingKeys_MAX = maximize window
+Script_Command_UsingKeys_MIN = minimize window
+Script_Command_UsingKeys_RESTORE = restore window
+Script_Command_UsingKeys_CLOSE = close window
+Script_Command_UsingKeys_OK = OK
+Script_Command_UsingKeys_CANCEL = cancel
+Script_Command_UsingKeys_SHOWMENU = show menu
+Script_Command_UsingKeys_SHOWCTRMENU = show control menu
+Script_Command_UsingKeys_SHOWMENUBAR = show menu bar
+Script_Command_UsingKeys_KEYUP = up
+Script_Command_UsingKeys_KEYDOWN = down
+Script_Command_UsingKeys_KEYLEFT = left
+Script_Command_UsingKeys_KEYRIGHT = right
+Script_Command_UsingKeys_ESC = escape
+Script_Command_UsingKeys_PREVAREA = previous area
+Script_Command_UsingKeys_NEXTAREA = next area
+Script_Command_UsingKeys_SELECT = select
+Script_Command_UsingKeys_ENDL = end of line
+Script_Command_UsingKeys_HOME = beginning of line
+#Script_Command_UsingKeys_SHON = shift on
+#Script_Command_UsingKeys_SHOFF = shift off
+
+# command names using mouse out
+Script_Command_MOUSE_CLICK = click
+Script_Command_MOUSE_RTCLICK = right click
+Script_Command_MOUSE_DBLCLICK = double click
+Script_Command_MOUSE_DBLRTCLICK = right double click
+Script_Command_MOUSE_SHDBLCLICK = shift double click
+Script_Command_MOUSE_SHCLICK = shift click
+Script_Command_MOUSE_SHRTCLICK = shift right click
+Script_Command_MOUSE_CTRLDBLCLICK = control double click
+Script_Command_MOUSE_CTRLCLICK = control click
+Script_Command_MOUSE_CTRLRTCLICK = control right click
+Script_Command_MOUSE_DRAGON = drag on
+Script_Command_MOUSE_DRAGOFF = drag off
+
+Script_Group_Application = Application scripts
+Script_Group_Desktop = Desktop scripts
+Script_Group_Dialog = Dialog box scripts
+Script_Group_Edit = Edit scripts
+Script_Group_Keyboard = Keyboard scripts
+Script_Group_Menu = Menu scripts
+Script_Group_Mouse = Mouse scripts
+Script_Group_MouseMove = Mouse move
+Script_Group_MouseAction = Mouse action
+Script_Group_MouseStep = Step size
+Script_Group_SAW = SAW scripts
+Script_Group_Item = Item
+Script_Group_State = State
+Script_Group_Visit = Visit
+Script_Group_Output = Output
+Script_Group_SAWWindow = SAW window
+Script_Group_Popup = Popup
+Script_Group_Settings = Settings scripts
+Script_Group_Scan = Scan settings
+Script_Group_MouseStepSettings = Mouse step settings
+Script_Group_Sound = Sound scripts
+Script_Group_Scroll = Scroll scripts
+Script_Group_Window = Window scripts
+Script_Group_Prediction = Word prediction scripts
+Script_Group_SelectionSets = Selection sets
+
+
+############### per-script strings - errors, descriptions, etc...
+Script_Error_UnknownCommand = Script line does not start with a recognised command: %0
+Script_Error_Exception = Unexpected error parsing script: %0
+Script_Error_LoadSAW6 = Script cannot be parsed when loading file: 
+Script_Error_ParameterNotInt = Parameter '%0' is not an integer
+Script_Error_ParameterNotFloat = Parameter '%0' is not an number
+Script_Error_ParameterNotBool = Parameter '%0' is not an boolean (on/off)
+Script_Error_TooFewParameters = Too few parameters for command '%0'
+Script_Error_TooManyParameters = Too many parameters for command '%0'
+Script_Error_ItemNotSelected = The item must be selected.
+Script_Error_ParamsNotExpected = Did not expect parameters for command '%0'
+Script_Error_CannotFindItem = Cannot find item '%0'
+Script_Error_WordListScrollWrong = '%=Script_Command_WordlistScroll%' must be followed by '%=Script_CommandPart_PageDown%', '%=Script_CommandPart_PageUp%', '%=Script_CommandPart_Top%' or '%=Script_CommandPart_Bottom%'
+Script_Error_BladeSettingsWrong = The Blade settings text must be in the format A=B,C=D,E=F ...
+
+# these were copied from SAW6.  The quotes aren't actually wanted, but are an artefact of the C++ code.  They are stripped out before these items are displayed
+Script_Desc_NORMALITEM = "Unhighlight an item."
+Script_Desc_HIGHLIGHTITEM = "Highlight an item."
+Script_Desc_OPENAPP = "This will open an Application.  The 'application' can also be a document on disc if Windows is able to automatically open the right software for it."
+Script_Desc_PARAMAPP = "Open application with parameters"
+Script_Desc_ALTERNATEAPP = "Trigger application with alternating parameters.  The alternation is remembered in the registry, so consecutive uses will use differing parameters even if SAW was stopped in the meantime"
+Script_Desc_SWITCHTOAPP = "This will Switch to an Application if the Application is running."
+Script_Desc_CLOSEAPP = "Closes the current application; equivalent to pressing Alt+F4 on the keyboard or selecting the Close command from the applications Control menu."
+Script_Desc_OPENDESKTOP = "This will load a desktop file.  This will open and position all the applications in the desktop."
+Script_Desc_SAVEDESKTOP = "This will save the current desktop.  This will store all the currently open applications so that they can be opened again by loading the Desktop file."
+Script_Desc_MOUSE_UP = "Move the mouse up by the current step size."
+Script_Desc_MOUSE_UP_RIGHT = "Move the mouse up and right by the current step size."
+Script_Desc_MOUSE_UP_LEFT = "Move the mouse up and left by the current step size."
+Script_Desc_MOUSE_DOWN = "Move the mouse down by the current step size."
+Script_Desc_MOUSE_DOWN_RIGHT = "Move the mouse down and right by the current step size."
+Script_Desc_MOUSE_DOWN_LEFT= "Move the mouse down and left by the current step size."
+Script_Desc_MOUSE_LEFT = "Move the mouse left by the current step size."
+Script_Desc_MOUSE_RIGHT = "Move the mouse right by the current step size."
+Script_Desc_MOUSESMALL = "Sets the step size to the smallest level.  The step size can be changed in SAW's options."
+Script_Desc_MOUSEMEDIUM = "Sets the step size to the medium level.  The step size can be changed in SAW's options."
+Script_Desc_MOUSELARGE = "Sets the step size to the large level.  The step size can be changed in SAW's options."
+Script_Desc_MOUSESINGLE = "Sets the step size to a single pixel. "
+Script_Desc_MOUSECONTINUOUS = "This will make mouse moves and keyboard arrow key movement continuous until a switch is pressed."
+Script_Desc_MOUSESTEP = "This will set the mouse movement back to steps from single pixels."
+Script_Desc_MOUSE_INCSMALL = "Increments the Small mouse step-size setting by 1 pixel (to a maximum of 999 pixels). The new setting is not saved on disk unless the save settings  script command is used."
+Script_Desc_MOUSE_DECSMALL = "Decrements the Small mouse step-size setting by 1 pixel (to a minimum of 1 pixel). The new setting is not saved on disk unless the save settings  script command is used."
+Script_Desc_MOUSE_INCMEDIUM = "Increments the Medium mouse step-size setting by 4 pixels (to a maximum of 999 pixels). The new setting is not saved on disk unless the save settings  script command is used."
+Script_Desc_MOUSE_DECMEDIUM = "Decrements the Medium mouse step-size setting by 4 pixels (to a minimum of 1 pixel). The new setting is not saved on disk unless the save settings  script command is used."
+Script_Desc_MOUSE_INCLARGE= "Increments the Large mouse step-size setting by 10 pixels (to a maximum of 999 pixels). The new setting is not saved on disk unless the save settings  script command is used."
+Script_Desc_MOUSE_DECLARGE= "Decrements the Large mouse step-size setting by 10 pixels (to a minimum of 1 pixel). The new setting is not saved on disk unless the save settings  script command is used."
+Script_Desc_MOUSEMOVETO = "Move the mouse to a specific location on the screen."
+Script_Desc_SIZEWINDOW = "Sets Size Window mode so that subsequent script mouse movement commands (e.g. NW, SE) change the size of the current application window in the specified direction. When this command is executed, the mouse cursor changes to a cross of four arrowheads and is positioned at the centre of the current window. "
+Script_Desc_MOVEWINDOW = "Sets Move Window mode so that subsequent script mouse movement commands (e.g. N, E) move the current window (e.g. application, dialogue box) in the specified direction. When this command is executed, the mouse cursor changes to a cross of four arrowheads and is positioned in the middle of the windows title bar. "
+Script_Desc_MOVEWINDOWTO = "Moves a window of another, specified application to a given set of coordinates"
+Script_Desc_GRIDSCAN = "This will split the screen up into a number of rows and columns then each one will start to be scanned."
+Script_Desc_TOP_LEFT = "Move the SAW widow to the top left of the screen."
+Script_Desc_TOP_CENTRE = "Move the SAW window to the top centre of the screen."
+Script_Desc_TOP_RIGHT = "Move the SAW window to the top right of the screen."
+Script_Desc_BOTTOM_LEFT= "Move the SAW window to the bottom left of the screen."
+Script_Desc_BOTTOM_CENTRE = "Move the SAW window to the bottom centre of the screen."
+Script_Desc_BOTTOM_RIGHT = "Move the SAW window to the bottom right of the screen."
+Script_Desc_KEYS = "This allows you to send keyboard presses to the current application."
+Script_Desc_KEYDELAY = "Changes the default delay between sending keys with the standard keys command.  Number is in ms.  Default is 0.  Allowed range 0 - 1000.  This does not affect the 'slow keys' command."
+Script_Desc_SLOWKEYS = "This allows you to send keyboard presses to the current application, with a configurable delay between keys"
+Script_Desc_POPUPSHOW = "Called to show a popup."
+Script_Desc_POPUPHIDE = "Called to hide a popup."
+Script_Desc_POPUPITEM = Runs the select script of the popup item with the specified ID.  (Usually this script will show it again).  Similar to 'exec item' but this command will be ignored if the item is not a popup
+Script_Desc_POPUPLAST = "Runs the select script of the last popup item that was displayed.  (Usually this script will show it again)"
+Script_Desc_POPUPSAVE = "Saves the ID of the last popup that was displayed;  it can then be triggered again later with popup restore"
+Script_Desc_POPUPRESTORE = "Runs the Select script on the popup item remembered using the popup save command.  Does nothing if 'popup save' had not been used."
+Script_Desc_FLASHITEM = "Flash an item"
+Script_Desc_EXECITEM = "Execute the select script of an item"
+Script_Desc_VISIT_UP = "Visit the item up from the current item. "
+Script_Desc_VISIT_DOWN = "Visit the item below this item.  This is used for a container item to visit the items in it."
+Script_Desc_VISIT_ITEM = "Called to call the Visit Script of a particular item."
+Script_Desc_VISIT_ME = "Call the visit script of the current item."
+Script_Desc_VISIT_FIRST = "Call the Visit Script of the first item in a container item."
+Script_Desc_VISIT_LAST = "Call the Visit Script of the last item in a container item."
+Script_Desc_VISIT_NEXT = "Call the Visit Script of the next item in a container item."
+Script_Desc_VISIT_PREVIOUS = "Call the Visit Script of the previous item in a container item."
+Script_Desc_MINIMIZE_SAW = "Minimize the SAW window."
+Script_Desc_MAXIMIZE_SAW = "Maximize the SAW window."
+Script_Desc_HIDE_SAW = "Hide the SAW widow for a period of time."
+Script_Desc_RESTORE_SAW = "Restore the SAW Window."
+Script_Desc_CLOSESAW = "Close SAW.  This can be used to start another program that the user wants to use without SAW."
+Script_Desc_MOVE_UP = "Move the SAW window up by the current step size."
+Script_Desc_MOVE_DOWN = "Move the SAW window down by the current step size."
+Script_Desc_MOVE_LEFT = "Move the SAW window left by the current step size."
+Script_Desc_MOVE_RIGHT = "Move the SAW window right by the current step size."
+Script_Desc_SIZE_TALLER = "Make the SAW window larger."
+Script_Desc_SIZE_SHORTER = "Make the SAW window smaller."
+Script_Desc_SIZE_WIDER = "Make the SAW window wider."
+Script_Desc_SIZE_NARROWER = "Make the SAW window narrower."
+Script_Desc_LOADSETTINGS = "Loads the specified settings file and makes the settings active.  If the specified settings file does not exist, then an error beep sounds when this command is executed."
+Script_Desc_SAVESETTINGS = "Saves the current settings on disk; the settings file is saved in the current SAW User directory using the current settings filename. The script command load settings must have been previously executed to make the current settings filename.  If the current settings filename has not yet been defined, then an error beep sounds when this command is executed."
+Script_Desc_OUTPUT_TO_SEND = "Sets the Output to Application setting to enable or disable text to be sent to the current application when the script command send display text , send output text , send prompt text ,or  send speech text  is executed."
+#Script_Desc_OUTPUT_TO_PRINTER = "Sets the Output to Printer setting to enable or disable text to be sent to the printer when the script command print display text , print output text , print prompt text , or  print speech text  is executed."
+Script_Desc_OUTPUT_TO_PLAY = "Sets the Output Speech as WAV sound setting to enable or disable playing a .WAV file when the script command say display text , say output text , say prompt text ,or  say speech text  is executed. This setting does not effect speech synthesis output."
+Script_Desc_OUTPUT_TO_SAY = "Sets the Speech to synthesiser setting to enable or disable text to be sent to the speech synthesiser when the script command say display text , say output text , say prompt text ,or  say speech text  is executed. This does not effects the playing on WAV files."
+Script_Desc_INC_SCANTIME = "Increments the Scan Time input setting  by 0.1 second up (to a maximum of 10 seconds). The new setting is not saved on disk unless the save settings  script command is used."
+Script_Desc_DEC_SCANTIME = "Decrements the Scan Time input setting  by 0.1 second (to a minimum of 0.1 second). The new setting is not saved on disk unless the save settings  script command is used."
+Script_Desc_INC_RESTARTTIME = "Increments the Restart Scan Time input setting  by 10% (to a maximum of 1000%). The new setting is not saved on disk unless the save settings  script command is used."
+Script_Desc_DEC_RESTARTTIME = "Decrements the Restart Scan Time input setting  by 10% (to a minimum of 0%). The new setting is not saved on disk unless the save settings  script command is used."
+Script_Desc_INC_INPUTACCEPT = "Increments the Input Acceptance Time  setting by 0.1 second (to the maximum of 10 seconds). The new setting is not saved on disk unless the save settings  script command is used."
+Script_Desc_DEC_INPUTACCEPT = "Decrements the Input Acceptance Time  setting by 0.1 second (to a minimum of 0 seconds). The new setting is not saved on disk unless the save settings  script command is used."
+Script_Desc_INC_POSTACCEPT = "Increments the Post Acceptance Delay  input setting by 0.1 second up to the maximum of 10 seconds. The new setting is not saved on disk unless the save settings  script command is used."
+Script_Desc_DEC_POSTACCEPT = "Decrements the Post Acceptance Delay  input setting by 0.1 second (to a minimum of 0 seconds). The new setting is not saved on disk unless the save settings  script command is used."
+Script_Desc_INC_REPEATDELAY = "Increments the Repeat Delay input setting  by 0.1 second up to the maximum of 10 seconds. The new setting is not saved on disk unless the save settings  script command is used."
+Script_Desc_DEC_REPEATDELAY = "Decrements the Repeat Delay input setting  by 0.1 second (set to 0 seconds to disable repeat). The new setting is not saved on disk unless the save settings  script command is used."
+Script_Desc_INC_REPEATTIME = "Increments the Repeat Time input setting  by 0.1 second (to a maximum of 10 seconds). The new setting is not saved on disk unless the save settings  script command is used."
+Script_Desc_DEC_REPEATTIME = "Decrements the Repeat Time input setting  by 0.1 second (to a minimum of 0 seconds). The new setting is not saved on disk unless the save settings  script command is used."
+Script_Desc_PROMPTONOFF = "Sets the Help Text input setting to enable or disable the display of items' Help Text when the script command display prompt text is executed."
+Script_Desc_CLICKSOUNDONOFF = "Sets the Click input setting; if enabled, a click sound is generated when the script command sound click  is executed. The new setting is not saved on disk unless the save settings  command is used."
+Script_Desc_BEEP = "Sounds a beep on the computers speaker."
+Script_Desc_SOUNDCLICK = "Sounds a click if the Click input setting has been enabled."
+Script_Desc_SPEAKCLIPBOARD = "Speaks the text on the Windows clipboard, if any"
+Script_Desc_WAIT = "Waits or pauses the execution of the script commands for the specified time before executing the next script command.  This is used to allow time for commands to be obeyed before the next command is issued.  SAW has no way of telling if a command has been completed (e.g. open application), so we have to give enough time sometimes for them to be completed before sending the next command (e.g. Open File via a 'key' command)."
+Script_Desc_DOCKWINDOW = "This docks the current window alongside - usually above - the SAW window so that it fills the entire screen excluding the SAW window.  Use 'above' 'below' 'left' or 'right' to specify where the window goes in relation to the SAW window."
+Script_Desc_WORDLISTSET = "Specifies the word list container item.  Should be used once only in the startup script"
+Script_Desc_BLADESETTINGS = "Change Blade word prediction settings while selection set is running"
+Script_Desc_WORDLISTSELECT= "Sends the current word list selection to the keyboard"
+Script_Desc_OPENSELECTIONSET = "Open another selection from the item."
+Script_Desc_PREVIOUSSET = "Go to the previous selection set."
+Script_Desc_SEND_DISPLAYTEXT = "Send the Display Text to a Program."
+Script_Desc_SEND_OUTPUTTEXT = "Send the Output Text to a Program."
+Script_Desc_SEND_SPEECHTEXT = "Send the Speech Text to a Program."
+Script_Desc_SEND_PROMPTTEXT = "Send the Help Text to a Program."
+Script_Desc_SAY_DISPLAYTEXT = "Speak the Display Text."
+Script_Desc_SAY_OUTPUTTEXT = "Speak the Output Text."
+Script_Desc_SAY_PROMPTTEXT = "Speak the Help Text."
+Script_Desc_SAY_SPEECHTEXT = "This will speak the text in the Items Speech Text Property."
+Script_Desc_SETHIDESAW = "Sets a time to hide SAW each time output is sent to an application"
+Script_Desc_DDEEXE = "This command is obsolete and does nothing in SAW 7"
+Script_Desc_EDITPREDICTIONWORDS = "View and edit word prediction words"
+Script_Desc_WORDLISTSCROLL = This command scrolls the displayed word predictions if there are more predictions available than can be displayed at once.
+Script_Desc_GOTOPAGE = If the file has more than one page this changes the view to a specified page number.
+ 
+
+#CmdKeysOut based:
+Script_Desc_CLOSE = "This will close the current window that has focus."
+Script_Desc_OK = "Click the OK button in a dialog."
+Script_Desc_CANCEL =  "Click the Cancel button in a dialog."
+Script_Desc_SEL_NEXT = "If a number of applications are opened, this command causes the next opened non-minimized application to become active: it becomes the current application and its window is displayed. This command is equivalent to pressing Alt+Tab on the keyboard, except that minimized applications are ignored. "
+Script_Desc_SELECT_PREV = "If a number of applications are opened, this command causes the last opened non-minimized application to become active: it becomes the current application and its window is displayed. This command is equivalent to pressing Alt+Shift+Tab on the keyboard, except that minimized applications are ignored. "
+Script_Desc_MAX = "Maximizes the window of the current application."
+Script_Desc_MIN = "Minimizes the window of the current application to a program icon."
+Script_Desc_RESTORE = "Restores the window of an application which has been minimized or maximised using the minimize  or maximize  script command, and makes it the current application. Note that the applications icon must be highlighted (using switch to <file> ) or this command to restore the application.  To restore the SAW window use the restore SAW command "
+Script_Desc_SHOWMENU = "This is called to move to menu bar to start navigating it."
+Script_Desc_SHOWCTRMENU = "This is called to move to the system menu for a window."
+Script_Desc_SHOWMENUBAR = "This will take you to the menu so that it can be navigated using the Up, down, left and right script commands."
+Script_Desc_KEYUP = "This presses the up Arrow.  Example use for this could be to move up a row of text, to move to the next item in a list box or to move up to the next menu item."
+Script_Desc_KEYDOWN = "This presses the down Arrow.  Example use for this could be to move down a row of text, move down in a list box or to move down to the next menu item."
+Script_Desc_KEYLEFT = "This presses the left Arrow.  Example use for this could be to move one character to the left in some text, or to close a popup menu."
+Script_Desc_KEYRIGHT = "This presses the right Arrow.  Example use for this could be to move one character to the right in some text or to display a popup menu."
+Script_Desc_Escape = Presses escape
+Script_Desc_NEXTAREA =  "Press Tab to move to the next control in the dialog."
+Script_Desc_PREVAREA =  "Press Shift Tab to move to the previous control in the dialog."
+Script_Desc_SELECT = "This will check or uncheck a checkbox control."
+Script_Desc_ENDL =  "Move the end of a line of text.  This presses the End key."
+Script_Desc_HOME =  "Move to the beginning of a line of text.  This presses the Home key."
+Script_Desc_SHON = Presses and holds shift.
+#message based
+Script_Desc_VSCROLL_UP = "Scrolls the applications window up one line (the text cursor position is not affected); equivalent to clicking on the up arrow icon on the applications vertical scroll bar."
+Script_Desc_VSCROLL_DOWN = "Scrolls the applications window down a page (the text cursor position is not affected); equivalent to clicking under the scroll box icon on the applications vertical scroll bar."
+Script_Desc_HSCROLL_LEFT = "Scrolls the applications window left one character (the text cursor position is not affected); equivalent to clicking on the left arrow icon on the applications horizontal scroll bar."
+Script_Desc_HSCROLL_RIGHT = "Description Scrolls the applications window right one character (the text cursor position is not affected); equivalent to clicking on the right arrow icon on the applications horizontal scroll bar."
+Script_Desc_HSCROLL_PAGELEFT = "Scrolls the applications window left a page (the text cursor position is not affected); equivalent to clicking to the left of the scroll box icon on the applications horizontal scroll bar."
+Script_Desc_HSCROLL_PAGERIGHT = "Scrolls the applications window right a page (the text cursor position is not affected); equivalent to clicking to the right of the scroll box icon on the applications horizontal scroll bar."
+Script_Desc_VSCROLL_PAGEUP = "Scrolls the applications window up a page (the text cursor position is not affected); equivalent to clicking above the scroll box icon on the applications vertical scroll bar."
+Script_Desc_VSCROLL_PAGEDOWN = "Scrolls the applications window down a page (the text cursor position is not affected); equivalent to clicking under the scroll box icon on the applications vertical scroll bar."
+Script_Desc_CUT =  "Used to call the Cut edit command."
+Script_Desc_COPY = "Used to call the Copy edit command."
+Script_Desc_PASTE = "Used to call the Paste edit command."
+Script_Desc_UNDO = "Used to call the Undo command in a program."
+Script_Desc_CLEAR = "Used to clear some select text."
+# using MouseOut
+Script_Desc_MOUSE_CLICK = "Send a left mouse click"
+Script_Desc_MOUSE_DBLCLICK = "Sends a left mouse double click."
+Script_Desc_MOUSE_RTCLICK = "Sends a right mouse click."
+Script_Desc_MOUSE_DBLRTCLICK = "Sends a right mouse double click."
+Script_Desc_MOUSE_DRAGON = "Sends a left mouse down.  This can allow you to drag items around the screen."
+Script_Desc_MOUSE_DRAGFF = "Sends a left mouse up.  This will release an item you are dragging."
+Script_Desc_MOUSE_SHCLICK = "Sends a left mouse shift click."
+Script_Desc_MOUSE_SHDBLCLICK = "Sends a left mouse shift double click."
+Script_Desc_MOUSE_CTRLCLICK = "Holds the Control key and clicks the left mouse button."
+Script_Desc_MOUSE_CTRLDBLCLICK = "Holds the Control Key and double clicks the left mouse button."
+Script_Desc_MOUSEOUT_SHRTCLICK = "Holds the Shift key and clicks the Right mouse button""
+Script_Desc_MOUSEOUT_CTRLRTCLICK = "Holds the control key and clicks the Right mouse button"
+
+
+
+#not yet used.  end part must be changed to match code in command list in upper case
+Script_Desc_DISPLAY_TEXT_ONLY_SCRIPT = "This will hide the graphics of any items that have Display Text."
+Script_Desc_DISPLAY_GRAPHIC_ONLY_SCRIPT = "This will hide the text of any items that have a Graphic set."
+Script_Desc_DISPLAY_TEXT_GRAPHIC_SCRIPT ="This will display the text and the graphic of any items that have display text and graphics set."
+Script_Desc_AUTOSET = "This generates a selection set using WindowCatcher for the target window."
+Script_Desc_MOUSE_MOVE = "This allows you to move the mouse."
+#Script_Desc_MOUSE_ACTION = "This allow you to perform a mouse action (i.e. Left Click, Right Click etc)"
+Script_Desc_CLOSE_MENU = "This is called to close the menu and return to the program."
+#Script_Desc_PRINT_DISPLAY = "Send the Display Text to the printer."
+#Script_Desc_PRINT_OUTPUT = "Send the Output Text to the printer."
+#Script_Desc_PRINT_SPEECH = "Send the Speech Text to the printer."
+#Script_Desc_PRINT_HELP = "Send the Help Text to the printer."
+Script_Desc_DISPLAY_HELP_TEXT ="Causes the item's Help text to be displayed provided that the Help Text input setting has been enabled either in the settings or through the  prompt on  command. The text is displayed in a special item, called the Help Item; you must define the Help Item,s ID number using the Help Item  menu command."
+
+
+
+#################### CCF
+CCF = CCF
+CCF_Full = Concept Coding Framework
+CCF_Lookup_ChangeToForm = Change display to word form:
+CCF_Registering = Registering
+CCF_Waiting = Waiting
+CCF_Failed = Failed
+CCF_Options_Title = Update selection set using CCF
+CCF_Options_ActionPrompt = Action to perform:
+CCF_Action_ChangeSymbols = Change symbols
+CCF_Action_ChangeText = Change item text
+CCF_Action_RemoveInfo = Remove CCF coding information
+CCF_Options_OnlyCoded = Only update items with CCF coding information
+CCF_Options_OnlySelected = Only update selected items
+CCF_Options_InLanguage = Language of existing text:
+CCF_Options_OutLanguage = Language of new text:
+CCF_Update_Starting = Starting update
+CCF_Update_QueryConcept = Query on conceptID
+CCF_Update_QueryWord = Query on word
+CCF_Update_TextResults = %0 representations.  First = %1
+CCF_Update_ImageResults = %0 representations.  Selecting image...
+CCF_Update_TimedOut = Timed out
+CCF_Update_Progress = CCF Update in Progress
+CCF_Update_Updating = Updating:
+CCF_Update_Done = Done:
+CCF_SocketError = Cannot connect to Concept Coding Framework; it might not be installed on this machine. See http://dev.conceptcoding.org/ooo/content.html
+
+
+#################### key support
+# !!!!!!!! these should possibly not be translated.  TBD
+# output codes for CmdKeysOut which implements a bunch of other commands via keys
+KEYSOUT_SELECT_PREV = <?New?><ALT+SHIFT><TAB>
+KEYSOUT_SEL_NEXT = <?New?><ALT><TAB>
+KEYSOUT_MAX = <?New?><ALT> x
+KEYSOUT_MIN = <?New?><ALT> n
+KEYSOUT_RESTORE = <?New?><ALT> r
+KEYSOUT_CLOSE = <?New?><CTRL><F4>
+KEYSOUT_OK = <esc>return.
+KEYSOUT_CANCEL = <esc>escape.
+KEYSOUT_SHOWMENU = <esc>f10.<esc>return.
+KEYSOUT_SHOWCTRMENU = <esc>f10.<esc>space.
+KEYSOUT_SHOWMENUBAR = <esc>f10.
+KEYSOUT_KEYUP = <esc>up.
+KEYSOUT_KEYDOWN = <esc>down.
+KEYSOUT_KEYLEFT = <esc>left.
+KEYSOUT_KEYRIGHT = <esc>right.
+KEYSOUT_ESC = <esc>escape.
+KEYSOUT_PREVAREA = <esc>,hold,shift.<esc>tab.
+KEYSOUT_NEXTAREA = <esc>tab.
+KEYSOUT_SELECT = <esc>space.
+KEYSOUT_HOME = <esc>home.
+KEYSOUT_ENDL = <esc>end.
+#KEYSOUT_SHON = <esc>,lock,shift.
+#KEYSOUT_SHOFF = <esc>,rel.
+#KEYSOUT_KEYPGUP = <esc>pgup.
+#KEYSOUT_KEYPGDN = <esc>pgdn.
+
+#Key names for SAW-style key scripting.  Items containing __ (double underscore) are not individual keys, but special codes
+#Items with single underscore : the part after the _ is the technical ID of key;  the part after = is the name used in scripting
+#All of the script codes here omit the containing <>.  These are fixed and cannot be changed
+#None of these are case sensitive (that is the text; the code to the left of = is always case-sensitive)
+#Note that the same list is mostly used for GIDEI and SAW style scripts
+#The text portion cannot repeat between any of the keys.  The names must be different
+# ****** WARNING! It may be better to leave these in English; all SAW scripts used English names I believe *********
+# many keys are automatically defined (eg F2) based on .net names.  To fully translate some names may need to be added here
+# also some are defined both ways (Del is below and Delete is automatic.)
+# to list multiple key names with same value on left add primes (').  This allows multiple possible names in scripting to refer to the same key.  This only works for key names (KeyScript_...)
+KeyScript__GIDEI_Escape = esc
+KeyScript__GIDEI_Combine = combine
+KeyScript__Lock = lock
+KeyScript__Hold = hold
+# unlock and rel effectively synonyms
+KeyScript__Unlock = unlock
+KeyScript__Release = rel
+KeyScript__Press = press
+KeyScript__On = on
+KeyScript__Off = off
+KeyScript__Repeat = repeat
+KeyScript__EndRepeat = end_repeat
+KeyScript__Delay = delay
+KeyScript_GIDEI_ShiftKey = Shift
+KeyScript_GIDEI_ControlKey = Ctrl
+KeyScript_GIDEI_ControlKey' = Control
+KeyScript_GIDEI_Menu = Alt
+KeyScript_GIDEI_Delete = Del
+KeyScript_GIDEI_Back = Backspace
+KeyScript_GIDEI_Back' = bksp
+KeyScript_GIDEI_CapsLock = capslk
+KeyScript_GIDEI_Oemcomma = comma
+KeyScript_GIDEI_OemQuestion = divide
+KeyScript_GIDEI_Insert = ins
+KeyScript_GIDEI_Return = enter
+KeyScript_GIDEI_Add = kp+
+KeyScript_GIDEI_Add = kpplus
+KeyScript_GIDEI_Multiply = kp*
+KeyScript_GIDEI_Multiply' = kpstar
+KeyScript_GIDEI_Multiply'' = kptimes
+KeyScript_GIDEI_Subtract = kp-
+KeyScript_GIDEI_Subtract' = kpminus
+KeyScript_GIDEI_Divide = kp/
+KeyScript_GIDEI_Divide' = kpdivide
+KeyScript_GIDEI_Divide'' = kpslash
+KeyScript_GIDEI_NumPad0 = kp0
+KeyScript_GIDEI_NumPad1 = kp1
+KeyScript_GIDEI_NumPad2 = kp2
+KeyScript_GIDEI_NumPad3 = kp3
+KeyScript_GIDEI_NumPad4 = kp4
+KeyScript_GIDEI_NumPad5 = kp5
+KeyScript_GIDEI_NumPad6 = kp6
+KeyScript_GIDEI_NumPad7 = kp7
+KeyScript_GIDEI_NumPad8 = kp8
+KeyScript_GIDEI_NumPad9 = kp9
+KeyScript_GIDEI_NumPad0' = kpins
+KeyScript_GIDEI_NumPad0'' = kpinsert
+KeyScript_GIDEI_NumPad1' = kpend
+KeyScript_GIDEI_NumPad2' = kpdow
+KeyScript_GIDEI_NumPad3' = kppgdn
+KeyScript_GIDEI_NumPad3'' = kppagedown
+KeyScript_GIDEI_NumPad4' = kpleft
+KeyScript_GIDEI_NumPad5' = kpmidl
+KeyScript_GIDEI_NumPad6' = kpright
+KeyScript_GIDEI_NumPad7' = kphome
+KeyScript_GIDEI_NumPad8' = kpup
+KeyScript_GIDEI_NumPad9' = kppgup
+KeyScript_GIDEI_NumPad9'' = kppageup
+KeyScript_GIDEI_Decimal = kpdel
+KeyScript_GIDEI_Decimal' = kpdelete
+KeyScript_GIDEI_Decimal'' = kpdp
+KeyScript_GIDEI_Return = kpenter
+KeyScript_GIDEI_LMenu' = lalt
+KeyScript_GIDEI_LShiftKey = lshift
+KeyScript_GIDEI_LControlKey = lcontrol
+KeyScript_GIDEI_LControlKey' = lctrl
+KeyScript_GIDEI_NumLock = numlk
+KeyScript_GIDEI_Next = pagedown
+KeyScript_GIDEI_Next = pgdn
+KeyScript_GIDEI_OemPeriod = period
+KeyScript_GIDEI_RMenu = ralt
+KeyScript_GIDEI_RShiftKey = rshift
+KeyScript_GIDEI_RControlKey = rcontrol
+KeyScript_GIDEI_Scroll = scrolllock
+
+KeyScript_NEW_Escape = escape
+KeyScript_NEW_Escape' = esc
+KeyScript_NEW_Return = enter
+KeyScript_NEW_Scroll = scrolllock
+KeyScript_NEW_Capital = capslock
+KeyScript_NEW_Next = pagedown
+KeyScript_NEW_PrintScreen = printscrn
+KeyScript_NEW_ShiftKey = shift
+KeyScript_NEW_ControlKey = ctrl
+KeyScript_NEW_Menu = alt
+
+
+KeyScript__UnknownKey = Key not recognised: %0
+KeyScript__Unterminated_Escape = Invalid key sequence.  Special sequence must be terminated with %0
+KeyScript__GIDEI_ModeNotFirst = The GIDEI action modes (hold, lock, rel) can only be used once immediately following <esc>.  Use a new <esc>  to perform further, different actions.
+KeyScript__InvalidSuffix = This key command enclosed in <> ("%0") containing a '_' is invalid.  It must end _Hold, _Lock, _Unlock or _Press.
+KeyScript__PlusUnderscore = Key commands in <> cannot contain both '+' and '_'.  To lock or unlock multiple keys use separate commands (or <unlock> releases all locked keys)
+KeyScript__InvalidOnOff = Invalid key command (%0): Only NumLock, CapsLock and ScrollLock can be followed by _On or _Off
+
+

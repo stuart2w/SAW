@@ -1,0 +1,543 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:tm="http://microsoft.com/wsdl/mime/textMatching/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:tns="http://tempuri.org/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:s="http://www.w3.org/2001/XMLSchema" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" targetNamespace="http://tempuri.org/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <s:schema elementFormDefault="qualified" targetNamespace="http://tempuri.org/">
+      <s:element name="Check">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="strSoftware" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="file" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="CheckResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="CheckResult" type="s:boolean" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="Products">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="strSoftware" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ProductsResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="ProductsResult" type="tns:ArrayOfString" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="ArrayOfString">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="string" nillable="true" type="s:string" />
+        </s:sequence>
+      </s:complexType>
+      <s:element name="Versions">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="strSoftware" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="strProduct" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="VersionsResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="VersionsResult" type="tns:ArrayOfString" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="LastVersionB">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="strSoftware" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="strProduct" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="strExistingVersion" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="strLicenceName" type="s:string" />
+            <s:element minOccurs="1" maxOccurs="1" name="bolSupport" type="s:boolean" />
+            <s:element minOccurs="0" maxOccurs="1" name="strLanguage" type="s:string" />
+            <s:element minOccurs="1" maxOccurs="1" name="intNetVersion" type="s:int" />
+            <s:element minOccurs="0" maxOccurs="1" name="strMachineID" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="LastVersionBResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="LastVersionBResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="VersionNeeds">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="strSoftware" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="strProduct" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="strVersion" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="VersionNeedsResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="VersionNeedsResult" type="tns:ArrayOfString" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="StoreError">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="strSoftware" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="aData" type="s:base64Binary" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="StoreErrorResponse">
+        <s:complexType />
+      </s:element>
+      <s:element name="Store">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="strSoftware" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="file" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="aData" type="s:base64Binary" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="StoreResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="StoreResult" type="s:boolean" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="Merge">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="strSoftware" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="file" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="MergeResponse">
+        <s:complexType />
+      </s:element>
+      <s:element name="VerifyVersion">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="strSoftware" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="strProduct" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="strVersion" type="s:string" />
+            <s:element minOccurs="1" maxOccurs="1" name="bolChecksum" type="s:boolean" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="VerifyVersionResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="VerifyVersionResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="Delete">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="strSoftware" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="file" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="DeleteResponse">
+        <s:complexType />
+      </s:element>
+      <s:element name="Fetch">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="strSoftware" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="file" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="FetchResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="FetchResult" type="s:base64Binary" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="FetchChunk">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="strSoftware" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="file" type="s:string" />
+            <s:element minOccurs="1" maxOccurs="1" name="intStart" type="s:int" />
+            <s:element minOccurs="1" maxOccurs="1" name="intLength" type="s:int" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="FetchChunkResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="FetchChunkResult" type="s:base64Binary" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+    </s:schema>
+  </wsdl:types>
+  <wsdl:message name="CheckSoapIn">
+    <wsdl:part name="parameters" element="tns:Check" />
+  </wsdl:message>
+  <wsdl:message name="CheckSoapOut">
+    <wsdl:part name="parameters" element="tns:CheckResponse" />
+  </wsdl:message>
+  <wsdl:message name="ProductsSoapIn">
+    <wsdl:part name="parameters" element="tns:Products" />
+  </wsdl:message>
+  <wsdl:message name="ProductsSoapOut">
+    <wsdl:part name="parameters" element="tns:ProductsResponse" />
+  </wsdl:message>
+  <wsdl:message name="VersionsSoapIn">
+    <wsdl:part name="parameters" element="tns:Versions" />
+  </wsdl:message>
+  <wsdl:message name="VersionsSoapOut">
+    <wsdl:part name="parameters" element="tns:VersionsResponse" />
+  </wsdl:message>
+  <wsdl:message name="LastVersionBSoapIn">
+    <wsdl:part name="parameters" element="tns:LastVersionB" />
+  </wsdl:message>
+  <wsdl:message name="LastVersionBSoapOut">
+    <wsdl:part name="parameters" element="tns:LastVersionBResponse" />
+  </wsdl:message>
+  <wsdl:message name="VersionNeedsSoapIn">
+    <wsdl:part name="parameters" element="tns:VersionNeeds" />
+  </wsdl:message>
+  <wsdl:message name="VersionNeedsSoapOut">
+    <wsdl:part name="parameters" element="tns:VersionNeedsResponse" />
+  </wsdl:message>
+  <wsdl:message name="StoreErrorSoapIn">
+    <wsdl:part name="parameters" element="tns:StoreError" />
+  </wsdl:message>
+  <wsdl:message name="StoreErrorSoapOut">
+    <wsdl:part name="parameters" element="tns:StoreErrorResponse" />
+  </wsdl:message>
+  <wsdl:message name="StoreSoapIn">
+    <wsdl:part name="parameters" element="tns:Store" />
+  </wsdl:message>
+  <wsdl:message name="StoreSoapOut">
+    <wsdl:part name="parameters" element="tns:StoreResponse" />
+  </wsdl:message>
+  <wsdl:message name="MergeSoapIn">
+    <wsdl:part name="parameters" element="tns:Merge" />
+  </wsdl:message>
+  <wsdl:message name="MergeSoapOut">
+    <wsdl:part name="parameters" element="tns:MergeResponse" />
+  </wsdl:message>
+  <wsdl:message name="VerifyVersionSoapIn">
+    <wsdl:part name="parameters" element="tns:VerifyVersion" />
+  </wsdl:message>
+  <wsdl:message name="VerifyVersionSoapOut">
+    <wsdl:part name="parameters" element="tns:VerifyVersionResponse" />
+  </wsdl:message>
+  <wsdl:message name="DeleteSoapIn">
+    <wsdl:part name="parameters" element="tns:Delete" />
+  </wsdl:message>
+  <wsdl:message name="DeleteSoapOut">
+    <wsdl:part name="parameters" element="tns:DeleteResponse" />
+  </wsdl:message>
+  <wsdl:message name="FetchSoapIn">
+    <wsdl:part name="parameters" element="tns:Fetch" />
+  </wsdl:message>
+  <wsdl:message name="FetchSoapOut">
+    <wsdl:part name="parameters" element="tns:FetchResponse" />
+  </wsdl:message>
+  <wsdl:message name="FetchChunkSoapIn">
+    <wsdl:part name="parameters" element="tns:FetchChunk" />
+  </wsdl:message>
+  <wsdl:message name="FetchChunkSoapOut">
+    <wsdl:part name="parameters" element="tns:FetchChunkResponse" />
+  </wsdl:message>
+  <wsdl:portType name="Repo2Soap">
+    <wsdl:operation name="Check">
+      <wsdl:input message="tns:CheckSoapIn" />
+      <wsdl:output message="tns:CheckSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="Products">
+      <wsdl:input message="tns:ProductsSoapIn" />
+      <wsdl:output message="tns:ProductsSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="Versions">
+      <wsdl:input message="tns:VersionsSoapIn" />
+      <wsdl:output message="tns:VersionsSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="LastVersionB">
+      <wsdl:input message="tns:LastVersionBSoapIn" />
+      <wsdl:output message="tns:LastVersionBSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="VersionNeeds">
+      <wsdl:input message="tns:VersionNeedsSoapIn" />
+      <wsdl:output message="tns:VersionNeedsSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="StoreError">
+      <wsdl:input message="tns:StoreErrorSoapIn" />
+      <wsdl:output message="tns:StoreErrorSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="Store">
+      <wsdl:input message="tns:StoreSoapIn" />
+      <wsdl:output message="tns:StoreSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="Merge">
+      <wsdl:input message="tns:MergeSoapIn" />
+      <wsdl:output message="tns:MergeSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="VerifyVersion">
+      <wsdl:input message="tns:VerifyVersionSoapIn" />
+      <wsdl:output message="tns:VerifyVersionSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="Delete">
+      <wsdl:input message="tns:DeleteSoapIn" />
+      <wsdl:output message="tns:DeleteSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="Fetch">
+      <wsdl:input message="tns:FetchSoapIn" />
+      <wsdl:output message="tns:FetchSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="FetchChunk">
+      <wsdl:input message="tns:FetchChunkSoapIn" />
+      <wsdl:output message="tns:FetchChunkSoapOut" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="Repo2Soap" type="tns:Repo2Soap">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="Check">
+      <soap:operation soapAction="http://tempuri.org/Check" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="Products">
+      <soap:operation soapAction="http://tempuri.org/Products" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="Versions">
+      <soap:operation soapAction="http://tempuri.org/Versions" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="LastVersionB">
+      <soap:operation soapAction="http://tempuri.org/LastVersionB" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="VersionNeeds">
+      <soap:operation soapAction="http://tempuri.org/VersionNeeds" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="StoreError">
+      <soap:operation soapAction="http://tempuri.org/StoreError" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="Store">
+      <soap:operation soapAction="http://tempuri.org/Store" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="Merge">
+      <soap:operation soapAction="http://tempuri.org/Merge" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="VerifyVersion">
+      <soap:operation soapAction="http://tempuri.org/VerifyVersion" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="Delete">
+      <soap:operation soapAction="http://tempuri.org/Delete" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="Fetch">
+      <soap:operation soapAction="http://tempuri.org/Fetch" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="FetchChunk">
+      <soap:operation soapAction="http://tempuri.org/FetchChunk" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="Repo2Soap12" type="tns:Repo2Soap">
+    <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="Check">
+      <soap12:operation soapAction="http://tempuri.org/Check" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="Products">
+      <soap12:operation soapAction="http://tempuri.org/Products" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="Versions">
+      <soap12:operation soapAction="http://tempuri.org/Versions" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="LastVersionB">
+      <soap12:operation soapAction="http://tempuri.org/LastVersionB" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="VersionNeeds">
+      <soap12:operation soapAction="http://tempuri.org/VersionNeeds" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="StoreError">
+      <soap12:operation soapAction="http://tempuri.org/StoreError" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="Store">
+      <soap12:operation soapAction="http://tempuri.org/Store" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="Merge">
+      <soap12:operation soapAction="http://tempuri.org/Merge" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="VerifyVersion">
+      <soap12:operation soapAction="http://tempuri.org/VerifyVersion" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="Delete">
+      <soap12:operation soapAction="http://tempuri.org/Delete" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="Fetch">
+      <soap12:operation soapAction="http://tempuri.org/Fetch" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="FetchChunk">
+      <soap12:operation soapAction="http://tempuri.org/FetchChunk" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="Repo2">
+    <wsdl:port name="Repo2Soap" binding="tns:Repo2Soap">
+      <soap:address location="http://saw-at.co.uk/tech/repo2.asmx" />
+    </wsdl:port>
+    <wsdl:port name="Repo2Soap12" binding="tns:Repo2Soap12">
+      <soap12:address location="http://saw-at.co.uk/tech/repo2.asmx" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

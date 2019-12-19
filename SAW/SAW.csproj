@@ -1,0 +1,2005 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{0AA1D0FC-9B11-4F4E-9947-40E45ABE7C0F}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>SAW</RootNamespace>
+    <AssemblyName>SAW</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;APPLICATION;WINDOWS;SAW</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE;APPLICATION;WINDOWS;SAW</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;APPLICATION;WINDOWS;SAW</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <DefineConstants>TRACE;APPLICATION;WINDOWS;SAW</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>icon.ico</ApplicationIcon>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Blade">
+      <HintPath>.\Blade.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.DirectX, Version=1.0.2902.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\Windows\Microsoft.NET\DirectX for Managed Code\1.0.2902.0\Microsoft.DirectX.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.DirectX.DirectInput, Version=1.0.2902.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\Windows\Microsoft.NET\DirectX for Managed Code\1.0.2902.0\Microsoft.DirectX.DirectInput.dll</HintPath>
+    </Reference>
+    <Reference Include="NAudio, Version=1.8.5.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\NAudio.1.8.5\lib\net35\NAudio.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.12.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="RepoB">
+      <HintPath>..\RepoB.dll</HintPath>
+    </Reference>
+    <Reference Include="Svg, Version=3.0.0.0, Culture=neutral, PublicKeyToken=12a0bac221edeae2, processorArchitecture=MSIL">
+      <HintPath>..\packages\Svg.3.0.49\lib\net35\Svg.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.ServiceModel" />
+    <Reference Include="System.Speech" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Services" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AM.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>AM.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Documents\AppliedConfig.cs" />
+    <Compile Include="Documents\Config.cs" />
+    <Compile Include="Documents\Document.cs" />
+    <Compile Include="Documents\Page.cs" />
+    <Compile Include="Documents\Paper.cs" />
+    <Compile Include="Documents\Transaction.cs" />
+    <Compile Include="Functions\IRM.cs" />
+    <Compile Include="GUI\Controls\WrappingCheckBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="GUI\DevelopmentDialogs\frmDeltas.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\DevelopmentDialogs\frmDeltas.Designer.cs">
+      <DependentUpon>frmDeltas.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\StaticView.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="SAW\CommandEditors\GotoPageEditor.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="SAW\CommandEditors\GotoPageEditor.Designer.cs">
+      <DependentUpon>GotoPageEditor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SAW\SAW6 Compatibility\Header.cs" />
+    <Compile Include="Shapes and data elements\Base classes\Filled.cs" />
+    <Compile Include="Shapes and data elements\Base classes\Interfaces.cs" />
+    <Compile Include="Shapes and data elements\Base classes\Sequential.cs" />
+    <Compile Include="Shapes and data elements\Base classes\SharedReference.cs" />
+    <Compile Include="Shapes and data elements\Base classes\AbstractRectangle.cs" />
+    <Compile Include="Utilities\Geometry\Bezier.cs" />
+    <Compile Include="Utilities\Geometry\Geometry.cs" />
+    <Compile Include="Utilities\Geometry\Intersection.cs" />
+    <Compile Include="Utilities\Geometry\PathElement.cs" />
+    <Compile Include="GUI\Abstract\Activities.cs" />
+    <Compile Include="GUI\Abstract\Animation.cs" />
+    <Compile Include="GUI\Abstract\ContextMenuTools.cs" />
+    <Compile Include="GUI\Abstract\Globals.cs" />
+    <Compile Include="GUI\Abstract\KeyForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\Abstract\Menus.cs" />
+    <Compile Include="GUI\Abstract\Parameters.cs" />
+    <Compile Include="GUI\Abstract\SoftwareVersion.cs" />
+    <Compile Include="GUI\Abstract\Strings.cs" />
+    <Compile Include="GUI\Config editor\cfgListValues.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="GUI\Config editor\cfgListValues.Designer.cs" />
+    <Compile Include="GUI\Controls\ButtonPanel.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="GUI\Controls\ColourPanel.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="GUI\Controls\ColourPicker.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="GUI\Controls\ColourPicker.Designer.cs">
+      <DependentUpon>ColourPicker.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\Controls\CustomButton.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="GUI\Controls\IconRadio.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="GUI\Controls\TextBoxAllKeys.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="GUI\Controls\PreviewPanel.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="GUI\Controls\RoundButton.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="GUI\Controls\SelectionPanel.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="GUI\Controls\SharedButton.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="GUI\Controls\TileList.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="GUI\Controls\TreeViewWithMove.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="GUI\Dialogs\FileDialog.cs" />
+    <Compile Include="GUI\Dialogs\frmAddButtons.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\Dialogs\frmAddButtons.Designer.cs">
+      <DependentUpon>frmAddButtons.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\Dialogs\frmButton.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\Dialogs\frmButton.Designer.cs">
+      <DependentUpon>frmButton.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\Dialogs\frmCreateActivity.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\Dialogs\frmCreateActivity.Designer.cs">
+      <DependentUpon>frmCreateActivity.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\Dialogs\frmErrorReport.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\Dialogs\frmErrorReport.Designer.cs">
+      <DependentUpon>frmErrorReport.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\Dialogs\frmFlow.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\Dialogs\frmFlow.Designer.cs">
+      <DependentUpon>frmFlow.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\Dialogs\frmFont.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\Dialogs\frmFont.Designer.cs">
+      <DependentUpon>frmFont.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\Dialogs\frmMoreColours.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\Dialogs\frmMoreColours.Designer.cs">
+      <DependentUpon>frmMoreColours.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\Dialogs\frmPageSize.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\Dialogs\frmPageSize.Designer.cs">
+      <DependentUpon>frmPageSize.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\Dialogs\frmPaper.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\Dialogs\frmPaper.Designer.cs">
+      <DependentUpon>frmPaper.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\Dialogs\frmTexture.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\Dialogs\frmTexture.Designer.cs">
+      <DependentUpon>frmTexture.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\Dialogs\frmUpdate.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\Dialogs\frmUpdate.Designer.cs">
+      <DependentUpon>frmUpdate.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Functions\Action.cs" />
+    <Compile Include="Functions\Documents.cs" />
+    <Compile Include="Functions\Drawing.cs" />
+    <Compile Include="Functions\GenericEdits.cs" />
+    <Compile Include="Functions\ObjectEdits.cs" />
+    <Compile Include="Functions\OptionsVerbs.cs" />
+    <Compile Include="Functions\Pages.cs" />
+    <Compile Include="Functions\ParameterAction.cs" />
+    <Compile Include="Functions\Selection.cs" />
+    <Compile Include="Functions\TextActions.cs" />
+    <Compile Include="Functions\Verb.cs" />
+    <Compile Include="GUI\Graphics output\Canvas.cs" />
+    <Compile Include="GUI\Graphics output\NetCanvas.cs" />
+    <Compile Include="GUI\Graphics output\SVG.cs" />
+    <Compile Include="GUI\GUIUtilities.cs" />
+    <Compile Include="GUI\MajorControls\ctrActionSelect.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="GUI\MajorControls\ctrButtonStyleEdit.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="GUI\MajorControls\ctrButtonStyleEdit.Designer.cs">
+      <DependentUpon>ctrButtonStyleEdit.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\MajorControls\ctrPages.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="GUI\MajorControls\ctrPrompts.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="GUI\MajorControls\ctrTextStyle.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="GUI\MajorControls\ctrTextStyle.Designer.cs">
+      <DependentUpon>ctrTextStyle.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\MajorControls\CustomOpenFile.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="GUI\MajorControls\DocumentTab.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="GUI\MajorControls\FolderTree.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="GUI\Minor dialogs\frmActivityRename.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\Minor dialogs\frmActivityRename.Designer.cs">
+      <DependentUpon>frmActivityRename.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\Minor dialogs\frmButtonStyleName.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\Minor dialogs\frmButtonStyleName.Designer.cs">
+      <DependentUpon>frmButtonStyleName.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\Minor dialogs\frmChooseImportPage.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\Minor dialogs\frmChooseImportPage.Designer.cs">
+      <DependentUpon>frmChooseImportPage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\Minor dialogs\frmLineWidth.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\Minor dialogs\frmLineWidth.Designer.cs">
+      <DependentUpon>frmLineWidth.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\Minor dialogs\frmNewPageBackground.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\Minor dialogs\frmNewPageBackground.Designer.cs">
+      <DependentUpon>frmNewPageBackground.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\Minor dialogs\frmPaletteDetails.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\Minor dialogs\frmPaletteDetails.Designer.cs">
+      <DependentUpon>frmPaletteDetails.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\Minor dialogs\frmReportOpErrors.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\Minor dialogs\frmReportOpErrors.Designer.cs">
+      <DependentUpon>frmReportOpErrors.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\Minor dialogs\frmReportProblem.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\Minor dialogs\frmReportProblem.Designer.cs">
+      <DependentUpon>frmReportProblem.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\Minor dialogs\frmResource.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\Minor dialogs\frmResource.Designer.cs">
+      <DependentUpon>frmResource.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\Palettes\AccordionContainer.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="GUI\Palettes\ctrArrowheadsPalette.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="GUI\Palettes\ctrArrowheadsPalette.Designer.cs">
+      <DependentUpon>ctrArrowheadsPalette.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\Palettes\ctrDocumentOutline.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="GUI\Palettes\ctrDocumentOutline.Designer.cs">
+      <DependentUpon>ctrDocumentOutline.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\Palettes\Palette containers.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="GUI\Palettes\Palettes.cs" />
+    <Compile Include="GUI\Palettes\PaletteView.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="GUI\RootApplication.cs" />
+    <Compile Include="GUI\Config editor\cfgCustomPalettes.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="GUI\Config editor\cfgCustomPalettes.Designer.cs">
+      <DependentUpon>cfgCustomPalettes.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\Config editor\cfgInput.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="GUI\Config editor\cfgInput.Designer.cs">
+      <DependentUpon>cfgInput.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\Config editor\cfgKeys.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="GUI\Config editor\cfgKeys.Designer.cs">
+      <DependentUpon>cfgKeys.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\Config editor\cfgMouseOutput.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="GUI\Config editor\cfgMouseOutput.Designer.cs">
+      <DependentUpon>cfgMouseOutput.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\Config editor\cfgOutput.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="GUI\Config editor\cfgOutput.Designer.cs">
+      <DependentUpon>cfgOutput.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\Config editor\cfgShowInEditing.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="GUI\Config editor\cfgShowInEditing.Designer.cs">
+      <DependentUpon>cfgShowInEditing.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\Config editor\cfgSpeech.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="GUI\Config editor\cfgSpeech.Designer.cs">
+      <DependentUpon>cfgSpeech.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\Config editor\cfgStyles.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="GUI\Config editor\cfgStyles.Designer.cs">
+      <DependentUpon>cfgStyles.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\Config editor\cfgSwitching.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="GUI\Config editor\cfgSwitching.Designer.cs">
+      <DependentUpon>cfgSwitching.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\Config editor\ConfigPage.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="GUI\Config editor\frmEditConfig.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\Config editor\frmEditConfig.Designer.cs">
+      <DependentUpon>frmEditConfig.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\frmMain.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\frmMain.Designer.cs">
+      <DependentUpon>frmMain.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\frmMenu.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\frmMenu.Designer.cs">
+      <DependentUpon>frmMenu.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\frmRun.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\frmRun.Designer.cs">
+      <DependentUpon>frmRun.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\Minor dialogs\frmUserButtonStyle.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\Minor dialogs\frmUserButtonStyle.Designer.cs">
+      <DependentUpon>frmUserButtonStyle.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\RunView.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="GUI\DevelopmentDialogs\frmShowErrorReport.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\DevelopmentDialogs\frmShowErrorReport.Designer.cs">
+      <DependentUpon>frmShowErrorReport.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Functions\SAWVerbs.cs" />
+    <Compile Include="GUI\EditableView.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SAW\CCF\Connection.cs" />
+    <Compile Include="SAW\CCF\Query.cs" />
+    <Compile Include="SAW\CCF\Response.cs" />
+    <Compile Include="SAW\CCF\frmLookup.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SAW\CCF\frmLookup.Designer.cs">
+      <DependentUpon>frmLookup.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SAW\CCF\frmMultiUpdateOptions.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SAW\CCF\frmMultiUpdateOptions.Designer.cs">
+      <DependentUpon>frmMultiUpdateOptions.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SAW\CCF\frmMultiUpdateProgress.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SAW\CCF\frmMultiUpdateProgress.Designer.cs">
+      <DependentUpon>frmMultiUpdateProgress.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SAW\CCF\MultiUpdate.cs" />
+    <Compile Include="SAW\CommandEditors\LoadSettingsEditor.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="SAW\CommandEditors\LoadSettingsEditor.Designer.cs">
+      <DependentUpon>LoadSettingsEditor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SAW\CommandEditors\MoveWindowEditor.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="SAW\CommandEditors\MoveWindowEditor.Designer.cs">
+      <DependentUpon>MoveWindowEditor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SAW\CommandEditors\BladeEditor.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="SAW\CommandEditors\BladeEditor.Designer.cs">
+      <DependentUpon>BladeEditor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SAW\CommandEditors\DockEditor.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="SAW\CommandEditors\DockEditor.Designer.cs">
+      <DependentUpon>DockEditor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SAW\CommandEditors\PickItemEditor.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="SAW\CommandEditors\PickItemEditor.Designer.cs">
+      <DependentUpon>PickItemEditor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SAW\CommandEditors\DesktopCommandEditor.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="SAW\CommandEditors\DesktopCommandEditor.Designer.cs">
+      <DependentUpon>DesktopCommandEditor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SAW\CommandEditors\GridScanEditor.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="SAW\CommandEditors\GridScanEditor.Designer.cs">
+      <DependentUpon>GridScanEditor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SAW\CommandEditors\KeyDelayEditor.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="SAW\CommandEditors\KeyDelayEditor.Designer.cs">
+      <DependentUpon>KeyDelayEditor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SAW\CommandEditors\KeysEditor.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="SAW\CommandEditors\KeysEditor.Designer.cs">
+      <DependentUpon>KeysEditor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SAW\CommandEditors\MoveToEditor.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="SAW\CommandEditors\MoveToEditor.Designer.cs">
+      <DependentUpon>MoveToEditor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SAW\CommandEditors\PopupItemEditor.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="SAW\CommandEditors\PopupItemEditor.Designer.cs">
+      <DependentUpon>PopupItemEditor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SAW\CommandEditors\PopupShowEditor.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="SAW\CommandEditors\PopupShowEditor.Designer.cs">
+      <DependentUpon>PopupShowEditor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SAW\CommandEditors\Util Controls.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="SAW\CommandEditors\FloatingTimeEditor.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="SAW\CommandEditors\FloatingTimeEditor.Designer.cs">
+      <DependentUpon>FloatingTimeEditor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SAW\CommandEditors\WordListScrollEditor.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="SAW\CommandEditors\WordListScrollEditor.Designer.cs">
+      <DependentUpon>WordListScrollEditor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SAW\Commands\CmdGridScan.cs" />
+    <Compile Include="SAW\Commands\Keys C.cs" />
+    <Compile Include="SAW\Commands\Popup C.cs" />
+    <Compile Include="SAW\Commands\Settings C.cs" />
+    <Compile Include="SAW\Commands\WordPred C.cs" />
+    <Compile Include="GUI\Minor dialogs\frmEditBounds.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\Minor dialogs\frmEditBounds.Designer.cs">
+      <DependentUpon>frmEditBounds.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\Dialogs\frmEditDefaultScripts.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\Dialogs\frmEditDefaultScripts.Designer.cs">
+      <DependentUpon>frmEditDefaultScripts.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\Dialogs\frmEditDesktop.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\Dialogs\frmEditDesktop.Designer.cs">
+      <DependentUpon>frmEditDesktop.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SAW\CommandEditors\OnOffEditor.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="SAW\CommandEditors\OnOffEditor.Designer.cs">
+      <DependentUpon>OnOffEditor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\Dialogs\frmEditStartupScript.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\Dialogs\frmEditStartupScript.Designer.cs">
+      <DependentUpon>frmEditStartupScript.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\Dialogs\frmGridWizard.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\Dialogs\frmGridWizard.Designer.cs">
+      <DependentUpon>frmGridWizard.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\Dialogs\frmOpenSymbol.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\Dialogs\frmOpenSymbol.Designer.cs">
+      <DependentUpon>frmOpenSymbol.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SAW\SAW6 Compatibility\LOGFONT.cs" />
+    <Compile Include="Utilities\AudioPlayer.cs" />
+    <Compile Include="SAW\SAW6 Compatibility\BinaryArchive.cs" />
+    <Compile Include="SAW\CommandEditors\CommandEditor.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="SAW\CommandEditors\CommandEditor.Designer.cs">
+      <DependentUpon>CommandEditor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SAW\CommandEditors\AppCommandEditor.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="SAW\CommandEditors\AppCommandEditor.Designer.cs">
+      <DependentUpon>AppCommandEditor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SAW\CommandEditors\ICommandEditor.cs" />
+    <Compile Include="SAW\CommandEditors\AnyItemStateEditor.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="SAW\CommandEditors\AnyItemStateEditor.Designer.cs">
+      <DependentUpon>AnyItemStateEditor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SAW\Commands\Apps and System C.cs" />
+    <Compile Include="SAW\Commands\Mouse C.cs" />
+    <Compile Include="SAW\Commands\SAW C.cs" />
+    <Compile Include="SAW\Commands\Output C.cs" />
+    <Compile Include="SAW\Commands\Item C.cs" />
+    <Compile Include="SAW\CommandList.cs" />
+    <Compile Include="SAW\Command.cs" />
+    <Compile Include="GUI\Dialogs\frmAddCommand.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\Dialogs\frmAddCommand.Designer.cs">
+      <DependentUpon>frmAddCommand.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\Minor dialogs\frmFocusWarning.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\Minor dialogs\frmFocusWarning.Designer.cs">
+      <DependentUpon>frmFocusWarning.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\MajorControls\ctrScriptableEdit.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="GUI\MajorControls\ctrScriptableEdit.Designer.cs">
+      <DependentUpon>ctrScriptableEdit.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\MajorControls\ctrScriptEdit.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="GUI\MajorControls\ctrScriptEdit.Designer.cs">
+      <DependentUpon>ctrScriptEdit.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SAW\SAW6 Compatibility\SAW6Doc.cs" />
+    <Compile Include="GUI\Dialogs\frmSAWItem.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\Dialogs\frmSAWItem.Designer.cs">
+      <DependentUpon>frmSAWItem.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Shapes and data elements\Item.cs" />
+    <Compile Include="SAW\Blade.cs" />
+    <Compile Include="SAW\Desktop.cs" />
+    <Compile Include="SAW\KeySend.cs" />
+    <Compile Include="SAW\Commands\Param.cs" />
+    <Compile Include="SAW\SAW6 Compatibility\SAW6.cs" />
+    <Compile Include="Shapes and data elements\Virtual\Script.cs" />
+    <Compile Include="Shapes and data elements\Virtual\Scriptable.cs" />
+    <Compile Include="Service References\Repo2\Reference.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </Compile>
+    <Compile Include="Shapes and data elements\Base classes\Shape.cs" />
+    <Compile Include="GUI\Abstract\Measure.cs" />
+    <Compile Include="Shapes and data elements\Button.cs" />
+    <Compile Include="Shapes and data elements\Graphical shapes\Circles.cs" />
+    <Compile Include="Shapes and data elements\Graphical shapes\Connector.cs" />
+    <Compile Include="Shapes and data elements\Graphical shapes\Curves.cs" />
+    <Compile Include="Shapes and data elements\Graphical shapes\ImportedImage.cs" />
+    <Compile Include="Shapes and data elements\Graphical shapes\Line.cs" />
+    <Compile Include="Shapes and data elements\Base classes\Lined.cs" />
+    <Compile Include="Shapes and data elements\Graphical shapes\Parallelograms.cs" />
+    <Compile Include="Shapes and data elements\Graphical shapes\Polygons.cs" />
+    <Compile Include="Shapes and data elements\Graphical shapes\PolyPath.cs" />
+    <Compile Include="Shapes and data elements\Graphical shapes\TextArea.cs" />
+    <Compile Include="Shapes and data elements\Graphical shapes\Triangle.cs" />
+    <Compile Include="Switches\ctrEditTiming.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Switches\ctrEditTiming.Designer.cs">
+      <DependentUpon>ctrEditTiming.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Switches\ctrSelectSwitch.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Switches\ctrSelectSwitch.Designer.cs">
+      <DependentUpon>ctrSelectSwitch.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Switches\Engines\PointerEngine.cs" />
+    <Compile Include="Switches\GUI\Diagram.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Switches\GUI\Display.cs" />
+    <Compile Include="Switches\Engines\Auto2.cs" />
+    <Compile Include="Switches\Engines\AutoSingle.cs" />
+    <Compile Include="Switches\Engines\CriticalOverScan.cs" />
+    <Compile Include="Switches\Engines\DwellSelectCancelEngine.cs" />
+    <Compile Include="Switches\Engines\DwellSelectEngine.cs" />
+    <Compile Include="Switches\Engine.cs" />
+    <Compile Include="Switches\Engines\EngineTwo.cs" />
+    <Compile Include="Switches\Engines\ManualEngine.cs" />
+    <Compile Include="Switches\Engines\UserSingle.cs" />
+    <Compile Include="Switches\DevelopTest.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Switches\DevelopTest.Designer.cs">
+      <DependentUpon>DevelopTest.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Switches\GUI\TestPanel.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Switches\Switching\ISwitch.cs" />
+    <Compile Include="Switches\Switching\JoySwitch.cs" />
+    <Compile Include="Switches\Switching\KeySwitch.cs" />
+    <Compile Include="Switches\Switching\LogicalDwell.cs" />
+    <Compile Include="Switches\Switching\LogicalLong.cs" />
+    <Compile Include="Switches\Switching\LogicalPassThrough.cs" />
+    <Compile Include="Switches\Switching\LogicalRising.cs" />
+    <Compile Include="Switches\Switching\LogicalSwapper.cs" />
+    <Compile Include="Switches\Switching\LogicalSwitch.cs" />
+    <Compile Include="Switches\Switching\PointerSwitch.cs" />
+    <Compile Include="Switches\Switching\PhysicalSwitch.cs" />
+    <Compile Include="Switches\StateTimer.cs" />
+    <Compile Include="Utilities\BinaryData.cs" />
+    <Compile Include="Utilities\CRCCalc.cs" />
+    <Compile Include="Utilities\Errors and logging.cs" />
+    <Compile Include="Utilities\Event definitions.cs" />
+    <Compile Include="Utilities\Extensions.cs" />
+    <Compile Include="Utilities\IndentStringBuilder.cs" />
+    <Compile Include="Utilities\Key utils.cs" />
+    <Compile Include="Utilities\MemoryImage.cs" />
+    <Compile Include="Utilities\Server.cs" />
+    <Compile Include="Utilities\Speech.cs" />
+    <Compile Include="Utilities\Target.cs" />
+    <Compile Include="Utilities\Utilities.cs" />
+    <Compile Include="Utilities\Windows.cs" />
+    <Compile Include="Shapes and data elements\Container.cs" />
+    <Compile Include="Shapes and data elements\Base classes\Datum.cs" />
+    <Compile Include="Shapes and data elements\Group.cs" />
+    <Compile Include="Shapes and data elements\Base classes\Segment.cs" />
+    <Compile Include="Shapes and data elements\Virtual\SelectionBox.cs" />
+    <Compile Include="Shapes and data elements\Virtual\SetOrigin.cs" />
+    <Compile Include="Shapes and data elements\Base classes\SharedImage.cs" />
+    <Compile Include="Shapes and data elements\Virtual\Transformation.cs" />
+    <Compile Include="Shapes and data elements\Virtual\UserSocket.cs" />
+    <EmbeddedResource Include="AM.resx">
+      <CustomToolNamespace>Resources</CustomToolNamespace>
+      <Generator>ResXFileCodeGenerator</Generator>
+      <SubType>Designer</SubType>
+      <LastGenOutput>AM.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\Config editor\cfgCustomPalettes.resx">
+      <DependentUpon>cfgCustomPalettes.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\Config editor\cfgInput.resx">
+      <DependentUpon>cfgInput.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\Config editor\cfgKeys.resx">
+      <DependentUpon>cfgKeys.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\Config editor\cfgListValues.resx" />
+    <EmbeddedResource Include="GUI\Config editor\cfgMouseOutput.resx">
+      <DependentUpon>cfgMouseOutput.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\Config editor\cfgOutput.resx">
+      <DependentUpon>cfgOutput.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\Config editor\cfgShowInEditing.resx">
+      <DependentUpon>cfgShowInEditing.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\Config editor\cfgSpeech.resx">
+      <DependentUpon>cfgSpeech.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\Config editor\cfgStyles.resx">
+      <DependentUpon>cfgStyles.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\Config editor\cfgSwitching.resx">
+      <DependentUpon>cfgSwitching.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\Config editor\ConfigPage.resx">
+      <DependentUpon>ConfigPage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\Config editor\frmEditConfig.resx">
+      <DependentUpon>frmEditConfig.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\Controls\ColourPicker.resx">
+      <DependentUpon>ColourPicker.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\Dialogs\frmAddButtons.resx">
+      <DependentUpon>frmAddButtons.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\Dialogs\frmButton.resx">
+      <DependentUpon>frmButton.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\Dialogs\frmCreateActivity.resx">
+      <DependentUpon>frmCreateActivity.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\Dialogs\frmErrorReport.resx">
+      <DependentUpon>frmErrorReport.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\Dialogs\frmFlow.resx">
+      <DependentUpon>frmFlow.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\Dialogs\frmFont.resx">
+      <DependentUpon>frmFont.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\Dialogs\frmMoreColours.resx">
+      <DependentUpon>frmMoreColours.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\Dialogs\frmPageSize.resx">
+      <DependentUpon>frmPageSize.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\Dialogs\frmPaper.resx">
+      <DependentUpon>frmPaper.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\Dialogs\frmTexture.resx">
+      <DependentUpon>frmTexture.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\Dialogs\frmUpdate.resx">
+      <DependentUpon>frmUpdate.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\frmMain.resx">
+      <DependentUpon>frmMain.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\frmMenu.resx">
+      <DependentUpon>frmMenu.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\frmRun.resx">
+      <DependentUpon>frmRun.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\MajorControls\ctrActionSelect.resx">
+      <DependentUpon>ctrActionSelect.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\MajorControls\ctrButtonStyleEdit.resx">
+      <DependentUpon>ctrButtonStyleEdit.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\MajorControls\ctrTextStyle.resx">
+      <DependentUpon>ctrTextStyle.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\MajorControls\FolderTree.resx">
+      <DependentUpon>FolderTree.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\Minor dialogs\frmActivityRename.resx">
+      <DependentUpon>frmActivityRename.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\Minor dialogs\frmButtonStyleName.resx">
+      <DependentUpon>frmButtonStyleName.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\Minor dialogs\frmChooseImportPage.resx">
+      <DependentUpon>frmChooseImportPage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\Minor dialogs\frmLineWidth.resx">
+      <DependentUpon>frmLineWidth.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\Minor dialogs\frmNewPageBackground.resx">
+      <DependentUpon>frmNewPageBackground.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\Minor dialogs\frmPaletteDetails.resx">
+      <DependentUpon>frmPaletteDetails.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\Minor dialogs\frmReportOpErrors.resx">
+      <DependentUpon>frmReportOpErrors.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\Minor dialogs\frmReportProblem.resx">
+      <DependentUpon>frmReportProblem.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\Minor dialogs\frmResource.resx">
+      <DependentUpon>frmResource.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\Minor dialogs\frmUserButtonStyle.resx">
+      <DependentUpon>frmUserButtonStyle.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\Palettes\ctrArrowheadsPalette.resx">
+      <DependentUpon>ctrArrowheadsPalette.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\Palettes\ctrDocumentOutline.resx">
+      <DependentUpon>ctrDocumentOutline.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\DevelopmentDialogs\frmDeltas.resx">
+      <DependentUpon>frmDeltas.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\DevelopmentDialogs\frmShowErrorReport.resx">
+      <DependentUpon>frmShowErrorReport.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <EmbeddedResource Include="SAW\CCF\frmLookup.resx">
+      <DependentUpon>frmLookup.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SAW\CCF\frmMultiUpdateOptions.resx">
+      <DependentUpon>frmMultiUpdateOptions.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SAW\CCF\frmMultiUpdateProgress.resx">
+      <DependentUpon>frmMultiUpdateProgress.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SAW\CommandEditors\GotoPageEditor.resx">
+      <DependentUpon>GotoPageEditor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SAW\CommandEditors\LoadSettingsEditor.resx">
+      <DependentUpon>LoadSettingsEditor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SAW\CommandEditors\MoveWindowEditor.resx">
+      <DependentUpon>MoveWindowEditor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SAW\CommandEditors\BladeEditor.resx">
+      <DependentUpon>BladeEditor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SAW\CommandEditors\DockEditor.resx">
+      <DependentUpon>DockEditor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SAW\CommandEditors\PickItemEditor.resx">
+      <DependentUpon>PickItemEditor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SAW\CommandEditors\CommandEditor.resx">
+      <DependentUpon>CommandEditor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SAW\CommandEditors\AnyItemStateEditor.resx">
+      <DependentUpon>AnyItemStateEditor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SAW\CommandEditors\DesktopCommandEditor.resx">
+      <DependentUpon>DesktopCommandEditor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SAW\CommandEditors\AppCommandEditor.resx">
+      <DependentUpon>AppCommandEditor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SAW\CommandEditors\GridScanEditor.resx">
+      <DependentUpon>GridScanEditor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SAW\CommandEditors\KeyDelayEditor.resx">
+      <DependentUpon>KeyDelayEditor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SAW\CommandEditors\KeysEditor.resx">
+      <DependentUpon>KeysEditor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SAW\CommandEditors\MoveToEditor.resx">
+      <DependentUpon>MoveToEditor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SAW\CommandEditors\PopupItemEditor.resx">
+      <DependentUpon>PopupItemEditor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SAW\CommandEditors\PopupShowEditor.resx">
+      <DependentUpon>PopupShowEditor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SAW\CommandEditors\FloatingTimeEditor.resx">
+      <DependentUpon>FloatingTimeEditor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SAW\CommandEditors\WordListScrollEditor.resx">
+      <DependentUpon>WordListScrollEditor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\MajorControls\ctrScriptableEdit.resx">
+      <DependentUpon>ctrScriptableEdit.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\MajorControls\ctrScriptEdit.resx">
+      <DependentUpon>ctrScriptEdit.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\Dialogs\frmAddCommand.resx">
+      <DependentUpon>frmAddCommand.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\Minor dialogs\frmEditBounds.resx">
+      <DependentUpon>frmEditBounds.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\Dialogs\frmEditDefaultScripts.resx">
+      <DependentUpon>frmEditDefaultScripts.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\Dialogs\frmEditDesktop.resx">
+      <DependentUpon>frmEditDesktop.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\Dialogs\frmEditStartupScript.resx">
+      <DependentUpon>frmEditStartupScript.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\Dialogs\frmGridWizard.resx">
+      <DependentUpon>frmGridWizard.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\Dialogs\frmOpenSymbol.resx">
+      <DependentUpon>frmOpenSymbol.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\Dialogs\frmSAWItem.resx">
+      <DependentUpon>frmSAWItem.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\Minor dialogs\frmFocusWarning.resx">
+      <DependentUpon>frmFocusWarning.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SAW\CommandEditors\OnOffEditor.resx">
+      <DependentUpon>OnOffEditor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Switches\ctrEditTiming.resx">
+      <DependentUpon>ctrEditTiming.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Switches\ctrSelectSwitch.resx">
+      <DependentUpon>ctrSelectSwitch.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Switches\DevelopTest.resx">
+      <DependentUpon>DevelopTest.cs</DependentUpon>
+    </EmbeddedResource>
+    <None Include=".editorconfig" />
+    <None Include="packages.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <None Include="Service References\Repo2\repo2.wsdl" />
+    <None Include="Service References\Repo2\SAW.Repo2.ArrayOfString.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\Repo2\SAW.Repo2.CheckResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\Repo2\SAW.Repo2.DeleteResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\Repo2\SAW.Repo2.FetchChunkResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\Repo2\SAW.Repo2.FetchResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\Repo2\SAW.Repo2.LastVersionBResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\Repo2\SAW.Repo2.MergeResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\Repo2\SAW.Repo2.ProductsResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\Repo2\SAW.Repo2.StoreErrorResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\Repo2\SAW.Repo2.StoreResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\Repo2\SAW.Repo2.VerifyVersionResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\Repo2\SAW.Repo2.VersionNeedsResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\Repo2\SAW.Repo2.VersionsResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Flaws.txt" />
+    <None Include="Resources\Warning.png" />
+    <None Include="Resources\SizeGrip_24.png" />
+    <None Include="Resources\Verb_NudgeUp.png" />
+    <None Include="Resources\Verb_NudgeDown.png" />
+    <None Include="Resources\Verb_NudgeLeft.png" />
+    <None Include="Resources\Verb_NudgeRight.png" />
+    <None Include="Resources\Verb_LargestHeight.png" />
+    <None Include="Resources\Verb_LargestWidth.png" />
+    <None Include="Resources\Verb_SmallestHeight.png" />
+    <None Include="Resources\Verb_SmallestWidth.png" />
+    <None Include="Service References\Repo2\repo2.disco" />
+    <None Include="Service References\Repo2\configuration91.svcinfo" />
+    <None Include="Service References\Repo2\configuration.svcinfo" />
+    <None Include="Service References\Repo2\Reference.svcmap">
+      <Generator>WCF Proxy Generator</Generator>
+      <LastGenOutput>Reference.cs</LastGenOutput>
+    </None>
+    <EmbeddedResource Include="Resources\ACCORDIONLEFTCLOSED.gif" />
+    <EmbeddedResource Include="Resources\ACCORDIONLEFTHOVER.gif" />
+    <EmbeddedResource Include="Resources\ACCORDIONLEFTOPEN.gif" />
+    <EmbeddedResource Include="Resources\ACCORDIONMIDCLOSED.gif" />
+    <EmbeddedResource Include="Resources\ACCORDIONMIDHOVER.gif" />
+    <EmbeddedResource Include="Resources\ACCORDIONMIDOPEN.gif" />
+    <EmbeddedResource Include="Resources\ACCORDIONRIGHTCLOSED.gif" />
+    <EmbeddedResource Include="Resources\ACCORDIONRIGHTHOVER.gif" />
+    <EmbeddedResource Include="Resources\ACCORDIONRIGHTOPEN.gif" />
+    <EmbeddedResource Include="Resources\ActiveItem_16.png" />
+    <EmbeddedResource Include="Resources\AddUser.png" />
+    <EmbeddedResource Include="Resources\AngleSnap.png" />
+    <EmbeddedResource Include="Resources\AngleSnapMove.png" />
+    <EmbeddedResource Include="Resources\AngleSnapMove_48.png" />
+    <EmbeddedResource Include="Resources\AngleSnapMove_64.png" />
+    <EmbeddedResource Include="Resources\AngleSnap_16.png" />
+    <EmbeddedResource Include="Resources\AngleSnap_48.png" />
+    <EmbeddedResource Include="Resources\AngleSnap_64.png" />
+    <EmbeddedResource Include="Resources\Arrowheads.png" />
+    <EmbeddedResource Include="Resources\back.png" />
+    <EmbeddedResource Include="Resources\BlackWhiteText.png" />
+    <EmbeddedResource Include="Resources\Bullet.png" />
+    <EmbeddedResource Include="Resources\ChangeView_24.png" />
+    <EmbeddedResource Include="Resources\CloseIconHot_16.png" />
+    <EmbeddedResource Include="Resources\CloseIconPressed_16.png" />
+    <EmbeddedResource Include="Resources\CloseIcon_16.png" />
+    <EmbeddedResource Include="Resources\close_24.png" />
+    <EmbeddedResource Include="Resources\close_32.png" />
+    <EmbeddedResource Include="Resources\ConfigDocument_Both_64.png" />
+    <EmbeddedResource Include="Resources\ConfigDocument_User_64.png" />
+    <EmbeddedResource Include="Resources\ConfigFlow.png" />
+    <EmbeddedResource Include="Resources\ConfigPrompt_Advanced_Colours.png" />
+    <EmbeddedResource Include="Resources\ConfigPrompt_Advanced_Graphics.png" />
+    <EmbeddedResource Include="Resources\ConfigPrompt_Angle_45_Off.png" />
+    <EmbeddedResource Include="Resources\ConfigPrompt_Angle_45_On.png" />
+    <EmbeddedResource Include="Resources\ConfigPrompt_KeyShortcuts_Off.png" />
+    <EmbeddedResource Include="Resources\ConfigPrompt_KeyShortcuts_On.png" />
+    <EmbeddedResource Include="Resources\ConfigPrompt_Key_Shortcuts_Off.png" />
+    <EmbeddedResource Include="Resources\ConfigPrompt_Key_Shortcuts_On.png" />
+    <EmbeddedResource Include="Resources\ConfigPrompt_Low_Graphics_Off.png" />
+    <EmbeddedResource Include="Resources\ConfigPrompt_Low_Graphics_On.png" />
+    <EmbeddedResource Include="Resources\ConfigPrompt_Moving_Shadow_Off.png" />
+    <EmbeddedResource Include="Resources\ConfigPrompt_Moving_Shadow_On.png" />
+    <EmbeddedResource Include="Resources\ConfigPrompt_Selection_Bounds_Off.png" />
+    <EmbeddedResource Include="Resources\ConfigPrompt_Selection_Bounds_On.png" />
+    <EmbeddedResource Include="Resources\ConfigPrompt_SelectorAfterCreate.png" />
+    <EmbeddedResource Include="Resources\ConfigPrompt_Separate_Cursors_Off.png" />
+    <EmbeddedResource Include="Resources\ConfigPrompt_Separate_Cursors_On.png" />
+    <EmbeddedResource Include="Resources\ConfigPrompt_Show_InfoMeasurement.png" />
+    <EmbeddedResource Include="Resources\ConfigPrompt_Show_PageList.png" />
+    <EmbeddedResource Include="Resources\ConfigPrompt_Show_PointerButtons.png" />
+    <EmbeddedResource Include="Resources\ConfigPrompt_Show_Prompts.png" />
+    <EmbeddedResource Include="Resources\ConfigPrompt_Show_Toolbar.png" />
+    <EmbeddedResource Include="Resources\ConfigPrompt_Show_ToolbarSnap.png" />
+    <EmbeddedResource Include="Resources\ConfigPrompt_Show_ToolbarVerbs.png" />
+    <EmbeddedResource Include="Resources\ConfigPrompt_Show_Tools.png" />
+    <EmbeddedResource Include="Resources\ConfigPrompt_Show_TransformCopy.png" />
+    <EmbeddedResource Include="Resources\ConfigPrompt_Smaller_Tools.png" />
+    <EmbeddedResource Include="Resources\ConfigPrompt_Windows_Colours_Off.png" />
+    <EmbeddedResource Include="Resources\ConfigPrompt_Windows_Colours_On.png" />
+    <EmbeddedResource Include="Resources\ConfigUserTeacher.png" />
+    <EmbeddedResource Include="Resources\ConfigUserUser.png" />
+    <EmbeddedResource Include="Resources\ConfigWheel.png" />
+    <EmbeddedResource Include="Resources\CopyXForm.png" />
+    <EmbeddedResource Include="Resources\CopyXForm_48.png" />
+    <EmbeddedResource Include="Resources\CopyXForm_64.png" />
+    <EmbeddedResource Include="Resources\CursorClick.png" />
+    <EmbeddedResource Include="Resources\CustomButtonHover_32.png" />
+    <EmbeddedResource Include="Resources\CustomButtonSelect_32.png" />
+    <EmbeddedResource Include="Resources\CustomButton_32.png" />
+    <EmbeddedResource Include="Resources\Divider.png" />
+    <EmbeddedResource Include="Resources\DocumentOutline_24.png" />
+    <EmbeddedResource Include="Resources\DocumentOutline_32.png" />
+    <EmbeddedResource Include="Resources\Document_16.png" />
+    <EmbeddedResource Include="Resources\DropDown.png" />
+    <EmbeddedResource Include="Resources\Empty.png" />
+    <EmbeddedResource Include="Resources\FileTemplate_16.png" />
+    <EmbeddedResource Include="Resources\FillColour.png" />
+    <EmbeddedResource Include="Resources\FillPattern.png" />
+    <EmbeddedResource Include="Resources\Flow_Direction_Down.png" />
+    <EmbeddedResource Include="Resources\Flow_Direction_DownThenLeft.png" />
+    <EmbeddedResource Include="Resources\Flow_Direction_DownThenRight.png" />
+    <EmbeddedResource Include="Resources\Flow_Direction_Left.png" />
+    <EmbeddedResource Include="Resources\Flow_Direction_LeftThenDown.png" />
+    <EmbeddedResource Include="Resources\Flow_Direction_LeftThenUp.png" />
+    <EmbeddedResource Include="Resources\Flow_Direction_Right.png" />
+    <EmbeddedResource Include="Resources\Flow_Direction_RightThenDown.png" />
+    <EmbeddedResource Include="Resources\Flow_Direction_RightThenUp.png" />
+    <EmbeddedResource Include="Resources\Flow_Direction_Up.png" />
+    <EmbeddedResource Include="Resources\Flow_Direction_UpThenLeft.png" />
+    <EmbeddedResource Include="Resources\Flow_Direction_UpThenRight.png" />
+    <EmbeddedResource Include="Resources\Flow_Overflow_Clip.png" />
+    <EmbeddedResource Include="Resources\Flow_Overflow_Hide.png" />
+    <EmbeddedResource Include="Resources\Flow_Overflow_Overflow.png" />
+    <EmbeddedResource Include="Resources\folder.png" />
+    <EmbeddedResource Include="Resources\folder_48.png" />
+    <EmbeddedResource Include="Resources\folder_add_32.png" />
+    <EmbeddedResource Include="Resources\GreyQuestion.png" />
+    <EmbeddedResource Include="Resources\GreyQuestion_24.png" />
+    <EmbeddedResource Include="Resources\GridSnap.png" />
+    <EmbeddedResource Include="Resources\GridSnap_16.png" />
+    <EmbeddedResource Include="Resources\GridSnap_48.png" />
+    <EmbeddedResource Include="Resources\GridSnap_64.png" />
+    <EmbeddedResource Include="Resources\home.png" />
+    <EmbeddedResource Include="Resources\home_24.png" />
+    <EmbeddedResource Include="Resources\icon32.ico" />
+    <EmbeddedResource Include="Resources\icon32.png" />
+    <EmbeddedResource Include="Resources\ImageFit_0.png" />
+    <EmbeddedResource Include="Resources\ImageFit_1.png" />
+    <EmbeddedResource Include="Resources\ImageFit_2.png" />
+    <EmbeddedResource Include="Resources\ImageFit_3.png" />
+    <EmbeddedResource Include="Resources\ImageFit_4.png" />
+    <EmbeddedResource Include="Resources\InactiveItem_16.png" />
+    <EmbeddedResource Include="Resources\info_24.png" />
+    <EmbeddedResource Include="Resources\info_32.png" />
+    <EmbeddedResource Include="Resources\info_64.png" />
+    <EmbeddedResource Include="Resources\internet_16.png" />
+    <EmbeddedResource Include="Resources\LeftRedArrrow.png" />
+    <EmbeddedResource Include="Resources\LeftRedArrrow16.png" />
+    <EmbeddedResource Include="Resources\LineColour.png" />
+    <EmbeddedResource Include="Resources\LinePattern.png" />
+    <EmbeddedResource Include="Resources\Lock_16.png" />
+    <EmbeddedResource Include="Resources\lock_24.png" />
+    <EmbeddedResource Include="Resources\lock_32.png" />
+    <EmbeddedResource Include="Resources\logo200.png" />
+    <EmbeddedResource Include="Resources\MarkerStyle.png" />
+    <EmbeddedResource Include="Resources\Missing_128.png" />
+    <EmbeddedResource Include="Resources\MouseStepLarge.png" />
+    <EmbeddedResource Include="Resources\MouseStepMedium.png" />
+    <EmbeddedResource Include="Resources\MouseStepSmall.png" />
+    <EmbeddedResource Include="Resources\MoveBottom_24.png" />
+    <EmbeddedResource Include="Resources\MoveDown_24.png" />
+    <EmbeddedResource Include="Resources\MoveTop_24.png" />
+    <EmbeddedResource Include="Resources\MoveUp_24.png" />
+    <EmbeddedResource Include="Resources\MoveXForm.png" />
+    <EmbeddedResource Include="Resources\MoveXForm_48.png" />
+    <EmbeddedResource Include="Resources\MoveXForm_64.png" />
+    <EmbeddedResource Include="Resources\Next_32_64.png" />
+    <EmbeddedResource Include="Resources\NoSnap.png" />
+    <EmbeddedResource Include="Resources\NoSnap_16.png" />
+    <EmbeddedResource Include="Resources\NoSnap_48.png" />
+    <EmbeddedResource Include="Resources\ok_24.png" />
+    <EmbeddedResource Include="Resources\ok_32.png" />
+    <EmbeddedResource Include="Resources\PageNew.png" />
+    <EmbeddedResource Include="Resources\PageNew16.png" />
+    <EmbeddedResource Include="Resources\Page_16.png" />
+    <EmbeddedResource Include="Resources\paint_128.png" />
+    <EmbeddedResource Include="Resources\paint_48.png" />
+    <EmbeddedResource Include="Resources\PALETTELEFT.gif" />
+    <EmbeddedResource Include="Resources\pdf-icon-16.png" />
+    <EmbeddedResource Include="Resources\pencil.png" />
+    <EmbeddedResource Include="Resources\pencil_48.png" />
+    <EmbeddedResource Include="Resources\pointer.gif" />
+    <EmbeddedResource Include="Resources\PopupHidden_16.png" />
+    <EmbeddedResource Include="Resources\Popup_16.png" />
+    <EmbeddedResource Include="Resources\Previous_32_64.png" />
+    <EmbeddedResource Include="Resources\Prompts_Arc_Cancel1.png" />
+    <EmbeddedResource Include="Resources\Prompts_Arc_Choose1.png" />
+    <EmbeddedResource Include="Resources\Prompts_Arc_Choose2.png" />
+    <EmbeddedResource Include="Resources\Prompts_Arc_Finish.png" />
+    <EmbeddedResource Include="Resources\Prompts_Arc_IncDec.png" />
+    <EmbeddedResource Include="Resources\Prompts_Arc_Start.png" />
+    <EmbeddedResource Include="Resources\Prompts_Arrow_Finish.png" />
+    <EmbeddedResource Include="Resources\Prompts_Arrow_Start.png" />
+    <EmbeddedResource Include="Resources\Prompts_Button_Complete.png" />
+    <EmbeddedResource Include="Resources\Prompts_Button_Start.png" />
+    <EmbeddedResource Include="Resources\Prompts_CancelAll.png" />
+    <EmbeddedResource Include="Resources\Prompts_ChangeMouseStep.png" />
+    <EmbeddedResource Include="Resources\Prompts_Circle_Finish.png" />
+    <EmbeddedResource Include="Resources\Prompts_Circle_Resize.png" />
+    <EmbeddedResource Include="Resources\Prompts_Circle_Start.png" />
+    <EmbeddedResource Include="Resources\Prompts_ClosedCurve_Cancel.png" />
+    <EmbeddedResource Include="Resources\Prompts_ClosedCurve_Cancel1.png" />
+    <EmbeddedResource Include="Resources\Prompts_ClosedCurve_Choose.png" />
+    <EmbeddedResource Include="Resources\Prompts_ClosedCurve_Finish.png" />
+    <EmbeddedResource Include="Resources\Prompts_ClosedCurve_Start.png" />
+    <EmbeddedResource Include="Resources\Prompts_Connector_Finish.png" />
+    <EmbeddedResource Include="Resources\Prompts_Connector_Hover.png" />
+    <EmbeddedResource Include="Resources\Prompts_Connector_Start.png" />
+    <EmbeddedResource Include="Resources\Prompts_CornerResize.png" />
+    <EmbeddedResource Include="Resources\Prompts_Curve_Cancel1.png" />
+    <EmbeddedResource Include="Resources\Prompts_Curve_Choose.png" />
+    <EmbeddedResource Include="Resources\Prompts_Curve_Finish.png" />
+    <EmbeddedResource Include="Resources\Prompts_Curve_Start.png" />
+    <EmbeddedResource Include="Resources\Prompts_Ellipse_Cancel.png" />
+    <EmbeddedResource Include="Resources\Prompts_Ellipse_Cancel1.png" />
+    <EmbeddedResource Include="Resources\Prompts_Ellipse_Choose.png" />
+    <EmbeddedResource Include="Resources\Prompts_Ellipse_Finish.png" />
+    <EmbeddedResource Include="Resources\Prompts_Ellipse_Start.png" />
+    <EmbeddedResource Include="Resources\Prompts_Equilateral_Cancel.png" />
+    <EmbeddedResource Include="Resources\Prompts_Equilateral_Cancel1.png" />
+    <EmbeddedResource Include="Resources\Prompts_Equilateral_Choose.png" />
+    <EmbeddedResource Include="Resources\Prompts_Equilateral_Finish.png" />
+    <EmbeddedResource Include="Resources\Prompts_Equilateral_Start.png" />
+    <EmbeddedResource Include="Resources\Prompts_Eraser_Start.png" />
+    <EmbeddedResource Include="Resources\Prompts_Eraser_Start_Pixels.png" />
+    <EmbeddedResource Include="Resources\Prompts_FreeText_Enter.png" />
+    <EmbeddedResource Include="Resources\Prompts_FreeText_Finish.png" />
+    <EmbeddedResource Include="Resources\Prompts_FreeText_Start.png" />
+    <EmbeddedResource Include="Resources\Prompts_FreeText_Start_Centre.png" />
+    <EmbeddedResource Include="Resources\Prompts_FreeText_Start_Right.png" />
+    <EmbeddedResource Include="Resources\Prompts_FreeText_Type.png" />
+    <EmbeddedResource Include="Resources\Prompts_Hash.png" />
+    <EmbeddedResource Include="Resources\Prompts_InfiniteLine_Finish.png" />
+    <EmbeddedResource Include="Resources\Prompts_InfiniteLine_Start.png" />
+    <EmbeddedResource Include="Resources\Prompts_IrregularPolygon_Cancel1.png" />
+    <EmbeddedResource Include="Resources\Prompts_IrregularPolygon_Choose.png" />
+    <EmbeddedResource Include="Resources\Prompts_IrregularPolygon_Finish.png" />
+    <EmbeddedResource Include="Resources\Prompts_IrregularPolygon_Start.png" />
+    <EmbeddedResource Include="Resources\Prompts_Isosceles_Cancel.png" />
+    <EmbeddedResource Include="Resources\Prompts_Isosceles_Cancel1.png" />
+    <EmbeddedResource Include="Resources\Prompts_Isosceles_Choose.png" />
+    <EmbeddedResource Include="Resources\Prompts_Isosceles_Finish.png" />
+    <EmbeddedResource Include="Resources\Prompts_Isosceles_Start.png" />
+    <EmbeddedResource Include="Resources\Prompts_Label_Start.png" />
+    <EmbeddedResource Include="Resources\Prompts_Label_Type.png" />
+    <EmbeddedResource Include="Resources\Prompts_Line_Finish.png" />
+    <EmbeddedResource Include="Resources\Prompts_Line_Start.png" />
+    <EmbeddedResource Include="Resources\Prompts_Marker_Start.png" />
+    <EmbeddedResource Include="Resources\Prompts_Move.png" />
+    <EmbeddedResource Include="Resources\Prompts_MoveVertex.png" />
+    <EmbeddedResource Include="Resources\Prompts_OrthogonalRectangle_Finish.png" />
+    <EmbeddedResource Include="Resources\Prompts_OrthogonalRectangle_Start.png" />
+    <EmbeddedResource Include="Resources\Prompts_Orthogonal_Finish.png" />
+    <EmbeddedResource Include="Resources\Prompts_Orthogonal_Start.png" />
+    <EmbeddedResource Include="Resources\Prompts_Parallelogram_Cancel1.png" />
+    <EmbeddedResource Include="Resources\Prompts_Parallelogram_Choose.png" />
+    <EmbeddedResource Include="Resources\Prompts_Parallelogram_Finish.png" />
+    <EmbeddedResource Include="Resources\Prompts_Parallelogram_Start.png" />
+    <EmbeddedResource Include="Resources\Prompts_Pencil_Cancel.png" />
+    <EmbeddedResource Include="Resources\Prompts_Pencil_Finish.png" />
+    <EmbeddedResource Include="Resources\Prompts_Pencil_FinishClose.png" />
+    <EmbeddedResource Include="Resources\Prompts_Pencil_Start.png" />
+    <EmbeddedResource Include="Resources\Prompts_Polygon_Cancel1.png" />
+    <EmbeddedResource Include="Resources\Prompts_Polygon_Choose.png" />
+    <EmbeddedResource Include="Resources\Prompts_Polygon_Finish.png" />
+    <EmbeddedResource Include="Resources\Prompts_Polygon_IncDec.png" />
+    <EmbeddedResource Include="Resources\Prompts_Polygon_Start.png" />
+    <EmbeddedResource Include="Resources\Prompts_PolyLine_Cancel1.png" />
+    <EmbeddedResource Include="Resources\Prompts_PolyLine_Choose.png" />
+    <EmbeddedResource Include="Resources\Prompts_PolyLine_Finish.png" />
+    <EmbeddedResource Include="Resources\Prompts_PolyLine_Start.png" />
+    <EmbeddedResource Include="Resources\Prompts_Rectangle_Cancel1.png" />
+    <EmbeddedResource Include="Resources\Prompts_Rectangle_Choose.png" />
+    <EmbeddedResource Include="Resources\Prompts_Rectangle_Finish.png" />
+    <EmbeddedResource Include="Resources\Prompts_Rectangle_Start.png" />
+    <EmbeddedResource Include="Resources\Prompts_Restore_Focus.png" />
+    <EmbeddedResource Include="Resources\Prompts_Rotate.png" />
+    <EmbeddedResource Include="Resources\Prompts_SemiCircle_Cancel.png" />
+    <EmbeddedResource Include="Resources\Prompts_Semicircle_Cancel1.png" />
+    <EmbeddedResource Include="Resources\Prompts_Semicircle_Choose.png" />
+    <EmbeddedResource Include="Resources\Prompts_Semicircle_Finish.png" />
+    <EmbeddedResource Include="Resources\Prompts_Semicircle_Start.png" />
+    <EmbeddedResource Include="Resources\Prompts_Square_Cancel1.png" />
+    <EmbeddedResource Include="Resources\Prompts_Square_Choose.png" />
+    <EmbeddedResource Include="Resources\Prompts_Square_Finish.png" />
+    <EmbeddedResource Include="Resources\Prompts_Square_Start.png" />
+    <EmbeddedResource Include="Resources\Prompts_StretchH.png" />
+    <EmbeddedResource Include="Resources\Prompts_StretchV.png" />
+    <EmbeddedResource Include="Resources\Prompts_Tab_Keys.png" />
+    <EmbeddedResource Include="Resources\Prompts_TextLine_Choose.png" />
+    <EmbeddedResource Include="Resources\Prompts_TextLine_Finish.png" />
+    <EmbeddedResource Include="Resources\Prompts_TextLine_Flow.png" />
+    <EmbeddedResource Include="Resources\Prompts_TextLine_Start.png" />
+    <EmbeddedResource Include="Resources\Prompts_TextLine_Type.png" />
+    <EmbeddedResource Include="Resources\Prompts_Triangle_Cancel.png" />
+    <EmbeddedResource Include="Resources\Prompts_Triangle_Cancel1.png" />
+    <EmbeddedResource Include="Resources\Prompts_Triangle_Choose.png" />
+    <EmbeddedResource Include="Resources\Prompts_Triangle_Finish.png" />
+    <EmbeddedResource Include="Resources\Prompts_Triangle_Start.png" />
+    <EmbeddedResource Include="Resources\Prompts_UserSocket_Start.png" />
+    <EmbeddedResource Include="Resources\Prompts_Vertical_Scroll.png" />
+    <EmbeddedResource Include="Resources\RedCross.png" />
+    <EmbeddedResource Include="Resources\RoundButtonHover_256.png" />
+    <EmbeddedResource Include="Resources\RoundButtonHover_32.png" />
+    <EmbeddedResource Include="Resources\RoundButtonHover_38.png" />
+    <EmbeddedResource Include="Resources\RoundButtonHover_48.png" />
+    <EmbeddedResource Include="Resources\RoundButtonHover_80.png" />
+    <EmbeddedResource Include="Resources\RoundButtonNoUser.png" />
+    <EmbeddedResource Include="Resources\RoundButtonNoUser_256.png" />
+    <EmbeddedResource Include="Resources\RoundButtonNoUser_38.png" />
+    <EmbeddedResource Include="Resources\RoundButtonNoUser_48.png" />
+    <EmbeddedResource Include="Resources\RoundButtonNoUser_80.png" />
+    <EmbeddedResource Include="Resources\RoundButtonPale.png" />
+    <EmbeddedResource Include="Resources\RoundButtonPale_80.png" />
+    <EmbeddedResource Include="Resources\RoundButtonSelect_256.png" />
+    <EmbeddedResource Include="Resources\RoundButtonSelect_32.png" />
+    <EmbeddedResource Include="Resources\RoundButtonSelect_38.png" />
+    <EmbeddedResource Include="Resources\RoundButtonSelect_48.png" />
+    <EmbeddedResource Include="Resources\RoundButtonSelect_80.png" />
+    <EmbeddedResource Include="Resources\RoundButton_256.png" />
+    <EmbeddedResource Include="Resources\RoundButton_32.png" />
+    <EmbeddedResource Include="Resources\RoundButton_38.png" />
+    <EmbeddedResource Include="Resources\RoundButton_48.png" />
+    <EmbeddedResource Include="Resources\RoundButton_80.png" />
+    <EmbeddedResource Include="Resources\ShapeSnap.png" />
+    <EmbeddedResource Include="Resources\ShapeSnap_16.png" />
+    <EmbeddedResource Include="Resources\ShapeSnap_48.png" />
+    <EmbeddedResource Include="Resources\ShapeSnap_64.png" />
+    <EmbeddedResource Include="Resources\smile_48.png" />
+    <EmbeddedResource Include="Resources\SocketAutoVector_20.png" />
+    <EmbeddedResource Include="Resources\SocketFixedVector_20.png" />
+    <EmbeddedResource Include="Resources\Start_MoveDown.png" />
+    <EmbeddedResource Include="Resources\Start_MoveUp.png" />
+    <EmbeddedResource Include="Resources\Start_Undelete.png" />
+    <EmbeddedResource Include="Resources\TabBackwards.png" />
+    <EmbeddedResource Include="Resources\TabForwards.png" />
+    <EmbeddedResource Include="Resources\Tabs_Centre.png" />
+    <EmbeddedResource Include="Resources\Tabs_CentreSelected.png" />
+    <EmbeddedResource Include="Resources\Tabs_Close.png" />
+    <EmbeddedResource Include="Resources\Tabs_CloseHover.png" />
+    <EmbeddedResource Include="Resources\Tabs_Left.png" />
+    <EmbeddedResource Include="Resources\Tabs_LeftSelected.png" />
+    <EmbeddedResource Include="Resources\Tabs_PaletteCentre.png" />
+    <EmbeddedResource Include="Resources\Tabs_PaletteCentreSelected.png" />
+    <EmbeddedResource Include="Resources\Tabs_PaletteLeft.png" />
+    <EmbeddedResource Include="Resources\Tabs_PaletteLeftSelected.png" />
+    <EmbeddedResource Include="Resources\Tabs_PaletteRight.png" />
+    <EmbeddedResource Include="Resources\Tabs_PaletteRightSelected.png" />
+    <EmbeddedResource Include="Resources\Tabs_Right.png" />
+    <EmbeddedResource Include="Resources\Tabs_RightSelected.png" />
+    <EmbeddedResource Include="Resources\teacher_128.png" />
+    <EmbeddedResource Include="Resources\teacher_32.png" />
+    <EmbeddedResource Include="Resources\teacher_48.png" />
+    <EmbeddedResource Include="Resources\TextBackwards.png" />
+    <EmbeddedResource Include="Resources\TextBottom.png" />
+    <EmbeddedResource Include="Resources\TextCentre.png" />
+    <EmbeddedResource Include="Resources\TextForwards.png" />
+    <EmbeddedResource Include="Resources\TextLarger.png" />
+    <EmbeddedResource Include="Resources\TextLeft.png" />
+    <EmbeddedResource Include="Resources\TextMiddle.png" />
+    <EmbeddedResource Include="Resources\TextRight.png" />
+    <EmbeddedResource Include="Resources\TextSmaller.png" />
+    <EmbeddedResource Include="Resources\TextStyle.png" />
+    <EmbeddedResource Include="Resources\TextTop.png" />
+    <EmbeddedResource Include="Resources\ThreeDefaultActive.png" />
+    <EmbeddedResource Include="Resources\ThreeDefaultFalse.png" />
+    <EmbeddedResource Include="Resources\ThreeDefaultInactive.png" />
+    <EmbeddedResource Include="Resources\ThreeDefaultTrue.png" />
+    <EmbeddedResource Include="Resources\ThreeMarker.png" />
+    <EmbeddedResource Include="Resources\ThreeOff.png" />
+    <EmbeddedResource Include="Resources\ThreeOn.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_16_ARC.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_16_ARROW.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_16_BUTTON.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_16_CIRCLE.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_16_CLOSEDCURVE.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_16_CONNECTOR.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_16_CONTAINER.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_16_CURVE.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_16_ELLIPSE.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_16_EQUILATERAL.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_16_FLOW.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_16_FREETEXT.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_16_IRREGULARPOLYGON.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_16_ISOSCELES.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_16_LABEL.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_16_LINE.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_16_MARKER.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_16_ORTHOGONAL.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_16_ORTHOGONALRECTANGLE.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_16_PARALLELOGRAM.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_16_PENCIL.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_16_POLYGON.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_16_POLYLINE.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_16_RECTANGLE.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_16_SELECTIONBOX.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_16_SELECTOR.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_16_SEMICIRCLE.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_16_SQUARE.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_16_TEXTLINE.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_16_TRANSFORMCOPY.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_16_TRANSFORMCOPYVH.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_16_TRANSFORMMIRROR.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_16_TRANSFORMMIRRORCOPY.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_16_TRANSFORMMOVE.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_16_TRANSFORMMOVEVH.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_16_TRANSFORMROTATE.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_16_TRANSFORMROTATECOPY.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_16_TRANSFORMSCALE.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_16_TRANSFORMSCALECOPY.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_16_TRIANGLE.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_16_USERSOCKET.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_48_ARC.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_48_ARROW.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_48_BUTTON.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_48_CIRCLE.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_48_CLOSEDCURVE.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_48_CONNECTOR.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_48_CONTAINER.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_48_CURVE.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_48_ELLIPSE.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_48_EQUILATERAL.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_48_FLOW.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_48_FREETEXT.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_48_IRREGULARPOLYGON.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_48_ISOSCELES.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_48_LABEL.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_48_LINE.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_48_MARKER.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_48_ORTHOGONAL.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_48_ORTHOGONALRECTANGLE.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_48_PARALLELOGRAM.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_48_PENCIL.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_48_POLYGON.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_48_POLYLINE.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_48_RECTANGLE.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_48_SELECTIONBOX.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_48_SELECTOR.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_48_SEMICIRCLE.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_48_SQUARE.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_48_TEXTLINE.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_48_TRANSFORMCOPY.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_48_TRANSFORMCOPYVH.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_48_TRANSFORMMIRROR.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_48_TRANSFORMMIRRORCOPY.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_48_TRANSFORMMOVE.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_48_TRANSFORMMOVEVH.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_48_TRANSFORMROTATE.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_48_TRANSFORMROTATECOPY.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_48_TRANSFORMSCALE.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_48_TRANSFORMSCALECOPY.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_48_TRASNFORMMIRRORCOPY.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_48_TRIANGLE.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_48_USERSOCKET.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_64_ARC.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_64_ARROW.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_64_BUTTON.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_64_CLOSEDCURVE.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_64_CONNECTOR.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_64_CONTAINER.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_64_CURVE.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_64_ELLIPSE.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_64_EQUILATERAL.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_64_FLOW.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_64_FREETEXT.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_64_IRREGULARPOLYGON.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_64_ISOSCELES.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_64_LABEL.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_64_LINE.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_64_MARKER.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_64_ORTHOGONAL.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_64_ORTHOGONALRECTANGLE.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_64_PARALLELOGRAM.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_64_PENCIL.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_64_POLYGON.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_64_POLYLINE.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_64_RECTANGLE.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_64_SELECTIONBOX.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_64_SELECTOR.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_64_SEMICIRCLE.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_64_SQUARE.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_64_TEXTLINE.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_64_TRANSFORMCOPY.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_64_TRANSFORMCOPYVH.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_64_TRANSFORMMIRROR.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_64_TRANSFORMMIRRORCOPY.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_64_TRANSFORMMOVE.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_64_TRANSFORMMOVEVH.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_64_TRANSFORMROTATE.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_64_TRANSFORMROTATECOPY.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_64_TRANSFORMSCALE.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_64_TRANSFORMSCALECOPY.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_64_TRASNFORMMIRRORCOPY.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_64_TRIANGLE.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_64_USERSOCKET.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_ARC.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_ARROW.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_BUTTON.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_CIRCLE.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_CLOSEDCURVE.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_CONNECTOR.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_CONTAINER.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_CURVE.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_ELLIPSE.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_EQUILATERAL.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_FLOW.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_FREETEXT.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_HUNDREDGRID.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_IRREGULARPOLYGON.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_ISOSCELES.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_LABEL.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_LINE.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_MARKER.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_ORTHOGONAL.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_ORTHOGONALRECTANGLE.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_PARALLELOGRAM.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_PENCIL.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_POLYGON.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_POLYLINE.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_RECTANGLE.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_SELECTIONBOX.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_SELECTOR.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_SEMICIRCLE.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_SQUARE.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_TEXTLINE.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_TRANSFORMCOPY.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_TRANSFORMCOPYVH.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_TRANSFORMMIRROR.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_TRANSFORMMIRRORCOPY.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_TRANSFORMMOVE.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_TRANSFORMMOVEVH.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_TRANSFORMROTATE.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_TRANSFORMROTATECOPY.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_TRANSFORMSCALE.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_TRANSFORMSCALECOPY.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_TRASNFORMMIRRORCOPY.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_TRIANGLE.png" />
+    <EmbeddedResource Include="Resources\TOOLIMG_USERSOCKET.png" />
+    <EmbeddedResource Include="Resources\Transparent.png" />
+    <EmbeddedResource Include="Resources\Transparent_24.png" />
+    <EmbeddedResource Include="Resources\trash.png" />
+    <EmbeddedResource Include="Resources\TwoOff.png" />
+    <EmbeddedResource Include="Resources\TwoOn.png" />
+    <EmbeddedResource Include="Resources\TypedAnswers.png" />
+    <EmbeddedResource Include="Resources\TYPEKEY.WAV" />
+    <EmbeddedResource Include="Resources\users.png" />
+    <EmbeddedResource Include="Resources\user_128.png" />
+    <EmbeddedResource Include="Resources\user_32.png" />
+    <EmbeddedResource Include="Resources\user_48.png" />
+    <EmbeddedResource Include="Resources\Verb_16_AlignBottom.png" />
+    <EmbeddedResource Include="Resources\Verb_16_AlignCentre.png" />
+    <EmbeddedResource Include="Resources\Verb_16_AlignLeft.png" />
+    <EmbeddedResource Include="Resources\Verb_16_AlignMiddle.png" />
+    <EmbeddedResource Include="Resources\Verb_16_AlignRight.png" />
+    <EmbeddedResource Include="Resources\Verb_16_AlignTop.png" />
+    <EmbeddedResource Include="Resources\Verb_16_BringFront.png" />
+    <EmbeddedResource Include="Resources\Verb_16_Cancel.png" />
+    <EmbeddedResource Include="Resources\Verb_16_Choose.png" />
+    <EmbeddedResource Include="Resources\Verb_16_Complete.png" />
+    <EmbeddedResource Include="Resources\Verb_16_ConfigDocument.png" />
+    <EmbeddedResource Include="Resources\Verb_16_Copy.png" />
+    <EmbeddedResource Include="Resources\Verb_16_Cut.png" />
+    <EmbeddedResource Include="Resources\Verb_16_Decrement.png" />
+    <EmbeddedResource Include="Resources\Verb_16_Delete.png" />
+    <EmbeddedResource Include="Resources\Verb_16_Down.png" />
+    <EmbeddedResource Include="Resources\Verb_16_EditPaper.png" />
+    <EmbeddedResource Include="Resources\Verb_16_EqualiseHeight.png" />
+    <EmbeddedResource Include="Resources\Verb_16_EqualiseWidth.png" />
+    <EmbeddedResource Include="Resources\Verb_16_ExportEMF.png" />
+    <EmbeddedResource Include="Resources\Verb_16_ExportJPEG.png" />
+    <EmbeddedResource Include="Resources\Verb_16_ExportPageAsDocument.png" />
+    <EmbeddedResource Include="Resources\Verb_16_ExportPNG.png" />
+    <EmbeddedResource Include="Resources\Verb_16_FlipHorizontal.png" />
+    <EmbeddedResource Include="Resources\Verb_16_FlipVertical.png" />
+    <EmbeddedResource Include="Resources\Verb_16_Group.png" />
+    <EmbeddedResource Include="Resources\Verb_16_ImportImage.png" />
+    <EmbeddedResource Include="Resources\Verb_16_Increment.png" />
+    <EmbeddedResource Include="Resources\Verb_16_Left.png" />
+    <EmbeddedResource Include="Resources\Verb_16_MouseLargeStep.png" />
+    <EmbeddedResource Include="Resources\Verb_16_MouseMediumStep.png" />
+    <EmbeddedResource Include="Resources\Verb_16_MouseSmallStep.png" />
+    <EmbeddedResource Include="Resources\Verb_16_NewDocument.png" />
+    <EmbeddedResource Include="Resources\Verb_16_Open.png" />
+    <EmbeddedResource Include="Resources\Verb_16_PageClear.png" />
+    <EmbeddedResource Include="Resources\Verb_16_PageDelete.png" />
+    <EmbeddedResource Include="Resources\Verb_16_PageInsertAfter.png" />
+    <EmbeddedResource Include="Resources\Verb_16_PageInsertBefore.png" />
+    <EmbeddedResource Include="Resources\Verb_16_PageMoveDown.png" />
+    <EmbeddedResource Include="Resources\Verb_16_PageMoveUp.png" />
+    <EmbeddedResource Include="Resources\Verb_16_PageNext.png" />
+    <EmbeddedResource Include="Resources\Verb_16_PagePrevious.png" />
+    <EmbeddedResource Include="Resources\Verb_16_PageSize.png" />
+    <EmbeddedResource Include="Resources\Verb_16_Paste.png" />
+    <EmbeddedResource Include="Resources\Verb_16_Print.png" />
+    <EmbeddedResource Include="Resources\Verb_16_PrintDirectly.png" />
+    <EmbeddedResource Include="Resources\Verb_16_PrintPreview.png" />
+    <EmbeddedResource Include="Resources\Verb_16_Redo.png" />
+    <EmbeddedResource Include="Resources\Verb_16_Right.png" />
+    <EmbeddedResource Include="Resources\Verb_16_RotateLeft.png" />
+    <EmbeddedResource Include="Resources\Verb_16_RotateRight.png" />
+    <EmbeddedResource Include="Resources\Verb_16_Save.png" />
+    <EmbeddedResource Include="Resources\Verb_16_SaveAs.png" />
+    <EmbeddedResource Include="Resources\Verb_16_SaveAsWorksheet.png" />
+    <EmbeddedResource Include="Resources\Verb_16_SelectAll.png" />
+    <EmbeddedResource Include="Resources\Verb_16_SelectNext.png" />
+    <EmbeddedResource Include="Resources\Verb_16_SelectNone.png" />
+    <EmbeddedResource Include="Resources\Verb_16_SelectPrevious.png" />
+    <EmbeddedResource Include="Resources\Verb_16_SendBack.png" />
+    <EmbeddedResource Include="Resources\Verb_16_SpreadHorizontal.png" />
+    <EmbeddedResource Include="Resources\Verb_16_SpreadVertical.png" />
+    <EmbeddedResource Include="Resources\Verb_16_TextLarger.png" />
+    <EmbeddedResource Include="Resources\Verb_16_TextSmaller.png" />
+    <EmbeddedResource Include="Resources\Verb_16_TidyAngle.png" />
+    <EmbeddedResource Include="Resources\Verb_16_TidyGrid.png" />
+    <EmbeddedResource Include="Resources\Verb_16_TidyShape.png" />
+    <EmbeddedResource Include="Resources\Verb_16_Undo.png" />
+    <EmbeddedResource Include="Resources\Verb_16_Ungroup.png" />
+    <EmbeddedResource Include="Resources\Verb_16_Up.png" />
+    <EmbeddedResource Include="Resources\verb_16_UserTeacher.png" />
+    <EmbeddedResource Include="Resources\Verb_16_Zoom100.png" />
+    <EmbeddedResource Include="Resources\Verb_16_ZoomIn.png" />
+    <EmbeddedResource Include="Resources\Verb_16_ZoomOut.png" />
+    <EmbeddedResource Include="Resources\Verb_16_ZoomPage.png" />
+    <EmbeddedResource Include="Resources\Verb_16_ZoomWidth.png" />
+    <EmbeddedResource Include="Resources\Verb_24_AlignBottom.png" />
+    <EmbeddedResource Include="Resources\Verb_24_AlignCentre.png" />
+    <EmbeddedResource Include="Resources\Verb_24_AlignLeft.png" />
+    <EmbeddedResource Include="Resources\Verb_24_AlignMiddle.png" />
+    <EmbeddedResource Include="Resources\Verb_24_AlignRight.png" />
+    <EmbeddedResource Include="Resources\Verb_24_AlignTop.png" />
+    <EmbeddedResource Include="Resources\Verb_24_BringFront.png" />
+    <EmbeddedResource Include="Resources\Verb_24_Cancel.png" />
+    <EmbeddedResource Include="Resources\Verb_24_Choose.png" />
+    <EmbeddedResource Include="Resources\Verb_24_Complete.png" />
+    <EmbeddedResource Include="Resources\Verb_24_ConfigDocument.png" />
+    <EmbeddedResource Include="Resources\Verb_24_Copy.png" />
+    <EmbeddedResource Include="Resources\Verb_24_Cut.png" />
+    <EmbeddedResource Include="Resources\Verb_24_Decrement.png" />
+    <EmbeddedResource Include="Resources\Verb_24_Delete.png" />
+    <EmbeddedResource Include="Resources\Verb_24_Down.png" />
+    <EmbeddedResource Include="Resources\Verb_24_EditPaper.png" />
+    <EmbeddedResource Include="Resources\Verb_24_EqualiseHeight.png" />
+    <EmbeddedResource Include="Resources\Verb_24_EqualiseWidth.png" />
+    <EmbeddedResource Include="Resources\Verb_24_ExportEMF.png" />
+    <EmbeddedResource Include="Resources\Verb_24_ExportJPEG.png" />
+    <EmbeddedResource Include="Resources\Verb_24_ExportPageAsDocument.png" />
+    <EmbeddedResource Include="Resources\Verb_24_ExportPNG.png" />
+    <EmbeddedResource Include="Resources\Verb_24_FlipHorizontal.png" />
+    <EmbeddedResource Include="Resources\Verb_24_FlipVertical.png" />
+    <EmbeddedResource Include="Resources\Verb_24_Group.png" />
+    <EmbeddedResource Include="Resources\Verb_24_Increment.png" />
+    <EmbeddedResource Include="Resources\Verb_24_Left.png" />
+    <EmbeddedResource Include="Resources\Verb_24_MouseLargeStep.png" />
+    <EmbeddedResource Include="Resources\Verb_24_MouseMediumStep.png" />
+    <EmbeddedResource Include="Resources\Verb_24_MouseSmallStep.png" />
+    <EmbeddedResource Include="Resources\Verb_24_NewDocument.png" />
+    <EmbeddedResource Include="Resources\Verb_24_Open.png" />
+    <EmbeddedResource Include="Resources\Verb_24_PageClear.png" />
+    <EmbeddedResource Include="Resources\Verb_24_PageDelete.png" />
+    <EmbeddedResource Include="Resources\Verb_24_PageInsertAfter.png" />
+    <EmbeddedResource Include="Resources\Verb_24_PageInsertBefore.png" />
+    <EmbeddedResource Include="Resources\Verb_24_PageMoveDown.png" />
+    <EmbeddedResource Include="Resources\Verb_24_PageMoveUp.png" />
+    <EmbeddedResource Include="Resources\Verb_24_PageNext.png" />
+    <EmbeddedResource Include="Resources\Verb_24_PagePrevious.png" />
+    <EmbeddedResource Include="Resources\Verb_24_PageSize.png" />
+    <EmbeddedResource Include="Resources\Verb_24_Paste.png" />
+    <EmbeddedResource Include="Resources\Verb_24_Print.png" />
+    <EmbeddedResource Include="Resources\Verb_24_PrintDirectly.png" />
+    <EmbeddedResource Include="Resources\Verb_24_PrintPreview.png" />
+    <EmbeddedResource Include="Resources\Verb_24_Redo.png" />
+    <EmbeddedResource Include="Resources\Verb_24_Right.png" />
+    <EmbeddedResource Include="Resources\Verb_24_RotateLeft.png" />
+    <EmbeddedResource Include="Resources\Verb_24_RotateRight.png" />
+    <EmbeddedResource Include="Resources\Verb_24_Save.png" />
+    <EmbeddedResource Include="Resources\Verb_24_SaveAs.png" />
+    <EmbeddedResource Include="Resources\Verb_24_SaveAsWorksheet.png" />
+    <EmbeddedResource Include="Resources\Verb_24_SelectAll.png" />
+    <EmbeddedResource Include="Resources\Verb_24_SelectNext.png" />
+    <EmbeddedResource Include="Resources\Verb_24_SelectNone.png" />
+    <EmbeddedResource Include="Resources\Verb_24_SelectPrevious.png" />
+    <EmbeddedResource Include="Resources\Verb_24_SendBack.png" />
+    <EmbeddedResource Include="Resources\Verb_24_SpreadHorizontal.png" />
+    <EmbeddedResource Include="Resources\Verb_24_SpreadVertical.png" />
+    <EmbeddedResource Include="Resources\Verb_24_TextLarger.png" />
+    <EmbeddedResource Include="Resources\Verb_24_TextSmaller.png" />
+    <EmbeddedResource Include="Resources\Verb_24_TidyAngle.png" />
+    <EmbeddedResource Include="Resources\Verb_24_TidyGrid.png" />
+    <EmbeddedResource Include="Resources\Verb_24_TidyShape.png" />
+    <EmbeddedResource Include="Resources\Verb_24_Undo.png" />
+    <EmbeddedResource Include="Resources\Verb_24_Ungroup.png" />
+    <EmbeddedResource Include="Resources\Verb_24_Up.png" />
+    <EmbeddedResource Include="Resources\verb_24_UserTeacher.png" />
+    <EmbeddedResource Include="Resources\verb_24_UserUser.png" />
+    <EmbeddedResource Include="Resources\Verb_24_Zoom100.png" />
+    <EmbeddedResource Include="Resources\Verb_24_ZoomIn.png" />
+    <EmbeddedResource Include="Resources\Verb_24_ZoomOut.png" />
+    <EmbeddedResource Include="Resources\Verb_24_ZoomPage.png" />
+    <EmbeddedResource Include="Resources\Verb_24_ZoomWidth.png" />
+    <EmbeddedResource Include="Resources\Verb_64_AlignBottom.png" />
+    <EmbeddedResource Include="Resources\Verb_64_AlignCentre.png" />
+    <EmbeddedResource Include="Resources\Verb_64_AlignLeft.png" />
+    <EmbeddedResource Include="Resources\Verb_64_AlignMiddle.png" />
+    <EmbeddedResource Include="Resources\Verb_64_AlignRight.png" />
+    <EmbeddedResource Include="Resources\Verb_64_AlignTop.png" />
+    <EmbeddedResource Include="Resources\Verb_64_BringFront.png" />
+    <EmbeddedResource Include="Resources\Verb_64_Cancel.png" />
+    <EmbeddedResource Include="Resources\Verb_64_Choose.png" />
+    <EmbeddedResource Include="Resources\Verb_64_Complete.png" />
+    <EmbeddedResource Include="Resources\Verb_64_ConfigDocument.png" />
+    <EmbeddedResource Include="Resources\Verb_64_Copy.png" />
+    <EmbeddedResource Include="Resources\Verb_64_Cut.png" />
+    <EmbeddedResource Include="Resources\Verb_64_Decrement.png" />
+    <EmbeddedResource Include="Resources\Verb_64_Delete.png" />
+    <EmbeddedResource Include="Resources\Verb_64_Down.png" />
+    <EmbeddedResource Include="Resources\Verb_64_EditPaper.png" />
+    <EmbeddedResource Include="Resources\Verb_64_EqualiseHeight.png" />
+    <EmbeddedResource Include="Resources\Verb_64_EqualiseWidth.png" />
+    <EmbeddedResource Include="Resources\Verb_64_ExportEMF.png" />
+    <EmbeddedResource Include="Resources\Verb_64_ExportJPEG.png" />
+    <EmbeddedResource Include="Resources\Verb_64_ExportPageAsDocument.png" />
+    <EmbeddedResource Include="Resources\Verb_64_ExportPNG.png" />
+    <EmbeddedResource Include="Resources\Verb_64_FlipHorizontal.png" />
+    <EmbeddedResource Include="Resources\Verb_64_FlipVertical.png" />
+    <EmbeddedResource Include="Resources\Verb_64_Group.png" />
+    <EmbeddedResource Include="Resources\Verb_64_Increment.png" />
+    <EmbeddedResource Include="Resources\Verb_64_Left.png" />
+    <EmbeddedResource Include="Resources\Verb_64_Merge.png" />
+    <EmbeddedResource Include="Resources\Verb_64_MouseLargeStep.png" />
+    <EmbeddedResource Include="Resources\Verb_64_MouseMediumStep.png" />
+    <EmbeddedResource Include="Resources\Verb_64_MouseSmallStep.png" />
+    <EmbeddedResource Include="Resources\Verb_64_NewDocument.png" />
+    <EmbeddedResource Include="Resources\Verb_64_Open.png" />
+    <EmbeddedResource Include="Resources\Verb_64_PageClear.png" />
+    <EmbeddedResource Include="Resources\Verb_64_PageDelete.png" />
+    <EmbeddedResource Include="Resources\Verb_64_PageInsertAfter.png" />
+    <EmbeddedResource Include="Resources\Verb_64_PageInsertBefore.png" />
+    <EmbeddedResource Include="Resources\Verb_64_PageMoveDown.png" />
+    <EmbeddedResource Include="Resources\Verb_64_PageMoveUp.png" />
+    <EmbeddedResource Include="Resources\Verb_64_PageNext.png" />
+    <EmbeddedResource Include="Resources\Verb_64_PagePrevious.png" />
+    <EmbeddedResource Include="Resources\Verb_64_PageSize.png" />
+    <EmbeddedResource Include="Resources\Verb_64_Paste.png" />
+    <EmbeddedResource Include="Resources\Verb_64_Print.png" />
+    <EmbeddedResource Include="Resources\Verb_64_PrintDirectly.png" />
+    <EmbeddedResource Include="Resources\Verb_64_PrintPreview.png" />
+    <EmbeddedResource Include="Resources\Verb_64_Redo.png" />
+    <EmbeddedResource Include="Resources\Verb_64_Right.png" />
+    <EmbeddedResource Include="Resources\Verb_64_RotateLeft.png" />
+    <EmbeddedResource Include="Resources\Verb_64_RotateRight.png" />
+    <EmbeddedResource Include="Resources\Verb_64_Save.png" />
+    <EmbeddedResource Include="Resources\Verb_64_SaveAs.png" />
+    <EmbeddedResource Include="Resources\Verb_64_SaveAsWorksheet.png" />
+    <EmbeddedResource Include="Resources\Verb_64_SelectAll.png" />
+    <EmbeddedResource Include="Resources\Verb_64_SelectNext.png" />
+    <EmbeddedResource Include="Resources\Verb_64_SelectNone.png" />
+    <EmbeddedResource Include="Resources\Verb_64_SelectPrevious.png" />
+    <EmbeddedResource Include="Resources\Verb_64_SendBack.png" />
+    <EmbeddedResource Include="Resources\Verb_64_SpreadHorizontal.png" />
+    <EmbeddedResource Include="Resources\Verb_64_SpreadVertical.png" />
+    <EmbeddedResource Include="Resources\Verb_64_TextLarger.png" />
+    <EmbeddedResource Include="Resources\Verb_64_TextSmaller.png" />
+    <EmbeddedResource Include="Resources\Verb_64_TidyAngle.png" />
+    <EmbeddedResource Include="Resources\Verb_64_TidyGrid.png" />
+    <EmbeddedResource Include="Resources\Verb_64_TidyShape.png" />
+    <EmbeddedResource Include="Resources\Verb_64_Undo.png" />
+    <EmbeddedResource Include="Resources\Verb_64_Ungroup.png" />
+    <EmbeddedResource Include="Resources\Verb_64_Up.png" />
+    <EmbeddedResource Include="Resources\Verb_64_Zoom100.png" />
+    <EmbeddedResource Include="Resources\Verb_64_ZoomIn.png" />
+    <EmbeddedResource Include="Resources\Verb_64_ZoomOut.png" />
+    <EmbeddedResource Include="Resources\Verb_64_ZoomPage.png" />
+    <EmbeddedResource Include="Resources\Verb_64_ZoomWidth.png" />
+    <EmbeddedResource Include="Resources\Verb_AddVertex.png" />
+    <EmbeddedResource Include="Resources\Verb_AlignBottom.png" />
+    <EmbeddedResource Include="Resources\Verb_AlignCentre.png" />
+    <EmbeddedResource Include="Resources\Verb_AlignLeft.png" />
+    <EmbeddedResource Include="Resources\Verb_AlignMiddle.png" />
+    <EmbeddedResource Include="Resources\Verb_AlignRight.png" />
+    <EmbeddedResource Include="Resources\Verb_AlignTop.png" />
+    <EmbeddedResource Include="Resources\Verb_BringFront.png" />
+    <EmbeddedResource Include="Resources\Verb_BringFrontOneStep.png" />
+    <EmbeddedResource Include="Resources\Verb_Cancel.png" />
+    <EmbeddedResource Include="Resources\Verb_Choose.png" />
+    <EmbeddedResource Include="Resources\Verb_ChooseExisting.png" />
+    <EmbeddedResource Include="Resources\Verb_Complete.png" />
+    <EmbeddedResource Include="Resources\Verb_ConfigDocument.png" />
+    <EmbeddedResource Include="Resources\Verb_ConfigUser.png" />
+    <EmbeddedResource Include="Resources\Verb_ConvertToBezier.png" />
+    <EmbeddedResource Include="Resources\Verb_ConvertToLine.png" />
+    <EmbeddedResource Include="Resources\Verb_Copy.png" />
+    <EmbeddedResource Include="Resources\Verb_CornerVertex.png" />
+    <EmbeddedResource Include="Resources\Verb_Cut.png" />
+    <EmbeddedResource Include="Resources\Verb_Decrement.png" />
+    <EmbeddedResource Include="Resources\Verb_Delete.png" />
+    <EmbeddedResource Include="Resources\Verb_Down.png" />
+    <EmbeddedResource Include="Resources\Verb_EditPaper.png" />
+    <EmbeddedResource Include="Resources\Verb_EqualiseHeight.png" />
+    <EmbeddedResource Include="Resources\Verb_EqualiseWidth.png" />
+    <EmbeddedResource Include="Resources\Verb_ExportEMF.png" />
+    <EmbeddedResource Include="Resources\Verb_ExportJPEG.png" />
+    <EmbeddedResource Include="Resources\Verb_ExportPageAsDocument.png" />
+    <EmbeddedResource Include="Resources\Verb_ExportPNG.png" />
+    <EmbeddedResource Include="Resources\Verb_ExportSVG.png" />
+    <EmbeddedResource Include="Resources\Verb_FlipHorizontal.png" />
+    <EmbeddedResource Include="Resources\Verb_FlipVertical.png" />
+    <EmbeddedResource Include="Resources\Verb_Group.png" />
+    <EmbeddedResource Include="Resources\Verb_Increment.png" />
+    <EmbeddedResource Include="Resources\Verb_Left.png" />
+    <EmbeddedResource Include="Resources\Verb_MouseLargeStep.png" />
+    <EmbeddedResource Include="Resources\Verb_MouseMediumStep.png" />
+    <EmbeddedResource Include="Resources\Verb_MouseSmallStep.png" />
+    <EmbeddedResource Include="Resources\Verb_MovePalette.png" />
+    <EmbeddedResource Include="Resources\Verb_NewDocument.png" />
+    <EmbeddedResource Include="Resources\Verb_Open.png" />
+    <EmbeddedResource Include="Resources\Verb_PageClear.png" />
+    <EmbeddedResource Include="Resources\Verb_PageDelete.png" />
+    <EmbeddedResource Include="Resources\Verb_PageInsertAfter.png" />
+    <EmbeddedResource Include="Resources\Verb_PageInsertBefore.png" />
+    <EmbeddedResource Include="Resources\Verb_PageMoveDown.png" />
+    <EmbeddedResource Include="Resources\Verb_PageMoveUp.png" />
+    <EmbeddedResource Include="Resources\Verb_PageNext.png" />
+    <EmbeddedResource Include="Resources\Verb_PagePrevious.png" />
+    <EmbeddedResource Include="Resources\Verb_PageSize.png" />
+    <EmbeddedResource Include="Resources\Verb_Paste.png" />
+    <EmbeddedResource Include="Resources\Verb_Print.png" />
+    <EmbeddedResource Include="Resources\Verb_PrintDirectly.png" />
+    <EmbeddedResource Include="Resources\Verb_PrintPreview.png" />
+    <EmbeddedResource Include="Resources\Verb_QuickAddButtons.png" />
+    <EmbeddedResource Include="Resources\Verb_Redo.png" />
+    <EmbeddedResource Include="Resources\Verb_RemoveVertex.png" />
+    <EmbeddedResource Include="Resources\Verb_ResizePalette.png" />
+    <EmbeddedResource Include="Resources\Verb_Right.png" />
+    <EmbeddedResource Include="Resources\Verb_RotateLeft.png" />
+    <EmbeddedResource Include="Resources\Verb_RotateRight.png" />
+    <EmbeddedResource Include="Resources\Verb_Save.png" />
+    <EmbeddedResource Include="Resources\Verb_SaveAs.png" />
+    <EmbeddedResource Include="Resources\Verb_SaveAsWorksheet.png" />
+    <EmbeddedResource Include="Resources\Verb_SelectAll.png" />
+    <EmbeddedResource Include="Resources\Verb_SelectNext.png" />
+    <EmbeddedResource Include="Resources\Verb_SelectNone.png" />
+    <EmbeddedResource Include="Resources\Verb_SelectPrevious.png" />
+    <EmbeddedResource Include="Resources\Verb_SendBack.png" />
+    <EmbeddedResource Include="Resources\Verb_SendBackOneStep.png" />
+    <EmbeddedResource Include="Resources\Verb_SetOrigin.png" />
+    <EmbeddedResource Include="Resources\Verb_SmoothVertex.png" />
+    <EmbeddedResource Include="Resources\Verb_SpreadHorizontal.png" />
+    <EmbeddedResource Include="Resources\Verb_SpreadVertical.png" />
+    <EmbeddedResource Include="Resources\Verb_TextLarger.png" />
+    <EmbeddedResource Include="Resources\Verb_TextSmaller.png" />
+    <EmbeddedResource Include="Resources\Verb_TidyAngle.png" />
+    <EmbeddedResource Include="Resources\Verb_TidyGrid.png" />
+    <EmbeddedResource Include="Resources\Verb_TidyShape.png" />
+    <EmbeddedResource Include="Resources\Verb_Undo.png" />
+    <EmbeddedResource Include="Resources\Verb_Ungroup.png" />
+    <EmbeddedResource Include="Resources\Verb_Up.png" />
+    <EmbeddedResource Include="Resources\verb_UserTeacher.png" />
+    <EmbeddedResource Include="Resources\Verb_Zoom100.png" />
+    <EmbeddedResource Include="Resources\Verb_ZoomIn.png" />
+    <EmbeddedResource Include="Resources\Verb_ZoomOut.png" />
+    <EmbeddedResource Include="Resources\Verb_ZoomPage.png" />
+    <EmbeddedResource Include="Resources\Verb_ZoomWidth.png" />
+    <EmbeddedResource Include="Resources\windows.png" />
+    <EmbeddedResource Include="Resources\world_128.png" />
+    <EmbeddedResource Include="Resources\world_48.png" />
+    <None Include="Resources\SoundClick.wav" />
+    <None Include="Resources\saw.png" />
+    <None Include="Resources\CopyXForm1.png" />
+    <None Include="Resources\CopyXForm_481.png" />
+    <None Include="Resources\CopyXForm_641.png" />
+    <None Include="Resources\TOOLIMG_64_SAWITEM.png" />
+    <None Include="Resources\TOOLIMG_SAWITEM.png" />
+    <None Include="Resources\ShowGrid.png" />
+    <None Include="Resources\ShowGrid_48.png" />
+    <None Include="Resources\ShowGrid_64.png" />
+    <None Include="Resources\verb_UserUser.png" />
+    <None Include="Resources\verb_16_UserUser.png" />
+    <Content Include="icon.ico" />
+    <None Include="Resources\help_16.png" />
+    <None Include="Resources\Verb_16_NudgeDown.png" />
+    <None Include="Resources\Verb_16_NudgeLeft.png" />
+    <None Include="Resources\Verb_16_NudgeRight.png" />
+    <None Include="Resources\Verb_16_NudgeUp.png" />
+    <None Include="Resources\Nudge_Narrower.png" />
+    <None Include="Resources\Nudge_Shorter.png" />
+    <None Include="Resources\Nudge_Taller.png" />
+    <None Include="Resources\Nudge_Wider.png" />
+    <Content Include="strings.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadataStorage Include="Service References\Repo2\" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
