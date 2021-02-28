@@ -211,16 +211,16 @@ namespace SAW
 		internal static bool Exists(object ctrTarget) => g_List.ContainsKey(ctrTarget);
 		internal static AnimationController Item(object ctrTarget) => g_List[ctrTarget];
 
-		internal static AnimationController GetAnimation(object objTarget)
+		internal static AnimationController GetAnimation(object target)
 		{
-			if (!g_List.ContainsKey(objTarget))
+			if (!g_List.ContainsKey(target))
 				return null;
-			return g_List[objTarget];
+			return g_List[target];
 		}
 
-		protected static void Add(AnimationController objController)
+		protected static void Add(AnimationController controller)
 		{
-			g_List.Add(objController.m_Target, objController);
+			g_List.Add(controller.m_Target, controller);
 		}
 
 		// any derived class should implement a suitable Create function

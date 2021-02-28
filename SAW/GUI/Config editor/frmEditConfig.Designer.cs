@@ -33,7 +33,6 @@ namespace SAW
 			this.btnCancel = new System.Windows.Forms.Button();
 			this.ttMain = new System.Windows.Forms.ToolTip(this.components);
 			this.pnlSections = new SAW.SelectionPanel();
-			this.tmrPrompt = new System.Windows.Forms.Timer(this.components);
 			this.tmrSearch = new System.Windows.Forms.Timer(this.components);
 			this.dlgFolder = new System.Windows.Forms.FolderBrowserDialog();
 			pnlBottom = new System.Windows.Forms.Panel();
@@ -116,12 +115,6 @@ namespace SAW
 			this.pnlSections.TabIndex = 64;
 			this.pnlSections.SelectedIndexChanged += new System.EventHandler(this.pnlSections_SelectedIndexChanged);
 			// 
-			// tmrPrompt
-			// 
-			this.tmrPrompt.Enabled = true;
-			this.tmrPrompt.Interval = 200;
-			this.tmrPrompt.Tick += new System.EventHandler(this.tmrPrompt_Tick);
-			// 
 			// tmrSearch
 			// 
 			this.tmrSearch.Interval = 600;
@@ -152,7 +145,6 @@ namespace SAW
 		private System.Windows.Forms.Button btnCancel;
 		private System.Windows.Forms.Button btnOK;
 		internal System.Windows.Forms.ToolTip ttMain;
-		private System.Windows.Forms.Timer tmrPrompt;
 		private System.Windows.Forms.Timer tmrSearch;
 		private System.Windows.Forms.FolderBrowserDialog dlgFolder;
 		private System.Windows.Forms.Label Label56;

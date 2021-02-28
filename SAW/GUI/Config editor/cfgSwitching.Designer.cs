@@ -255,7 +255,6 @@
 			this.ctrTimingAcceptance.Size = new System.Drawing.Size(404, 33);
 			this.ctrTimingAcceptance.TabIndex = 5;
 			this.ctrTimingAcceptance.Tag = "1";
-			this.ctrTimingAcceptance.UserChangedValue += new System.EventHandler(this.ctrTiming_UserChangedValue);
 			// 
 			// lblAcceptance
 			// 

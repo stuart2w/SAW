@@ -61,8 +61,6 @@ namespace SAW
 				return; // Or m_bolSelected - need to resend Tool=Measure in particular
 			if (m_Parameter != Parameters.None)
 			{
-				if (m_Parameter == Parameters.Tool && Globals.Root.CurrentConfig.ReadBoolean(Config.Use_Speech))
-					Globals.Root.Speech.Speak(Action.CreateForShape((Shape.Shapes)m_ParameterValue, true).DescriptionWithoutAccelerator());
 				Globals.SetParameterValue(m_ParameterValue, m_Parameter);
 				// it should raise the value changed event back again which will update the GUI
 			}

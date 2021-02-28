@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using SAW.CCF;
+using SAW.GUI.Dialogs;
 
 namespace SAW.Functions
 {
@@ -32,6 +33,10 @@ namespace SAW.Functions
 			Verb.Register(Codes.LoadSettings, new LoadSettings());
 			Verb.Register(Codes.ImportIRM, new ImportIRM());
 			Verb.Register(Codes.ExportIRM, new ExportIRM());
+			Verb.Register(Codes.MakeActive, new MakeActive());
+			Verb.Register(Codes.MakeInactive, new MakeInactive());
+			Verb.Register(Codes.SAWManual, (source, pnlView, Transaction) => { Globals.Root.ShellOpen(Path.Combine(Globals.Root.InternalFolder, "SAW Manual.pdf")); });
+			Verb.Register(Codes.YoctoTest, (SourceFilter, pnlView, Transaction) => { frmYocto.Display(); }).MightOpenDialogValue = true;
 		}
 
 	}
@@ -52,7 +57,7 @@ namespace SAW.Functions
 		}
 
 		public override bool AutoRefreshAfterTrigger => true;
-		public override bool IsApplicable(EditableView pnlView) 
+		public override bool IsApplicable(EditableView pnlView)
 			=> CurrentPage.SelectedShapes.OfType<Scriptable>().Any(s => s.Popup && s.Shown != Show);
 	}
 
@@ -100,7 +105,8 @@ namespace SAW.Functions
 	#endregion
 
 	#region Show/Hide text or graphic
-	class ShowHideGraphicSelection : Verb
+
+	internal class ShowHideGraphicSelection : Verb
 	{
 		public bool Show;
 		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
@@ -116,7 +122,7 @@ namespace SAW.Functions
 		public override bool IsApplicable(EditableView pnlView) => CurrentPage.SelectedCount > 0;
 	}
 
-	class ShowHideTextSelection : Verb
+	internal class ShowHideTextSelection : Verb
 	{
 		public bool Show;
 		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
@@ -134,7 +140,8 @@ namespace SAW.Functions
 	#endregion
 
 	#region Prediction words
-	class ViewPredictionWords : Verb
+
+	internal class ViewPredictionWords : Verb
 	{
 		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
 		{
@@ -150,7 +157,8 @@ namespace SAW.Functions
 	#endregion
 
 	#region Grid wizard
-	class GridWizard : Verb
+
+	internal class GridWizard : Verb
 	{
 		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
 		{
@@ -167,7 +175,8 @@ namespace SAW.Functions
 	#endregion
 
 	#region Item/Window bounds
-	class EditItemBounds : Verb
+
+	internal class EditItemBounds : Verb
 	{
 
 		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
@@ -196,17 +205,25 @@ namespace SAW.Functions
 
 	}
 
-	class EditWindowBounds : Verb
+	internal class EditWindowBounds : Verb
 	{
 		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
 		{
+			if (CurrentDocument.IsPaletteWithin)
+			{ // not appropriate for palettes - and will fail as EditWindowBounds tries to access the SAWHeader
+				(new PageSize()).Trigger(source, pnlView, transaction);
+				return;
+			}
 			frmEditBounds.EditWindowBounds();
 		}
+
 	}
+
 	#endregion
 
 	#region Copy and Cut
-	class CopyScripts : Verb
+
+	internal class CopyScripts : Verb
 	{
 
 		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
@@ -287,7 +304,7 @@ namespace SAW.Functions
 
 	}
 
-	class CopyPresentation : Verb
+	internal class CopyPresentation : Verb
 	{
 		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
 		{
@@ -354,6 +371,8 @@ namespace SAW.Functions
 					itemTarget.LineStyle?.CopyFrom(copied.LineStyle);
 					itemTarget.TextStyle?.CopyFrom(copied.TextStyle);
 					itemTarget.CopyPresentationFrom(copied, true);
+					Scriptable scriptableTarget = target as Scriptable ?? (Scriptable)(target as Item).Parent;
+					scriptableTarget.CopyPresentationFrom((Scriptable)copied.Parent, true);
 				}
 			}
 			pnlView.InvalidateData(CurrentPage.SelectedRefreshBoundary(), StaticView.InvalidationBuffer.All);
@@ -376,7 +395,8 @@ namespace SAW.Functions
 
 	#region CCF
 
-	class CCFUpdate : Verb
+	/// <summary>Update entire selection set using Concept Coding Framework</summary>
+	internal class CCFUpdate : Verb
 	{
 		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
 		{
@@ -401,14 +421,14 @@ namespace SAW.Functions
 					{
 						case MultiUpdate.Functions.ChangeSymbols:
 							string imagePath = Path.Combine(Connection.LocalPath, result);
-							var image = (SharedImage)Globals.Root.CurrentDocument.AddSharedResourceFromFile(imagePath, transaction);
+							SharedImage image = (SharedImage)Globals.Root.CurrentDocument.AddSharedResourceFromFile(imagePath, transaction);
 							item.Image = new SharedReference<SharedImage>(image);
 							item.ImageName = Path.GetFileName(imagePath);
 							break;
 						case MultiUpdate.Functions.ChangeText:
 							item.LabelText = result;
-							if (item.OutputAsDisplay)
-								item.OutputText = result;
+							if ((item.Parent is Scriptable scriptable) && scriptable.OutputAsDisplay)
+								scriptable.OutputText = result;
 							break;
 						case MultiUpdate.Functions.RemoveInfo:
 							item.ConceptID = null;
@@ -424,6 +444,10 @@ namespace SAW.Functions
 		}
 
 		public override bool AutoRefreshAfterTrigger => true;
+
+		/// <summary>This is disabled in advanced graphics mode to reduce clutter (and it seems very unlikely it would be used with a very graphical set)</summary>
+		public override bool IsApplicable(EditableView pnlView) => !Globals.Root.CurrentConfig.ReadBoolean(Config.Advanced_Graphics);
+
 	}
 
 	#endregion
@@ -448,6 +472,7 @@ namespace SAW.Functions
 		public static string ExtensionFilter => "*" + Config.Extension + "|*" + Config.Extension;
 		public override bool AbandonsCurrent => true;
 		public override bool IncludeOnContextMenu => false;
+
 	}
 
 	public class LoadSettings : Verb
@@ -478,6 +503,96 @@ namespace SAW.Functions
 
 		public override bool AbandonsCurrent => true;
 		public override bool IncludeOnContextMenu => false;
+
+	}
+
+	#endregion
+
+	#region Make (in)active
+
+	internal class MakeActive : Verb
+	{
+		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
+		{
+			IShapeContainer container = CurrentPage.SelectionContainer();
+			if (container == null)
+			{
+				MessageBox.Show(Strings.Item("Container_Mismatch"));
+				return;
+			}
+
+			transaction.Edit((Datum)container);
+			List<Shape> created = new List<Shape>();
+			int nextID = (from p in Globals.Root.CurrentDocument.Pages select p.FindHighestUsedID()).Max() + 1;
+			foreach (Shape s in CurrentPage.SelectedShapes)
+			{
+				transaction.Edit(s);
+				Scriptable scriptable = new Scriptable(s);
+				transaction.Create(scriptable);
+				scriptable.Parent = container;
+				scriptable.SAWID = nextID++;
+				container.Contents.Remove(s);
+				container.Contents.Add(scriptable);
+				// note this makes no attempt to maintain Z order.  Edited items will be brought to the front (but are likely to maintain relative order)
+				created.Add(scriptable);
+			}
+			container.FinishedModifyingContents(transaction);
+			// it should still be the contained elements which are listed as selected I think
+			CurrentPage.SelectOnly(created);
+		}
+
+		public override bool HideFromContextMenuIfUnavailable => true;
+
+		public override bool IsApplicable(EditableView pnlView)
+		{
+			if (CurrentPage.SelectedCount == 0)
+				return false;
+			if (CurrentPage.SelectionContainer() == null) // Trigger requires that all items are in same parent
+				return false;
+			return CurrentPage.SelectedShapes.All(s => !(s is Scriptable) && !(s.Parent is Scriptable));
+		}
+
+	}
+
+	internal class MakeInactive : Verb
+	{
+		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
+		{
+			IShapeContainer container = CurrentPage.SelectionContainer();
+			if (container == null)
+			{
+				MessageBox.Show(Strings.Item("Container_Mismatch"));
+				return;
+			}
+
+			transaction.Edit((Datum)container);
+			List<Shape> moved = new List<Shape>();
+			foreach (Scriptable scriptable in CurrentPage.SelectedShapes)
+			{
+				transaction.Delete(scriptable);
+				Shape shape = scriptable.Element;
+				transaction.Edit(shape);
+				shape.Parent = container;
+				container.Contents.Remove(scriptable);
+				container.Contents.Add(shape);
+				moved.Add(shape);
+			}
+			container.FinishedModifyingContents(transaction);
+			CurrentPage.SelectOnly(moved);
+
+		}
+
+		public override bool HideFromContextMenuIfUnavailable => true;
+
+		public override bool IsApplicable(EditableView pnlView)
+		{
+			if (CurrentPage.SelectedCount == 0)
+				return false;
+			if (CurrentPage.SelectionContainer() == null) // Trigger requires that all items are in same parent
+				return false;
+			// doesn't allow traditional SAW buttons to make made inert
+			return CurrentPage.SelectedShapes.All(s => (s is Scriptable scriptable) && !(scriptable.Element is Item));
+		}
 	}
 
 	#endregion

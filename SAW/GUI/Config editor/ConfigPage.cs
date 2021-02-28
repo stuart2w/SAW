@@ -29,11 +29,8 @@ namespace SAW
 		}
 
 		#region Replication of fields on form
-		//protected Users m_eUser
-		//{ get { return Form.m_eUser; } }
 
-		protected Config.Levels Level
-		{ get { return Form.m_Level; } }
+		protected Config.Levels Level => Form.m_Level;
 
 		protected Config m_Config
 		{[DebuggerStepThrough] get { return Form.m_Config; } }
@@ -53,8 +50,7 @@ namespace SAW
 			}
 		}
 
-		protected Document m_Document
-		{ get { return Form.m_Document; } }
+		protected Document m_Document => Form.m_Document;
 
 		protected Transaction m_Transaction
 		{ [DebuggerStepThrough]  get { return Form.m_Transaction; } }

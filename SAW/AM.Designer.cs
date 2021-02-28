@@ -373,316 +373,6 @@ namespace Resources {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap ConfigPrompt_Advanced_Colours {
-            get {
-                object obj = ResourceManager.GetObject("ConfigPrompt_Advanced_Colours", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap ConfigPrompt_Advanced_Graphics {
-            get {
-                object obj = ResourceManager.GetObject("ConfigPrompt_Advanced_Graphics", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap ConfigPrompt_Angle_45_Off {
-            get {
-                object obj = ResourceManager.GetObject("ConfigPrompt_Angle_45_Off", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap ConfigPrompt_Angle_45_On {
-            get {
-                object obj = ResourceManager.GetObject("ConfigPrompt_Angle_45_On", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap ConfigPrompt_Display_Centres_2 {
-            get {
-                object obj = ResourceManager.GetObject("ConfigPrompt_Display_Centres_2", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap ConfigPrompt_Display_Origin {
-            get {
-                object obj = ResourceManager.GetObject("ConfigPrompt_Display_Origin", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap ConfigPrompt_Key_Shortcuts_Off {
-            get {
-                object obj = ResourceManager.GetObject("ConfigPrompt_Key_Shortcuts_Off", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap ConfigPrompt_Key_Shortcuts_On {
-            get {
-                object obj = ResourceManager.GetObject("ConfigPrompt_Key_Shortcuts_On", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap ConfigPrompt_KeyShortcuts_Off {
-            get {
-                object obj = ResourceManager.GetObject("ConfigPrompt_KeyShortcuts_Off", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap ConfigPrompt_KeyShortcuts_On {
-            get {
-                object obj = ResourceManager.GetObject("ConfigPrompt_KeyShortcuts_On", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap ConfigPrompt_Low_Graphics_Off {
-            get {
-                object obj = ResourceManager.GetObject("ConfigPrompt_Low_Graphics_Off", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap ConfigPrompt_Low_Graphics_On {
-            get {
-                object obj = ResourceManager.GetObject("ConfigPrompt_Low_Graphics_On", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap ConfigPrompt_Moving_Shadow_Off {
-            get {
-                object obj = ResourceManager.GetObject("ConfigPrompt_Moving_Shadow_Off", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap ConfigPrompt_Moving_Shadow_On {
-            get {
-                object obj = ResourceManager.GetObject("ConfigPrompt_Moving_Shadow_On", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap ConfigPrompt_Selection_Bounds_Off {
-            get {
-                object obj = ResourceManager.GetObject("ConfigPrompt_Selection_Bounds_Off", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap ConfigPrompt_Selection_Bounds_On {
-            get {
-                object obj = ResourceManager.GetObject("ConfigPrompt_Selection_Bounds_On", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap ConfigPrompt_SelectorAfterCreate {
-            get {
-                object obj = ResourceManager.GetObject("ConfigPrompt_SelectorAfterCreate", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap ConfigPrompt_Separate_Cursors_Off {
-            get {
-                object obj = ResourceManager.GetObject("ConfigPrompt_Separate_Cursors_Off", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap ConfigPrompt_Separate_Cursors_On {
-            get {
-                object obj = ResourceManager.GetObject("ConfigPrompt_Separate_Cursors_On", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap ConfigPrompt_Show_InfoMeasurement {
-            get {
-                object obj = ResourceManager.GetObject("ConfigPrompt_Show_InfoMeasurement", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap ConfigPrompt_Show_PageList {
-            get {
-                object obj = ResourceManager.GetObject("ConfigPrompt_Show_PageList", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap ConfigPrompt_Show_PointerButtons {
-            get {
-                object obj = ResourceManager.GetObject("ConfigPrompt_Show_PointerButtons", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap ConfigPrompt_Show_Prompts {
-            get {
-                object obj = ResourceManager.GetObject("ConfigPrompt_Show_Prompts", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap ConfigPrompt_Show_Toolbar {
-            get {
-                object obj = ResourceManager.GetObject("ConfigPrompt_Show_Toolbar", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap ConfigPrompt_Show_ToolbarSnap {
-            get {
-                object obj = ResourceManager.GetObject("ConfigPrompt_Show_ToolbarSnap", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap ConfigPrompt_Show_ToolbarVerbs {
-            get {
-                object obj = ResourceManager.GetObject("ConfigPrompt_Show_ToolbarVerbs", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap ConfigPrompt_Show_Tools {
-            get {
-                object obj = ResourceManager.GetObject("ConfigPrompt_Show_Tools", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap ConfigPrompt_Show_TransformCopy {
-            get {
-                object obj = ResourceManager.GetObject("ConfigPrompt_Show_TransformCopy", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap ConfigPrompt_Smaller_Tools {
-            get {
-                object obj = ResourceManager.GetObject("ConfigPrompt_Smaller_Tools", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap ConfigPrompt_Windows_Colours_Off {
-            get {
-                object obj = ResourceManager.GetObject("ConfigPrompt_Windows_Colours_Off", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap ConfigPrompt_Windows_Colours_On {
-            get {
-                object obj = ResourceManager.GetObject("ConfigPrompt_Windows_Colours_On", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
         internal static System.Drawing.Bitmap ConfigUserTeacher {
             get {
                 object obj = ResourceManager.GetObject("ConfigUserTeacher", resourceCulture);
@@ -706,6 +396,16 @@ namespace Resources {
         internal static System.Drawing.Bitmap ConfigWheel {
             get {
                 object obj = ResourceManager.GetObject("ConfigWheel", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap CoordEdit_64 {
+            get {
+                object obj = ResourceManager.GetObject("CoordEdit_64", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -2673,6 +2373,16 @@ namespace Resources {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap Rotate_64 {
+            get {
+                object obj = ResourceManager.GetObject("Rotate_64", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap RoundButton_256 {
             get {
                 object obj = ResourceManager.GetObject("RoundButton_256", resourceCulture);
@@ -2876,6 +2586,16 @@ namespace Resources {
         internal static System.Drawing.Bitmap SAW {
             get {
                 object obj = ResourceManager.GetObject("SAW", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap Scale_64 {
+            get {
+                object obj = ResourceManager.GetObject("Scale_64", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -4162,6 +3882,16 @@ namespace Resources {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap TOOLIMG_64_RHOMBUS {
+            get {
+                object obj = ResourceManager.GetObject("TOOLIMG_64_RHOMBUS", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap TOOLIMG_64_SCRIPTABLE {
             get {
                 object obj = ResourceManager.GetObject("TOOLIMG_64_SCRIPTABLE", resourceCulture);
@@ -4332,6 +4062,16 @@ namespace Resources {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap TOOLIMG_FLOATINGLABEL {
+            get {
+                object obj = ResourceManager.GetObject("TOOLIMG_FLOATINGLABEL", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap TOOLIMG_FLOW {
             get {
                 object obj = ResourceManager.GetObject("TOOLIMG_FLOW", resourceCulture);
@@ -4345,6 +4085,16 @@ namespace Resources {
         internal static System.Drawing.Bitmap TOOLIMG_FREETEXT {
             get {
                 object obj = ResourceManager.GetObject("TOOLIMG_FREETEXT", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap TOOLIMG_GENERICPATH {
+            get {
+                object obj = ResourceManager.GetObject("TOOLIMG_GENERICPATH", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -4465,6 +4215,16 @@ namespace Resources {
         internal static System.Drawing.Bitmap TOOLIMG_RECTANGLE {
             get {
                 object obj = ResourceManager.GetObject("TOOLIMG_RECTANGLE", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap TOOLIMG_RHOMBUS {
+            get {
+                object obj = ResourceManager.GetObject("TOOLIMG_RHOMBUS", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

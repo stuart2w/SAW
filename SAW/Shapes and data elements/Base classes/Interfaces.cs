@@ -13,8 +13,8 @@ namespace SAW
 		Bounds = 2,
 		/// <summary>Indicates that previous GrabSpots are no longer valid and must be regenerated</summary>
 		GrabSpots = 4,
-		Intersections = 8,
-		IterateRainbowOnTransform = 16,
+//		Intersections = 8,
+		//IterateRainbowOnTransform = 16,
 		Diagnostic = 32,
 		/// <summary>GUI will update applicability and refill the palettes</summary>
 		StyleInformation = 64,

@@ -18,7 +18,7 @@ namespace SAW
 		public Shape.SnapModes SnapMode = Shape.SnapModes.Off;
 		public Config UserSettings; // settings which apply only in user mode
 		public Config BothSettings;
-		// settings which apply in BOTH user and teacher mode
+		// settings which apply in BOTH user and editor mode
 		// Settings are not automatically created with documents, because we do have a number of documents which don't really represent actual documents
 
 
@@ -37,7 +37,7 @@ namespace SAW
 		/// <summary>(Was ActivityName) Intended for storage in the activity itself; NO LONGER copied to the derived document</summary>
 		/// <remarks>Both Name and DisplayName are also used for palettes in PaletteTitle and PaletteDescription properties</remarks>
 		public string Name = "";
-		/// <summary>Alternate version of Name which is used when displaying to the end user (not teacher).
+		/// <summary>Alternate version of Name which is used when displaying in run mode to the end user (not editor).
 		/// E.g. Name might be "Infant Numbers" whereas the display version would be just "Numbers"</summary>
 		/// <remarks>Both Name and DisplayName are also used for palettes in PaletteTitle and PaletteDescription properties</remarks>
 		public string DisplayName = "";
@@ -196,7 +196,7 @@ namespace SAW
 		#region Datum
 		// Activity IDs have been moved into the activities region
 		/// <summary>needed when converting OLD configurations prior to
-		/// the split into teacher and user separately.  We only want to perform split if this is a document or activity</summary>
+		/// the split into editor and user separately.  We only want to perform split if this is a document or activity</summary>
 		internal static Config.Levels ConfigLevelHint = Config.Levels.DocumentUser;
 
 		public override void CopyFrom(Datum other, CopyDepth depth, Mapping mapID)
@@ -213,18 +213,18 @@ namespace SAW
 				m_Pages = new List<Page>();
 				if (depth == CopyDepth.Duplicate)
 				{
-					foreach (Page objPage in document.m_Pages)
+					foreach (Page page in document.m_Pages)
 					{
-						m_Pages.Add((Page)objPage.Clone(mapID));
+						m_Pages.Add((Page)page.Clone(mapID));
 					}
 				}
 				else
 					m_Pages.AddRange(document.m_Pages);
 				m_SharedResources = new DatumList();
 				// The bitmaps themselves not duplicated, the other document has a reference to the same ones
-				foreach (Datum objImage in document.m_SharedResources.Values)
+				foreach (Datum image in document.m_SharedResources.Values)
 				{
-					m_SharedResources.Add(objImage.ID, objImage);
+					m_SharedResources.Add(image.ID, image);
 				}
 				SnapMode = document.SnapMode;
 				if (depth == CopyDepth.Duplicate && document.UserSettings != null)
@@ -334,7 +334,10 @@ namespace SAW
 			DisplayName = reader.ReadString();
 			m_SharedButtonStyles.Add(reader.ReadDataList(FileMarkers.ButtonStyle));
 			if (hasStyleDefaults)
-				Shape.MarkerStyleC.Read(reader);
+			{ // was marker style.  Redundant in SAW
+				reader.ReadByte();
+				reader.ReadByte();
+			}
 			PaletteDesignSize = reader.ReadSizeF();
 			SubTitle = reader.ReadString();
 			Units = (GraphicsUnit)reader.ReadInt32();
@@ -396,8 +399,9 @@ namespace SAW
 			writer.Write(m_SharedButtonStyles);
 			if (defaults)
 			{
-				(new Shape.MarkerStyleC()).Write(writer);
-				writer.Write(0);
+				writer.WriteByte(0); // these 2 bytes were marker style.  Redundant in SAW
+				writer.WriteByte(0);
+				//writer.Write(0);
 			}
 			writer.Write(PaletteDesignSize);
 			writer.Write(SubTitle);
@@ -837,6 +841,8 @@ namespace SAW
 			GC.SuppressFinalize(this);
 		}
 
+		public bool IsDisposed => m_Pages.Count == 0 || m_Pages[0].IsDisposed;
+
 		#endregion
 
 		#region Activities
@@ -882,7 +888,7 @@ namespace SAW
 			return BothSettings;
 		}
 
-		public void NotifySettingsChanged(Shape.EnvironmentChanges change)
+		internal void NotifySettingsChanged(Shape.EnvironmentChanges change)
 		{
 			// should be passed on down through the hierarchy of shapes
 			foreach (Page page in m_Pages)
@@ -1038,7 +1044,6 @@ namespace SAW
 			}
 		}
 
-
 		public void WriteExportText(IndentStringBuilder output)
 		{
 			output.AppendLine("Header for SAW");
@@ -1046,6 +1051,7 @@ namespace SAW
 			output.Append("Version = ").AppendLine(SoftwareVersion.VersionString);
 			output.Append("SAW Bounds = ").AppendLine(SAWHeader.MainWindowBounds.ToString());
 			output.Indent -= 1;
+			output.Append("End Header for SAW");
 			for (int page = 0; page < Pages.Count(); page++)
 			{
 				// The page number framework is only written if there are multiple pages
@@ -1061,7 +1067,6 @@ namespace SAW
 					output.Append("End of Page ").Append(page + 1).AppendLine("");
 				}
 			}
-			output.Append("End Header for SAW");
 		}
 
 

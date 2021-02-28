@@ -11,7 +11,7 @@ namespace SAW
 	{
 		//Text which is created based upon a baseline.  The base class Label is used for the text
 
-		private PointF[] Vertices = new PointF[2];
+		protected PointF[] Vertices = new PointF[2];
 
 		public TextLine()
 		{ }
@@ -60,7 +60,7 @@ namespace SAW
 			}
 		}
 
-		public override bool DefaultStylesApplied()
+		internal override bool DefaultStylesApplied()
 		{
 			if (TextStyle.Alignment != StringAlignment.Near)
 			{
@@ -69,10 +69,10 @@ namespace SAW
 			}
 			return false;
 		}
+		
+		private bool m_LastPromptWasEmpty;
 
-
-		private bool m_LastPromptWasEmpty = false;
-		public override List<Prompt> GetPrompts()
+		internal override List<Prompt> GetPrompts()
 		{
 			List<Prompt> list = new List<Prompt>();
 			if (!m_BaseLineFixed)
@@ -90,11 +90,12 @@ namespace SAW
 			}
 			return list;
 		}
+
 		#endregion
 
 		#region Verbs
 
-		private bool m_BaseLineFixed = true;
+		protected bool m_BaseLineFixed = true;
 		public override VerbResult Start(EditableView.ClickPosition position)
 		{
 			PointF pt = position.Snapped;
@@ -182,7 +183,7 @@ namespace SAW
 				Utilities.LogSubError("TextLine has caret without base line fixed");
 				return VerbResult.Unexpected;
 			}
-			var result = base.CombinedKey(key, ch, page, simulated, fromView);
+			VerbResult result = base.CombinedKey(key, ch, page, simulated, fromView);
 			if (ch != '\0')
 			{
 				m_Bounds = CalculateBounds();
@@ -361,15 +362,16 @@ namespace SAW
 		#endregion
 
 		#region Grabs and transforms
-		public override List<GrabSpot> GetGrabSpots(float scale)
+
+		internal override List<GrabSpot> GetGrabSpots(float scale)
 		{
-			List<GrabSpot> objList = new List<GrabSpot>();
-			objList.Add(new GrabSpot(this, GrabTypes.Fixed, Vertices[0], 0));
-			objList.Add(new GrabSpot(this, GrabTypes.SingleVertex, Vertices[1], 1));
-			return objList;
+			List<GrabSpot> list = new List<GrabSpot>();
+			list.Add(new GrabSpot(this, GrabTypes.Fixed, Vertices[0], 0));
+			list.Add(new GrabSpot(this, GrabTypes.SingleVertex, Vertices[1], 1));
+			return list;
 		}
 
-		protected override void DoGrabMove(GrabMovement move)
+		protected internal override void DoGrabMove(GrabMovement move)
 		{
 			switch (move.GrabType)
 			{
@@ -390,7 +392,7 @@ namespace SAW
 			}
 		}
 
-		public override void DoGrabAngleSnap(GrabMovement move)
+		internal override void DoGrabAngleSnap(GrabMovement move)
 		{
 			if (move.GrabType != GrabTypes.SingleVertex)
 				base.DoGrabAngleSnap(move);
@@ -405,6 +407,7 @@ namespace SAW
 			transformation.TransformPoint(ref Vertices[1]);
 			ClearTextCache();
 		}
+
 		#endregion
 
 	}
@@ -445,7 +448,8 @@ namespace SAW
 		}
 
 		private bool m_LastPromptWasEmpty;
-		public override List<Prompt> GetPrompts()
+
+		internal override List<Prompt> GetPrompts()
 		{
 			List<Prompt> list = new List<Prompt>();
 			list.Add(new Prompt(ShapeVerbs.Type, "FreeText_Type", "FreeText_Type"));
@@ -643,7 +647,7 @@ namespace SAW
 			return rctBounds;
 		}
 
-		public override List<GrabSpot> GetGrabSpots(float scale) => new List<GrabSpot>();
+		internal override List<GrabSpot> GetGrabSpots(float scale) => new List<GrabSpot>();
 
 		protected override void SetTextTransforms()
 		{

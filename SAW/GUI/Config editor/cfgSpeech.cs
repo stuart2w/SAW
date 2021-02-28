@@ -19,7 +19,6 @@ namespace SAW
 			m_Filling = true;
 			try
 			{
-				chkUseSpeech.Checked = m_Applied.ReadBoolean(Config.Use_Speech, true);
 				// we only fill the list of voices when needed
 				ctrVolume.Value = m_Config.ReadInteger(Config.Speech_Volume, 100);
 				ctrSpeed.Value = m_Config.ReadInteger(Config.Speech_Speed, 70);
@@ -37,22 +36,13 @@ namespace SAW
 				catch
 				{
 				}
-				chkUseSpeech_UserChangedState(this, null);
 			}
 			finally
 			{
 				m_Filling = false;
 			}
 		}
-
-		public void chkUseSpeech_UserChangedState(object sender, EventArgs e)
-		{
-			ctrVolume.Enabled = chkUseSpeech.Checked;
-			ctrSpeed.Enabled = chkUseSpeech.Checked;
-			cmbSpeechVoice.Enabled = chkUseSpeech.Checked;
-			btnSpeechTest.Enabled = chkUseSpeech.Checked;
-		}
-
+		
 		public void cmbSpeechVoice_SelectedIndexChanged(object sender, EventArgs e)
 		{
 			if (m_Filling)

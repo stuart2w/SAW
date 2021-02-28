@@ -81,6 +81,9 @@ namespace SAW
 
 		public static SizeF Page_Size_Default = new SizeF(750, 500);
 
+		/// <summary>True if resizing editor updates document size.  Default true</summary>
+		internal static string Resize_Document_ToWindow = "Resize_Document_ToWindow";
+
 
 		// Also: FileDialog generates its own keys
 		internal const string Low_Graphics = "Low_Graphics";
@@ -98,7 +101,6 @@ namespace SAW
 		internal const string Moving_Shadow = "Moving_Shadow";
 		internal const string Advanced_Colours = "Advanced_Colours";
 		internal const string Key_Shortcuts = "KeyShortcuts"; // _ is not permitted, names cannot start "Key_"
-		internal const string Use_Speech = "Use_Speech";
 		internal const string Speech_Voice = "Speech_Voice";
 		internal const string Speech_Volume = "Speech_Volume";
 		internal const string Speech_Speed = "Speech_Speed";
@@ -106,8 +108,6 @@ namespace SAW
 		internal const string Default_Zoom = "Default_Zoom"; // stored as an integer which is 100 times the actual zoom (because the config ComboBox uses integers)
 		internal const string Multiple_Documents = "Multiple_Documents"; // only changeable in teacher settings (i.e. specifically at user level only).  This also assumed in frmEditConfig.FillPalettes
 		internal const string Delta_Applied = "Delta_Applied"; // system only.  The last set of version Deltas (changes to default between versions) which have been applied
-		internal const string Toolbar_OnlyExplicit = "Toolbar_OnlyExplicit";
-		internal const string Toolbar_ButtonSize = "Toolbar_Button_Size";
 		internal const string Show_DefaultOff = "Show_DefaultOff";
 		internal const string Shapes_DefaultOff = "Shapes_DefaultOff";
 		internal const string MouseStep_Small = "MouseStep_Small";
@@ -117,7 +117,7 @@ namespace SAW
 		internal const string Page_Size = "Page_Size";
 		internal const string Selection_Bounds = "Selection_Bounds";
 		internal const string Display_Origin = "Display_Origin";
-		internal const string Speak_Selected = "Speak_Selected";
+		///internal const string Speak_Selected = "Speak_Selected";
 		/// <summary>Enables full vector graphic editing, grab handles etc</summary>
 		internal const string Advanced_Graphics = "Advanced_Graphics";
 		internal const string Context_Menus = "Context_Menus";
@@ -157,10 +157,7 @@ namespace SAW
 			return true;
 		}
 
-		public static IEnumerable<Document> ActivityConfigs()
-		{
-			return ActivityNew.Values;
-		}
+		public static IEnumerable<Document> ActivityConfigs => ActivityNew.Values;
 
 		public static void AddActivity(Document document)
 		{
@@ -176,17 +173,14 @@ namespace SAW
 			set { User = value; }
 		}
 
-		/// <summary>Just user config.  In Splash this can be the teache config instead</summary>
+		/// <summary>Just user config.  In Splash this can be the editor config instead</summary>
 		public static Config UserCurrent
 		{
 			get { return User; }
 		}
 
 		/// <summary>Dummy for compatibility with Splash.  This = Config.UserCurrent, but in Splash would be a different config</summary>
-		public static Config UserEditor
-		{
-			get { return User; }
-		}
+		public static Config UserEditor => User;
 
 		public static string[] StandardIDs = { "System", "User" };
 		// note case sensitive!
@@ -697,6 +691,8 @@ namespace SAW
 		{
 			if (purpose.IsParameter)
 			{
+				if (purpose.Parameter == Parameters.FillColour)
+					return "FillColour"; // there is a duplicate name for this in the enum which confuses the ToString in the line below
 				if (purpose.Parameter == Parameters.FillColour || purpose.Parameter == Parameters.FillPattern || purpose.Parameter == Parameters.LineColour || purpose.Parameter == Parameters.LinePattern || purpose.Parameter == (Parameters)Palette.Purpose.Specials.Number || purpose.Parameter == Parameters.Tool)
 					return purpose.Parameter.ToString();
 				else if (purpose.Parameter == Parameters.FontSize)
@@ -724,11 +720,14 @@ namespace SAW
 			return "Show_Palette_" + fragment;
 		}
 
-		public static string ShowPaletteKey(Parameters whichPalette)
+		/// <summary>Note that there is an implicit conversion from Parameters or a custom Guid to purpose, so either can also be supplied here</summary>
+		public static string ShowPaletteKey(Palette.Purpose purpose)
 		{
 			// Generally the version with a Palette parameter is better, but this is useful in the wizard to control the standard palettes
-			return "Show_Palette_" + PaletteKeyFragment(new Palette.Purpose(whichPalette));
+			return "Show_Palette_" + PaletteKeyFragment(purpose);
 		}
+
+		public static string ShowPaletteKey(Guid customID) => "Show_Palette_" + customID;
 
 		public static string SelectPaletteKey(Palette.Purpose purpose)
 		{
@@ -749,10 +748,6 @@ namespace SAW
 		#endregion
 
 		#region Defaults
-		/// <summary>Default value for VI_Background if VI_ReplaceBackground is selected</summary>
-		internal const int VI_Background_Default = unchecked((int)0xFFFFF196);
-		/// <summary>Default value for VI_TextColour if VI_ChangeText is selected</summary>
-		internal const int VI_Text_Default = unchecked((int)0xFF000088);
 		internal const int Toolbar_ButtonSize_Default = 40; // v1 value - size of buttons in TB (img inside is smaller)
 
 		public enum MouseStepDefaults
@@ -831,15 +826,14 @@ namespace SAW
 				{
 					if (key == Delta_Applied)
 						continue;
-					if (key.StartsWith("Open_Folder"))
-						continue; // current folder locations for various file types.  Don't want to propagate from me to them!
-					newConfig.Values.Add(key, this.Values[key]);
+					if (!DeltaIgnoreSetting(key))
+						newConfig.Values.Add(key, this.Values[key]);
 				}
 			}
 			// now check for anything which has been removed
 			foreach (string key in fromConfig.Values.Keys)
 			{
-				if (!Values.ContainsKey(key) && key != Delta_Applied)
+				if (!Values.ContainsKey(key) && key != Delta_Applied && !DeltaIgnoreSetting(key))
 					newConfig.Values.Add(key, "");
 			}
 			try
@@ -862,6 +856,17 @@ namespace SAW
 				IdenticalForPaletteDelta = false;
 			}
 			return newConfig;
+		}
+
+		private bool DeltaIgnoreSetting(string key)
+		{
+			if (key.Contains("Switch"))
+				return true;
+			if (key.StartsWith("Timing"))
+				return true;
+			if (key.StartsWith("Open_Folder"))
+				return true; // current folder locations for various file types.  Don't want to propagate from me to them!
+			return false;
 		}
 
 		// changes to shape folders and PaletteShapes are ignored at the moment.  But the data is stored as a config object, and could contain these
@@ -924,6 +929,7 @@ namespace SAW
 				}
 
 			}
+
 #endif
 
 			public bool IsEmpty => Changes.Values.Count == 0 && Changes.CustomPalettes.Count == 0;
@@ -1004,7 +1010,18 @@ namespace SAW
 						Globals.Root.LogPermanent.WriteLine("Applied delta file: " + System.IO.Path.GetFileName(update.File));
 					}
 				}
+				if (done < 800)
+
 				SystemConfig.Write(Delta_Applied, SoftwareVersion.Version);
+			}
+
+			/// <summary>Applies some manual changes needed for the upgrade to V8 </summary>
+			internal static void ApplyV8Changes()
+			{
+				(Config.SystemConfig.CustomPalettes[Config.ToolboxPaletteID] as Document).PalettePurpose = new Palette.Purpose(Parameters.Tool);
+				User.RemoveValue(Config.ShowPaletteKey(Config.ToolboxPaletteID));
+				User.Write(Config.ShowPaletteKey(Parameters.Tool), true);
+				User.Write(Config.SelectPaletteKey(new Palette.Purpose(Parameters.Tool)), Config.ToolboxPaletteID);
 			}
 
 			private static void ApplyDeltaFile(string file, float version)

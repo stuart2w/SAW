@@ -2,7 +2,7 @@
 
 namespace SAW.Functions
 {
-	static class PageVerbs
+	internal static class PageVerbs
 	{
 		public static void RegisterVerbs()
 		{
@@ -21,7 +21,7 @@ namespace SAW.Functions
 		}
 	}
 
-	class PageNext : Verb
+	internal class PageNext : Verb
 	{// adds another page if at the end
 		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
 		{
@@ -37,7 +37,7 @@ namespace SAW.Functions
 		public override bool IncludeOnContextMenu => false;
 	}
 
-	class PagePrevious : Verb
+	internal class PagePrevious : Verb
 	{
 		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
 		{
@@ -49,7 +49,7 @@ namespace SAW.Functions
 		public override bool IncludeOnContextMenu => false;
 	}
 
-	class PageDelete : Verb
+	internal class PageDelete : Verb
 	{
 		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
 		{
@@ -73,7 +73,7 @@ namespace SAW.Functions
 		public override bool IsApplicable(EditableView pnlView) => CurrentDocument.Count > 1 && !CurrentDocument.IsPaletteWithin;
 	}
 
-	class PageClear : Verb
+	internal class PageClear : Verb
 	{
 		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
 		{
@@ -86,7 +86,7 @@ namespace SAW.Functions
 		public override bool IncludeOnContextMenu => false;
 	}
 
-	class PageAdd : Verb
+	internal class PageAdd : Verb
 	{
 		public int Offset = 1;
 		public bool Duplicate;
@@ -100,7 +100,7 @@ namespace SAW.Functions
 		public override bool IsApplicable(EditableView pnlView) => !CurrentDocument.IsPaletteWithin;
 	}
 
-	class PageMoveDown : Verb
+	internal class PageMoveDown : Verb
 	{
 		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
 		{
@@ -113,7 +113,7 @@ namespace SAW.Functions
 		public override bool IsApplicable(EditableView pnlView) => CurrentPageIndex < CurrentDocument.Count - 1 && !CurrentDocument.IsPaletteWithin;
 	}
 
-	class PageMoveUp : Verb
+	internal class PageMoveUp : Verb
 	{
 		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
 		{
@@ -126,7 +126,7 @@ namespace SAW.Functions
 		public override bool IsApplicable(EditableView pnlView) => CurrentPageIndex > 0 && !CurrentDocument.IsPaletteWithin;
 	}
 
-	class EditPaper : Verb
+	internal class EditPaper : Verb
 	{
 		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
 		{
@@ -147,7 +147,7 @@ namespace SAW.Functions
 		public override bool MightOpenModalDialog => true;
 	}
 
-	class PageSize : Verb
+	internal class PageSize : Verb
 	{
 		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
 		{
@@ -158,15 +158,16 @@ namespace SAW.Functions
 		}
 	}
 
-	class SetOrigin : Verb
+	internal class SetOrigin : Verb
 	{
 		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
 		{
-			pnlView.StartSetOrigin();
+			pnlView.StartCustomShape(new SAW.SetOrigin());
 		}
 
 		public override bool IsApplicable(EditableView pnlView)
 			=> Globals.Root.CurrentConfig.ShowArea(Config.Show_InfoMeasurement, true) && !CurrentDocument.IsPaletteWithin;
+
 		public override bool IncludeOnContextMenu => false;
 	}
 }

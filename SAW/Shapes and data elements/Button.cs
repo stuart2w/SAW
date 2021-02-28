@@ -252,7 +252,7 @@ namespace SAW
 		public bool SelectDuringUserPress
 		{ get { return !(Action is ValueSelectableAction); } }
 
-		public override List<Prompt> GetPrompts()
+		internal override List<Prompt> GetPrompts()
 		{
 			// if we are being asked, then the first vertex must have been placed
 			List<Prompt> objList = new List<Prompt>();
@@ -267,6 +267,9 @@ namespace SAW
 				return SnapModes.Off;
 			return base.SnapNext(requested);
 		}
+
+		public override string ToString() => $"Buttonshape (Action={Action})";
+
 		#endregion
 
 		#region Verbs
@@ -285,7 +288,7 @@ namespace SAW
 			return VerbResult.Continuing;
 		}
 
-		public override void InitialiseFreeStanding()
+		internal override void InitialiseFreeStanding()
 		{
 			base.InitialiseFreeStanding();
 			BackgroundStyleObject = new ButtonStyle();
@@ -323,14 +326,14 @@ namespace SAW
 		}
 
 		// Editing (and therefore double-click) only available in teacher mode (user mode can affect some of the controls in the editing screen, e.g. colour picker)
-		public override string DoubleClickText()
+		internal override string DoubleClickText()
 		{
 			if (Globals.Root.User == Users.User)
 				return "";
 			return Strings.Item("Button_Edit");
 		}
 
-		public override void DoDoubleClick(EditableView view, EditableView.ClickPosition.Sources source)
+		internal override void DoDoubleClick(EditableView view, EditableView.ClickPosition.Sources source)
 		{
 			if (Globals.Root.User == Users.User)
 				return;
@@ -789,7 +792,7 @@ namespace SAW
 			}
 		}
 
-		public override List<GrabSpot> GetGrabSpots(float scale)
+		internal override List<GrabSpot> GetGrabSpots(float scale)
 		{
 			List<GrabSpot> objList = new List<GrabSpot>();
 			base.AddBoundingGrabSpots(objList, scale);

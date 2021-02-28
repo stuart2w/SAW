@@ -7,7 +7,8 @@ namespace Switches.Engines
 		protected override void Switch1Changed(bool down)
 		{
 			if (down)
-				OnIterate(); // and will automatically repeat
+				//OnIterate(); // and will automatically repeat // WRONG - this isn't supposed to provide an iteration when first pressed as the first item cannot be selected
+				m_Timer.Start(ScanTime, OnIterate, Timings.ScanTime);
 			else
 			{
 				m_Timer.Cancel();
@@ -16,11 +17,9 @@ namespace Switches.Engines
 			}
 		}
 
-		public override Timings RelevantTimings // no repeats are possible
-		{ get { return Timings.ScanTime | Timings.AcceptanceTime | Timings.PostActivation; } }
+		public override Timings RelevantTimings => Timings.ScanTime | Timings.AcceptanceTime | Timings.PostActivation; // no repeats are possible
 
-		public override Methods Method
-		{ get { return Methods.UserSingle; } }
+		public override Methods Method => Methods.UserSingle;
 
 	}
 }

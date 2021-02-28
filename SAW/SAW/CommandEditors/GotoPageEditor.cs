@@ -46,10 +46,8 @@ namespace SAW.CommandEditors
 			}
 		}
 
-		public string GetValidationError()
-		{
-			return null;
-		}
+		public string GetValidationError() => null;
+
 		#endregion
 
 		#region Events
@@ -58,7 +56,7 @@ namespace SAW.CommandEditors
 		{
 			if (m_Filling)
 				return;
-			m_Command.m_ParamList[0] = new IntegerParam((int)(nudPage.Value - 1));
+			m_Command.m_ParamList[0] = new IntegerParam((int)(nudPage.Value));
 			UserChanged?.Invoke(sender, e);
 		}
 

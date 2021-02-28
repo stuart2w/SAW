@@ -298,14 +298,10 @@ namespace Switches.Switching
 			// get description for Param for any type
 			switch (type)
 			{
-				case Types.Null:
-					return "--";
-				case Types.Joystick:
-					return JoySwitch.GetParamDescription(param);
-				case Types.Keyboard:
-					return KeySwitch.GetParamDescription(param);
-				case Types.Pointer:
-					return "";
+				case Types.Null:return "--";
+				case Types.Joystick:return JoySwitch.GetParamDescription(param);
+				case Types.Keyboard:return KeySwitch.GetParamDescription(param);
+				case Types.Pointer:return "";
 				default:
 					OnError("Unexpected type in GetParamDescription");
 					return "?";

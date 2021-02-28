@@ -15,135 +15,6 @@ namespace SAW
 
 		protected override LineLogics LineLogic => LineLogics.Custom;
 
-		#region Intersections
-		public override void CheckIntersectionsWith(Shape shape)
-		{
-			Utilities.ErrorAssert((shape.Flags & GeneralFlags.NoIntersections) == 0);
-			switch (shape.ShapeCode)
-			{
-				case Shapes.Circle:
-				case Shapes.Arc:
-					CheckIntersectionsWithCircular((Circular)shape);
-					break;
-				case Shapes.Semicircle:
-				case Shapes.Pie:
-					// these also need to do the edge lines so they override this function.  Let the other shape do the processing
-					shape.CheckIntersectionsWith(this);
-					break;
-				case Shapes.Ellipse:
-					shape.CheckIntersectionsWith(this);
-					break;
-				case Shapes.TextLine:
-					break;
-				default:
-					shape.CheckIntersectionsWith(this);
-					break;
-					// all of the line shapes, let them call back to us using CheckIntersectionsWithLine
-			}
-		}
-
-		protected void CheckIntersectionsWithCircular(Circular shape)
-		{
-			float certainty = 0;
-			PointF[] results = Intersection.Circle_CircleIntersection(Centre, Radius, shape.Centre, shape.Radius, ref certainty);
-			// will have returned nothing failed
-			if (results != null)
-			{
-				for (int index = 0; index <= results.Length - 1; index++)
-				{
-					PointF pt = results[index];
-					if (IntersectionAcceptable(pt) && shape.IntersectionAcceptable(pt))
-					{
-						Intersection create = new Intersection(pt, this, 0, 0, shape, 0, 0, certainty);
-						m_Intersections.Add(create);
-						shape.AddIntersection(create);
-					}
-				}
-			}
-		}
-
-		public override void CheckIntersectionsWithLine(Shape shape, int shapeIndex, float shapeParameter, PointF A, PointF B, bool ignoreEnd)
-		{
-			float certainty = 0;
-			List<PointF> colPoints = Intersection.Circle_LineIntersection(Centre, Radius, A, B, ignoreEnd, ref certainty);
-			if (colPoints == null || colPoints.Count == 0)
-				return;
-			foreach (PointF pt in colPoints)
-			{
-				if (IntersectionAcceptable(pt))
-				{
-					Intersection create = new Intersection(pt, this, 0, 0, shape, shapeIndex, shapeParameter, certainty);
-					m_Intersections.Add(create);
-					shape.AddIntersection(create);
-				}
-			}
-		}
-
-		public override void CheckIntersectionsWithBezier(Shape shape, int shapeIndex, PointF[] Q)
-		{
-			//  sub classes can override to check lines as well.  The shape parameter is not provided; if there is an intersection the Bezier parameter at that point is used
-			PointF[] path = GetPathForArc(); // could be 0-length
-			PointF[] P = new PointF[4]; // need to extract each section of the PathForArc
-			for (int vertex = 0; vertex <= path.Length - 4; vertex += 3) //steps through the contained curves
-			{
-				P[0] = path[vertex];
-				P[1] = path[vertex + 1];
-				P[2] = path[vertex + 2];
-				P[3] = path[vertex + 3];
-				List<Intersection.BezierParameterPair> intersections = Intersection.FatClip(P, Q);
-				if (intersections != null && intersections.Count > 0)
-				{
-					foreach (Intersection.BezierParameterPair objPair in intersections)
-					{
-						PointF pt = Bezier.GetPoint(P, objPair.Tp);
-						if (IntersectionAcceptable(pt))
-						{
-							Intersection create = new Intersection(pt, this, 0, 0, shape, shapeIndex, objPair.Tq, Intersection.CertaintyFromDepth(objPair.Recursion));
-							m_Intersections.Add(create);
-							shape.AddIntersection(create);
-						}
-					}
-				}
-			}
-		}
-
-		protected void DoCheckIntersectionsLineWithBezier(Shape shape, int shapeIndex, PointF[] Q, PointF A, PointF B, int lineIndex)
-		{
-			// the second line parameters describe the line within my shape
-			// List of the Bezier parameters at which the intersections occur
-			List<Intersection.BezierParameterPair> colIntersection = Intersection.Bezier_LineIntersection(Q, A, B);
-			if (colIntersection != null && colIntersection.Count > 0)
-			{
-				foreach (Intersection.BezierParameterPair objPair in colIntersection)
-				{
-					float parameter = objPair.Tp;
-					PointF pt = Bezier.GetPoint(Q, parameter);
-					Intersection intersection = new Intersection(pt, this, lineIndex, 0, shape, shapeIndex, parameter, Intersection.CertaintyFromDepth(objPair.Recursion));
-					m_Intersections.Add(intersection);
-					shape.AddIntersection(intersection);
-				}
-			}
-		}
-
-		/// <summary>must state whether the point (which is guaranteed to be on the circumference of a circle) is actually a valid part of this shape.
-		/// for the partial circles this depends on whether this point falls within the sweep angle.  Always true for circle</summary>
-		public abstract bool IntersectionAcceptable(PointF intersection);
-
-		protected float IntersectionAngle(Intersection intersection)
-		{
-			// circular intersections do not immediately store the angle in the intersection parameter, because calculating it now is just as cheap
-			// as calculating it as the intersection is created, and most intersections will never be needed for complex iteration
-			// however once calculated, we store it back in the intersection
-			float angle = intersection.Parameter(this);
-			if (angle == 0)
-			{
-				angle = Geometry.VectorAngle(Centre, intersection.Position);
-				intersection.SetParameter(angle, this); // now remember this angle to save recalculating it
-			}
-			return angle;
-		}
-		#endregion
-
 		#region Path support
 		// Few of the circular items use Path for drawing.  All will create paths however for cutting
 
@@ -174,7 +45,7 @@ namespace SAW
 		}
 		#endregion
 
-		public override float[] GetRelevantAngles()
+		internal override float[] GetRelevantAngles()
 		{
 			return null; // don't want any vertex-based information from the base class to be used
 						 // although semicircle will override this again
@@ -190,28 +61,6 @@ namespace SAW
 		}
 
 		public override string StatusInformation(bool ongoing) => Strings.Item("Info_Radius") + ": " + Measure.FormatLength(Radius);
-
-		public override bool ContainsSegment(Segment segment)
-		{
-			// this version implements the check whether the segment is on the radius.
-			// if the derived class has a linear segments, it should override and check for those
-			if (segment.IsLine)
-				return false;
-			float radius = Radius;
-			//' not sure if it is possible or worth checking that the other points actually form a radius Bezier; presumably it is unlikely
-			//' that we would get a different Bezier starting and ending on the radius, and for which this test was critical (i.e. only this segment stopped the traced path being a single shape)
-			// actually it does if it's just 2 slightly overlapping circles
-			foreach (PointF P in segment.P)
-			{
-				if (Math.Abs(Geometry.DistanceBetween(Centre, P) - radius) > Geometry.NEGLIGIBLE)
-					return false;
-			}
-			if (!IntersectionAcceptable(segment.P[0]))
-				return false; // this will test that the angle falls within the arc actually used by this shape
-			if (!IntersectionAcceptable(segment.P[3]))
-				return false;
-			return true;
-		}
 
 		protected PointF PointAtAngle(float angle)
 		{
@@ -237,7 +86,7 @@ namespace SAW
 
 		public override float Radius => m_Radius;
 
-		public override List<Prompt> GetPrompts()
+		internal override List<Prompt> GetPrompts()
 		{
 			List<Prompt> list = new List<Prompt> { new Prompt(ShapeVerbs.Complete, "Circle_Finish", "Circle_Finish"), new Prompt(ShapeVerbs.Cancel, "CancelAll", "CancelAll") };
 			return list;
@@ -369,8 +218,6 @@ namespace SAW
 				return Math.Abs(distance - m_Radius) < Line.LINEHITTOLERANCE;
 		}
 
-		public override bool IntersectionAcceptable(PointF intersection) => true;
-
 		public override bool Tidy(SnapModes mode, Page page)
 		{
 			bool changed = false;
@@ -420,7 +267,6 @@ namespace SAW
 		{
 			if (resources.MainBrush != null || resources.MainPen != null)
 				gr.Ellipse(Bounds, resources.MainPen, resources.MainBrush);
-			base.DrawCentre(gr, resources);
 		}
 
 		#region BinaryData and Copy
@@ -446,11 +292,11 @@ namespace SAW
 		#endregion
 
 		#region Targets, grab spots, sockets
-		public override List<Target> GenerateTargets(UserSocket floating)
+
+		internal override List<Target> GenerateTargets(UserSocket floating)
 		{
 			List<Target> targets = new List<Target>();
 			targets.Add(new Target(this, Centre, Target.Types.Centre, floating));
-			base.AddIntersectionTargets(targets, floating);
 			SizeF vector = Centre.VectorTo(floating.Centre);
 			if (vector.Length() > m_Radius / 3) // don't try and add an edge target if we are very near the middle - this will look very strange/would cause problems if exactly over the centre
 			{
@@ -462,7 +308,7 @@ namespace SAW
 			return targets;
 		}
 
-		public override void DrawLineTarget(Target target, Graphics gr, Pen pn, int activePhase)
+		internal override void DrawLineTarget(Target target, Graphics gr, Pen pn, int activePhase)
 		{
 			// we want to calculate the angle to sweep the marker through to keep the length of the marker similar
 			// L = desired length
@@ -474,7 +320,7 @@ namespace SAW
 			gr.DrawArc(pn, Bounds, Geometry.DotNetAngle(target.ShapeParameter + sweep / 2), -Geometry.Degrees(sweep));
 		}
 
-		public override List<GrabSpot> GetGrabSpots(float scale)
+		internal override List<GrabSpot> GetGrabSpots(float scale)
 		{
 			EnsureBounds();
 			List<GrabSpot> list = new List<GrabSpot>();
@@ -483,7 +329,7 @@ namespace SAW
 		}
 
 		// sockets are numbered 0-3: top, right, bottom, left
-		public override List<Socket> GetSockets()
+		internal override List<Socket> GetSockets()
 		{
 			List<Socket> sockets = new List<Socket>
 			{
@@ -496,7 +342,7 @@ namespace SAW
 			return sockets;
 		}
 
-		public override PointF SocketPosition(int index)
+		internal override PointF SocketPosition(int index)
 		{
 			switch (index)
 			{
@@ -515,49 +361,13 @@ namespace SAW
 			}
 		}
 
-		public override SizeF SocketExitVector(int index)
+		internal override SizeF SocketExitVector(int index)
 		{
 			if (index < 0)
 				return new SizeF(1, 0); // should not be requesting this!
 			return Vertices[0].VectorTo(SocketPosition(index));
 		}
 		#endregion
-
-		#region Segments and arcs
-		public override Segment GetSegment(Intersection fromIntersection, bool forward)
-		{
-			float startAngle = IntersectionAngle(fromIntersection);
-			int direction = forward ? 1 : -1;
-			float endAngle = startAngle;
-			Intersection end = null;
-			foreach (Intersection intersection in m_Intersections)
-			{
-				float angle = IntersectionAngle(intersection);
-				if (angle != startAngle && PartCircle.ArcIncludes(startAngle, endAngle, direction, angle))
-				{
-					// this intersection is within the current postulated segment
-					end = intersection;
-					endAngle = angle;
-				}
-			}
-			if (end == null)
-			{
-				// return entire circle
-				if (forward)
-					return new Segment(this, base.GetPathPointsForArc(startAngle, endAngle - Geometry.NEGLIGIBLEANGLESMALL, direction), 0, 0, true, null);
-				else
-					return new Segment(this, base.GetPathPointsForArc(startAngle - Geometry.NEGLIGIBLEANGLESMALL, endAngle, direction), 0, 0, false, null);
-			}
-			else
-			{
-				if (Math.Abs(startAngle - endAngle) < Geometry.NEGLIGIBLEANGLESMALL) // presumably to intersections at basically the same point due to grid snapping
-				{
-					// which have come out fractionally different due to rounding errors.  Try again using this end as a new starting point
-					return GetSegment(end, forward);
-				}
-				return new Segment(this, base.GetPathPointsForArc(startAngle, endAngle, direction), 0, 0, forward, end);
-			}
-		}
 
 		protected override PointF[] GetPathForArc()
 		{
@@ -566,10 +376,7 @@ namespace SAW
 				objPath.AddEllipse(CircleRectangle());
 				return objPath.PathPoints;
 			}
-
 		}
-
-		#endregion
 
 	}
 	#endregion
@@ -602,13 +409,6 @@ namespace SAW
 				EnsureBounds();
 				return m_Radius;
 			}
-		}
-
-		public override bool IntersectionAcceptable(PointF intersection)
-		{
-			float angle = Centre.VectorTo(intersection).VectorAngle();
-			EnsureBounds(); // so that we have the Start and End angles
-			return ArcIncludes(angle);
 		}
 
 		protected override PointF[] GetPathForArc() => GetPathPointsForArc(m_StartAngle, m_EndAngle, m_Direction);
@@ -746,15 +546,14 @@ namespace SAW
 		}
 		#endregion
 
-		#region Targets, GrabSpots, segment
+		#region Targets, GrabSpots
 		// Target.ShapeParameter will be the angle (as with a circle - see Circle for some drawing comments etc)
 		// Generate should be overridden again by each class to add the other vertices
 		// Target.ShapeIndex should be = -1 if on the arc, otherwise used by the derived class to specify which line it is on
-		public override List<Target> GenerateTargets(UserSocket floating)
+		internal override List<Target> GenerateTargets(UserSocket floating)
 		{
 			EnsureBounds(); // for angles
 			List<Target> targets = new List<Target>();
-			base.AddIntersectionTargets(targets, floating);
 			// the derived class should add the centre if it wants to - unnecessary on high as this is a line vertex anyway, and needs higher priority on semicircle
 			//colTargets.Add(New Target(Me, Centre, Target.Types.Centre, ptMouse))
 			SizeF vector = Centre.VectorTo(floating.Centre);
@@ -773,7 +572,7 @@ namespace SAW
 			return targets;
 		}
 
-		public override void DrawLineTarget(Target target, Graphics gr, Pen pn, int activePhase)
+		internal override void DrawLineTarget(Target target, Graphics gr, Pen pn, int activePhase)
 		{
 			// see circle
 			Debug.Assert(target.ShapeIndex == -1, "PartCircle.DrawLineTarget only draws the line on the Arc - the derived class mustoverride this if it wants to draw a straight lines");
@@ -782,41 +581,13 @@ namespace SAW
 			gr.DrawArc(pn, bounds, Geometry.DotNetAngle(target.ShapeParameter + sweep / 2), -Geometry.Degrees(sweep));
 		}
 
-		public override List<GrabSpot> GetGrabSpots(float scale)
+		internal override List<GrabSpot> GetGrabSpots(float scale)
 		{
 			EnsureBounds();
 			List<GrabSpot> objList = new List<GrabSpot>();
 			objList.Add(new GrabSpot(this, GrabTypes.Radius, MidArcPoint()) { Focus = Centre });
 			base.AddStandardRotationGrabSpot(objList);
 			return objList;
-		}
-
-		protected Segment GetSegmentInArc(Intersection fromIX, bool forward)
-		{
-			// implements GetSegment in the arc part of the shape.  The returned segment has an end intersection of nothing
-			// if the segment ends at the end of the arc; the derived class may need to fill in a dummy vertex intersection
-			// returns nothing if already at the end we are travelling towards.  Caller must iterate to another segment if applicable
-			float initialAngle = IntersectionAngle(fromIX);
-			int direction = forward ? m_Direction : -m_Direction;
-			float finishAngle = forward ? m_EndAngle : m_StartAngle;
-			if (Geometry.AbsoluteAngularDifference(finishAngle, initialAngle) < 0.01)
-				return null;
-			Intersection end = null;
-			foreach (Intersection intersection in m_Intersections)
-			{
-				if (intersection.Index(this) == 0) // all of the partial circles use index = 0 to indicate that the intersection is in the circular part
-				{
-					float angle = IntersectionAngle(intersection);
-					if (Math.Abs(angle - initialAngle) > Geometry.NEGLIGIBLEANGLE && ArcIncludes(initialAngle, finishAngle, direction, angle))
-					{
-						// this intersection is within the current postulated segment
-						end = intersection;
-						finishAngle = angle;
-					}
-				}
-			}
-			// this is valid whether an intersection has modified finishAngle or not
-			return new Segment(this, base.GetPathPointsForArc(initialAngle, finishAngle, direction), 0, 0, forward, end);
 		}
 
 		#endregion
@@ -926,7 +697,7 @@ namespace SAW
 
 		protected override LabelPositions LabelPosition => LabelPositions.Line;
 
-		public override List<Prompt> GetPrompts() => base.GetBaseLinePrompts("Semicircle", true);
+		internal override List<Prompt> GetPrompts() => base.GetBaseLinePrompts("Semicircle", true);
 
 		#endregion
 
@@ -1040,7 +811,7 @@ namespace SAW
 
 		protected override PointF[] LineLabelGetPoints() => Vertices.ToArray();
 
-		public override float[] GetRelevantAngles()
+		internal override float[] GetRelevantAngles()
 		{
 			return new[] { Geometry.VectorAngle(Vertices[0], Vertices[1]) };
 		}
@@ -1060,7 +831,8 @@ namespace SAW
 		#endregion
 
 		#region Targets
-		public override List<Target> GenerateTargets(UserSocket floating)
+
+		internal override List<Target> GenerateTargets(UserSocket floating)
 		{
 			List<Target> targets = base.GenerateTargets(floating);
 			// the base class added "Centre", which in this case is the average of the vertices.  We just need to add both vertices themselves and the line
@@ -1073,7 +845,7 @@ namespace SAW
 			return targets;
 		}
 
-		public override void DrawLineTarget(Target target, Graphics gr, Pen pn, int activePhase)
+		internal override void DrawLineTarget(Target target, Graphics gr, Pen pn, int activePhase)
 		{
 			if (target.ShapeIndex < 0)// base class (PartCircle draws the target on the edge)
 				base.DrawLineTarget(target, gr, pn, activePhase);
@@ -1081,12 +853,12 @@ namespace SAW
 				DrawLineTargetGivenPoints(gr, pn, activePhase, target.Position, Vertices[0], Vertices[1]);
 		}
 
-		public override List<Socket> GetSockets()
+		internal override List<Socket> GetSockets()
 		{
 			return new List<Socket> { new Socket(this, 0, Centre), new Socket(this, 1, Vertices[0]), new Socket(this, 2, Vertices[1]), new Socket(this, 3, MidArcPoint()) };
 		}
 
-		public override PointF SocketPosition(int index)
+		internal override PointF SocketPosition(int index)
 		{
 			switch (index)
 			{
@@ -1102,7 +874,7 @@ namespace SAW
 			}
 		}
 
-		public override SizeF SocketExitVector(int index)
+		internal override SizeF SocketExitVector(int index)
 		{
 			switch (index)
 			{
@@ -1116,99 +888,10 @@ namespace SAW
 
 		#endregion
 
-		#region Intersections & segments
-		// shape index 0 indicates intersection with circular part; 1 with baseline
-		// parameter can be angle if known in arc - 0 otherwise; not used in line part
-		public override void CheckIntersectionsWith(Shape shape)
-		{
-			switch (shape.ShapeCode)
-			{
-				case Shapes.Circle:
-				case Shapes.Pie:
-				case Shapes.Arc:
-				case Shapes.Semicircle:
-					base.CheckIntersectionsWithCircular((Circular)shape);
-					shape.CheckIntersectionsWithLine(this, 1, 0, Vertices[0], Vertices[1], true);
-					break;
-				default:
-					shape.CheckIntersectionsWith(this);
-					break;
-			}
-		}
-
-		public override void CheckIntersectionsWithLine(Shape shape, int shapeIndex, float shapeParameter, PointF A, PointF B, bool ignoreEnd)
-		{
-			base.CheckIntersectionsWithLine(shape, shapeIndex, shapeParameter, A, B, ignoreEnd); // does the circular bit
-			DefaultCheckIntersectionBetweenLines(shape, Vertices[0], Vertices[1], true, 1, 0, A, B, ignoreEnd, shapeIndex, shapeParameter);
-		}
-
-		public override void CheckIntersectionsWithBezier(Shape shape, int shapeIndex, PointF[] Q)
-		{
-			base.CheckIntersectionsWithBezier(shape, shapeIndex, Q); // does the arc
-			base.DoCheckIntersectionsLineWithBezier(shape, shapeIndex, Q, Vertices[0], Vertices[1], 1);
-		}
-
-		public override Segment GetSegment(Intersection fromIntersection, bool forward)
-		{
-			if (fromIntersection.Index(this) == 0)
-			{
-				// in the circular part
-				Segment segment = base.GetSegmentInArc(fromIntersection, forward);
-				if (segment == null)
-				{
-					// already at end of arc, no segment remaining
-					return GetSegment(new Intersection(fromIntersection.Position, this, 1, 0), forward);
-				}
-				else if (segment.EndIntersection == null)
-				{
-					// segment ends at the end of the arc; this is not the end of the shape, we need to do the continuation onto one of the lines
-					segment.EndIntersection = new Intersection(segment.EndPoint, this, 1, 0); // param not used in line
-				}
-				return segment;
-			}
-			else
-			{
-				// in the baseline
-				PointF end;
-				Debug.Assert(fromIntersection.Index(this) == 1);
-				if (forward)
-					end = Vertices[1];
-				else
-					end = Vertices[0];
-				Intersection endIntersection = FindLineSegmentIntersection(1, fromIntersection.Position, ref end); // will be intersection at end of segment if any intersections within this line
-				if (endIntersection == null)
-				{
-					// create dummy intersection at end of line, with ShapeIndex set for the curve
-					// dummy intersection for next section...
-					if (end.ApproxEqual(fromIntersection.Position))
-						return GetSegment(new Intersection(fromIntersection.Position, this, 0, 0), forward);
-					else
-						endIntersection = new Intersection(end, this, 0, forward ? m_EndAngle : m_StartAngle);
-				}
-				return new Segment(this, fromIntersection.Position, end, 0, forward, endIntersection);
-			}
-		}
-
-		public override bool ContainsSegment(Segment segment)
-		{
-			if (segment.IsBezier)
-				return base.ContainsSegment(segment); // base class does the circular part
-			if (segment.P[0].Equals(Vertices[0]) && segment.P[1].Equals(Vertices[1]))
-				return true;
-			if (segment.P[0].Equals(Vertices[1]) && segment.P[1].Equals(Vertices[0]))
-				return true;
-			return false;
-		}
-
-		#endregion
-
 		protected override void InternalDraw(Canvas gr, DrawResources resources)
 		{
 			// the diameter is drawn whether still placing the diameter/radius or the entire shape is present
 			base.InternalDrawFromPath(gr, resources);
-			//If Not objResources.MainPen Is Nothing Then gr.DrawLine(objResources.MainPen, Vertices(0), Vertices(1))
-			//InternalDrawSolid(gr, objResources)
-			base.DrawCentre(gr, resources);
 		}
 
 		// Load/Save/CopyFrom in base class are sufficient
@@ -1383,7 +1066,7 @@ namespace SAW
 
 		protected override LabelPositions LabelPosition => LabelPositions.RotatedRectangle;
 
-		public override List<Prompt> GetPrompts()
+		internal override List<Prompt> GetPrompts()
 		{
 			List<Prompt> list = new List<Prompt>();
 			if (m_DefinedVertices == 1)
@@ -1504,10 +1187,9 @@ namespace SAW
 
 		#region Targets and GrabSpots, sockets
 		// we can add the ends of the axes as vertices.  We then also need to add a line target for the edge
-		public override List<Target> GenerateTargets(UserSocket floating)
+		internal override List<Target> GenerateTargets(UserSocket floating)
 		{
 			List<Target> targets = new List<Target>();
-			base.AddIntersectionTargets(targets, floating);
 			// centre
 			targets.Add(new Target(this, Centre, Target.Types.Centre, floating));
 			// Major axis:
@@ -1539,7 +1221,7 @@ namespace SAW
 			return targets;
 		}
 
-		public override void DrawLineTarget(Target target, Graphics gr, Pen pn, int activePhase)
+		internal override void DrawLineTarget(Target target, Graphics gr, Pen pn, int activePhase)
 		{
 			// Target.ShapeParameter is the angle of this target
 			// need to calculate the angle across which to draw based upon the "radius" of this ellipse.  We need to achieve an approximately consistent linear size
@@ -1554,7 +1236,7 @@ namespace SAW
 			gr.DrawLine(pn, A, B);
 		}
 
-		public override List<GrabSpot> GetGrabSpots(float scale)
+		internal override List<GrabSpot> GetGrabSpots(float scale)
 		{
 			List<GrabSpot> list = new List<GrabSpot>();
 			base.AddStandardRotationGrabSpot(list);
@@ -1565,7 +1247,7 @@ namespace SAW
 			return list;
 		}
 
-		protected override void DoGrabMove(GrabMovement move)
+		protected internal override void DoGrabMove(GrabMovement move)
 		{
 			switch (move.GrabType)
 			{
@@ -1593,7 +1275,7 @@ namespace SAW
 			}
 		}
 
-		public override void DoGrabAngleSnap(GrabMovement move)
+		internal override void DoGrabAngleSnap(GrabMovement move)
 		{
 			if (move.GrabType == GrabTypes.SingleVertex)
 				move.Current.Snapped = Geometry.AngleSnapPoint(move.Current.Exact, Vertices[0]);
@@ -1601,7 +1283,7 @@ namespace SAW
 				base.DoGrabAngleSnap(move);
 		}
 
-		public override List<Socket> GetSockets()
+		internal override List<Socket> GetSockets()
 		{
 			// sockets are at the vertices only
 			if (m_Path == null)
@@ -1617,7 +1299,7 @@ namespace SAW
 			return colSockets;
 		}
 
-		public override PointF SocketPosition(int index)
+		internal override PointF SocketPosition(int index)
 		{
 			if (index == -1)
 				return Middle();
@@ -1628,82 +1310,13 @@ namespace SAW
 			return m_Bezier[index * 3];
 		}
 
-		public override SizeF SocketExitVector(int index)
+		internal override SizeF SocketExitVector(int index)
 		{
 			if (index < 0)
 				return new SizeF(1, 0); // should not be requesting this!
 			return Centre.VectorTo(SocketPosition(index));
 		}
 		#endregion
-
-		#region Intersections
-		// this has some custom implementation (cos was already done before path logic and probably faster).  Does use path numbering for intersection segments now
-		// CheckIntersectionsWithBezier uses path logic (always was path based - just didn't use m_Path in v1)
-		public override void CheckIntersectionsWith(Shape shape)
-		{
-			switch (shape.ShapeCode)
-			{
-				case Shapes.Circle:
-				case Shapes.Arc:
-				case Shapes.Pie:
-				case Shapes.Semicircle:
-				case Shapes.Ellipse:
-					// treat this ellipse as 4 Bezier curves and let the circular shape check against these
-					base.CheckIntersectionsWith(shape);
-					break;
-				default:
-					shape.CheckIntersectionsWith(this);
-					break;
-			}
-		}
-
-		public override void CheckIntersectionsWithLine(Shape shape, int shapeIndex, float shapeParameter, PointF A, PointF B, bool ignoreEnd)
-		{
-			// we need to adjust the coordinate space so that the ellipse becomes a circle on the origin; and we can use the standard Circle_Line intersection
-			SizeF centre = new SizeF(Centre); // some of the commands below require the centre as a SizeF PointF
-			A = PointF.Subtract(A, centre);
-			B = PointF.Subtract(B, centre);
-			// rotate the space so that the major axis is vertical
-			float angle = BaseVector().VectorAngle();
-			PointF rotatedA = A.RotateBy(-angle);
-			PointF rotatedB = B.RotateBy(-angle);
-			// now stretched vertically so that the ellipse is circular
-			float stretch = BaseVector().Length() / (m_MinorAxis.Length() * 2); // the ratio major: minor
-			rotatedA.Y /= stretch;
-			rotatedB.Y /= stretch; // has been shrunk vertically so that the radius of the "ellipse" in these coordinates is the minor axis
-			float certainty = 0;
-			List<PointF> intersections = Intersection.Circle_LineIntersection(PointF.Empty, m_MinorAxis.Length(), rotatedA, rotatedB, ignoreEnd, ref certainty);
-			if (intersections == null)
-				return;
-			foreach (PointF intersection in intersections)
-			{
-				// must stretch the results back again
-				PointF temp = intersection;
-				temp.Y *= stretch;
-				temp = temp.RotateBy(angle);
-				temp = PointF.Add(temp, centre);
-				Intersection newIX = new Intersection(temp, this, -1, 0, shape, shapeIndex, shapeParameter, certainty);
-				m_Intersections.Add(newIX);
-				shape.AddIntersection(newIX);
-			}
-		}
-
-		internal override void AddIntersection(Intersection intersection)
-		{
-			base.AddIntersection(intersection);
-			// we need to be clear which ones have the index and param filled in
-			if (intersection.Parameter(this) == 0)
-				intersection.SetIndex(-1, this);
-		}
-
-		public override Segment GetSegment(Intersection fromIntersection, bool forward)
-		{
-			EnsureAllIntersectionParameters(); // need to do all of them, not just objFrom because we need the correct values in the stored intersections in order to see which comes next
-			EnsureIntersectionParameters(fromIntersection); // and need to recheck this one as it might not be in list
-			EnsurePath(true);
-			return base.GetSegmentUsingPath(m_Path, fromIntersection, forward);
-			// correctly sets line and param if its a made up IX (param=0 or 1 for end)
-		}
 
 		#region Deducing Bezier parameter from point
 		// see handwritten notes.  If we assume that a Bezier curve is for a unit circle, going from the x-axis to the positive y-axis
@@ -1759,13 +1372,6 @@ namespace SAW
 			return TfromY[(int)Math.Round(Y * 10000f)];
 		}
 
-		private void EnsureAllIntersectionParameters()
-		{
-			foreach (Intersection objIntersection in m_Intersections)
-			{
-				EnsureIntersectionParameters(objIntersection);
-			}
-		}
 		private void EnsureIntersectionParameters(Intersection intersection)
 		{
 			// the line intersection code does not set the Bezier parameters in the intersection (because it does not really have the information at that time)
@@ -1811,8 +1417,6 @@ namespace SAW
 
 		#endregion
 
-		#endregion
-
 		#region Miscellaneous coordinates
 		public override bool HitTestDetailed(PointF clickPoint, float scale, bool treatAsFilled)
 		{
@@ -1840,7 +1444,7 @@ namespace SAW
 			return aPoints;
 		}
 
-		public override float[] GetRelevantAngles()
+		internal override float[] GetRelevantAngles()
 		{
 			return new float[] { Geometry.VectorAngle(Vertices[0], Vertices[1]), m_MinorAxis.VectorAngle() };
 		}

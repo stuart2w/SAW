@@ -10,7 +10,9 @@ namespace SAW
 	public sealed class ctrPrompts : Control, IBlendableColourDisplay
 	{
 		private List<Shape.Prompt> m_Prompts;
-		public List<Shape.Prompt> Prompts
+
+		[System.ComponentModel.DesignerSerializationVisibility(System.ComponentModel.DesignerSerializationVisibility.Hidden)]
+		internal List<Shape.Prompt> Prompts
 		{
 			get { return m_Prompts; }
 			set
@@ -84,7 +86,7 @@ namespace SAW
 				e.Graphics.DrawString("Prompts", new Font(FontFamily.GenericSansSerif, 16), Brushes.Black, new PointF(0, 0), FormatTopLeft);
 			else
 			{
-				if (Globals.Root.CurrentConfig != null && !Globals.Root.CurrentConfig.Low_Graphics)
+				if (Globals.Root.CurrentConfig != null)
 					e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
 				if (m_Prompts != null && m_Prompts.Count > 0)
 				{
@@ -103,8 +105,7 @@ namespace SAW
 						{
 							e.Graphics.DrawImage(image,
 								new Rectangle(X, Padding.Top, availableHeight,
-									availableHeight)); //, New Rectangle(0, 0, objImage.Width, objImage.Height), GraphicsUnit.Pixel) ' this deliberately lists height twice - the image is square
-														  //objImage.Dispose()
+									availableHeight)); 
 							X += availableHeight + 2;
 						}
 						RectangleF rctText = new RectangleF(X, Padding.Top, right - X, availableHeight);

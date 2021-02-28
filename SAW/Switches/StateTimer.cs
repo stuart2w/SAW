@@ -8,7 +8,6 @@ namespace Switches
 		/// NOTE can be Started with time N even if N is zero - it just fires immediately without using the timer</summary>
 	public class StateTimer : IDisposable
 	{
-		// 
 
 		private Timer m_Timer;
 		/// <summary>TickCount when started</summary>
@@ -68,8 +67,7 @@ namespace Switches
 			// must not clear Meaning - Invoke might want to check it
 		}
 
-		public bool Running
-		{ get { return m_Timer.Enabled && m_fnTimeUp != null; } }
+		public bool Running => m_Timer.Enabled && m_fnTimeUp != null;
 
 		public float ElapsedFraction
 		{

@@ -16,6 +16,7 @@ namespace SAW
 		public override void OnDisplay()
 		{
 			base.OnDisplay();
+			m_Filling=true;
 			if (tvActions.IsFilled == false)
 				FillKeyActions();
 			tvActions_AfterSelect(this, null);
@@ -23,6 +24,7 @@ namespace SAW
 			m_DisplayedKey = Keys.None;
 			txtKey.Text = "";
 			PerformLayout();
+			m_Filling=false;
 		}
 
 		public override void OnHide()

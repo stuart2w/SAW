@@ -30,7 +30,7 @@ namespace SAW
 		public override PointF Centre => base.CalculateCentreFromPoints();
 		public override Shapes ShapeCode => !m_Closed ? Shapes.Curve : Shapes.ClosedCurve;
 		protected override bool UseBaseline() => false;
-		protected override bool Closed() => m_Closed;
+		protected  internal  override bool Closed() => m_Closed;
 		public override string StatusInformation(bool ongoing) => "";
 		public override LabelModes LabelMode => LabelModes.NotSupported;
 		public override AllowedActions Allows => base.Allows & ~(AllowedActions.Tidy | AllowedActions.PermittedArea);
@@ -65,7 +65,7 @@ namespace SAW
 			output.Append("Closed = ").AppendLine(m_Closed.ToString());
 		}
 
-		public override List<Prompt> GetPrompts()
+		internal override List<Prompt> GetPrompts()
 		{
 			if (m_Closed)
 				return GetPolyPointPrompts("ClosedCurve");
@@ -75,8 +75,6 @@ namespace SAW
 		#endregion
 
 		#region Verbs
-		//Private m_eLastSnap As SnapModes = SnapModes.Off
-		// we want to check snap in CompleteRetrospective, which isn't given the snap - so remember last floated value
 
 		public override VerbResult Start(EditableView.ClickPosition position)
 		{
@@ -253,6 +251,7 @@ namespace SAW
 		}
 
 		private const float CONTROLLENGTH = 0.4f; // length of control arm relative to distance P(n-1) -> P(n+1)
+
 		protected virtual void SetControlPoints(int firstVertex, int lastVertex = int.MaxValue)
 		{
 			// intFirstVertex is the vertex at the beginning of the first curve that needs updating (during Float only the last couple will need updating)
@@ -329,6 +328,7 @@ namespace SAW
 			}
 			DiscardDerived();
 		}
+
 		#endregion
 
 		#region Coordinates
@@ -382,7 +382,7 @@ namespace SAW
 			transformation.TransformPoints(m_ControlPoints);
 		}
 
-		public override float[] GetRelevantAngles() => null;
+		internal override float[] GetRelevantAngles() => null;
 
 		public override RectangleF MinimalBounds
 		{
@@ -418,11 +418,11 @@ namespace SAW
 		#endregion
 
 		#region Targets, GrabSpots
-		public override List<Target> GenerateTargets(UserSocket floating)
+
+		internal override List<Target> GenerateTargets(UserSocket floating)
 		{
 			// copied from Lined.GenerateDefaultTargets and modified
 			List<Target> targets = new List<Target>();
-			base.AddIntersectionTargets(targets, floating);
 			// add all of the vertices
 			// note that using m_intDefinedVertices rather than Vertices.Count omits the last closing vertex if closed
 			for (int index = 0; index <= m_DefinedVertices - 1; index++)
@@ -449,7 +449,7 @@ namespace SAW
 			return targets;
 		}
 
-		public override void DrawLineTarget(Target target, Graphics gr, Pen pn, int activePhase)
+		internal override void DrawLineTarget(Target target, Graphics gr, Pen pn, int activePhase)
 		{
 			// Target.ShapeIndex is the index of the first vertex on this side
 			// Target.ShapeParameter is the T-value at this point
@@ -464,7 +464,7 @@ namespace SAW
 			gr.DrawLine(pn, start, end);
 		}
 
-		public override List<GrabSpot> GetGrabSpots(float scale)
+		internal override List<GrabSpot> GetGrabSpots(float scale)
 		{
 			List<GrabSpot> list = new List<GrabSpot>();
 			// cannot use Lined.AddGrabSpotsForAllVertices because that would use Vertices.Count; one too many if closed
@@ -474,7 +474,7 @@ namespace SAW
 			}
 			if (Globals.Root.CurrentConfig.ReadBoolean(Config.Advanced_Graphics))
 			{
-				// add grab handles for the vertices.  These don't actually move in this shape; but will trigger an offer to degenerate into an IndependentPolyPath
+				// add grab handles for the vertices.  These don't actually move in this shape; but will trigger an offer to degenerate into an GenericPath
 				for (int index = 0; index <= m_DefinedVertices - (m_Closed ? 1 : 2); index++)
 				{
 					list.Add(new GrabSpot(this, GrabTypes.BezierInactive, m_ControlPoints[index * 2], index) { Focus = Vertices[index] });
@@ -485,7 +485,7 @@ namespace SAW
 			return list;
 		}
 
-		protected override void DoGrabMove(GrabMovement move)
+		protected  internal override void DoGrabMove(GrabMovement move)
 		{
 			base.DoGrabMove(move);
 			if (move.GrabType == GrabTypes.SingleVertex && m_Closed && move.ShapeIndex == 0)
@@ -497,20 +497,20 @@ namespace SAW
 			m_Bounds = RectangleF.Empty;
 		}
 
-		public override void DoGrabAngleSnap(GrabMovement move)
+		internal override void DoGrabAngleSnap(GrabMovement move)
 		{
 			if (move.GrabType != GrabTypes.SingleVertex)
 				base.DoGrabAngleSnap(move);
 		}
 
-		public override bool StartGrabMove(GrabMovement grab)
+		internal override bool StartGrabMove(GrabMovement grab)
 		{
 			if (grab.SnapMode == SnapModes.Grid)
 				grab.SnapMode = SnapModes.Off;
 			return base.StartGrabMove(grab);
 		}
 
-		public override List<Socket> GetSockets()
+		internal override List<Socket> GetSockets()
 		{
 			// basically like Lined.DefaultGetSockets, but we don't include the ones halfway down each line(!)
 			// we also don't include an automatic one; although this might be useful, displayed it in the middle would be weird
@@ -522,6 +522,7 @@ namespace SAW
 			return sockets;
 
 		}
+
 		#endregion
 
 		#region Support functions
@@ -539,16 +540,6 @@ namespace SAW
 			// it needs to be more precise if this arc is quite long
 			return 1 / (25 + NominalLength(arc) * 1);
 		}
-		#endregion
-
-		#region Intersections & segments
-
-		public override void CheckIntersectionsWithSelf()
-		{
-			CheckIntersectionsWithSelfUsingPath(EnsurePath(true));
-			// will be exterior path, only if available
-		}
-
 		#endregion
 
 		#region Graphics

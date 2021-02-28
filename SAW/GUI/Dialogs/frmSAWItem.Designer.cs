@@ -26,8 +26,8 @@
 			this.btnNudgeWider = new System.Windows.Forms.Button();
 			this.btnNudgeShorter = new System.Windows.Forms.Button();
 			this.btnNudgeTaller = new System.Windows.Forms.Button();
-			this.label1 = new System.Windows.Forms.Label();
-			this.label2 = new System.Windows.Forms.Label();
+			this.lblDisplayText = new System.Windows.Forms.Label();
+			this.lblLineSpacing = new System.Windows.Forms.Label();
 			this.label3 = new System.Windows.Forms.Label();
 			this.label4 = new System.Windows.Forms.Label();
 			this.label5 = new System.Windows.Forms.Label();
@@ -42,32 +42,23 @@
 			this.chkAutoRepeatable = new System.Windows.Forms.CheckBox();
 			this.chkEscapeItem = new System.Windows.Forms.CheckBox();
 			this.tableStyles = new System.Windows.Forms.TableLayoutPanel();
-			this.panel3 = new System.Windows.Forms.Panel();
-			this.panel2 = new System.Windows.Forms.Panel();
-			this.label8 = new System.Windows.Forms.Label();
+			this.lblItemStyle = new System.Windows.Forms.Label();
 			this.cmbStyle = new System.Windows.Forms.ComboBox();
-			this.label9 = new System.Windows.Forms.Label();
+			this.lblTextColourHeader = new System.Windows.Forms.Label();
 			this.label10 = new System.Windows.Forms.Label();
-			this.clrNormalText = new SAW.ColourPicker();
 			this.label11 = new System.Windows.Forms.Label();
-			this.label12 = new System.Windows.Forms.Label();
-			this.label15 = new System.Windows.Forms.Label();
+			this.lblBackColourHeader = new System.Windows.Forms.Label();
+			this.lblBorderHeader = new System.Windows.Forms.Label();
 			this.label16 = new System.Windows.Forms.Label();
 			this.label17 = new System.Windows.Forms.Label();
 			this.label18 = new System.Windows.Forms.Label();
 			this.label19 = new System.Windows.Forms.Label();
-			this.clrHighlightText = new SAW.ColourPicker();
-			this.clrNormalBack = new SAW.ColourPicker();
-			this.clrHighlightBack = new SAW.ColourPicker();
-			this.clrNormalBorder = new SAW.ColourPicker();
-			this.clrHighlightBorder = new SAW.ColourPicker();
-			this.label20 = new System.Windows.Forms.Label();
+			this.lblBorderShape = new System.Windows.Forms.Label();
 			this.cmbThicknessNormal = new System.Windows.Forms.ComboBox();
 			this.cmbThicknessHighlight = new System.Windows.Forms.ComboBox();
 			this.cmbShape = new System.Windows.Forms.ComboBox();
 			this.chkNormalFilled = new System.Windows.Forms.CheckBox();
 			this.chkHighlightFilled = new System.Windows.Forms.CheckBox();
-			this.panel1 = new System.Windows.Forms.Panel();
 			this.lblStyleWarning = new System.Windows.Forms.Label();
 			this.radioButton1 = new System.Windows.Forms.RadioButton();
 			this.radioButton2 = new System.Windows.Forms.RadioButton();
@@ -102,7 +93,6 @@
 			this.txtSpeechText = new System.Windows.Forms.TextBox();
 			this.chkSpeechTextSame = new System.Windows.Forms.CheckBox();
 			this.btnTestSpeech = new System.Windows.Forms.Button();
-			this.pnlGraphic = new System.Windows.Forms.Panel();
 			this.btnImageBrowse = new System.Windows.Forms.Button();
 			this.btnCCF = new System.Windows.Forms.Button();
 			this.txtHelp = new System.Windows.Forms.TextBox();
@@ -117,6 +107,7 @@
 			this.chkShowGraphic = new System.Windows.Forms.CheckBox();
 			this.chkGraphicOnlyHighlight = new System.Windows.Forms.CheckBox();
 			this.label7 = new System.Windows.Forms.Label();
+			this.pnlGraphic = new System.Windows.Forms.Panel();
 			this.tpStyle = new System.Windows.Forms.TabPage();
 			this.tpLayout = new System.Windows.Forms.TabPage();
 			this.chkRatioAutomatic = new System.Windows.Forms.CheckBox();
@@ -132,7 +123,6 @@
 			this.rdoTextBelow = new System.Windows.Forms.RadioButton();
 			this.rdoTextAbove = new System.Windows.Forms.RadioButton();
 			this.tpScripts = new System.Windows.Forms.TabPage();
-			this.ctrScripts = new SAW.ctrScriptableEdit();
 			this.colorDialog1 = new System.Windows.Forms.ColorDialog();
 			this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
 			this.label13 = new System.Windows.Forms.Label();
@@ -141,6 +131,13 @@
 			this.rdoAlternate = new System.Windows.Forms.RadioButton();
 			this.dlgOpen = new System.Windows.Forms.OpenFileDialog();
 			this.ttGraphic = new System.Windows.Forms.ToolTip(this.components);
+			this.clrNormalText = new SAW.ColourPicker();
+			this.clrHighlightText = new SAW.ColourPicker();
+			this.clrNormalBack = new SAW.ColourPicker();
+			this.clrHighlightBack = new SAW.ColourPicker();
+			this.clrNormalBorder = new SAW.ColourPicker();
+			this.clrHighlightBorder = new SAW.ColourPicker();
+			this.ctrScripts = new SAW.ctrScriptableEdit();
 			flowNudge = new System.Windows.Forms.FlowLayoutPanel();
 			flowNudge.SuspendLayout();
 			this.grpAttributes.SuspendLayout();
@@ -269,25 +266,27 @@
 			this.btnNudgeTaller.UseVisualStyleBackColor = true;
 			this.btnNudgeTaller.Click += new System.EventHandler(this.btnNudgeTaller_Click);
 			// 
-			// label1
+			// lblDisplayText
 			// 
-			this.label1.AutoSize = true;
-			this.label1.Location = new System.Drawing.Point(3, 0);
-			this.label1.Name = "label1";
-			this.label1.Size = new System.Drawing.Size(123, 13);
-			this.label1.TabIndex = 0;
-			this.label1.Text = "[SAW_Edit_DisplayText]";
+			this.lblDisplayText.AutoSize = true;
+			this.tablePresentation.SetColumnSpan(this.lblDisplayText, 4);
+			this.lblDisplayText.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.lblDisplayText.Location = new System.Drawing.Point(3, 0);
+			this.lblDisplayText.Name = "lblDisplayText";
+			this.lblDisplayText.Size = new System.Drawing.Size(633, 13);
+			this.lblDisplayText.TabIndex = 0;
+			this.lblDisplayText.Text = "[SAW_Edit_DisplayText]";
 			// 
-			// label2
+			// lblLineSpacing
 			// 
-			this.label2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.label2.AutoSize = true;
-			this.label2.Location = new System.Drawing.Point(329, 41);
-			this.label2.Margin = new System.Windows.Forms.Padding(3, 5, 3, 0);
-			this.label2.Name = "label2";
-			this.label2.Size = new System.Drawing.Size(98, 26);
-			this.label2.TabIndex = 3;
-			this.label2.Text = "[SAW_Edit_LineSpacing]";
+			this.lblLineSpacing.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.lblLineSpacing.AutoSize = true;
+			this.lblLineSpacing.Location = new System.Drawing.Point(329, 41);
+			this.lblLineSpacing.Margin = new System.Windows.Forms.Padding(3, 5, 3, 0);
+			this.lblLineSpacing.Name = "lblLineSpacing";
+			this.lblLineSpacing.Size = new System.Drawing.Size(98, 26);
+			this.lblLineSpacing.TabIndex = 3;
+			this.lblLineSpacing.Text = "[SAW_Edit_LineSpacing]";
 			// 
 			// label3
 			// 
@@ -438,16 +437,14 @@
 			this.tableStyles.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
 			this.tableStyles.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
 			this.tableStyles.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
-			this.tableStyles.Controls.Add(this.panel3, 1, 5);
-			this.tableStyles.Controls.Add(this.panel2, 1, 3);
-			this.tableStyles.Controls.Add(this.label8, 0, 0);
+			this.tableStyles.Controls.Add(this.lblItemStyle, 0, 0);
 			this.tableStyles.Controls.Add(this.cmbStyle, 1, 0);
-			this.tableStyles.Controls.Add(this.label9, 0, 1);
+			this.tableStyles.Controls.Add(this.lblTextColourHeader, 0, 1);
 			this.tableStyles.Controls.Add(this.label10, 0, 2);
 			this.tableStyles.Controls.Add(this.clrNormalText, 1, 2);
 			this.tableStyles.Controls.Add(this.label11, 2, 2);
-			this.tableStyles.Controls.Add(this.label12, 0, 3);
-			this.tableStyles.Controls.Add(this.label15, 0, 5);
+			this.tableStyles.Controls.Add(this.lblBackColourHeader, 0, 3);
+			this.tableStyles.Controls.Add(this.lblBorderHeader, 0, 5);
 			this.tableStyles.Controls.Add(this.label16, 0, 6);
 			this.tableStyles.Controls.Add(this.label17, 2, 6);
 			this.tableStyles.Controls.Add(this.label18, 0, 7);
@@ -457,13 +454,12 @@
 			this.tableStyles.Controls.Add(this.clrHighlightBack, 3, 4);
 			this.tableStyles.Controls.Add(this.clrNormalBorder, 1, 6);
 			this.tableStyles.Controls.Add(this.clrHighlightBorder, 3, 6);
-			this.tableStyles.Controls.Add(this.label20, 0, 8);
+			this.tableStyles.Controls.Add(this.lblBorderShape, 0, 8);
 			this.tableStyles.Controls.Add(this.cmbThicknessNormal, 1, 7);
 			this.tableStyles.Controls.Add(this.cmbThicknessHighlight, 3, 7);
 			this.tableStyles.Controls.Add(this.cmbShape, 1, 8);
 			this.tableStyles.Controls.Add(this.chkNormalFilled, 0, 4);
 			this.tableStyles.Controls.Add(this.chkHighlightFilled, 2, 4);
-			this.tableStyles.Controls.Add(this.panel1, 1, 1);
 			this.tableStyles.Controls.Add(this.lblStyleWarning, 2, 0);
 			this.tableStyles.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.tableStyles.Location = new System.Drawing.Point(3, 3);
@@ -479,126 +475,95 @@
 			this.tableStyles.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 14.28571F));
 			this.tableStyles.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 14.28571F));
 			this.tableStyles.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 14.28571F));
-			this.tableStyles.Size = new System.Drawing.Size(625, 456);
+			this.tableStyles.Size = new System.Drawing.Size(639, 495);
 			this.tableStyles.TabIndex = 0;
 			// 
-			// panel3
+			// lblItemStyle
 			// 
-			this.panel3.AutoSize = true;
-			this.panel3.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
-			this.tableStyles.SetColumnSpan(this.panel3, 3);
-			this.panel3.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.panel3.Location = new System.Drawing.Point(156, 210);
-			this.panel3.Margin = new System.Windows.Forms.Padding(0);
-			this.panel3.Name = "panel3";
-			this.panel3.Size = new System.Drawing.Size(469, 21);
-			this.panel3.TabIndex = 29;
-			// 
-			// panel2
-			// 
-			this.panel2.AutoSize = true;
-			this.panel2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
-			this.tableStyles.SetColumnSpan(this.panel2, 3);
-			this.panel2.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.panel2.Location = new System.Drawing.Point(156, 133);
-			this.panel2.Margin = new System.Windows.Forms.Padding(0);
-			this.panel2.Name = "panel2";
-			this.panel2.Size = new System.Drawing.Size(469, 21);
-			this.panel2.TabIndex = 28;
-			// 
-			// label8
-			// 
-			this.label8.AutoSize = true;
-			this.label8.Location = new System.Drawing.Point(3, 0);
-			this.label8.Name = "label8";
-			this.label8.Size = new System.Drawing.Size(145, 13);
-			this.label8.TabIndex = 0;
-			this.label8.Text = "[SAW_Edit_ItemDisplayStyle]";
+			this.lblItemStyle.AutoSize = true;
+			this.lblItemStyle.Location = new System.Drawing.Point(3, 0);
+			this.lblItemStyle.Name = "lblItemStyle";
+			this.lblItemStyle.Size = new System.Drawing.Size(145, 13);
+			this.lblItemStyle.TabIndex = 0;
+			this.lblItemStyle.Text = "[SAW_Edit_ItemDisplayStyle]";
 			// 
 			// cmbStyle
 			// 
 			this.cmbStyle.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.cmbStyle.FormattingEnabled = true;
-			this.cmbStyle.Location = new System.Drawing.Point(159, 3);
+			this.cmbStyle.Location = new System.Drawing.Point(162, 3);
 			this.cmbStyle.Name = "cmbStyle";
 			this.cmbStyle.Size = new System.Drawing.Size(121, 21);
 			this.cmbStyle.TabIndex = 1;
 			this.cmbStyle.SelectedIndexChanged += new System.EventHandler(this.cmbStyle_SelectedIndexChanged);
 			// 
-			// label9
+			// lblTextColourHeader
 			// 
-			this.label9.AutoSize = true;
-			this.label9.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
-			this.label9.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.label9.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.label9.Location = new System.Drawing.Point(0, 56);
-			this.label9.Margin = new System.Windows.Forms.Padding(0);
-			this.label9.Name = "label9";
-			this.label9.Padding = new System.Windows.Forms.Padding(3, 4, 0, 4);
-			this.label9.Size = new System.Drawing.Size(156, 21);
-			this.label9.TabIndex = 2;
-			this.label9.Text = "[Button_TextColour]";
+			this.lblTextColourHeader.AutoSize = true;
+			this.lblTextColourHeader.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
+			this.tableStyles.SetColumnSpan(this.lblTextColourHeader, 4);
+			this.lblTextColourHeader.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.lblTextColourHeader.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.lblTextColourHeader.Location = new System.Drawing.Point(0, 61);
+			this.lblTextColourHeader.Margin = new System.Windows.Forms.Padding(0);
+			this.lblTextColourHeader.Name = "lblTextColourHeader";
+			this.lblTextColourHeader.Padding = new System.Windows.Forms.Padding(3, 4, 0, 4);
+			this.lblTextColourHeader.Size = new System.Drawing.Size(639, 21);
+			this.lblTextColourHeader.TabIndex = 2;
+			this.lblTextColourHeader.Text = "[Button_TextColour]";
 			// 
 			// label10
 			// 
 			this.label10.AutoSize = true;
-			this.label10.Location = new System.Drawing.Point(3, 77);
+			this.label10.Location = new System.Drawing.Point(3, 82);
 			this.label10.Name = "label10";
 			this.label10.Size = new System.Drawing.Size(131, 13);
 			this.label10.TabIndex = 3;
 			this.label10.Text = "[SAW_Edit_NormalColour]";
 			// 
-			// clrNormalText
-			// 
-			this.clrNormalText.Cursor = System.Windows.Forms.Cursors.Hand;
-			this.clrNormalText.Location = new System.Drawing.Point(159, 80);
-			this.clrNormalText.Name = "clrNormalText";
-			this.clrNormalText.Size = new System.Drawing.Size(75, 23);
-			this.clrNormalText.TabIndex = 6;
-			this.clrNormalText.Text = "colourPicker1";
-			this.clrNormalText.UserChangedColour += new System.EventHandler(this.clrNormalText_UserChangedColour);
-			// 
 			// label11
 			// 
 			this.label11.AutoSize = true;
-			this.label11.Location = new System.Drawing.Point(315, 77);
+			this.label11.Location = new System.Drawing.Point(321, 82);
 			this.label11.Name = "label11";
 			this.label11.Size = new System.Drawing.Size(142, 13);
 			this.label11.TabIndex = 7;
 			this.label11.Text = "[SAW_Edit_HightlightColour]";
 			// 
-			// label12
+			// lblBackColourHeader
 			// 
-			this.label12.AutoSize = true;
-			this.label12.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
-			this.label12.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.label12.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.label12.Location = new System.Drawing.Point(0, 133);
-			this.label12.Margin = new System.Windows.Forms.Padding(0);
-			this.label12.Name = "label12";
-			this.label12.Padding = new System.Windows.Forms.Padding(3, 4, 0, 4);
-			this.label12.Size = new System.Drawing.Size(156, 21);
-			this.label12.TabIndex = 8;
-			this.label12.Text = "[Button_Background]";
+			this.lblBackColourHeader.AutoSize = true;
+			this.lblBackColourHeader.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
+			this.tableStyles.SetColumnSpan(this.lblBackColourHeader, 4);
+			this.lblBackColourHeader.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.lblBackColourHeader.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.lblBackColourHeader.Location = new System.Drawing.Point(0, 143);
+			this.lblBackColourHeader.Margin = new System.Windows.Forms.Padding(0);
+			this.lblBackColourHeader.Name = "lblBackColourHeader";
+			this.lblBackColourHeader.Padding = new System.Windows.Forms.Padding(3, 4, 0, 4);
+			this.lblBackColourHeader.Size = new System.Drawing.Size(639, 21);
+			this.lblBackColourHeader.TabIndex = 8;
+			this.lblBackColourHeader.Text = "[Button_Background]";
 			// 
-			// label15
+			// lblBorderHeader
 			// 
-			this.label15.AutoSize = true;
-			this.label15.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
-			this.label15.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.label15.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.label15.Location = new System.Drawing.Point(0, 210);
-			this.label15.Margin = new System.Windows.Forms.Padding(0);
-			this.label15.Name = "label15";
-			this.label15.Padding = new System.Windows.Forms.Padding(3, 4, 0, 4);
-			this.label15.Size = new System.Drawing.Size(156, 21);
-			this.label15.TabIndex = 11;
-			this.label15.Text = "[Button_Border]";
+			this.lblBorderHeader.AutoSize = true;
+			this.lblBorderHeader.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
+			this.tableStyles.SetColumnSpan(this.lblBorderHeader, 4);
+			this.lblBorderHeader.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.lblBorderHeader.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.lblBorderHeader.Location = new System.Drawing.Point(0, 225);
+			this.lblBorderHeader.Margin = new System.Windows.Forms.Padding(0);
+			this.lblBorderHeader.Name = "lblBorderHeader";
+			this.lblBorderHeader.Padding = new System.Windows.Forms.Padding(3, 4, 0, 4);
+			this.lblBorderHeader.Size = new System.Drawing.Size(639, 21);
+			this.lblBorderHeader.TabIndex = 11;
+			this.lblBorderHeader.Text = "[Button_Border]";
 			// 
 			// label16
 			// 
 			this.label16.AutoSize = true;
-			this.label16.Location = new System.Drawing.Point(3, 231);
+			this.label16.Location = new System.Drawing.Point(3, 246);
 			this.label16.Name = "label16";
 			this.label16.Size = new System.Drawing.Size(131, 13);
 			this.label16.TabIndex = 12;
@@ -607,7 +572,7 @@
 			// label17
 			// 
 			this.label17.AutoSize = true;
-			this.label17.Location = new System.Drawing.Point(315, 231);
+			this.label17.Location = new System.Drawing.Point(321, 246);
 			this.label17.Name = "label17";
 			this.label17.Size = new System.Drawing.Size(142, 13);
 			this.label17.TabIndex = 13;
@@ -616,7 +581,7 @@
 			// label18
 			// 
 			this.label18.AutoSize = true;
-			this.label18.Location = new System.Drawing.Point(3, 287);
+			this.label18.Location = new System.Drawing.Point(3, 307);
 			this.label18.Name = "label18";
 			this.label18.Size = new System.Drawing.Size(150, 13);
 			this.label18.TabIndex = 14;
@@ -625,76 +590,26 @@
 			// label19
 			// 
 			this.label19.AutoSize = true;
-			this.label19.Location = new System.Drawing.Point(315, 287);
+			this.label19.Location = new System.Drawing.Point(321, 307);
 			this.label19.Name = "label19";
-			this.label19.Size = new System.Drawing.Size(148, 26);
+			this.label19.Size = new System.Drawing.Size(153, 26);
 			this.label19.TabIndex = 15;
 			this.label19.Text = "[SAW_Edit_HightlightThickness]";
 			// 
-			// clrHighlightText
+			// lblBorderShape
 			// 
-			this.clrHighlightText.Cursor = System.Windows.Forms.Cursors.Hand;
-			this.clrHighlightText.Location = new System.Drawing.Point(471, 80);
-			this.clrHighlightText.Name = "clrHighlightText";
-			this.clrHighlightText.Size = new System.Drawing.Size(75, 23);
-			this.clrHighlightText.TabIndex = 16;
-			this.clrHighlightText.Text = "colourPicker2";
-			this.clrHighlightText.UserChangedColour += new System.EventHandler(this.clrHighlightText_UserChangedColour);
-			// 
-			// clrNormalBack
-			// 
-			this.clrNormalBack.Cursor = System.Windows.Forms.Cursors.Hand;
-			this.clrNormalBack.Location = new System.Drawing.Point(159, 157);
-			this.clrNormalBack.Name = "clrNormalBack";
-			this.clrNormalBack.Size = new System.Drawing.Size(75, 23);
-			this.clrNormalBack.TabIndex = 17;
-			this.clrNormalBack.Text = "colourPicker3";
-			this.clrNormalBack.UserChangedColour += new System.EventHandler(this.clrNormalBack_UserChangedColour);
-			// 
-			// clrHighlightBack
-			// 
-			this.clrHighlightBack.Cursor = System.Windows.Forms.Cursors.Hand;
-			this.clrHighlightBack.Location = new System.Drawing.Point(471, 157);
-			this.clrHighlightBack.Name = "clrHighlightBack";
-			this.clrHighlightBack.Size = new System.Drawing.Size(75, 23);
-			this.clrHighlightBack.TabIndex = 18;
-			this.clrHighlightBack.Text = "colourPicker4";
-			this.clrHighlightBack.UserChangedColour += new System.EventHandler(this.clrHighlightBack_UserChangedColour);
-			// 
-			// clrNormalBorder
-			// 
-			this.clrNormalBorder.Cursor = System.Windows.Forms.Cursors.Hand;
-			this.clrNormalBorder.Location = new System.Drawing.Point(159, 234);
-			this.clrNormalBorder.Name = "clrNormalBorder";
-			this.clrNormalBorder.Size = new System.Drawing.Size(75, 23);
-			this.clrNormalBorder.TabIndex = 19;
-			this.clrNormalBorder.Text = "colourPicker5";
-			this.clrNormalBorder.UserChangedColour += new System.EventHandler(this.clrNormalBorder_UserChangedColour);
-			// 
-			// clrHighlightBorder
-			// 
-			this.clrHighlightBorder.Cursor = System.Windows.Forms.Cursors.Hand;
-			this.clrHighlightBorder.Location = new System.Drawing.Point(471, 234);
-			this.clrHighlightBorder.Name = "clrHighlightBorder";
-			this.clrHighlightBorder.Size = new System.Drawing.Size(75, 23);
-			this.clrHighlightBorder.TabIndex = 20;
-			this.clrHighlightBorder.Text = "colourPicker6";
-			this.clrHighlightBorder.UserChangedColour += new System.EventHandler(this.clrHighlightBorder_UserChangedColour);
-			// 
-			// label20
-			// 
-			this.label20.AutoSize = true;
-			this.label20.Location = new System.Drawing.Point(3, 343);
-			this.label20.Name = "label20";
-			this.label20.Size = new System.Drawing.Size(130, 13);
-			this.label20.TabIndex = 21;
-			this.label20.Text = "[SAW_Edit_BorderShape]";
+			this.lblBorderShape.AutoSize = true;
+			this.lblBorderShape.Location = new System.Drawing.Point(3, 368);
+			this.lblBorderShape.Name = "lblBorderShape";
+			this.lblBorderShape.Size = new System.Drawing.Size(130, 13);
+			this.lblBorderShape.TabIndex = 21;
+			this.lblBorderShape.Text = "[SAW_Edit_BorderShape]";
 			// 
 			// cmbThicknessNormal
 			// 
 			this.cmbThicknessNormal.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.cmbThicknessNormal.FormattingEnabled = true;
-			this.cmbThicknessNormal.Location = new System.Drawing.Point(159, 290);
+			this.cmbThicknessNormal.Location = new System.Drawing.Point(162, 310);
 			this.cmbThicknessNormal.Name = "cmbThicknessNormal";
 			this.cmbThicknessNormal.Size = new System.Drawing.Size(121, 21);
 			this.cmbThicknessNormal.TabIndex = 22;
@@ -704,7 +619,7 @@
 			// 
 			this.cmbThicknessHighlight.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.cmbThicknessHighlight.FormattingEnabled = true;
-			this.cmbThicknessHighlight.Location = new System.Drawing.Point(471, 290);
+			this.cmbThicknessHighlight.Location = new System.Drawing.Point(480, 310);
 			this.cmbThicknessHighlight.Name = "cmbThicknessHighlight";
 			this.cmbThicknessHighlight.Size = new System.Drawing.Size(121, 21);
 			this.cmbThicknessHighlight.TabIndex = 23;
@@ -714,7 +629,7 @@
 			// 
 			this.cmbShape.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.cmbShape.FormattingEnabled = true;
-			this.cmbShape.Location = new System.Drawing.Point(159, 346);
+			this.cmbShape.Location = new System.Drawing.Point(162, 371);
 			this.cmbShape.Name = "cmbShape";
 			this.cmbShape.Size = new System.Drawing.Size(121, 21);
 			this.cmbShape.TabIndex = 24;
@@ -723,7 +638,7 @@
 			// chkNormalFilled
 			// 
 			this.chkNormalFilled.AutoSize = true;
-			this.chkNormalFilled.Location = new System.Drawing.Point(3, 157);
+			this.chkNormalFilled.Location = new System.Drawing.Point(3, 167);
 			this.chkNormalFilled.Name = "chkNormalFilled";
 			this.chkNormalFilled.Size = new System.Drawing.Size(150, 17);
 			this.chkNormalFilled.TabIndex = 25;
@@ -734,34 +649,22 @@
 			// chkHighlightFilled
 			// 
 			this.chkHighlightFilled.AutoSize = true;
-			this.chkHighlightFilled.Location = new System.Drawing.Point(315, 157);
+			this.chkHighlightFilled.Location = new System.Drawing.Point(321, 167);
 			this.chkHighlightFilled.Name = "chkHighlightFilled";
-			this.chkHighlightFilled.Size = new System.Drawing.Size(150, 17);
+			this.chkHighlightFilled.Size = new System.Drawing.Size(153, 17);
 			this.chkHighlightFilled.TabIndex = 26;
 			this.chkHighlightFilled.Text = "[SAW_Edit_HightlightColour]";
 			this.chkHighlightFilled.UseVisualStyleBackColor = true;
 			this.chkHighlightFilled.CheckedChanged += new System.EventHandler(this.chkHighlightFilled_CheckedChanged);
-			// 
-			// panel1
-			// 
-			this.panel1.AutoSize = true;
-			this.panel1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
-			this.tableStyles.SetColumnSpan(this.panel1, 3);
-			this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.panel1.Location = new System.Drawing.Point(156, 56);
-			this.panel1.Margin = new System.Windows.Forms.Padding(0);
-			this.panel1.Name = "panel1";
-			this.panel1.Size = new System.Drawing.Size(469, 21);
-			this.panel1.TabIndex = 27;
 			// 
 			// lblStyleWarning
 			// 
 			this.lblStyleWarning.AutoSize = true;
 			this.tableStyles.SetColumnSpan(this.lblStyleWarning, 2);
 			this.lblStyleWarning.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.lblStyleWarning.Location = new System.Drawing.Point(315, 0);
+			this.lblStyleWarning.Location = new System.Drawing.Point(321, 0);
 			this.lblStyleWarning.Name = "lblStyleWarning";
-			this.lblStyleWarning.Size = new System.Drawing.Size(307, 56);
+			this.lblStyleWarning.Size = new System.Drawing.Size(315, 61);
 			this.lblStyleWarning.TabIndex = 30;
 			this.lblStyleWarning.Text = "label14";
 			this.lblStyleWarning.Visible = false;
@@ -1020,10 +923,10 @@
 			this.tablePresentation.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 16.32653F));
 			this.tablePresentation.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 16.32653F));
 			this.tablePresentation.Controls.Add(this.btnOpenSymbol, 1, 14);
-			this.tablePresentation.Controls.Add(this.label1, 0, 0);
+			this.tablePresentation.Controls.Add(this.lblDisplayText, 0, 0);
 			this.tablePresentation.Controls.Add(this.txtDisplay, 0, 1);
 			this.tablePresentation.Controls.Add(this.chkShowText, 1, 1);
-			this.tablePresentation.Controls.Add(this.label2, 1, 2);
+			this.tablePresentation.Controls.Add(this.lblLineSpacing, 1, 2);
 			this.tablePresentation.Controls.Add(this.nudLineSpacing, 2, 2);
 			this.tablePresentation.Controls.Add(this.btnFont, 3, 2);
 			this.tablePresentation.Controls.Add(this.label3, 0, 3);
@@ -1117,7 +1020,7 @@
 			// 
 			this.btnFont.Location = new System.Drawing.Point(537, 39);
 			this.btnFont.Name = "btnFont";
-			this.btnFont.Size = new System.Drawing.Size(75, 18);
+			this.btnFont.Size = new System.Drawing.Size(75, 28);
 			this.btnFont.TabIndex = 5;
 			this.btnFont.Text = "[Font_Title]";
 			this.btnFont.UseVisualStyleBackColor = true;
@@ -1176,19 +1079,6 @@
 			this.btnTestSpeech.Text = "[Config_SpeechTest]";
 			this.btnTestSpeech.UseVisualStyleBackColor = true;
 			this.btnTestSpeech.Click += new System.EventHandler(this.btnTestSpeech_Click);
-			// 
-			// pnlGraphic
-			// 
-			this.pnlGraphic.AutoSize = true;
-			this.pnlGraphic.BackColor = System.Drawing.SystemColors.Control;
-			this.pnlGraphic.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-			this.pnlGraphic.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.pnlGraphic.Location = new System.Drawing.Point(3, 290);
-			this.pnlGraphic.Name = "pnlGraphic";
-			this.tablePresentation.SetRowSpan(this.pnlGraphic, 5);
-			this.pnlGraphic.Size = new System.Drawing.Size(320, 113);
-			this.pnlGraphic.TabIndex = 16;
-			this.pnlGraphic.Paint += new System.Windows.Forms.PaintEventHandler(this.pnlGraphic_Paint);
 			// 
 			// btnImageBrowse
 			// 
@@ -1362,6 +1252,19 @@
 			this.label7.TabIndex = 27;
 			this.label7.Text = "[SAW_Edit_Nudge]";
 			// 
+			// pnlGraphic
+			// 
+			this.pnlGraphic.AutoSize = true;
+			this.pnlGraphic.BackColor = System.Drawing.SystemColors.Control;
+			this.pnlGraphic.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+			this.pnlGraphic.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.pnlGraphic.Location = new System.Drawing.Point(3, 290);
+			this.pnlGraphic.Name = "pnlGraphic";
+			this.tablePresentation.SetRowSpan(this.pnlGraphic, 5);
+			this.pnlGraphic.Size = new System.Drawing.Size(320, 113);
+			this.pnlGraphic.TabIndex = 16;
+			this.pnlGraphic.Paint += new System.Windows.Forms.PaintEventHandler(this.pnlGraphic_Paint);
+			// 
 			// tpStyle
 			// 
 			this.tpStyle.BackColor = System.Drawing.SystemColors.Control;
@@ -1369,7 +1272,7 @@
 			this.tpStyle.Location = new System.Drawing.Point(4, 22);
 			this.tpStyle.Name = "tpStyle";
 			this.tpStyle.Padding = new System.Windows.Forms.Padding(3);
-			this.tpStyle.Size = new System.Drawing.Size(631, 462);
+			this.tpStyle.Size = new System.Drawing.Size(645, 501);
 			this.tpStyle.TabIndex = 1;
 			this.tpStyle.Text = "[SAW_Edit_Style]";
 			// 
@@ -1390,7 +1293,7 @@
 			this.tpLayout.Controls.Add(this.rdoTextAbove);
 			this.tpLayout.Location = new System.Drawing.Point(4, 22);
 			this.tpLayout.Name = "tpLayout";
-			this.tpLayout.Size = new System.Drawing.Size(631, 462);
+			this.tpLayout.Size = new System.Drawing.Size(645, 501);
 			this.tpLayout.TabIndex = 2;
 			this.tpLayout.Text = "[SAW_Edit_Layout]";
 			// 
@@ -1550,18 +1453,9 @@
 			this.tpScripts.Controls.Add(this.ctrScripts);
 			this.tpScripts.Location = new System.Drawing.Point(4, 22);
 			this.tpScripts.Name = "tpScripts";
-			this.tpScripts.Size = new System.Drawing.Size(631, 462);
+			this.tpScripts.Size = new System.Drawing.Size(645, 501);
 			this.tpScripts.TabIndex = 3;
 			this.tpScripts.Text = "[SAW_Edit_Scripts]";
-			// 
-			// ctrScripts
-			// 
-			this.ctrScripts.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.ctrScripts.Location = new System.Drawing.Point(0, 0);
-			this.ctrScripts.MinimumSize = new System.Drawing.Size(100, 100);
-			this.ctrScripts.Name = "ctrScripts";
-			this.ctrScripts.Size = new System.Drawing.Size(631, 462);
-			this.ctrScripts.TabIndex = 0;
 			// 
 			// flowLayoutPanel1
 			// 
@@ -1630,6 +1524,69 @@
 			this.rdoAlternate.Text = "[SAW_Edit_PreviewAlternate]";
 			this.rdoAlternate.UseVisualStyleBackColor = true;
 			this.rdoAlternate.CheckedChanged += new System.EventHandler(this.rdoAlternate_CheckedChanged);
+			// 
+			// clrNormalText
+			// 
+			this.clrNormalText.Location = new System.Drawing.Point(162, 85);
+			this.clrNormalText.Name = "clrNormalText";
+			this.clrNormalText.Size = new System.Drawing.Size(75, 23);
+			this.clrNormalText.TabIndex = 6;
+			this.clrNormalText.Text = "colourPicker1";
+			this.clrNormalText.UserChangedColour += new System.EventHandler(this.clrNormalText_UserChangedColour);
+			// 
+			// clrHighlightText
+			// 
+			this.clrHighlightText.Location = new System.Drawing.Point(480, 85);
+			this.clrHighlightText.Name = "clrHighlightText";
+			this.clrHighlightText.Size = new System.Drawing.Size(75, 23);
+			this.clrHighlightText.TabIndex = 16;
+			this.clrHighlightText.Text = "colourPicker2";
+			this.clrHighlightText.UserChangedColour += new System.EventHandler(this.clrHighlightText_UserChangedColour);
+			// 
+			// clrNormalBack
+			// 
+			this.clrNormalBack.Location = new System.Drawing.Point(162, 167);
+			this.clrNormalBack.Name = "clrNormalBack";
+			this.clrNormalBack.Size = new System.Drawing.Size(75, 23);
+			this.clrNormalBack.TabIndex = 17;
+			this.clrNormalBack.Text = "colourPicker3";
+			this.clrNormalBack.UserChangedColour += new System.EventHandler(this.clrNormalBack_UserChangedColour);
+			// 
+			// clrHighlightBack
+			// 
+			this.clrHighlightBack.Location = new System.Drawing.Point(480, 167);
+			this.clrHighlightBack.Name = "clrHighlightBack";
+			this.clrHighlightBack.Size = new System.Drawing.Size(75, 23);
+			this.clrHighlightBack.TabIndex = 18;
+			this.clrHighlightBack.Text = "colourPicker4";
+			this.clrHighlightBack.UserChangedColour += new System.EventHandler(this.clrHighlightBack_UserChangedColour);
+			// 
+			// clrNormalBorder
+			// 
+			this.clrNormalBorder.Location = new System.Drawing.Point(162, 249);
+			this.clrNormalBorder.Name = "clrNormalBorder";
+			this.clrNormalBorder.Size = new System.Drawing.Size(75, 23);
+			this.clrNormalBorder.TabIndex = 19;
+			this.clrNormalBorder.Text = "colourPicker5";
+			this.clrNormalBorder.UserChangedColour += new System.EventHandler(this.clrNormalBorder_UserChangedColour);
+			// 
+			// clrHighlightBorder
+			// 
+			this.clrHighlightBorder.Location = new System.Drawing.Point(480, 249);
+			this.clrHighlightBorder.Name = "clrHighlightBorder";
+			this.clrHighlightBorder.Size = new System.Drawing.Size(75, 23);
+			this.clrHighlightBorder.TabIndex = 20;
+			this.clrHighlightBorder.Text = "colourPicker6";
+			this.clrHighlightBorder.UserChangedColour += new System.EventHandler(this.clrHighlightBorder_UserChangedColour);
+			// 
+			// ctrScripts
+			// 
+			this.ctrScripts.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.ctrScripts.Location = new System.Drawing.Point(0, 0);
+			this.ctrScripts.MinimumSize = new System.Drawing.Size(100, 100);
+			this.ctrScripts.Name = "ctrScripts";
+			this.ctrScripts.Size = new System.Drawing.Size(645, 501);
+			this.ctrScripts.TabIndex = 0;
 			// 
 			// frmSAWItem
 			// 
@@ -1729,9 +1686,6 @@
 		private System.Windows.Forms.RadioButton rdoNormal;
 		private System.Windows.Forms.RadioButton rdoHighlight;
 		private System.Windows.Forms.RadioButton rdoAlternate;
-		private System.Windows.Forms.Panel panel1;
-		private System.Windows.Forms.Panel panel3;
-		private System.Windows.Forms.Panel panel2;
 		private System.Windows.Forms.Label lblStyleWarning;
 		private System.Windows.Forms.RadioButton rdoTextAbove;
 		private System.Windows.Forms.RadioButton rdoTextRight;
@@ -1744,8 +1698,8 @@
 		private System.Windows.Forms.RadioButton rdoTextOverlay;
 		private System.Windows.Forms.GroupBox grpGraphicAlignment;
 		private System.Windows.Forms.GroupBox grpTextAlignment;
-		private System.Windows.Forms.Label label1;
-		private System.Windows.Forms.Label label2;
+		private System.Windows.Forms.Label lblDisplayText;
+		private System.Windows.Forms.Label lblLineSpacing;
 		private System.Windows.Forms.Label label3;
 		private System.Windows.Forms.Label label4;
 		private System.Windows.Forms.Label label5;
@@ -1754,16 +1708,16 @@
 		private System.Windows.Forms.GroupBox grpAttributes;
 		private System.Windows.Forms.FlowLayoutPanel flowAttributes;
 		private System.Windows.Forms.TableLayoutPanel tableStyles;
-		private System.Windows.Forms.Label label8;
-		private System.Windows.Forms.Label label9;
+		private System.Windows.Forms.Label lblItemStyle;
+		private System.Windows.Forms.Label lblTextColourHeader;
 		private System.Windows.Forms.Label label10;
 		private System.Windows.Forms.Label label11;
-		private System.Windows.Forms.Label label12;
-		private System.Windows.Forms.Label label15;
+		private System.Windows.Forms.Label lblBackColourHeader;
+		private System.Windows.Forms.Label lblBorderHeader;
 		private System.Windows.Forms.Label label16;
 		private System.Windows.Forms.Label label18;
 		private System.Windows.Forms.Label label19;
-		private System.Windows.Forms.Label label20;
+		private System.Windows.Forms.Label lblBorderShape;
 		private System.Windows.Forms.RadioButton radioButton1;
 		private System.Windows.Forms.RadioButton radioButton2;
 		private System.Windows.Forms.RadioButton radioButton3;

@@ -17,7 +17,6 @@ namespace SAW
 		Splash = 229, // just a random Byte
 		Page = 230,
 		Paper = 231,
-		//IsometricPaper = 232,
 		GraphPaper = 233,
 		Document = 234,
 		SharedBitmap = 235,
@@ -33,9 +32,9 @@ namespace SAW
 
 	public sealed class DataUtilities
 	{
-		public const int FILEVERSION = 128;
+		public const int FILEVERSION = 130;
 		public const int MINIMUMSUPPORTEDVERSION = 120;
-		public const float MINIMUMCOMPATIBLEVERSION = 300.0f; // earliest version which can open files written by this
+		public const float MINIMUMCOMPATIBLEVERSION = 700.0f; // earliest version which can open files written by this
 
 		//VERSIONS....
 		// these start at higher numbers for compatibility with Splash during early development
@@ -50,6 +49,8 @@ namespace SAW
 		// 126: XX: Added DesktopScreens to SAW header
 		// 127: XX: SharedResource now calls base classes (oops)
 		// 128: XX: Added SAWItem.GraphicOnlyOnHighlight
+		// 129: XX: Added HighlightStyle to Scriptable and removed various Highlight styles from Item.  Moved various other fields from Item to Scriptable
+		// 130: XX: Added Page.RecentRotationPoints
 	}
 
 	public class DataWriter : System.IO.BinaryWriter
@@ -468,18 +469,12 @@ namespace SAW
 			Debug.WriteLineIf(Version == 71, "Opening file version 71: this should only happen for the latest v1 files (this number was also used for the earliest v2 files");
 			if (Version < DataUtilities.MINIMUMSUPPORTEDVERSION)
 				throw new UserException("[File_TooOld]", true);
-			if (Version < 79)
-			{
-				// These versions didn't use Unicode strings
-				UnusedReader = Reader; // we cannot close (or allowed to be disposed) the original reader, because that will close the stream.  This assignment keeps it in scope and prevent it being garbage collected
-				Reader = new System.IO.BinaryReader(Reader.BaseStream, System.Text.Encoding.Default);
-			}
 			m_NumberStrings = ReadByte();
 			m_Strings = new string[m_NumberStrings + 1];
 			SoftwareVersion = ReadSingle();
 			MinimumSoftwareVersion = ReadSingle();
-			if (Globals.Root != null && MinimumSoftwareVersion > SAW.SoftwareVersion.Version) // AM is nothing when loading initial configs
-				throw new UserException(Strings.Item("File_Too_New").Replace("%0", SAW.SoftwareVersion.VersionStringFromNumber(MinimumSoftwareVersion)));
+			//if (Globals.Root != null && MinimumSoftwareVersion > SAW.SoftwareVersion.Version) // AM is nothing when loading initial configs
+			//	throw new UserException(Strings.Item("File_Too_New").Replace("%0", SAW.SoftwareVersion.VersionStringFromNumber(MinimumSoftwareVersion)));
 			Thumbnail = ReadOptionalPNG();
 		}
 

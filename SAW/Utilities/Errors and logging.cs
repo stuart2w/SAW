@@ -12,8 +12,8 @@ namespace SAW
 		public UserException(string translateableText, bool breakpoint = false) : base(Strings.Translate(translateableText))
 		{
 			if (breakpoint)
-			{ // leave breakpoint set here:
-				short i = 0;
+			{
+				Debugger.Break();
 			}
 		}
 	}

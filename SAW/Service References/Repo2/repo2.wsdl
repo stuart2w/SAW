@@ -6,7 +6,7 @@
         <s:complexType>
           <s:sequence>
             <s:element minOccurs="0" maxOccurs="1" name="strSoftware" type="s:string" />
-            <s:element minOccurs="0" maxOccurs="1" name="file" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="strFile" type="s:string" />
           </s:sequence>
         </s:complexType>
       </s:element>
@@ -75,9 +75,9 @@
       <s:element name="VersionNeeds">
         <s:complexType>
           <s:sequence>
-            <s:element minOccurs="0" maxOccurs="1" name="strSoftware" type="s:string" />
-            <s:element minOccurs="0" maxOccurs="1" name="strProduct" type="s:string" />
-            <s:element minOccurs="0" maxOccurs="1" name="strVersion" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="software" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="product" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="version" type="s:string" />
           </s:sequence>
         </s:complexType>
       </s:element>
@@ -91,8 +91,8 @@
       <s:element name="StoreError">
         <s:complexType>
           <s:sequence>
-            <s:element minOccurs="0" maxOccurs="1" name="strSoftware" type="s:string" />
-            <s:element minOccurs="0" maxOccurs="1" name="aData" type="s:base64Binary" />
+            <s:element minOccurs="0" maxOccurs="1" name="software" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="data" type="s:base64Binary" />
           </s:sequence>
         </s:complexType>
       </s:element>
@@ -102,9 +102,9 @@
       <s:element name="Store">
         <s:complexType>
           <s:sequence>
-            <s:element minOccurs="0" maxOccurs="1" name="strSoftware" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="software" type="s:string" />
             <s:element minOccurs="0" maxOccurs="1" name="file" type="s:string" />
-            <s:element minOccurs="0" maxOccurs="1" name="aData" type="s:base64Binary" />
+            <s:element minOccurs="0" maxOccurs="1" name="data" type="s:base64Binary" />
           </s:sequence>
         </s:complexType>
       </s:element>
@@ -118,7 +118,7 @@
       <s:element name="Merge">
         <s:complexType>
           <s:sequence>
-            <s:element minOccurs="0" maxOccurs="1" name="strSoftware" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="software" type="s:string" />
             <s:element minOccurs="0" maxOccurs="1" name="file" type="s:string" />
           </s:sequence>
         </s:complexType>
@@ -129,10 +129,10 @@
       <s:element name="VerifyVersion">
         <s:complexType>
           <s:sequence>
-            <s:element minOccurs="0" maxOccurs="1" name="strSoftware" type="s:string" />
-            <s:element minOccurs="0" maxOccurs="1" name="strProduct" type="s:string" />
-            <s:element minOccurs="0" maxOccurs="1" name="strVersion" type="s:string" />
-            <s:element minOccurs="1" maxOccurs="1" name="bolChecksum" type="s:boolean" />
+            <s:element minOccurs="0" maxOccurs="1" name="software" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="product" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="version" type="s:string" />
+            <s:element minOccurs="1" maxOccurs="1" name="checksum" type="s:boolean" />
           </s:sequence>
         </s:complexType>
       </s:element>
@@ -147,7 +147,7 @@
         <s:complexType>
           <s:sequence>
             <s:element minOccurs="0" maxOccurs="1" name="strSoftware" type="s:string" />
-            <s:element minOccurs="0" maxOccurs="1" name="file" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="strFile" type="s:string" />
           </s:sequence>
         </s:complexType>
       </s:element>
@@ -158,7 +158,7 @@
         <s:complexType>
           <s:sequence>
             <s:element minOccurs="0" maxOccurs="1" name="strSoftware" type="s:string" />
-            <s:element minOccurs="0" maxOccurs="1" name="file" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="strFile" type="s:string" />
           </s:sequence>
         </s:complexType>
       </s:element>
@@ -173,7 +173,7 @@
         <s:complexType>
           <s:sequence>
             <s:element minOccurs="0" maxOccurs="1" name="strSoftware" type="s:string" />
-            <s:element minOccurs="0" maxOccurs="1" name="file" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="strFile" type="s:string" />
             <s:element minOccurs="1" maxOccurs="1" name="intStart" type="s:int" />
             <s:element minOccurs="1" maxOccurs="1" name="intLength" type="s:int" />
           </s:sequence>

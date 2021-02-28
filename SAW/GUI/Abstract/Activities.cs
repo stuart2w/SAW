@@ -18,6 +18,7 @@ namespace SAW
 
 		internal static Guid PaletteID = new Guid("0ca6dcd6-4418-4f0a-bdc4-2a2c0f4ff4ba");
 		internal static Guid SAW6 = new Guid("f4af4489-204a-4b28-9997-115e18a24124");
+		internal static Guid Graphics = new Guid("0290fe4a-282c-4f29-8608-ae8114d0c819");
 
 		#endregion
 
@@ -84,11 +85,9 @@ namespace SAW
 			return config.Document;
 		}
 
-		internal static string ActivityConfigFolder
-		{ get { return Globals.Root.ConfigFolder + System.IO.Path.DirectorySeparatorChar + "Activities"; } }
+		internal static string ActivityConfigFolder => Globals.Root.ConfigFolder + System.IO.Path.DirectorySeparatorChar + "Activities";
 
-		public static Guid ActivityID
-		{get{return Globals.Root.CurrentDocument == null ? Guid.Empty : Globals.Root.CurrentDocument.ActivityID;}}
+		public static Guid ActivityID => Globals.Root.CurrentDocument == null ? Guid.Empty : Globals.Root.CurrentDocument.ActivityID;
 
 		public static void EnsureAllActivitiesLoaded()
 		{
@@ -116,6 +115,8 @@ namespace SAW
 			AllActivitiesLoaded = true;
 		}
 
+		/// <summary>Simple check for graphics mode, which at the moment is a yes/no (graphics or normal).  Might need to be removed if further options are added</summary>
+		public static bool IsGraphicsMode => ActivityID.Equals(Graphics);
 
 	}
 

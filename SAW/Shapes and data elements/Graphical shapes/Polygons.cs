@@ -47,7 +47,7 @@ namespace SAW
 			}
 		}
 
-		public override List<Prompt> GetPrompts()
+		internal override List<Prompt> GetPrompts()
 		{
 			List<Prompt> list = base.GetBaseLinePrompts("Polygon", true);
 			if (m_DefinedVertices > 1)
@@ -106,7 +106,7 @@ namespace SAW
 			DiscardPath();
 		}
 
-		public override List<GrabSpot> GetGrabSpots(float scale)
+		internal override List<GrabSpot> GetGrabSpots(float scale)
 		{
 			List<GrabSpot> list = new List<GrabSpot>();
 			base.AddStandardRotationGrabSpot(list);
@@ -119,7 +119,7 @@ namespace SAW
 			return list;
 		}
 
-		protected override void DoGrabMove(GrabMovement move)
+		protected  internal override void DoGrabMove(GrabMovement move)
 		{
 			if (move.GrabType == GrabTypes.Radius)
 			{
@@ -139,7 +139,7 @@ namespace SAW
 				base.DoGrabMove(move);
 		}
 
-		public override void DoGrabAngleSnap(GrabMovement move)
+		internal override void DoGrabAngleSnap(GrabMovement move)
 		{
 			if (move.GrabType == GrabTypes.SingleVertex)
 				move.Current.Snapped = Geometry.AngleSnapPoint(move.Current.Exact, Vertices[0]);
@@ -249,7 +249,7 @@ namespace SAW
 
 		protected override bool UseBaseline() => false;
 
-		public override List<Prompt> GetPrompts()
+		internal override List<Prompt> GetPrompts()
 		{
 			return GetPolyPointPrompts("IrregularPolygon");
 		}
@@ -294,7 +294,7 @@ namespace SAW
 
 		public override PointF Centre => PointF.Empty;
 
-		public override List<GrabSpot> GetGrabSpots(float scale)
+		internal override List<GrabSpot> GetGrabSpots(float scale)
 		{
 			List<GrabSpot> list = new List<GrabSpot>();
 			base.AddGrabSpotsForAllVertices(list, new Prompt(ShapeVerbs.Choose, "MoveVertex_Independent", "MoveVertex"));
@@ -302,21 +302,13 @@ namespace SAW
 			return list;
 		}
 
-		public override List<Target> GenerateTargets(UserSocket floating) => base.GenerateTargetsDefault(floating, Closed());
+		internal override List<Target> GenerateTargets(UserSocket floating) => base.GenerateTargetsDefault(floating, Closed());
 
 		public override PointF DoSnapAngle(PointF newPoint)
 		{
 			if (m_DefinedVertices == 1)
 				return base.DoSnapAngle(newPoint);
 			return Geometry.AngleSnapFromTwoPoints(newPoint, Vertices[m_DefinedVertices - 1], Vertices[0], true);
-		}
-
-		public override void CheckIntersectionsWithSelf()
-		{
-			if (IsWide)
-				CheckIntersectionsWithSelfUsingPath(EnsurePath(true)); // Exterior path
-			else
-				CheckIntersectionsWithSelfUsingLines(); // need to enable this (defaults to empty fn in Lined)
 		}
 
 		#endregion
@@ -331,13 +323,13 @@ namespace SAW
 
 		public override Shapes ShapeCode => Shapes.PolyLine;
 
-		public override List<Prompt> GetPrompts() => GetPolyPointPrompts("PolyLine");
+		internal override List<Prompt> GetPrompts() => GetPolyPointPrompts("PolyLine");
 
 		public override LabelModes LabelMode => LabelModes.NotSupported;
 
 		public override AllowedActions Allows => base.Allows | AllowedActions.Tidy;
 
-		protected override bool Closed() => false;
+		protected  internal override bool Closed() => false;
 
 		#endregion
 
@@ -404,17 +396,6 @@ namespace SAW
 
 		#region Coordinates
 
-		public override void CheckIntersectionsWithSelf()
-		{
-			if (IsWide)
-			{
-				EnsurePath(true);
-				CheckIntersectionsWithSelfUsingPath(m_ExteriorPath);
-			}
-			else
-				CheckIntersectionsWithSelfUsingLines(); // need to enable this (defaults to empty fn in Lined)
-		}
-
 		protected override RectangleF CalculateBounds() => base.BoundsOfVertices();
 
 		protected override void CreatePath()
@@ -422,11 +403,11 @@ namespace SAW
 			m_Path = GetLinearPath(Vertices, false);
 		}
 
-		public override List<Target> GenerateTargets(UserSocket floating) => base.GenerateTargetsDefault(floating, false);
+		internal override List<Target> GenerateTargets(UserSocket floating) => base.GenerateTargetsDefault(floating, false);
 
 		public override PointF Centre => PointF.Empty;
 
-		public override List<GrabSpot> GetGrabSpots(float scale)
+		internal override List<GrabSpot> GetGrabSpots(float scale)
 		{
 			List<GrabSpot> list = new List<GrabSpot>();
 			base.AddGrabSpotsForAllVertices(list);

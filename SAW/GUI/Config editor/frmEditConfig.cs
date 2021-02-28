@@ -23,7 +23,7 @@ namespace SAW
 		internal Config.Levels m_Level;
 		private Document m_OpenPaletteOnExit; // if creating or editing a palette this is a reference to the object which needs to be opened for editing (in teacher mode) on exit
 		internal bool m_PalettePurposeChanged = false; // true if any existing palettes had their purpose changed; in which case we need to update the registrations on exit
-														  // mode is now sticky between opening and closing screen...
+													   // mode is now sticky between opening and closing screen...
 		private cfgKeys m_pnlKeys;
 
 		private frmEditConfig(Config config, Config.Levels level, Document document)
@@ -54,20 +54,23 @@ namespace SAW
 		{
 			//pnlSections.AddLabel(Strings.Item("Config_Introduction"));
 			//m_colSectionPanels.Add(null); // actual value inserted during SetLevels
-			pnlSections.AddLabel(Strings.Item("SAW_Settings_Switches")).Font = new Font(pnlSections.Font, FontStyle.Bold);
-			m_SectionPanels.Add(AddPanel(new cfgSwitching()));
-			pnlSections.AddLabel(Strings.Item("SAW_Settings_Input"));
-			m_SectionPanels.Add(AddPanel(new cfgInput()));
-			pnlSections.AddLabel(Strings.Item("SAW_Settings_Output"));
-			m_SectionPanels.Add(AddPanel(new cfgOutput()));
-			pnlSections.AddLabel(Strings.Item("SAW_Settings_MouseMovement"));
-			m_SectionPanels.Add(AddPanel(new cfgMouseOutput()));
-			pnlSections.AddLabel(Strings.Item("SAW_Settings_Styles"));
-			m_SectionPanels.Add(AddPanel(new cfgStyles()));
-			pnlSections.AddLabel(Strings.Item("Config_Speech"));
-			m_SectionPanels.Add(AddPanel(new cfgSpeech()));
+			if (m_Level == Config.Levels.User)
+			{
+				pnlSections.AddLabel(Strings.Item("SAW_Settings_Switches")).Font = new Font(pnlSections.Font, FontStyle.Bold);
+				m_SectionPanels.Add(AddPanel(new cfgSwitching()));
+				pnlSections.AddLabel(Strings.Item("SAW_Settings_Input"));
+				m_SectionPanels.Add(AddPanel(new cfgInput()));
+				pnlSections.AddLabel(Strings.Item("SAW_Settings_Output"));
+				m_SectionPanels.Add(AddPanel(new cfgOutput()));
+				pnlSections.AddLabel(Strings.Item("SAW_Settings_MouseMovement"));
+				m_SectionPanels.Add(AddPanel(new cfgMouseOutput()));
+				pnlSections.AddLabel(Strings.Item("SAW_Settings_Styles"));
+				m_SectionPanels.Add(AddPanel(new cfgStyles()));
+				pnlSections.AddLabel(Strings.Item("Config_Speech"));
+				m_SectionPanels.Add(AddPanel(new cfgSpeech()));
+			}
 			pnlSections.AddLabel(Strings.Item("SAW_Settings_EditorView"));
-			m_SectionPanels.Add(AddPanel(new cfgShowInEditing()));
+			m_SectionPanels.Add(AddPanel(new cfgEditing()));
 			pnlSections.AddLabel(Strings.Item("Config_Keys"));
 			m_pnlKeys = (cfgKeys)AddPanel(new cfgKeys());
 			m_SectionPanels.Add(m_pnlKeys);
@@ -81,12 +84,6 @@ namespace SAW
 		}
 
 		/// <summary>Edits the config.  Document should be the document being edited, not the config container document</summary>
-		/// <param name="level"></param>
-		/// <param name="document"></param>
-		/// <param name="config"></param>
-		/// <param name="userOnly"></param>
-		/// <param name="initialSection"></param>
-		/// <returns></returns>
 		public static DialogResult EditConfig(Config.Levels level, Document document, Config config = null, bool userOnly = false, Sections initialSection = (Sections)(-1))
 		{
 			// returns DialogResult = Yes if OK, but has stored doc settings transaction which will have triggered refresh of main screen settings already
@@ -94,10 +91,8 @@ namespace SAW
 			if (config == null)
 				config = Globals.Root.GetCurrentConfig(level, document);
 			frmEditConfig frm = new frmEditConfig(config, level, document);
-			if (initialSection >= 0)
-			{
-				frm.pnlSections.SelectedIndex = (int)initialSection;
-			}
+			if (initialSection >= 0) 
+				frm.pnlSections.SelectedIndex = (int) initialSection;
 			DialogResult result = frm.ShowDialog();
 			if (result == DialogResult.OK)
 			{
@@ -106,7 +101,7 @@ namespace SAW
 				bool activityChanged = false;
 				foreach (Config changed in frm.m_Changed.Values)
 				{
-					if (changed == Config.UserUser || changed == Config.UserEditor)
+					if (changed == Config.UserUser)
 						usersChanged = true;
 					else if (changed == Config.SystemConfig)
 						Globals.Root.SaveSystemConfig();
@@ -203,76 +198,6 @@ namespace SAW
 		{
 			if (!m_Changed.Contains(m_Config))
 				m_Changed.Add(m_Config);
-		}
-
-		#endregion
-
-		#region Prompts
-		// The prompts are updated from a timer.  We can't use MouseMove on the form because this is not raised since the form is covered in controls
-		// (and I think capturing would fail eventually due to pop up forms and combo boxes).  We could in theory attach Enter and Leave events to every control
-		// but this seems inefficient and complicated
-
-		private object m_ctrPromptDisplayed; // the control for which prompts are currently displayed' For tree views this will be the Node
-		public void tmrPrompt_Tick(object sender, EventArgs e)
-		{
-			List<Shape.Prompt> list = new List<Shape.Prompt>();
-			if (!this.ContainsFocus)
-			{
-				// This in case of modal dialogs appearing over this window.  Looks very strange if the prompts still respond to this window (responding to control which might be hidden behind the modal dialog)
-				if (m_ctrPromptDisplayed != null)
-				{
-					Globals.SetHover(list);
-					m_ctrPromptDisplayed = null;
-				}
-				return;
-			}
-			Control ctr = GUIUtilities.YoungestChildUnderMouse(this);
-			if (ctr == m_ctrPromptDisplayed)
-				return;
-			if (ctr?.Parent is ctrActionSelect)
-				ctr = ctr.Parent;
-			if (ctr is ctrActionSelect)
-			{
-				ctrActionSelect action = (ctrActionSelect)ctr;
-				TreeNode node = action.GetNodeAt(action.PointToClient(Cursor.Position));
-				if (m_ctrPromptDisplayed == node)
-					return;
-				m_ctrPromptDisplayed = node;
-				if (node?.Tag != null)
-				{
-					Functions.Action objAction = (Functions.Action)node.Tag;
-					list.Add(objAction.GetPrompt());
-				}
-			}
-			else if (ctr is TreeView) // other Treeviews are all in the toolbar section
-			{
-				TreeNode node = ((TreeView)ctr).GetNodeAt(ctr.PointToClient(Cursor.Position));
-				if (m_ctrPromptDisplayed == node)
-					return;
-				m_ctrPromptDisplayed = node;
-				if (node != null)
-				{
-					Functions.Action objAction = Functions.Verb.Find((Functions.Codes)node.Tag);
-					list.Add(objAction.GetPrompt());
-				}
-			}
-			else if (ctr?.Tag == null || !(ctr.Tag is string) || ctr.Tag.ToString() == "")
-				m_ctrPromptDisplayed = null;
-			else
-			{
-				m_ctrPromptDisplayed = ctr;
-				string text = "ConfigPrompt_" + ctr.Tag;
-				if (Strings.Exists(text))
-					list.Add(new Shape.Prompt(Shape.ShapeVerbs.Info, text));
-				if (Strings.Exists(text + "_2"))
-					list.Add(new Shape.Prompt(Shape.ShapeVerbs.Info, text + "_2"));
-#if DEBUG
-				if (list.Count == 0)
-					list.Add(new Shape.Prompt(Shape.ShapeVerbs.Info, "No prompts for: " + ctr.Tag, (Image)null));
-#endif
-			}
-			Globals.SetHover(list); // this can deliberately set an empty list; we don't want to do ClearHover because this would allow any previous prompt from the current tool - it's better to clear the prompts area completely
-									  //If objList.Count > 0 Then Globals.SetHover(objList)
 		}
 
 		#endregion

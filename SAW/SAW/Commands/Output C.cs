@@ -99,15 +99,15 @@ namespace SAW.Commands
 					text = context.TargetItem.Element.LabelText;
 					break;
 				case Source.OutputText:
-					text = (context.TargetItem.Element as Item)?.OutputText ?? context.TargetItem.Element.LabelText; // defaults to same text for any non-SAW items
+					text = context.TargetItem?.OutputText ?? context.TargetItem.Element.LabelText; // defaults to same text for any non-SAW items
 					break;
 				case Source.PromptText:
-					text = (context.TargetItem.Element as Item)?.PromptText;
+					text = context.TargetItem?.PromptText;
 					break;
 				case Source.SpeechText:
-					text = (context.TargetItem.Element as Item)?.SpeechText;
+					text = context.TargetItem?.SpeechText;
 					// this also plays any sound file (now embedded) in addition
-					var sound = (context.TargetItem.Element as Item)?.Sound?.Content;
+					var sound = context.TargetItem?.Sound?.Content;
 					if (sound != null && Globals.Root.CurrentConfig.ReadBoolean(Config.Output_Sound, true))
 					{
 						context.View.PlaySoundResource(sound.GetStream());
@@ -360,7 +360,7 @@ namespace SAW.Commands
 			var scriptable = context.Page.FindScriptableByID(ID);
 			if (scriptable == null)
 				return;
-			string text = (context.TargetItem?.Element as Item)?.PromptText;
+			string text = context.TargetItem?.PromptText;
 			if (text == null)
 				return;
 			scriptable.Element.LabelText = text;

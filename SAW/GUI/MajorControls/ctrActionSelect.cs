@@ -193,6 +193,7 @@ namespace SAW
 		}
 
 		#region Filling tree
+
 		public void Fill(AppliedConfig applied)
 		{
 			// fill the Treeview showing the possible actions
@@ -205,16 +206,21 @@ namespace SAW
 				ActionImageList.Images.Add("CursorClick", Resources.AM.CursorClick);
 
 				// shapes...
-				TreeNode subFolder;
 				TreeNode folder = TV.Nodes.Add(Strings.Item("Config_ShapesTools"));
-				foreach (Shape.Shapes eShape in Shape.UserShapes)
+				foreach (Shape.Shapes shape in Shape.UserShapes.Union(new[] { Shape.Shapes.SetRotation })) // set rotation is included in here, although not entirely a normal user shape
 				{
 					//If Shape.HideShapeType (eShape) andalso not **advanced continue for
-					var action = new ToolAction(eShape);
+					ToolAction action = new ToolAction(shape);
 					TreeNode node = folder.Nodes.Add(action.DescriptionWithoutAccelerator());
-					ActionImageList.Images.Add(action.ToString(), GUIUtilities.ShapeImage(eShape, 32));
-					node.ImageKey = action.ToString();
-					node.SelectedImageKey = action.ToString();
+					Image image = GUIUtilities.ShapeImage(shape, 32);
+					if (image != null)
+					{
+						ActionImageList.Images.Add(action.ToString(), image);
+						node.ImageKey = action.ToString();
+						node.SelectedImageKey = action.ToString();
+					}
+					else
+						node.ImageKey = node.SelectedImageKey = "Empty";
 					node.Tag = action;
 				}
 
@@ -226,7 +232,7 @@ namespace SAW
 					AddKeyVerbs(1100, 1149, "Config_MouseControl", folder.Nodes);
 				AddKeyVerbs(1150, 1199, "Config_Scrolling", folder.Nodes);
 				AddKeyVerbs(1200, 1249, "Config_ShapeSelection", folder.Nodes);
-				subFolder = folder.Nodes.Add(Strings.Item("Config_Keys_Snapping"));
+				TreeNode subFolder = folder.Nodes.Add(Strings.Item("Config_Keys_Snapping"));
 				foreach (Shape.SnapModes snap in new[] { Shape.SnapModes.Off, Shape.SnapModes.Grid, Shape.SnapModes.Shape, Shape.SnapModes.Angle })
 				{
 					AddAction(subFolder, new SnapAction(snap));
@@ -262,16 +268,14 @@ namespace SAW
 				AddAction(subFolder, Verb.Find(Codes.TextSmaller));
 				AddAction(subFolder, Verb.Find(Codes.TextLarger));
 
-
 				// arrows just select palette
-				subFolder = folder.Nodes.Add(Strings.Item("Palette_Arrowheads"));
-				if (Mode == Modes.Key)
-					AddAction(subFolder, new PaletteAction(Parameters.ArrowheadEndType), Strings.Item("Config_SwitchToPalette"), "CursorClick");
+				//subFolder = folder.Nodes.Add(Strings.Item("Palette_Arrowheads"));
+				//if (Mode == Modes.Key)
+				//	AddAction(subFolder, new PaletteAction(Parameters.ArrowheadEndType), Strings.Item("Config_SwitchToPalette"), "CursorClick");
 
 				subFolder = folder.Nodes.Add(Strings.Item("Config_Keys_Palettes"));
 				AddAction(subFolder, new PaletteButtonAction(1), Strings.Item("Config_Keys_Palette_Refine"), "Empty");
 				AddAction(subFolder, new PaletteButtonAction(2), Strings.Item("Config_Keys_Palette_Transparent"), "Empty");
-				AddAction(subFolder, new PaletteButtonAction(3), Strings.Item("Config_Keys_Palette_Rainbow"), "Empty");
 				// in palettes main folder:
 				AddAction(folder, Verb.Find(Codes.MovePalette));
 				AddAction(folder, Verb.Find(Codes.ResizePalette));
@@ -284,6 +288,11 @@ namespace SAW
 						AddAction(subFolder, objPalette.PalettePurpose.GetSelectAction(), Strings.Translate(objPalette.EditDescription));
 					}
 				}
+
+				subFolder = folder.Nodes.Add(Strings.Item("Config_PalettesToggle"));
+				AddAction(subFolder, new ShowPaletteAction(Palette.Purpose.Specials.Rotation), Strings.Item("Palette_Rotation"));
+				AddAction(subFolder, new ShowPaletteAction(Palette.Purpose.Specials.CoordEdit), Strings.Item("Palette_CoordEdit"));
+				AddAction(subFolder, new ShowPaletteAction(Palette.Purpose.Specials.Scale), Strings.Item("Palette_ShowScale"));
 
 				if (Mode == Modes.Button)
 				{
@@ -304,7 +313,6 @@ namespace SAW
 				MessageBox.Show(ex.Message);
 			}
 		}
-
 
 		/// <summary>Adds verbs for which there is a text description within the given range</summary>
 		private TreeNode AddKeyVerbs(int first, int last, string folderName, TreeNodeCollection within = null)
@@ -347,8 +355,8 @@ namespace SAW
 		{
 			if (action == null)
 				return; // can happen for verb enums that aren't used
-			// we don't usually use objaction.Description, because sometimes that is a bit longer (describing context which is obvious in the Treeview)
-			// strImage is the key of the image to use; pass "" to omit the image.  If "?" it is created from the action
+						// we don't usually use objaction.Description, because sometimes that is a bit longer (describing context which is obvious in the Treeview)
+						// strImage is the key of the image to use; pass "" to omit the image.  If "?" it is created from the action
 			if (title == "?")
 				title = action.DescriptionWithoutAccelerator();
 			TreeNode node = folder.Nodes.Add(title);

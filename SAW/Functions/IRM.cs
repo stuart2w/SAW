@@ -10,6 +10,7 @@ using SAW.Commands;
 
 namespace SAW.Functions
 {
+	/// <summary>Performs import of IRM file format</summary>
 	internal class ImportIRM : Verb
 	{
 		public const string Filter = "*.irm|*.irm";
@@ -35,9 +36,7 @@ namespace SAW.Functions
 					MessageBox.Show(ex.Message);
 				}
 				finally
-				{
-					m_Elements = null;
-				}
+				{ m_Elements = null; }
 		}
 
 		public override bool MightOpenModalDialog => true;
@@ -100,11 +99,7 @@ namespace SAW.Functions
 				return new Point(x, y);
 			}
 
-			public void Throw(string message)
-			{
-				throw new Exception($"{Code} @ line {Line}: {message}");
-			}
-
+			public void Throw(string message) => throw new Exception($"{Code} @ line {Line}: {message}");
 		}
 
 		private int m_NextElement;
@@ -286,31 +281,29 @@ namespace SAW.Functions
 			Item item = new Item();
 			item.SetBounds(GetRect(topLeft, size, page));
 			item.LabelText = text;
-			item.HighlightLineStyle.Colour = Color.White;
-			item.HighlightFillStyle.Colour = Color.Red;
 			Scriptable script = new Scriptable(item);
 			script.SAWID = m_NextID++;
+			script.HighlightStyle.LineColour = Color.White;
+			script.HighlightStyle.FillColour = Color.Red;
 			return script;
 		}
 
-		private Element ReadElement()
-		{
-			return m_Elements[m_NextElement++];
-		}
+		private Element ReadElement() => m_Elements[m_NextElement++];
 
 		/// <summary>Shifts all the existing content on the given page up or down</summary>
 		private void TranslateContentsVertically(Page page, float deltaY)
 		{
-			Transformation x = new TransformMove(0, deltaY);
+			Transformation transform = new TransformMove(0, deltaY);
 			foreach (Shape s in page.Shapes)
 			{
-				s.ApplyTransformation(x);
+				s.ApplyTransformation(transform);
 			}
 
 		}
 
 	}
 
+	/// <summary>Exports selection set in IRM format</summary>
 	internal class ExportIRM : Verb
 	{
 		private static bool g_WarningDone;
@@ -423,7 +416,7 @@ namespace SAW.Functions
 		public override bool MightOpenModalDialog => true;
 
 		/// <summary>For a button navigating to a page, returns the page index</summary>
-		private int PageButtonDestination(Scriptable button)
+		private static int PageButtonDestination(Scriptable button)
 		{
 			return (from c in button.SelectScript.CommandList where c is CmdGotoPage select c.GetParamAsInt(0)).FirstOrDefault();
 		}

@@ -9,13 +9,15 @@
 			Verb.Register(Codes.ZoomOut, new Zoom() { Multiplier = 1 / StaticView.ZOOMSTEP });
 			Verb.Register(Codes.ZoomPage, new Zoom() { Value = (float)StaticView.SpecialZooms.FitPage });
 			Verb.Register(Codes.ZoomWidth, new Zoom() { Value = (float)StaticView.SpecialZooms.FitWidth });
-			Verb.Register(Codes.ConfigUser, (source, pnlView, tx) => { frmEditConfig.EditConfig(Config.Levels.User, Globals.Root.CurrentDocument); }).MightOpenDialogValue = true; 
+			Verb.Register(Codes.ConfigUser, (source, pnlView, tx) => { frmEditConfig.EditConfig(Config.Levels.User, Globals.Root.CurrentDocument); }).MightOpenDialogValue = true;
 			Verb.Register(Codes.StoreStylesAsDefault, (source, pnlView, tx) => { Globals.Root.Editor.StoreStyleDefaults(true, tx); }, true, pnlView => !Globals.Root.CurrentDocument.IsPaletteWithin);
 			Verb.Register(Codes.StoreStylesAsUserDefault, (source, pnlView, tx) => { Globals.Root.Editor.StoreStyleDefaults(false, tx); });
 			Verb.Register(Codes.ResetPalettes, (source, pnlView, tx) => { Globals.Root.Editor.ResetPalettes(); });
 			Verb.Register(Codes.TogglePrompts, new TogglePrompts());
 			Verb.Register(Codes.MovePalette, (source, pnlView, tx) => { Globals.Root.Editor.FocalPaletteContainer()?.PaletteVerb(Codes.MovePalette); });
 			Verb.Register(Codes.ResizePalette, (source, pnlView, tx) => { Globals.Root.Editor.FocalPaletteContainer()?.PaletteVerb(Codes.ResizePalette); });
+			Verb.Register(Codes.IncludeTextInRotation, new ToggleTextRotate());
+			Verb.Register(Codes.ToggleFullScreen, new ToggleFullScreen());
 		}
 
 	}
@@ -36,6 +38,8 @@
 
 		public override bool IsApplicable(EditableView pnlView)
 		{
+			if (Globals.Root.CurrentConfig.ReadBoolean(Config.Resize_Document_ToWindow, true))
+				return false;
 			switch (Code)
 			{
 				case Codes.Zoom100:
@@ -63,15 +67,31 @@
 		}
 	}
 
-	internal class ConfigDocument : Verb
+	internal class ToggleTextRotate : Verb
 	{
 		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
 		{
-			CurrentDocument.GetCreateUserSettings(transaction);
-			frmEditConfig.EditConfig(Config.Levels.DocumentUser, CurrentDocument);
+			TransformRotate.IncludeText = !TransformRotate.IncludeText;
+			ctrRotation palette = (ctrRotation)Palette.Item("Rotation").Control;
+			palette.IncludeTextChanged();
 		}
 
-		public override bool IsApplicable(EditableView pnlView) =>  !Globals.Root.CurrentDocument.IsPaletteWithin;
-		public override bool MightOpenModalDialog => true;
+	}
+
+	internal class ToggleFullScreen : Verb
+	{
+
+		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
+		{
+			if (Editor.WindowState == System.Windows.Forms.FormWindowState.Maximized)
+				Editor.WindowState = System.Windows.Forms.FormWindowState.Normal;
+			else
+				Editor.WindowState = System.Windows.Forms.FormWindowState.Maximized;
+		}
+
+		public override bool IsApplicable(EditableView pnlView)
+		{
+			return Globals.Root.User == Users.Editor;
+		}
 	}
 }

@@ -89,34 +89,37 @@ namespace Switches
 
 		private void FillTimings()
 		{
-			while (pnlTimings.Controls.Count > 0)
+			tblTimings.SuspendLayout();
+			while (tblTimings.Controls.Count > 0)
 			{
-				pnlTimings.Controls[0].Dispose();
+				tblTimings.Controls[0].Dispose();
 			}
 			if (m_Engine == null || !m_Loaded)
 				return;
 			Engine.Timings needed = m_Engine.RelevantTimings;
-			for (int logical = 0; logical <= Logical.Count - 1; logical++)
+			for (int index = 0; index <= Logical.Count - 1; index++)
 			{
-				Logical objSwitch = Logical.Switch(logical);
-				if (objSwitch != null)
-					needed = needed | objSwitch.RequiredTimings;
+				Logical logical = Logical.Switch(index);
+				if (logical != null)
+					needed = needed | logical.RequiredTimings;
 			}
-			pnlTimings.SuspendLayout();
+			int row = 0;
 			foreach (Engine.Timings timing in Enum.GetValues(typeof(Engine.Timings)))
 			{
 				if ((needed & timing) > 0)
 				{
-					ctrEditTiming ctr = new ctrEditTiming();
-					//ctr.Label =Strings.Item("Switch_Timing_"+ timing);
-					ctr.Meaning = timing;
-					ctr.Value = m_Engine.ConfiguredTiming(timing);
-					ctr.Width = 260; // pnlTimings.Width - 8
+					Label label = new Label { Text = Strings.Item("Switch_Timing_" + timing), TextAlign = System.Drawing.ContentAlignment.MiddleRight, Dock = DockStyle.Fill };
+					tblTimings.Controls.Add(label);
+					tblTimings.SetRow(label, row);
+					ctrEditTiming ctr = new ctrEditTiming { Meaning = timing, Value = m_Engine.ConfiguredTiming(timing), Dock = DockStyle.Fill };
 					ctr.UserChangedValue += TimingChanged;
-					pnlTimings.Controls.Add(ctr);
+					tblTimings.Controls.Add(ctr);
+					tblTimings.SetRow(ctr, row);
+					tblTimings.SetColumn(ctr, 1);
+					row++;
 				}
 			}
-			pnlTimings.ResumeLayout();
+			tblTimings.ResumeLayout();
 		}
 
 		private void TimingChanged(object sender, EventArgs e)
@@ -155,7 +158,6 @@ namespace Switches
 		// always displays 10 boxes
 
 		#endregion
-
 	}
 
 }

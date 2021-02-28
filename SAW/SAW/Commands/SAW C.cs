@@ -274,17 +274,17 @@ namespace SAW.Commands
 
 		public override void Execute(ExecutionContext context)
 		{
-			context.View.PreviousSelectionSet = Globals.Root.CurrentDocument.Filename; // doesn't matter if not defined - PreviousSelectionSet null or empty just means that previous cannot work
-			string target = m_ParamList[0].ValueAsString();
-			CmdOpenApp.ProcessOutputDirective(ref target, context);
-			TidyFilename(ref target, new[] { Document.StandardExtension, Document.SAW6Extension });
-			if (!System.IO.File.Exists(target))
-				context.View.OnFail("open selection set file not found: " + target);
-			else
-			{
-				context.Terminate = true;
-				Globals.QueueDelayedAction(() => Globals.Root.OpenFile(target, true, true));
-			}
+				context.View.PreviousSelectionSet = Globals.Root.CurrentDocument.Filename; // doesn't matter if not defined - PreviousSelectionSet null or empty just means that previous cannot work
+				string target = m_ParamList[0].ValueAsString();
+				CmdOpenApp.ProcessOutputDirective(ref target, context);
+				TidyFilename(ref target, new[] {Document.StandardExtension, Document.SAW6Extension});
+				if (!System.IO.File.Exists(target))
+					context.View.OnFail("open selection set file not found: " + target);
+				else
+				{
+					context.Terminate = true;
+					Globals.QueueDelayedAction(() => Globals.Root.OpenFile(target, true, true));
+				}
 		}
 
 		/// <summary>Adds the folder if it's missing, and also the extension.  For the extension this is only added if it results in a file which exists - searching the listed ones in order</summary>

@@ -32,7 +32,7 @@ namespace SAW
 
 		// base does Centre and Middle
 
-		public override List<Target> GenerateTargets(UserSocket floating)
+		internal override List<Target> GenerateTargets(UserSocket floating)
 		{
 			if (!AutoTargets)
 				return null;
@@ -42,7 +42,7 @@ namespace SAW
 			return targets;
 		}
 
-		public override List<UserSocket> GetPointsWhichSnapWhenMoving()
+		internal override List<UserSocket> GetPointsWhichSnapWhenMoving()
 		{
 			if (!AutoTargets)
 				return null;
@@ -55,7 +55,7 @@ namespace SAW
 			return list;
 		}
 
-		public override void DrawLineTarget(Target target, Graphics gr, Pen pn, int activePhase)
+		internal override void DrawLineTarget(Target target, Graphics gr, Pen pn, int activePhase)
 		{
 			if (!AutoTargets)
 				return;
@@ -217,7 +217,7 @@ namespace SAW
 		/// <summary>Overrides to true to the targets for the bounding edges</summary>
 		protected virtual bool AutoTargets => false;
 
-		public override List<Target> GenerateTargets(UserSocket floating)
+		internal override List<Target> GenerateTargets(UserSocket floating)
 		{
 			if (!AutoTargets)
 				return null;
@@ -227,7 +227,7 @@ namespace SAW
 			return targets;
 		}
 
-		public override List<UserSocket> GetPointsWhichSnapWhenMoving()
+		internal override List<UserSocket> GetPointsWhichSnapWhenMoving()
 		{
 			if (!AutoTargets)
 				return null;
@@ -236,7 +236,7 @@ namespace SAW
 			return list;
 		}
 
-		public override void DrawLineTarget(Target target, Graphics gr, Pen pn, int activePhase)
+		internal override void DrawLineTarget(Target target, Graphics gr, Pen pn, int activePhase)
 		{
 			if (!AutoTargets)
 				return;

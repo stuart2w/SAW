@@ -18,7 +18,7 @@ namespace SAW
 		public ColourPicker()
 		{
 			InitializeComponent();
-			this.Cursor = Cursors.Hand;
+			base.Cursor = Cursors.Hand;
 		}
 
 		#region Properties
@@ -57,6 +57,7 @@ namespace SAW
 
 		[System.ComponentModel.DefaultValue(true)]
 		public bool UseSettings { get; set; } = true;
+
 		#endregion
 
 		#region Parameter
@@ -85,9 +86,9 @@ namespace SAW
 			m_Parameter = Parameters.None;
 		}
 
-		private void ParameterChanged(Parameters eParameter)
+		private void ParameterChanged(Parameters parameter)
 		{
-			if (eParameter == m_Parameter)
+			if (parameter == m_Parameter)
 				m_Current = Color.FromArgb(Globals.ParameterValue(m_Parameter));
 		}
 
@@ -100,12 +101,12 @@ namespace SAW
 			}
 			if (m_Applicable)
 			{
-				Cursor = Cursors.Hand;
+				base.Cursor = Cursors.Hand;
 				TabStop = true;
 			}
 			else
 			{
-				Cursor = Cursors.Default;
+				base.Cursor = Cursors.Default;
 				TabStop = false;
 			}
 		}
@@ -131,11 +132,11 @@ namespace SAW
 				if (m_Current.IsEmpty)
 				{
 					e.Graphics.Clear(Color.White);
-					Image objImage = BlackWhite ? Resources.AM.BlackWhiteText : Resources.AM.RedCross;
-					if (objImage != null && m_Applicable)
+					Image image = BlackWhite ? Resources.AM.BlackWhiteText : Resources.AM.RedCross;
+					if (image != null && m_Applicable)
 					{
-						e.Graphics.DrawImageUnscaled(objImage, (Width - objImage.Width) / 2, (Height - objImage.Height) / 2);
-						objImage.Dispose();
+						e.Graphics.DrawImageUnscaled(image, (Width - image.Width) / 2, (Height - image.Height) / 2);
+						image.Dispose();
 					}
 				}
 				else if (m_Current.A < 255)
@@ -149,6 +150,9 @@ namespace SAW
 				else
 					e.Graphics.Clear(m_Current);
 			}
+			if (!m_Applicable || !Enabled)
+				using (Brush br = new System.Drawing.Drawing2D.HatchBrush(System.Drawing.Drawing2D.HatchStyle.DiagonalCross, Color.Gray))
+					e.Graphics.FillRectangle(br, new Rectangle(0, 0, Width, Height));
 			if (Focused)
 				e.Graphics.DrawRectangle(GUIUtilities.FocusPen, 3, 3, Width - 6, Height - 6);
 		}
@@ -174,6 +178,14 @@ namespace SAW
 			Invalidate();
 		}
 
+		/// <summary>Prevent form designer from setting the cursor </summary>
+		[System.ComponentModel.DesignerSerializationVisibility(System.ComponentModel.DesignerSerializationVisibility.Hidden)]
+		public override Cursor Cursor
+		{
+			get => base.Cursor;
+			set {  }
+		}
+
 		#region Keys
 		public void ColourPicker_KeyDown(object sender, KeyEventArgs e)
 		{
@@ -192,6 +204,7 @@ namespace SAW
 		}
 
 		#endregion
+
 	}
 
 }

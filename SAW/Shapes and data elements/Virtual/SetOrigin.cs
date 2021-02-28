@@ -11,30 +11,23 @@ namespace SAW
 
 		#region Information
 
-		public override Shapes ShapeCode
-		{ get { return Shapes.SetOrigin; } }
+		public override Shapes ShapeCode => Shapes.SetOrigin;
 
-		public PointF Origin
-		{ get { return m_Origin; } }
+		public PointF Origin => m_Origin;
 
-		public override List<Prompt> GetPrompts()
+		internal override List<Prompt> GetPrompts()
 		{
 			// if we are being asked, then the first vertex must have been placed
-			List<Prompt> objList = new List<Prompt>();
-			objList.Add(new Prompt(ShapeVerbs.Choose, "SetOrigin", "SetOrigin"));
-			objList.Add(new Prompt(ShapeVerbs.Cancel, "SetOrigin_Cancel", ""));
-			return objList;
+			List<Prompt> list = new List<Prompt>();
+			list.Add(new Prompt(ShapeVerbs.Choose, "SetOrigin", "SetOrigin"));
+			list.Add(new Prompt(ShapeVerbs.Cancel, "SetOrigin_Cancel", ""));
+			return list;
 		}
 
-		public override GeneralFlags Flags
-		{ get { return base.Flags | GeneralFlags.NotWithinContainer; } }
+		public override GeneralFlags Flags => base.Flags | GeneralFlags.NotWithinContainer | GeneralFlags.AlwaysResetToolAfterCreation;
 
-		public override SnapModes SnapNext(SnapModes requested)
-		{
-			if (requested == SnapModes.Angle)
-				return SnapModes.Off;
-			return base.SnapNext(requested);
-		}
+		public override SnapModes SnapNext(SnapModes requested) => requested == SnapModes.Angle ? SnapModes.Off : base.SnapNext(requested);
+
 		#endregion
 
 		#region Verbs
@@ -46,10 +39,7 @@ namespace SAW
 			return VerbResult.Continuing;
 		}
 
-		public override VerbResult Cancel(EditableView.ClickPosition position)
-		{
-			return VerbResult.Destroyed;
-		}
+		public override VerbResult Cancel(EditableView.ClickPosition position) => VerbResult.Destroyed;
 
 		public override VerbResult Float(EditableView.ClickPosition position)
 		{
@@ -58,10 +48,7 @@ namespace SAW
 			return VerbResult.Continuing;
 		}
 
-		public override VerbResult Choose(EditableView.ClickPosition position)
-		{
-			return Complete(position);
-		}
+		public override VerbResult Choose(EditableView.ClickPosition position) => Complete(position);
 
 		public override VerbResult Complete(EditableView.ClickPosition position)
 		{
@@ -70,22 +57,13 @@ namespace SAW
 			return VerbResult.Custom;
 		}
 
-		public override VerbResult CompleteRetrospective()
-		{
-			return VerbResult.Custom;
-		}
+		public override VerbResult CompleteRetrospective() => VerbResult.Custom;
 
 		#endregion
 
-		protected override RectangleF CalculateBounds()
-		{
-			return Geometry.RectangleFromPoint(m_Origin, DRAWSIZE);
-		}
+		protected override RectangleF CalculateBounds() => Geometry.RectangleFromPoint(m_Origin, DRAWSIZE);
 
-		public override bool HitTestDetailed(PointF clickPoint, float scale, bool treatAsFilled)
-		{
-			return false;
-		}
+		public override bool HitTestDetailed(PointF clickPoint, float scale, bool treatAsFilled) => false;
 
 		private const float DRAWSIZE = 4;
 

@@ -40,7 +40,7 @@ namespace SAW.CommandEditors
 	#region IntegerTextBox
 
 	/// <summary>Version of textbox that supports reading the contained value safely as an integer.  Empty text is considered as a valid number 0</summary>
-	public class IntegerTextBox : TextBox
+	public class IntegerTextBox : TextBox, IKeyControl
 	{
 		public int Value
 		{
@@ -65,6 +65,30 @@ namespace SAW.CommandEditors
 					return true;
 				return int.TryParse(Text, out _);
 			}
+		}
+
+		public bool IsValidAndNotEmpty
+		{
+			get
+			{
+				if (string.IsNullOrWhiteSpace(Text))
+					return false;
+				return int.TryParse(Text, out _);
+			}
+		}
+
+		public bool IsEmpty => string.IsNullOrWhiteSpace(Text);
+
+		public void CombinedKeyDown(CombinedKeyEvent e)
+		{
+			if (e.Modifiers == 0)
+				e.DoNotHandle = true;
+		}
+
+		public void CombinedKeyUp(CombinedKeyEvent e)
+		{
+			if (e.Modifiers == 0)
+				e.DoNotHandle = true;
 		}
 	}
 

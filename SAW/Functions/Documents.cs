@@ -35,8 +35,6 @@ namespace SAW.Functions
 					Globals.Root.CloseApplication();
 			});
 			Verb.Register(Codes.CloseDocument, new CloseDocument());
-			Verb.Register(Codes.NextDocument, new IterateDocument() { Delta = 1 });
-			Verb.Register(Codes.PreviousDocument, new IterateDocument() { Delta = -1 });
 
 			Verb.Register(Codes.Start, (source, pnlView, tx) => { Globals.Root.Editor.DoStartVerb(); });
 			Verb.Register(Codes.StartupScript, (source, pnlView, tx) => { frmEditStartupScript.Display(Globals.Root.Editor); });
@@ -86,7 +84,7 @@ namespace SAW.Functions
 
 		public static void SaveAs(bool worksheet, EditableView pnlView)
 		{
-			var strFilename = FileDialog.ShowSave(FileDialog.Context.Document, "SAW 7|*" + Document.StandardExtension + "|SAW 6|*.sss", System.IO.Path.GetFileName(CurrentDocument.FilenameWithExtension(Document.StandardExtension)));
+			var strFilename = FileDialog.ShowSave(FileDialog.Context.Document, "SAW 7|*" + Document.StandardExtension + "|SAW 6|*.sss", Path.GetFileName(CurrentDocument.FilenameWithExtension(Document.StandardExtension)));
 			if (string.IsNullOrEmpty(strFilename))
 				return;
 			CurrentDocument.SAWHeader.SetWindowBounds(pnlView.GetDocumentScreenCoords());
@@ -155,8 +153,9 @@ namespace SAW.Functions
 				return;
 			IndentStringBuilder output = new IndentStringBuilder();
 			CurrentDocument.WriteExportText(output);
-			System.IO.File.WriteAllText(file, output.ToString());
+			File.WriteAllText(file, output.ToString());
 		}
+
 	}
 	#endregion
 
@@ -569,38 +568,6 @@ namespace SAW.Functions
 
 	}
 
-	#endregion
-
-	#region IterateDocument
-	class IterateDocument : Verb
-	{
-		public int Delta;
-		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
-		{
-			if (Editor.IsDocumentSequence && !Editor.CheckDiscardCurrent(false))
-				return; // In theory the condition should never fire
-			if (Delta == 1)
-			{
-				// we need to call CheckDiscardCode in order to trigger the automatic saving if this is a document sequence.
-				// If this is not a document sequence it implies we are viewing tabs, and it is fine to have multiple changed documents open
-				if (Globals.Root.DocumentIndex < Globals.Root.DocumentsCount - 1)
-					Globals.Root.SelectDocument(Globals.Root.DocumentIndex + 1);
-			}
-			else
-			{
-				if (Globals.Root.DocumentIndex > 0)
-					Globals.Root.SelectDocument(Globals.Root.DocumentIndex - 1);
-			}
-		}
-
-		public override bool IsApplicable(EditableView pnlView)
-		{
-			if (Delta > 0)
-				return Globals.Root.DocumentIndex < Globals.Root.DocumentsCount - 1;
-			else
-				return Globals.Root.DocumentIndex > 0;
-		}
-	}
 	#endregion
 
 }

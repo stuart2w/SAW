@@ -12,7 +12,7 @@ namespace SAW
 		#region Information
 		public override Shapes ShapeCode => Shapes.Triangle;
 		protected override int FixedVerticesLength() => 3;
-		public override List<Prompt> GetPrompts() => base.GetBaseLinePrompts("Triangle", false);
+		internal override List<Prompt> GetPrompts() => base.GetBaseLinePrompts("Triangle", false);
 
 		#endregion
 
@@ -26,7 +26,7 @@ namespace SAW
 
 		public override PointF Centre => base.CalculateCentreFromPoints();
 
-		public override List<GrabSpot> GetGrabSpots(float scale)
+		internal override List<GrabSpot> GetGrabSpots(float scale)
 		{
 			List<GrabSpot> list = new List<GrabSpot>();
 			base.AddStandardRotationGrabSpot(list);
@@ -71,7 +71,7 @@ namespace SAW
 		#region Information
 		public override Shapes ShapeCode => Shapes.Isosceles;
 		public override AllowedActions Allows => base.Allows & ~AllowedActions.TransformLinearStretch;
-		public override List<Prompt> GetPrompts() => base.GetBaseLinePrompts("Isosceles", false);
+		internal override List<Prompt> GetPrompts() => base.GetBaseLinePrompts("Isosceles", false);
 
 		public override SnapModes SnapNext(SnapModes requested)
 		{
@@ -108,7 +108,7 @@ namespace SAW
 			return VerbResult.Continuing;
 		}
 
-		public override List<GrabSpot> GetGrabSpots(float scale)
+		internal override List<GrabSpot> GetGrabSpots(float scale)
 		{
 			List<GrabSpot> list = new List<GrabSpot>();
 			base.AddStandardRotationGrabSpot(list);
@@ -119,7 +119,7 @@ namespace SAW
 			return list;
 		}
 
-		protected override void DoGrabMove(GrabMovement move)
+		protected  internal override void DoGrabMove(GrabMovement move)
 		{
 			switch (move.GrabType)
 			{
@@ -159,7 +159,7 @@ namespace SAW
 			DiscardPath();
 		}
 
-		public override void DoGrabAngleSnap(GrabMovement move)
+		internal override void DoGrabAngleSnap(GrabMovement move)
 		{
 			if (move.GrabType == GrabTypes.SingleVertex)
 				move.Current.Snapped = Geometry.AngleSnapPoint(move.Current.Exact, Vertices[0]);
@@ -198,7 +198,7 @@ namespace SAW
 		#region Information
 		public override Shapes ShapeCode => Shapes.Equilateral;
 		public override AllowedActions Allows => base.Allows & ~AllowedActions.TransformLinearStretch;
-		public override List<Prompt> GetPrompts() => base.GetBaseLinePrompts("Equilateral", true);
+		internal override List<Prompt> GetPrompts() => base.GetBaseLinePrompts("Equilateral", true);
 		public override string StatusInformation(bool ongoing) => Strings.Item("Info_Edge") + ": " + Measure.FormatLength(Geometry.DistanceBetween(Vertices[0], Vertices[1]));
 
 		#endregion
@@ -229,7 +229,7 @@ namespace SAW
 			m_Bounds = CalculateBounds();
 		}
 
-		public override List<GrabSpot> GetGrabSpots(float scale)
+		internal override List<GrabSpot> GetGrabSpots(float scale)
 		{
 			List<GrabSpot> list = new List<GrabSpot>();
 			base.AddStandardRotationGrabSpot(list);
@@ -237,7 +237,7 @@ namespace SAW
 			return list;
 		}
 
-		protected override void DoGrabMove(GrabMovement move)
+		protected  internal override void DoGrabMove(GrabMovement move)
 		{
 			if (move.GrabType == GrabTypes.SingleVertex)
 			{
@@ -257,7 +257,7 @@ namespace SAW
 				base.DoGrabMove(move);
 		}
 
-		public override void DoGrabAngleSnap(GrabMovement move)
+		internal override void DoGrabAngleSnap(GrabMovement move)
 		{
 			if (move.GrabType == GrabTypes.SingleVertex)
 				move.Current.Snapped = Geometry.AngleSnapPoint(move.Current.Exact, Vertices[0]);

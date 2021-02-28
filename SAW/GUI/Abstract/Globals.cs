@@ -97,6 +97,15 @@ namespace SAW
 		/// This is used to notify smaller changes (eg during dragging) that might require an update of status panels</summary>
 		public static event NullEventHandler UpdateInfo;
 
+		public static event NullEventHandler RotationInfoChanged;
+
+		/// <summary>Fires event synchronously.  Used when current rotation point is changed, or the rotate about centres/point is changed
+		/// But not when page is changed (which implies a change of rotation point)</summary>
+		public static void OnRotationInfoChanged()
+		{
+			RotationInfoChanged?.Invoke();
+		}
+
 		#endregion
 
 		#region Misc functions
@@ -167,10 +176,10 @@ namespace SAW
 
 		#region Prompts
 		/// <summary>Fired when the requested list changes.  Param may be empty</summary>
-		public delegate void CurrentPromptsChangedEventHandler(List<Shape.Prompt> list);
+		internal delegate void CurrentPromptsChangedEventHandler(List<Shape.Prompt> list);
 		private static CurrentPromptsChangedEventHandler CurrentPromptsChangedEvent;
 
-		public static event CurrentPromptsChangedEventHandler CurrentPromptsChanged
+		internal static event CurrentPromptsChangedEventHandler CurrentPromptsChanged
 		{
 			add
 			{
@@ -189,7 +198,7 @@ namespace SAW
 		private static List<Shape.Prompt> m_HoverPrompts;
 
 		/// <summary>Displays prompts for current activity - not just mouse hovering over something</summary>
-		public static void DisplayPrompts(List<Shape.Prompt> prompts)
+		internal static void DisplayPrompts(List<Shape.Prompt> prompts)
 		{
 			if (prompts != null && prompts.Count > 0)
 				m_HoverPrompts = null;
@@ -197,19 +206,19 @@ namespace SAW
 			SetPrompts();
 		}
 
-		public static void SetHover(List<Shape.Prompt> prompts)
+		internal static void SetHover(List<Shape.Prompt> prompts)
 		{
 			m_HoverPrompts = prompts;
 			SetPrompts();
 		}
 
-		public static void ClearHover()
+		internal static void ClearHover()
 		{
 			m_HoverPrompts = null;
 			SetPrompts();
 		}
 
-		public static void SetHover(Action action)
+		internal static void SetHover(Action action)
 		{
 			Shape.Prompt prompt = action.GetPrompt();
 			if (prompt != null)
@@ -222,13 +231,13 @@ namespace SAW
 			SetPrompts();
 		}
 
-		public static void SetHoverPrompt(string textID, string imageID, string secondText = "")
+		internal static void SetHoverPrompt(string textID, string imageID, string secondText = "")
 		{
 			m_HoverPrompts = new List<Shape.Prompt> { new Shape.Prompt(Shape.ShapeVerbs.Info, textID, imageID, secondText) };
 			SetPrompts();
 		}
 
-		public static void SetHoverPrompt(Shape.Prompt prompt)
+		internal static void SetHoverPrompt(Shape.Prompt prompt)
 		{
 			m_HoverPrompts = new List<Shape.Prompt> { prompt };
 			SetPrompts();
@@ -244,13 +253,6 @@ namespace SAW
 				CurrentPromptsChangedEvent?.Invoke(m_ShapePrompts);
 		}
 
-		public static Shape.Prompt GetFirstHoverPrompt()
-		{
-			if (m_HoverPrompts == null || m_HoverPrompts.Count == 0)
-				return null;
-			return m_HoverPrompts[0];
-		}
-
 		#endregion
 
 		#region Parameter
@@ -263,7 +265,7 @@ namespace SAW
 
 		public static event NullEventHandler ApplicabilityChanged; // (of parameters) the parameter is not specified, as usually most will change at once
 
-		public delegate void ParameterChangedEventHandler(Parameters eParameter);
+		public delegate void ParameterChangedEventHandler(Parameters parameter);
 		public static event ParameterChangedEventHandler ParameterChanged;
 
 		/// <summary>Delayed notification that applicable keys may have changed.  Only sent on selection change and sometimes by individual shapes.</summary>
@@ -340,10 +342,17 @@ namespace SAW
 						return m_aApplicable[(int)eParameter];
 					else
 					{
-						Debug.Fail("Unexpected eParameter in View.ParameterApplicable");
+						Debug.Fail("Unexpected parameter in View.ParameterApplicable");
 						return true;
 					}
 			}
+		}
+
+		/// <summary>Will trigger the applicable changed event.  NOT USUALLY NEEDED - this usually happens automatically via setting applicability of a parameter</summary>
+		public static void OnApplicableChanged()
+		{
+			m_ApplicableChanged = true;
+			m_tmr.Enabled = true;
 		}
 
 		#endregion
@@ -362,7 +371,7 @@ namespace SAW
 			m_ParametersChanged.Clear();
 			foreach (Parameters parameter in parameters)
 			{
-				//Debug.WriteLine("Sending param change: " + eParameter.ToString)
+				//Debug.WriteLine("Sending param change: " + parameter.ToString)
 				ParameterChanged?.Invoke(parameter);
 			}
 			if (m_SettingsChanged)

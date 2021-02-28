@@ -14,19 +14,19 @@ namespace SAW
 			InitializeComponent();
 			Strings.Translate(this); // Must be before the values are assigned
 
-			List<Palette.Purpose> colList = new List<Palette.Purpose>();
+			List<Palette.Purpose> list = new List<Palette.Purpose>();
 			// we filter out a few purposes which aren't appropriate for user defined palettes
-			foreach (Palette.Purpose objPurpose in Palette.Purpose.PossiblePurposes)
+			foreach (Palette.Purpose purpose in Palette.Purpose.PossiblePurposes)
 			{
-				switch (objPurpose.Special)
+				switch (purpose.Special)
 				{
 					case Palette.Purpose.Specials.Sockets:
 					default:
-						colList.Add(objPurpose);
+						list.Add(purpose);
 						break;
 				}
 			}
-			cmbPurpose.DataSource = colList;
+			cmbPurpose.DataSource = list;
 			cmbPurpose.ValueMember = "Parameter"; // or "Special" - they are interchangeable
 			cmbPurpose.DisplayMember = "Name";
 		}
@@ -53,8 +53,8 @@ namespace SAW
 			Debug.Assert(!createFlow || !isDuplicate); // partly because the 2 controls are on top of each other.  But also it makes no sense for both of these to be true
 			form.chkFlow.Visible = createFlow;
 			form.lblDuplicate.Visible = isDuplicate;
-			DialogResult eResult = form.ShowDialog();
-			if (eResult == DialogResult.OK)
+			DialogResult result = form.ShowDialog();
+			if (result == DialogResult.OK)
 			{
 				purpose = new Palette.Purpose((int)form.cmbPurpose.SelectedValue);
 				title = form.txtTitle.Text;
@@ -62,7 +62,7 @@ namespace SAW
 				subtitle = form.txtSubTitle.Text;
 				createFlow = form.chkFlow.Checked;
 			}
-			return eResult;
+			return result;
 		}
 
 		public void txtName_TextChanged(object sender, EventArgs e)

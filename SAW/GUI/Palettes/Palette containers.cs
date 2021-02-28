@@ -449,7 +449,7 @@ namespace SAW
 		}
 	}
 
-	/// <summary>can be placed as the one control in an Accordion.  Used as the base class for most of the custom control palettes
+	/// <summary>Can be placed as the one control in an Accordion.  Used as the base class for most of the custom control palettes
 	/// Requires that MinimumSize is set in designer</summary>
 	public class PalettePanel : UserControl, IPalette
 	{
@@ -464,10 +464,10 @@ namespace SAW
 
 		public void Initialise()
 		{
-			foreach (Control objControl in this.Controls)
+			foreach (Control control in this.Controls)
 			{
-				objControl.GotFocus += SubControl_FocusChanged;
-				objControl.LostFocus += SubControl_FocusChanged;
+				control.GotFocus += SubControl_FocusChanged;
+				control.LostFocus += SubControl_FocusChanged;
 			}
 		}
 
@@ -567,6 +567,55 @@ namespace SAW
 					size = new Size(columnsHigh, rowsHigh);
 				return Math.Min(availableSpace.Width / size.Width, availableSpace.Height / size.Height);
 			}
+		}
+
+		#endregion
+
+		#region Support for explicit resize grip control (needed if other controls stretch to bottom right)
+
+		private PictureBox picSizeGrip;
+
+		protected PictureBox AddGripper() => AddGripper(new Size(16, 22));
+
+		protected PictureBox AddGripper(Size sz)
+		{
+			//((System.ComponentModel.ISupportInitialize)picSizeGrip).BeginInit();
+			picSizeGrip = new PictureBox
+			{
+				Dock = DockStyle.Fill,
+				Image = Resources.AM.SizeGrip_24,
+				Location = new Point(ClientSize.Width - sz.Width, ClientSize.Height - sz.Height),
+				Margin = new Padding(4, 4, 0, 0),
+				Name = "picSizeGrip",
+				Size = sz,
+				SizeMode = PictureBoxSizeMode.StretchImage,
+				TabIndex = 3,
+				TabStop = false,
+				Anchor = AnchorStyles.Bottom | AnchorStyles.Right
+			};
+
+			picSizeGrip.MouseDown += (s, e) =>
+			{
+				if (e.Button == MouseButtons.Left)
+					OnMouseDown(new MouseEventArgs(e.Button, 1, e.X + picSizeGrip.Left, e.Y + picSizeGrip.Top, e.Delta));
+			};
+			picSizeGrip.MouseMove += (s, e) => OnMouseMove(new MouseEventArgs(e.Button, 1, e.X + picSizeGrip.Left, e.Y + picSizeGrip.Top, e.Delta));
+			picSizeGrip.MouseUp += (s, e) =>
+			{
+				if (e.Button == MouseButtons.Left)
+					OnMouseUp(new MouseEventArgs(e.Button, 1, e.X + picSizeGrip.Left, e.Y + picSizeGrip.Top, e.Delta));
+			};
+			Controls.Add(picSizeGrip);
+			picSizeGrip.BringToFront();
+			//((System.ComponentModel.ISupportInitialize)picSizeGrip).EndInit();
+			return picSizeGrip;
+		}
+
+		protected override void Dispose(bool disposing)
+		{
+			base.Dispose(disposing);
+			picSizeGrip?.Dispose();
+			picSizeGrip = null;
 		}
 
 		#endregion

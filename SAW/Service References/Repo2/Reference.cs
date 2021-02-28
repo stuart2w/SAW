@@ -52,35 +52,35 @@ namespace SAW.Repo2 {
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/LastVersionB", ReplyAction="*")]
         System.Threading.Tasks.Task<SAW.Repo2.LastVersionBResponse> LastVersionBAsync(SAW.Repo2.LastVersionBRequest request);
         
-        // CODEGEN: Generating message contract since element name strSoftware from namespace http://tempuri.org/ is not marked nillable
+        // CODEGEN: Generating message contract since element name software from namespace http://tempuri.org/ is not marked nillable
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/VersionNeeds", ReplyAction="*")]
         SAW.Repo2.VersionNeedsResponse VersionNeeds(SAW.Repo2.VersionNeedsRequest request);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/VersionNeeds", ReplyAction="*")]
         System.Threading.Tasks.Task<SAW.Repo2.VersionNeedsResponse> VersionNeedsAsync(SAW.Repo2.VersionNeedsRequest request);
         
-        // CODEGEN: Generating message contract since element name strSoftware from namespace http://tempuri.org/ is not marked nillable
+        // CODEGEN: Generating message contract since element name software from namespace http://tempuri.org/ is not marked nillable
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/StoreError", ReplyAction="*")]
         SAW.Repo2.StoreErrorResponse StoreError(SAW.Repo2.StoreErrorRequest request);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/StoreError", ReplyAction="*")]
         System.Threading.Tasks.Task<SAW.Repo2.StoreErrorResponse> StoreErrorAsync(SAW.Repo2.StoreErrorRequest request);
         
-        // CODEGEN: Generating message contract since element name strSoftware from namespace http://tempuri.org/ is not marked nillable
+        // CODEGEN: Generating message contract since element name software from namespace http://tempuri.org/ is not marked nillable
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/Store", ReplyAction="*")]
         SAW.Repo2.StoreResponse Store(SAW.Repo2.StoreRequest request);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/Store", ReplyAction="*")]
         System.Threading.Tasks.Task<SAW.Repo2.StoreResponse> StoreAsync(SAW.Repo2.StoreRequest request);
         
-        // CODEGEN: Generating message contract since element name strSoftware from namespace http://tempuri.org/ is not marked nillable
+        // CODEGEN: Generating message contract since element name software from namespace http://tempuri.org/ is not marked nillable
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/Merge", ReplyAction="*")]
         SAW.Repo2.MergeResponse Merge(SAW.Repo2.MergeRequest request);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/Merge", ReplyAction="*")]
         System.Threading.Tasks.Task<SAW.Repo2.MergeResponse> MergeAsync(SAW.Repo2.MergeRequest request);
         
-        // CODEGEN: Generating message contract since element name strSoftware from namespace http://tempuri.org/ is not marked nillable
+        // CODEGEN: Generating message contract since element name software from namespace http://tempuri.org/ is not marked nillable
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/VerifyVersion", ReplyAction="*")]
         SAW.Repo2.VerifyVersionResponse VerifyVersion(SAW.Repo2.VerifyVersionRequest request);
         
@@ -441,21 +441,21 @@ namespace SAW.Repo2 {
     public partial class VersionNeedsRequestBody {
         
         [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
-        public string strSoftware;
+        public string software;
         
         [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=1)]
-        public string strProduct;
+        public string product;
         
         [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=2)]
-        public string strVersion;
+        public string version;
         
         public VersionNeedsRequestBody() {
         }
         
-        public VersionNeedsRequestBody(string strSoftware, string strProduct, string strVersion) {
-            this.strSoftware = strSoftware;
-            this.strProduct = strProduct;
-            this.strVersion = strVersion;
+        public VersionNeedsRequestBody(string software, string product, string version) {
+            this.software = software;
+            this.product = product;
+            this.version = version;
         }
     }
     
@@ -517,17 +517,17 @@ namespace SAW.Repo2 {
     public partial class StoreErrorRequestBody {
         
         [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
-        public string strSoftware;
+        public string software;
         
         [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=1)]
-        public byte[] aData;
+        public byte[] data;
         
         public StoreErrorRequestBody() {
         }
         
-        public StoreErrorRequestBody(string strSoftware, byte[] aData) {
-            this.strSoftware = strSoftware;
-            this.aData = aData;
+        public StoreErrorRequestBody(string software, byte[] data) {
+            this.software = software;
+            this.data = data;
         }
     }
     
@@ -582,21 +582,21 @@ namespace SAW.Repo2 {
     public partial class StoreRequestBody {
         
         [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
-        public string strSoftware;
+        public string software;
         
         [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=1)]
-        public string strFile;
+        public string file;
         
         [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=2)]
-        public byte[] aData;
+        public byte[] data;
         
         public StoreRequestBody() {
         }
         
-        public StoreRequestBody(string strSoftware, string strFile, byte[] aData) {
-            this.strSoftware = strSoftware;
-            this.strFile = strFile;
-            this.aData = aData;
+        public StoreRequestBody(string software, string file, byte[] data) {
+            this.software = software;
+            this.file = file;
+            this.data = data;
         }
     }
     
@@ -658,17 +658,17 @@ namespace SAW.Repo2 {
     public partial class MergeRequestBody {
         
         [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
-        public string strSoftware;
+        public string software;
         
         [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=1)]
-        public string strFile;
+        public string file;
         
         public MergeRequestBody() {
         }
         
-        public MergeRequestBody(string strSoftware, string strFile) {
-            this.strSoftware = strSoftware;
-            this.strFile = strFile;
+        public MergeRequestBody(string software, string file) {
+            this.software = software;
+            this.file = file;
         }
     }
     
@@ -723,25 +723,25 @@ namespace SAW.Repo2 {
     public partial class VerifyVersionRequestBody {
         
         [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
-        public string strSoftware;
+        public string software;
         
         [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=1)]
-        public string strProduct;
+        public string product;
         
         [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=2)]
-        public string strVersion;
+        public string version;
         
         [System.Runtime.Serialization.DataMemberAttribute(Order=3)]
-        public bool bolChecksum;
+        public bool checksum;
         
         public VerifyVersionRequestBody() {
         }
         
-        public VerifyVersionRequestBody(string strSoftware, string strProduct, string strVersion, bool bolChecksum) {
-            this.strSoftware = strSoftware;
-            this.strProduct = strProduct;
-            this.strVersion = strVersion;
-            this.bolChecksum = bolChecksum;
+        public VerifyVersionRequestBody(string software, string product, string version, bool checksum) {
+            this.software = software;
+            this.product = product;
+            this.version = version;
+            this.checksum = checksum;
         }
     }
     
@@ -1146,12 +1146,12 @@ namespace SAW.Repo2 {
             return base.Channel.VersionNeeds(request);
         }
         
-        public SAW.Repo2.ArrayOfString VersionNeeds(string strSoftware, string strProduct, string strVersion) {
+        public SAW.Repo2.ArrayOfString VersionNeeds(string software, string product, string version) {
             SAW.Repo2.VersionNeedsRequest inValue = new SAW.Repo2.VersionNeedsRequest();
             inValue.Body = new SAW.Repo2.VersionNeedsRequestBody();
-            inValue.Body.strSoftware = strSoftware;
-            inValue.Body.strProduct = strProduct;
-            inValue.Body.strVersion = strVersion;
+            inValue.Body.software = software;
+            inValue.Body.product = product;
+            inValue.Body.version = version;
             SAW.Repo2.VersionNeedsResponse retVal = ((SAW.Repo2.Repo2Soap)(this)).VersionNeeds(inValue);
             return retVal.Body.VersionNeedsResult;
         }
@@ -1161,12 +1161,12 @@ namespace SAW.Repo2 {
             return base.Channel.VersionNeedsAsync(request);
         }
         
-        public System.Threading.Tasks.Task<SAW.Repo2.VersionNeedsResponse> VersionNeedsAsync(string strSoftware, string strProduct, string strVersion) {
+        public System.Threading.Tasks.Task<SAW.Repo2.VersionNeedsResponse> VersionNeedsAsync(string software, string product, string version) {
             SAW.Repo2.VersionNeedsRequest inValue = new SAW.Repo2.VersionNeedsRequest();
             inValue.Body = new SAW.Repo2.VersionNeedsRequestBody();
-            inValue.Body.strSoftware = strSoftware;
-            inValue.Body.strProduct = strProduct;
-            inValue.Body.strVersion = strVersion;
+            inValue.Body.software = software;
+            inValue.Body.product = product;
+            inValue.Body.version = version;
             return ((SAW.Repo2.Repo2Soap)(this)).VersionNeedsAsync(inValue);
         }
         
@@ -1175,11 +1175,11 @@ namespace SAW.Repo2 {
             return base.Channel.StoreError(request);
         }
         
-        public void StoreError(string strSoftware, byte[] aData) {
+        public void StoreError(string software, byte[] data) {
             SAW.Repo2.StoreErrorRequest inValue = new SAW.Repo2.StoreErrorRequest();
             inValue.Body = new SAW.Repo2.StoreErrorRequestBody();
-            inValue.Body.strSoftware = strSoftware;
-            inValue.Body.aData = aData;
+            inValue.Body.software = software;
+            inValue.Body.data = data;
             SAW.Repo2.StoreErrorResponse retVal = ((SAW.Repo2.Repo2Soap)(this)).StoreError(inValue);
         }
         
@@ -1188,11 +1188,11 @@ namespace SAW.Repo2 {
             return base.Channel.StoreErrorAsync(request);
         }
         
-        public System.Threading.Tasks.Task<SAW.Repo2.StoreErrorResponse> StoreErrorAsync(string strSoftware, byte[] aData) {
+        public System.Threading.Tasks.Task<SAW.Repo2.StoreErrorResponse> StoreErrorAsync(string software, byte[] data) {
             SAW.Repo2.StoreErrorRequest inValue = new SAW.Repo2.StoreErrorRequest();
             inValue.Body = new SAW.Repo2.StoreErrorRequestBody();
-            inValue.Body.strSoftware = strSoftware;
-            inValue.Body.aData = aData;
+            inValue.Body.software = software;
+            inValue.Body.data = data;
             return ((SAW.Repo2.Repo2Soap)(this)).StoreErrorAsync(inValue);
         }
         
@@ -1201,12 +1201,12 @@ namespace SAW.Repo2 {
             return base.Channel.Store(request);
         }
         
-        public bool Store(string strSoftware, string strFile, byte[] aData) {
+        public bool Store(string software, string file, byte[] data) {
             SAW.Repo2.StoreRequest inValue = new SAW.Repo2.StoreRequest();
             inValue.Body = new SAW.Repo2.StoreRequestBody();
-            inValue.Body.strSoftware = strSoftware;
-            inValue.Body.strFile = strFile;
-            inValue.Body.aData = aData;
+            inValue.Body.software = software;
+            inValue.Body.file = file;
+            inValue.Body.data = data;
             SAW.Repo2.StoreResponse retVal = ((SAW.Repo2.Repo2Soap)(this)).Store(inValue);
             return retVal.Body.StoreResult;
         }
@@ -1216,12 +1216,12 @@ namespace SAW.Repo2 {
             return base.Channel.StoreAsync(request);
         }
         
-        public System.Threading.Tasks.Task<SAW.Repo2.StoreResponse> StoreAsync(string strSoftware, string strFile, byte[] aData) {
+        public System.Threading.Tasks.Task<SAW.Repo2.StoreResponse> StoreAsync(string software, string file, byte[] data) {
             SAW.Repo2.StoreRequest inValue = new SAW.Repo2.StoreRequest();
             inValue.Body = new SAW.Repo2.StoreRequestBody();
-            inValue.Body.strSoftware = strSoftware;
-            inValue.Body.strFile = strFile;
-            inValue.Body.aData = aData;
+            inValue.Body.software = software;
+            inValue.Body.file = file;
+            inValue.Body.data = data;
             return ((SAW.Repo2.Repo2Soap)(this)).StoreAsync(inValue);
         }
         
@@ -1230,11 +1230,11 @@ namespace SAW.Repo2 {
             return base.Channel.Merge(request);
         }
         
-        public void Merge(string strSoftware, string strFile) {
+        public void Merge(string software, string file) {
             SAW.Repo2.MergeRequest inValue = new SAW.Repo2.MergeRequest();
             inValue.Body = new SAW.Repo2.MergeRequestBody();
-            inValue.Body.strSoftware = strSoftware;
-            inValue.Body.strFile = strFile;
+            inValue.Body.software = software;
+            inValue.Body.file = file;
             SAW.Repo2.MergeResponse retVal = ((SAW.Repo2.Repo2Soap)(this)).Merge(inValue);
         }
         
@@ -1243,11 +1243,11 @@ namespace SAW.Repo2 {
             return base.Channel.MergeAsync(request);
         }
         
-        public System.Threading.Tasks.Task<SAW.Repo2.MergeResponse> MergeAsync(string strSoftware, string strFile) {
+        public System.Threading.Tasks.Task<SAW.Repo2.MergeResponse> MergeAsync(string software, string file) {
             SAW.Repo2.MergeRequest inValue = new SAW.Repo2.MergeRequest();
             inValue.Body = new SAW.Repo2.MergeRequestBody();
-            inValue.Body.strSoftware = strSoftware;
-            inValue.Body.strFile = strFile;
+            inValue.Body.software = software;
+            inValue.Body.file = file;
             return ((SAW.Repo2.Repo2Soap)(this)).MergeAsync(inValue);
         }
         
@@ -1256,13 +1256,13 @@ namespace SAW.Repo2 {
             return base.Channel.VerifyVersion(request);
         }
         
-        public string VerifyVersion(string strSoftware, string strProduct, string strVersion, bool bolChecksum) {
+        public string VerifyVersion(string software, string product, string version, bool checksum) {
             SAW.Repo2.VerifyVersionRequest inValue = new SAW.Repo2.VerifyVersionRequest();
             inValue.Body = new SAW.Repo2.VerifyVersionRequestBody();
-            inValue.Body.strSoftware = strSoftware;
-            inValue.Body.strProduct = strProduct;
-            inValue.Body.strVersion = strVersion;
-            inValue.Body.bolChecksum = bolChecksum;
+            inValue.Body.software = software;
+            inValue.Body.product = product;
+            inValue.Body.version = version;
+            inValue.Body.checksum = checksum;
             SAW.Repo2.VerifyVersionResponse retVal = ((SAW.Repo2.Repo2Soap)(this)).VerifyVersion(inValue);
             return retVal.Body.VerifyVersionResult;
         }
@@ -1272,13 +1272,13 @@ namespace SAW.Repo2 {
             return base.Channel.VerifyVersionAsync(request);
         }
         
-        public System.Threading.Tasks.Task<SAW.Repo2.VerifyVersionResponse> VerifyVersionAsync(string strSoftware, string strProduct, string strVersion, bool bolChecksum) {
+        public System.Threading.Tasks.Task<SAW.Repo2.VerifyVersionResponse> VerifyVersionAsync(string software, string product, string version, bool checksum) {
             SAW.Repo2.VerifyVersionRequest inValue = new SAW.Repo2.VerifyVersionRequest();
             inValue.Body = new SAW.Repo2.VerifyVersionRequestBody();
-            inValue.Body.strSoftware = strSoftware;
-            inValue.Body.strProduct = strProduct;
-            inValue.Body.strVersion = strVersion;
-            inValue.Body.bolChecksum = bolChecksum;
+            inValue.Body.software = software;
+            inValue.Body.product = product;
+            inValue.Body.version = version;
+            inValue.Body.checksum = checksum;
             return ((SAW.Repo2.Repo2Soap)(this)).VerifyVersionAsync(inValue);
         }
         

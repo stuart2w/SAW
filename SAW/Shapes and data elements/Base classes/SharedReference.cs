@@ -64,16 +64,10 @@ namespace SAW
 			m_id = m_Data?.ID ?? Guid.Empty;
 		}
 
-		public static implicit operator SharedReference<T>(T data)
-		{
-			if (data == null)
-				return null;
-			return new SharedReference<T>(data);
-		}
+		public static implicit operator SharedReference<T>(T data) => data == null ? null : new SharedReference<T>(data);
 
 		/// <summary>Mainly intended to allow foo?.HasImage which will also be false if foo == null</summary>
-		public bool HasContent
-		{ get { return m_Data != null; } }
+		public bool HasContent => m_Data != null;
 
 		public static bool ReferencesAreEqual(SharedReference<T> a, SharedReference<T> b)
 		{
@@ -97,7 +91,7 @@ namespace SAW
 		{
 			if (m_Data == null)
 				return m_id.ToString();
-			return m_Data.GetType() + " (" + m_id + ")";
+			return $"{m_Data.GetType()} ({m_id})";
 		}
 
 	}

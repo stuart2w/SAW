@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 namespace SAW.Functions
 {
+
 	#region Verb enum
 
 	public enum Codes
@@ -27,8 +28,6 @@ namespace SAW.Functions
 		Start,
 		Quit = 17,
 		CloseDocument = 19, // will return to menu unless multiples
-		NextDocument = 21, // only when viewing a sequence of documents
-		PreviousDocument,
 		ExportSVG = 24,
 
 		Undo = 100, // edits...
@@ -51,10 +50,14 @@ namespace SAW.Functions
 		QuickAddButtons,
 		FreeTextToTextLine,
 		ConvertToPath = 124,
-		MoveToPixels,
-		TypeDegree,
-		MakeChild,
+		//MoveToPixels,
+		//TypeDegree,
+		MakeChild = 127,
 		MoveOutOfContainer,
+		ToggleBold=129,
+		ToggleUnderline,
+		ToggleItalic,
+
 
 		AlignLeft = 150, // edits, alignment
 		AlignCentre,
@@ -89,6 +92,8 @@ namespace SAW.Functions
 		ConvertToBezier,
 		SmoothVertex,
 		CornerVertex,
+		MakeMask,
+		RemoveMask,
 
 		ZoomIn = 200, // options
 		ZoomOut,
@@ -96,14 +101,16 @@ namespace SAW.Functions
 		ZoomPage,
 		ZoomWidth,
 		ConfigUser,
-		ConfigDocument,
+		//ConfigDocument,
 		UserUser = 208,
+		/// <summary>Display in edit mode - name is left over from Splash </summary>
 		UserTeacher,
 		StoreStylesAsDefault = 211,
 		ClearDefaultStyles,
 		ResetPalettes,
 		StoreStylesAsUserDefault = 215,
-		TogglePrompts=218,
+		TogglePrompts = 218,
+		ToggleFullScreen = 219,
 
 		PageNext = 300, // not implemented on the menu as a Verb_ because the name changes
 		PagePrevious,
@@ -117,10 +124,9 @@ namespace SAW.Functions
 		PageSize,
 		SetOrigin,
 		PageDuplicate,
-		DeletePixels,
+		//DeletePixels,
 
 		// 400 used above
-#if SAW
 		StartupScript = 500,
 		DefaultItemScript,
 		DefaultEscapeScript,
@@ -149,7 +155,11 @@ namespace SAW.Functions
 		LoadSettings,
 		ImportIRM,
 		ExportIRM,
-#endif
+		MakeActive,
+		MakeInactive,
+		IncludeTextInRotation,
+		SAWManual,
+		YoctoTest,
 
 		// any verb over 1000 does not (automatically) abandon any ongoing shape
 		Choose = 1000, // Drawing shapes...
@@ -232,7 +242,7 @@ namespace SAW.Functions
 			return GUIUtilities.VariableSizeImageResourceID("Verb", "_" + Code, size);
 		}
 
-		public override Shape.Prompt GetPrompt()
+		internal override Shape.Prompt GetPrompt()
 		{
 			// These use the verb name as the first text, and a second, longer, custom item as the second text
 			// the prompt is only displayed if that custom text is defined
@@ -241,6 +251,8 @@ namespace SAW.Functions
 				return new Shape.Prompt(Shape.ShapeVerbs.Info, "Verb_" + Code, "Verb_" + Code, text);
 			return null;
 		}
+
+		//public override string ToString() => "Verb: " +Code;
 
 		#endregion
 
@@ -256,6 +268,7 @@ namespace SAW.Functions
 			ObjectEdits.RegisterVerbs();
 			OptionsVerbs.RegisterVerbs();
 			PageVerbs.RegisterVerbs();
+			AdvancedGraphics.RegisterVerbs();
 		}
 
 		private static Dictionary<Codes, Verb> g_List = new Dictionary<Codes, Verb>();

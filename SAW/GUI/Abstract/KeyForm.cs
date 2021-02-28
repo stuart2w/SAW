@@ -70,11 +70,11 @@ namespace SAW
 			// note e may not be the event sent by Windows; so changing Handled or SuppressKeyPress won't always do much
 			// IF DOWN KEYS AREN'T ARRIVING FOR SPECIAL KEYS (cursors, etc) - check that controls all implement IsInputKey for relevant keys
 			Control current = GUIUtilities.GetFocusControl();
-			if (current is TextBoxAllKeys)
-			{
-				e.Handled = false;
-				return;
-			}
+			//if (current is TextBoxAllKeys)
+			//{
+			//	e.Handled = false;
+			//	return;
+			//}
 			m_PendingDown = null;
 #if DEBUG
 			if (down)
@@ -86,6 +86,8 @@ namespace SAW
 #endif
 			while (current != null && e.Handled == false)
 			{
+				if (e.DoNotHandle)// shouldn't really be set on first pass, but just in case
+					return;
 				if (current is IKeyControl control)
 				{
 					if (down)
@@ -101,9 +103,9 @@ namespace SAW
 						e.Handled = true;
 					}
 				}
-				if (current.Parent == null && current is Form)
+				if (current.Parent == null && current is Form form)
 					// .Parent doesn't follow form ownership - doing this ensures that we end up back here, which is essential for misc control keys to work
-					current = ((Form)current).Owner;
+					current = form.Owner;
 				else
 					current = current.Parent;
 			}

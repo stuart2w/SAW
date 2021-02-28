@@ -17,7 +17,7 @@ namespace SAW
 				{
 					g_Blade = new Blade.Engine();
 					g_Instance = new BladeWrapper();
-					g_Blade.Initialise(Globals.Root.SharedFolder + "\\basedata-%lang%.bin", g_Instance);
+					g_Blade.Initialise(Globals.Root.EXEFolder + "\\basedata-%lang%.bin", g_Instance);
 				}
 				return g_Blade;
 			}
@@ -26,7 +26,7 @@ namespace SAW
 		// blade callbacks
 		void INotification.Notify(Notification state)
 		{
-			Debug.WriteLine("Blade notification: " + state);
+			Globals.Root.Log.WriteLine("Blade notification: " + state);
 		}
 
 		bool INotification.Learning(string text)

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Windows.Forms;
@@ -9,6 +10,7 @@ namespace SAW
 {
 	public static class ContextMenuTools
 	{
+
 		#region creating and initialising for first time
 		/// <summary>Sets tag and text based on an action deduced from initial tag OR text </summary>
 		public static void InitialiseMenu(MenuStrip strip)
@@ -32,9 +34,9 @@ namespace SAW
 		public static void InitialiseMenu(ToolStripMenuItem item)
 		{
 			string tag = null;
-			if (item.Tag is string && item.Tag.ToString() != "")
-				tag = (string)item.Tag;
-			else if (item.Text.StartsWith("[Verb_") && item.Text.EndsWith("]"))
+			if (item.Tag is string stringTag && stringTag != "")
+				tag = stringTag;
+			else if (item.Text.StartsWith("[Verb_") && item.Text.EndsWith("]")) // if text is a translation code for a verb, then the tag is inferred
 				tag = item.Text.Substring(1, item.Text.Length - 2).Replace("Verb_", "Verb/");
 			if (!string.IsNullOrEmpty(tag))
 			{
@@ -123,6 +125,7 @@ namespace SAW
 				intoCollection.RemoveAt(intoCollection.Count - 1); // don't allow a separate at the end
 			return added;
 		}
+
 		#endregion
 
 		#region Updating state before display
@@ -133,15 +136,13 @@ namespace SAW
 			{
 				foreach (ToolStripItem sub in item.DropDownItems)
 				{
-					if (sub is ToolStripMenuItem)
+					if (sub is ToolStripMenuItem menuItem)
 					{
-						ToolStripMenuItem menuItem = (ToolStripMenuItem)sub;
-						if (menuItem.Tag is Action)
+						if (menuItem.Tag is Action action)
 						{
-							Action objAction = (Action)menuItem.Tag;
-							if (!objAction.IsEmpty)
+							if (!action.IsEmpty)
 							{
-								Keys key = Globals.Root.CurrentConfig.GetFirstKeyForAction(objAction);
+								Keys key = Globals.Root.CurrentConfig.GetFirstKeyForAction(action);
 								if (key != Keys.None)
 									menuItem.ShortcutKeyDisplayString = GUIUtilities.KeyDescription(key);
 								else
@@ -164,16 +165,15 @@ namespace SAW
 		{
 			// This is roughly copied from frmMain.Menu_Open, but modified.  (Not easy to share the code as the menu is to not have a shared base type with the Items collection)
 			// This is only used for the top-level menu.  Menu_Open is triggered for submenus and works as normal
-			foreach (var sub in mnu.Items.OfType<ToolStripMenuItem>())
+			foreach (ToolStripMenuItem sub in mnu.Items.OfType<ToolStripMenuItem>())
 			{
-				if (sub.Tag is Action)
+				if (sub.Tag is Action tag)
 				{
-					Action tag = (Action)sub.Tag;
-					var applicable = Globals.ActionApplicable(tag);
+					bool applicable = Globals.ActionApplicable(tag);
 					sub.Enabled = applicable; // The enabled flag is set even if the item is hidden (it's easier this way, and makes no difference)
-					sub.Visible = applicable || !tag.HideFromContextMenuIfUnavailable;
-					if (tag is ParameterAction) // i.e. genuine parameter
-						sub.Checked = Globals.ParameterValue(tag.Change) == (tag as ParameterAction).Value;
+					sub.Visible = (applicable || !tag.HideFromContextMenuIfUnavailable) && !string.IsNullOrWhiteSpace(sub.Text); // last condition needed for DoubleClick entry - which can have empty text meaning it is available, but omitted from menu
+					if (tag is ParameterAction parameterAction) // i.e. genuine parameter
+						sub.Checked = Globals.ParameterValue(parameterAction.Change) == parameterAction.Value;
 				}
 			}
 		}
@@ -190,17 +190,16 @@ namespace SAW
 				switch (action.Code)
 				{
 					case Codes.DoubleClick:
-						var strText = "";
-						var selection = Globals.Root.CurrentPage.SelectedShapes;
+						string text = "";
+						List<Shape> selection = Globals.Root.CurrentPage.SelectedShapes;
 						if (selection.Count >= 1 && selection.First().CanDoubleClickWith(selection))
-							strText = selection.First().DoubleClickText();
-						mnu.Text = strText;
-						mnu.Visible = !string.IsNullOrEmpty(strText);
+							text = selection.First().DoubleClickText();
+						mnu.Text = text;
+						mnu.Visible = !string.IsNullOrEmpty(text);
 						break;
 					case Codes.FreeTextToTextLine:
 					case Codes.ConvertToPath:
-					case Codes.MoveToPixels:
-					case Codes.DeletePixels:
+					case Codes.CCFUpdate:
 						// these are rare enough to hide unless allowed (actually only appears on the main edit menu)
 						mnu.Visible = Globals.VerbApplicable(action.Code);
 						break;

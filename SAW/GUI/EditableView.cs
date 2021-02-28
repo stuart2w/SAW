@@ -12,6 +12,7 @@ namespace SAW
 	{
 		// the complete document view class which supports all editing
 
+		#region Events
 		public event ShapeEventHandler ChangeDiagnostic; // causes the containing form to display diagnostic info for this shape
 		public event ShapeEventHandler DisplayShapeStyles;
 		public event ShapeEventHandler ApplyDefaultStyles;
@@ -34,7 +35,7 @@ namespace SAW
 		public delegate void RequestPaletteExclusionHandler(Rectangle screen);
 
 		public event RequestPaletteExclusionHandler RequestPaletteExclusion;
-
+		#endregion
 
 		// MORE MEMBERS WITHIN REGIONS
 		/// <summary>shape being placed; not currently on page</summary>
@@ -107,8 +108,6 @@ namespace SAW
 		public override void DisplayPage(Page page, Document document)
 		{
 			if (m_Page != null)
-				m_Page.SelectionChanged -= m_Page_SelectionChanged_Editable;
-			if (m_Page != null)
 				ConcludeOngoing();
 			base.DisplayPage(page, document);
 
@@ -127,9 +126,6 @@ namespace SAW
 			Cursor = Cursors.Default; // will be Hand if displaying a prompt page
 			if (page != null)
 				Focus();
-
-			if (m_Page != null)
-				m_Page.SelectionChanged += m_Page_SelectionChanged_Editable;
 		}
 
 		private void PageSizeChanged()
@@ -151,13 +147,6 @@ namespace SAW
 			m_PromptsDirty = false;
 			m_TypingTransaction = null;
 			base.EndDisplayPage(); // This clears m_Page, so mustn't be done first
-		}
-
-		protected override void RemovePageHandlers()
-		{
-			if (m_Page != null)
-				m_Page.SelectionChanged -= m_Page_SelectionChanged_Editable;
-			base.RemovePageHandlers();
 		}
 
 		#region Public information and properties
@@ -225,7 +214,7 @@ namespace SAW
 			}
 			else if (e.KeyCode == Keys.ControlKey && IsSingleSelector)
 			{
-				InvalidateData(ForceUpdateGrabSpots(), InvalidationBuffer.Selection);
+				ForceUpdateGrabSpots();
 				// changing the control key can change which GrabSpots are shown (e.g. in container)
 			}
 			else if (e.KeyCode == Keys.Apps && Globals.Root.CurrentConfig.ReadBoolean(Config.Context_Menus))
@@ -261,7 +250,7 @@ namespace SAW
 		public void CombinedKeyUp(CombinedKeyEvent e)
 		{
 			if (e.KeyCode == Keys.ControlKey && IsSingleSelector)
-				InvalidateData(ForceUpdateGrabSpots(), InvalidationBuffer.Selection);
+				ForceUpdateGrabSpots();
 		}
 
 		// not sure why this is separate from DoVerbResult - escape in 100G goes there for example, and never here
@@ -327,7 +316,6 @@ namespace SAW
 					handled = true; // this is only returned if the key has been processed
 					Geometry.Extend(ref previousBounds, shp.RefreshBounds());
 					InvalidateData(previousBounds, InvalidationBuffer.All);
-					m_Page.UpdateIntersectionsWith(shp, true);
 					if (m_Status == Status.Waiting)
 						UpdateDiagnostic();
 					break;
@@ -476,9 +464,6 @@ namespace SAW
 
 		private DateTime m_tmPreviousClick = DateTime.MinValue;
 
-		/// <summary>Used only with Advanced_Graphics this indicates which part of a path was selected (currently only by using right click)</summary>
-		private Target m_PathTarget;
-
 		private void EditableView_MouseDown(object sender, MouseEventArgs e)
 		{
 			// If not yet creating a shape we can use the following edge of the mouse as the trigger for the Start command
@@ -570,10 +555,7 @@ namespace SAW
 				if (m_Page.SelectedCount == 1 && m_Page.SelectedShapes[0].AllowVerbWhenComplete(Codes.Cancel))
 					TriggerVerb(Codes.Cancel, ClickPosition.Sources.Mouse);
 				else if (Globals.Root.CurrentConfig.ReadBoolean(Config.Context_Menus))
-				{
-					// we can have a context menu in teacher mode
 					TriggerContextMenu(target, e.Location);
-				}
 			}
 			m_DragMode = false;
 			UpdateDiagnostic();
@@ -581,29 +563,20 @@ namespace SAW
 
 		public void TriggerContextMenu(ClickPosition target, Point location)
 		{
-			if (m_Page.SelectedCount == 0 || !m_Page.SelectedShapes.First().Bounds.Contains(target.Exact))
+			Shape firstSelected = m_Page.SelectedShapes.FirstOrDefault();
+			if (m_Page.SelectedCount == 0 || !firstSelected.Bounds.Contains(target.Exact))
 			{
 				// if nothing is selected, or we haven't clicked within the selected shape, then we try to select what is under the current click
 				// so right-clicking can change selection (people expect menu to act on what is clicked on, and mechanism for that is to change selection - this is normal for other software)
 				// however... only want to change selection if something was clicked on (dont want to change from something selected to nothing selected)
 				// ie right-clicking on background will act on selection rather than clicked-item (none).   therefore check that first...
-				var hit = m_Page.HitTest(target.Exact, m_Zoom, Page.HitTestMode.StartFront);
+				Shape hit = m_Page.HitTest(target.Exact, m_Zoom, Page.HitTestMode.StartFront);
 				if (hit != null)
-				{
 					SelectorClick(target, false);
-					// TriggerVerb(Verbs.Choose, ClickPosition.Sources.Mouse) - bad idea!  does something silly if F9 not selected!
-				}
 			}
-			if (m_Page.SelectedCount == 1) // See if we can select a particular vertex/line
-			{
-				var col = m_Page.SelectedShapes.First().GenerateTargets(UserSocket.CreateForPoint(target.Exact));
-				if (col != null)
-					m_PathTarget = (from t in col where (t.Type == Target.Types.Vertex || t.Type == Target.Types.Line) && t.ActualDistance < 3 orderby t.ActualDistance select t).FirstOrDefault();
-				else
-					m_PathTarget = null;
-				// Has selected the closest line or vertex target (not interested in intersections and such)
-				// Requires that the click is within 3 mm
-			}
+			else if (m_Page.SelectedCount == 1 && (target.Source == ClickPosition.Sources.Mouse && firstSelected.Bounds.Contains(target.Exact)
+					 || HitTestGrabSpots(target.Exact)?.Shape == firstSelected))
+				SelectOnly(firstSelected, target.Exact); // can update the selected vertex/line
 			DisplayContextMenu?.Invoke(location);
 		}
 
@@ -617,7 +590,7 @@ namespace SAW
 			if (m_GrabMove != null)
 			{
 				// already moving a grab spot - works whether drag or move version
-				MoveGrab(target, false); // does invalidation internally
+				MoveGrab(target); // does invalidation internally
 				return;
 			}
 			// check for starting some sort of drag...
@@ -648,7 +621,7 @@ namespace SAW
 							Codes.None); // will ignore grid.  Last param bogus - there is no float verb; but only used for Custom response anyway
 					}
 				}
-				else if (e.Button == MouseButtons.Left && m_CurrentShape == null && m_OriginalClickPoint != null && m_Tool != Shape.Shapes.Label)
+				else if (e.Button == MouseButtons.Left && m_CurrentShape == null && m_OriginalClickPoint != null)
 				{
 					{
 						TriggerStart(m_OriginalClickPoint, false); // this would have happened on mouse up, but need to do it immediately so we can start dragging
@@ -659,8 +632,6 @@ namespace SAW
 					}
 				}
 			}
-			else if (m_Status == Status.Waiting && m_CurrentShape == null && Shape.AutostartType(EffectiveTool))
-				TriggerStart(target, false); // The current tool needs to create a shape before the user first clicks
 			DoCursorMove(target, false);
 		}
 
@@ -702,7 +673,7 @@ namespace SAW
 					Geometry.Extend(ref invalidArea, m_CurrentShape.RefreshBounds());
 				//rctInvalid.Inflate(10, 10) ' what is this for?!
 				if (m_CurrentShape.GetClass() == Shape.Classes.Real)
-					UpdateTargetHover(m_CurrentShape.Middle());
+					UpdateTargetHover(m_CurrentShape.Middle(), m_CurrentShape);
 				UpdateDiagnostic();
 			}
 			ActiveGrabSpot = HitTestGrabSpots(target.Exact);
@@ -773,6 +744,7 @@ namespace SAW
 			public Shape.SnapModes RequestedSnap; // current user config
 			public Page Page; // the page on which we are working
 			public float Zoom; // the scale factor of the editing window where the click occurred.  Only occasionally used; can adjust tolerances slightly
+			/// <summary>The view the click was within.  Not defined in some other uses of this</summary>
 			public StaticView View;
 			public Transaction Transaction; // only created sometimes
 			public bool WasFocused = true;
@@ -842,6 +814,7 @@ namespace SAW
 				// Only used for diagnostic events
 				return Exact + " from " + Source;
 			}
+
 		}
 
 		#endregion
@@ -891,9 +864,10 @@ namespace SAW
 		/// <summary>Changes m_shpContainerHover.  Forces repaint within the current layer internally</summary>
 		/// <param name="pt">The reference point - usually the mouse position, but is the middle of the shape if it is being newly created.</param>
 		/// <remarks>Caller is probably doing its own invalidation, but seems more efficient to make a separate Invalidate call here, because this is probably affecting fewer buffers</remarks>
-		private void UpdateTargetHover(PointF pt)
+		private void UpdateTargetHover(PointF pt, Shape forShape = null)
 		{
-			Shape hover = (Shape)m_Page.FindTarget(pt, m_Page.SelectedShapes);
+			List<Shape> forList = forShape == null ? m_Page.SelectedShapes : new List<Shape>() { forShape };
+			Shape hover = (Shape)m_Page.FindTarget(pt, forList);
 			RectangleF refreshBounds = RectangleF.Empty;
 			if (m_TargetHover != null)
 				refreshBounds = m_TargetHover.RefreshBounds();
@@ -971,7 +945,10 @@ namespace SAW
 			m_ActionIsKeyboard = keyCursor;
 			m_OngoingTransaction = new Transaction();
 			if (m_GrabSpotHit != null)
+			{
 				m_GrabMove = new Shape.GrabMovement(m_GrabSpotHit, m_Page, m_SnapMode, m_OngoingTransaction);
+				m_Page.SelectPathOnShape(shape, Target.FromGrabSpot(m_GrabSpotHit));
+			}
 			else
 			{
 				if (shape != null) // Allow the shape the first opportunity to do some custom action (this only applies if no actual GrabSpot was clicked on)
@@ -998,7 +975,7 @@ namespace SAW
 			//List<Shape> shapes = new List<Shape>(); 
 			foreach (Shape shp in m_Page.SelectedShapes)
 			{
-				var use = shp;
+				Shape use = shp;
 				m_OngoingTransaction.Edit(use);
 				//shapes.Add(use);
 				if (!use.StartGrabMove(m_GrabMove))
@@ -1007,42 +984,16 @@ namespace SAW
 					return;
 				}
 			}
-			RectangleF bounds = m_Page.SelectedBounds(true);
-			switch (m_GrabMove.GrabType)
+
+			if (m_GrabMove.GrabType == Shape.GrabTypes.BezierInactive)
 			{
-				case Shape.GrabTypes.Move:
-				case Shape.GrabTypes.SingleVertex:
-				case Shape.GrabTypes.Invisible:
-				case Shape.GrabTypes.Bezier:
-					m_GrabMove.Transform = new TransformMove(Transformation.Modes.Move);
-					break;
-				case Shape.GrabTypes.Rotate:
-					m_GrabMove.Transform = TransformRotate.CreateForGrabMove(m_GrabSpotHit.Focus, m_GrabMove.Position);
-					break;
-				case Shape.GrabTypes.Radius:
-					m_GrabMove.Transform = TransformScale.CreateForGrabMove(m_GrabSpotHit.Focus, m_GrabMove.Position);
-					break;
-				case Shape.GrabTypes.CornerResize:
-					PointF focus1 = new PointF(bounds.Right - m_GrabSpotHit.Position.X + bounds.X, bounds.Bottom - m_GrabSpotHit.Position.Y + bounds.Y);
-					m_GrabMove.Transform = TransformScale.CreateForGrabMove(focus1, m_GrabSpotHit.Position);
-					break;
-				case Shape.GrabTypes.EdgeMoveV:
-				case Shape.GrabTypes.EdgeMoveH:
-					PointF focus = new PointF(bounds.Right - m_GrabSpotHit.Position.X + bounds.X, bounds.Bottom - m_GrabSpotHit.Position.Y + bounds.Y);
-					// ptFocus can be deduced by subtracting in both directions because the direction which not move will be halfway across the shape, so subtracting will just return the original position
-					m_GrabMove.Transform = TransformLinearScale.CreateForGrabMove(focus, m_GrabSpotHit.Position);
-					break;
-				case Shape.GrabTypes.TextSelection:
-					m_GrabMove.Transform = null;
-					break;
-				case Shape.GrabTypes.BezierInactive: // this doesn't actually do any dragging, rather it prompts to convert to a path
-					AbortGrab();
-					if (MessageBox.Show(Strings.Item("ConvertPath_Auto"), RootApplication.AppName, MessageBoxButtons.YesNo) == DialogResult.Yes)
-						Globals.Root.PerformAction(Verb.Find(Codes.ConvertToPath));
-					return;
-				default:
-					throw new ArgumentException("GrabType");
+				AbortGrab();
+				if (MessageBox.Show(Strings.Item("ConvertPath_Auto"), RootApplication.AppName, MessageBoxButtons.YesNo) == DialogResult.Yes)
+					Globals.Root.PerformAction(Verb.Find(Codes.ConvertToPath));
+				return;
 			}
+			m_GrabMove.SetGrabMoveTransform(m_Page, m_GrabSpotHit);
+
 			if (m_GrabMove.GrabType == Shape.GrabTypes.Move && m_SnapMode == Shape.SnapModes.Angle)
 				InvalidateAll(InvalidationBuffer.Current); // for the guidelines to give feedback that it is orthogonal
 			m_Page.MovingSelection = m_GrabMove.UseMovingLogic;
@@ -1059,7 +1010,7 @@ namespace SAW
 			m_OngoingTransaction = null;
 		}
 
-		private void MoveGrab(ClickPosition position, bool keyCursor)
+		private void MoveGrab(ClickPosition position)
 		{
 			//Debug.WriteLine("MoveGrab");
 			// mouse moved during adjustment via grab point
@@ -1137,9 +1088,9 @@ namespace SAW
 				}
 			}
 			m_GrabMove.Transform?.SetGrabTransform(m_GrabMove.PositionGridSnapped, position.Snapped);
-			foreach (Shape shp in m_Page.SelectedShapes)
+			foreach (Shape shape in m_Page.SelectedShapes)
 			{
-				shp.GrabMove(m_GrabMove);
+				shape.GrabMove(m_GrabMove);
 			}
 			if (performShapeSnap)
 			{
@@ -1163,9 +1114,9 @@ namespace SAW
 					RectangleF originalBounds = new RectangleF(); // calculate the original total bounds, to get the original centre of these shapes
 					foreach (Shape shape in m_Page.SelectedShapes)
 					{
-						var colForShape = shape.GetPointsWhichSnapWhenMoving(); // can be nothing to mean no such points
-						if (colForShape != null)
-							vertices.AddRange(colForShape);
+						List<UserSocket> socketsForShape = shape.GetPointsWhichSnapWhenMoving(); // can be nothing to mean no such points
+						if (socketsForShape != null)
+							vertices.AddRange(socketsForShape);
 						Geometry.Extend(ref originalBounds, m_GrabMove.OriginalShape(shape).Bounds);
 					}
 					currentCentre = m_Page.SelectedBounds(false).Centre();
@@ -1178,9 +1129,9 @@ namespace SAW
 					if (((TransformMove)m_GrabMove.Transform).Snap(vertices, m_Zoom, m_Page, singleShape, originalCentre, currentCentre))
 					{
 						// the transform will have updated itself.  We need to apply it to the shapes again however
-						foreach (Shape shp in m_Page.SelectedShapes)
+						foreach (Shape shape in m_Page.SelectedShapes)
 						{
-							shp.GrabMove(m_GrabMove);
+							shape.GrabMove(m_GrabMove);
 						}
 					}
 				}
@@ -1258,10 +1209,6 @@ namespace SAW
 					else
 						((IShapeContainer)m_TargetHover).FinishedModifyingContents(m_OngoingTransaction); // Flow, for example, needs to update positions now that DoGrabTransform has corrupted them
 				}
-			}
-			foreach (Shape shp in m_Page.SelectedShapes) // deliberately doesn't use colShapes don't want to check intersections with any which have been deleted!
-			{
-				m_Page.UpdateIntersectionsWith(shp);
 			}
 			Globals.Root.StoreNewTransaction(m_OngoingTransaction);
 			TidyGrab(invalid);
@@ -1363,10 +1310,7 @@ namespace SAW
 
 		#region Verbs and editing
 
-		private bool m_IterateRainbowNext = true; // if we cancel a shape this is set to false so that we don't keep iterating
 
-		// the rainbow colour if the user has several attempts at placing a shape.  Note this doesn't do the avoidance of iteration before the first shape
-		// that happens in the colour panel;  this is only used to stop cancellations iterating, and defaults to TRUE
 		private ClickPosition m_ClickDeferredPoint; // defined if the selection, and any other effects of "clicking" have not been processed immediately
 
 		// (Since the click may be start of a drag, or the first of a double-click, we cannot do the clicking selects the next item until we are sure
@@ -1400,20 +1344,20 @@ namespace SAW
 			// equation works rather like the pointer tool when clicking on an equation (especially it can select text the same)
 			if (IsSingleSelector)
 				SelectorClick(target, wasKeyboard);
-			else if (m_Tool == Shape.Shapes.Label)
-			{
-				// no need to wait for up on Label - just label the first shape hit
-				m_DragTrigger = Rectangle.Empty; // this never drags to start
-				Shape shp = m_Page.HitTest(target.Exact, m_Zoom, Page.HitTestMode.StartSelectionFilled);
-				// note cannot merge the two HitTest calls as they are different
-				if (shp != null && shp.SupportsTextLabel)
-				{
-					shp.CreateLabel((Shape.TextStyleC)Globals.StyleParameterDefaultObject(Parameters.TextColour));
-					//Globals.ParameterValue(Parameters.Tool) = Shape.Shapes.Selector' It did this in v1; but not sure now why.  Eive requested change, in email 25/11/13
-					m_Page.SelectOnly(shp);
-				}
-				//Else all other tools start a new shape, but on mouse up
-			}
+			//else if (m_Tool == Shape.Shapes.Label)
+			//{
+			//	// no need to wait for up on Label - just label the first shape hit
+			//	m_DragTrigger = Rectangle.Empty; // this never drags to start
+			//	Shape shp = m_Page.HitTest(target.Exact, m_Zoom, Page.HitTestMode.StartSelectionFilled);
+			//	// note cannot merge the two HitTest calls as they are different
+			//	if (shp != null && shp.SupportsTextLabel)
+			//	{
+			//		shp.CreateLabel((Shape.TextStyleC)Globals.StyleParameterDefaultObject(Parameters.TextColour));
+			//		//Globals.ParameterValue(Parameters.Tool) = Shape.Shapes.Selector' It did this in v1; but not sure now why.  Eive requested change, in email 25/11/13
+			//		m_Page.SelectOnly(shp);
+			//	}
+			//	//Else all other tools start a new shape, but on mouse up
+			//}
 		}
 
 		private void ChooseUp(ClickPosition target, bool fromKeyboard)
@@ -1448,8 +1392,7 @@ namespace SAW
 				if (m_Status == Status.MakingSolid)
 					ForceConcludeSolidifying();
 				// not adding, or doing any sort of drag - normal click
-				if (!IsSingleSelector && m_Tool != Shape.Shapes.Label) // select and label done in mouse down (ish)
-																	   // all other tools start a new shape
+				if (!IsSingleSelector) // select  done in mouse down (ish) all other tools start a new shape
 					TriggerStart(target, fromKeyboard);
 			}
 		}
@@ -1635,7 +1578,6 @@ namespace SAW
 						m_SpawnShape = null;
 						AnimationController.EnsureNoAnimation(m_Solidify);
 					}
-					m_IterateRainbowNext = true;
 					break;
 				case Shape.VerbResult.Substitute: // Now permits new shape to be Nothing; indicating a shape has completed, but doesn't actually want to be added to the page (e.g. pixel layer drawing)
 					InvalidateData(shp.RefreshBounds(), InvalidationBuffer.All);
@@ -1659,10 +1601,12 @@ namespace SAW
 				case Shape.VerbResult.Unchanged:
 					break;
 				case Shape.VerbResult.Destroyed:
-					Shape objSpawnedFrom = m_SpawnedFrom; // this is cleared by AbandonCurrent
+					Shape spawnedFrom = m_SpawnedFrom; // this is cleared by AbandonCurrent
 					AbandonCurrent(true);
-					if (objSpawnedFrom != null)
-						m_Page.SelectOnly(objSpawnedFrom);
+					if (spawnedFrom != null)
+						m_Page.SelectOnly(spawnedFrom);
+					else if (m_Page.SelectedCount > 0) // this is important for SelectionBox
+						ForceUpdateGrabSpots();
 					break;
 				case Shape.VerbResult.Unexpected:
 				case 0:
@@ -1706,7 +1650,7 @@ namespace SAW
 					break;
 				case Shape.VerbResult.Continuing:
 					if (modifyingExisting)
-						Geometry.Extend(ref currentBoundsBefore, ForceUpdateGrabSpots());
+						ForceUpdateGrabSpots();
 					if (m_Status == Status.Adding)
 						UpdateDiagnostic();
 					break;
@@ -1757,26 +1701,34 @@ namespace SAW
 			m_OngoingTransaction = null;
 		}
 
-		private void CustomVerbResponse(Shape shp, RectangleF currentBoundsBefore, ref Transaction transaction, Codes code)
+		private void CustomVerbResponse(Shape shape, RectangleF currentBoundsBefore, ref Transaction transaction, Codes code)
 		{
-			switch (shp.ShapeCode)
+			transaction.Edit(m_Page);
+			switch (shape.ShapeCode)
 			{
 				case Shape.Shapes.SetOrigin:
-					transaction.Edit(m_Page);
-					m_Page.Origin = ((SetOrigin)shp).Origin;
-					m_CurrentShape = null;
-					m_Status = Status.Waiting;
-					InvalidateData(shp.Bounds, InvalidationBuffer.Current);
+					m_Page.Origin = ((SetOrigin)shape).Origin;
+					InvalidateData(shape.Bounds, InvalidationBuffer.Current);
 					if (Globals.Root.CurrentConfig.ReadBoolean(Config.Display_Origin))
 						InvalidateAll(InvalidationBuffer.Base); // fills width and height if drawn
 					PromptsDirty();
-					Globals.Root.StoreNewTransaction(transaction);
-					transaction = null;
+					break;
+				case Shape.Shapes.SetRotation:
+					PointF point = ((SetRotation)shape).SelectedPoint;
+					TransformRotate.RotationPoint = point;
+					m_Page.SetCurrentRotationPoint(point, true);
+					InvalidateData(shape.Bounds, InvalidationBuffer.Current);
+					Globals.OnRotationInfoChanged();
+					// no need to worry about invalidating the displayed marker within page as that happens on a timer anyway
 					break;
 				default:
-					Debug.Fail("Unexpected Custom verb response, shape type=" + shp.ShapeCode);
+					Debug.Fail("Unexpected Custom verb response, shape type=" + shape.ShapeCode);
 					break;
 			}
+			m_CurrentShape = null;
+			m_Status = Status.Waiting;
+			Globals.Root.StoreNewTransaction(transaction);
+			transaction = null;
 		}
 
 		private void SelectorClick(ClickPosition target, bool wasKeyboard)
@@ -1809,49 +1761,70 @@ namespace SAW
 				// the current shape selected for the moment IF the user has clicked inside it.  Therefore MouseUp does the selection in most cases
 				// exception is if the user clicked on nothing, then we do the selection now (partly because MouseUp wants to see a shape in m_shpSelectClickHit to be sure it should do the selection)
 				if (m_SelectClickHit == null)
-					m_Page.SelectOnly(m_SelectClickHit);
+					m_Page.SelectOnly(m_SelectClickHit); // doesn't use "null" as param as that is ambiguous
 				else
 				{
-					Shape shpSelectedHit = m_Page.HitTest(target.Exact, m_Zoom, Page.HitTestMode.OnlySelection);
-					Debug.Assert(shpSelectedHit == null || m_Page.SelectedShapes.Contains(shpSelectedHit));
-					if ((shpSelectedHit == null || wasKeyboard) && m_GrabSpotHit == null)
+					Shape selectedHit = m_Page.HitTest(target.Exact, m_Zoom, Page.HitTestMode.OnlySelection);
+					Debug.Assert(selectedHit == null || m_Page.SelectedShapes.Contains(selectedHit));
+					if ((selectedHit == null || wasKeyboard) && m_GrabSpotHit == null)
 					{
 						// the user HASN'T clicked on an already selected shape, we can do the selection immediately
 						// Also there is no confusion between single click and double-click from the keyboard
 						ProcessClickEffects(target);
-						// In version 1 this was only in ChooseUp; however the JigsawSelector require that this is always used
 					}
 					else
 						m_ClickDeferredPoint = target;
 				}
 			}
-
-			// Do speech if necessary:
-			if (Globals.Root.CurrentConfig.ReadBoolean(Config.Speak_Selected) && Globals.Root.CurrentConfig.ReadBoolean(Config.Use_Speech))
-			{
-				var shp = m_SelectClickHit;
-				if (shp == null)
-					shp = m_Page.HitTest(target.Exact, m_Zoom, Page.HitTestMode.StartFront, true); // Try again including protected items
-				if (shp != null && !string.IsNullOrEmpty(shp.LabelText))
-					Globals.Root.Speech.Speak(shp.LabelText);
-			}
 		}
 
 		/// <summary>Performs some parts of "clicking" (or equivalent) which can only be done when we are sure it is not a double-click or drag</summary>
-		private void ProcessClickEffects(ClickPosition ptTarget)
+		private void ProcessClickEffects(ClickPosition target)
 		{
 			m_tmrDelayedClick.Enabled = false;
-			var boundsBefore = m_SelectClickHit.RefreshBounds();
-			SelectOnlyWithJigsawExpansion(m_SelectClickHit);
+			RectangleF boundsBefore = m_SelectClickHit.RefreshBounds();
+			SelectOnly(m_SelectClickHit, target.Exact);
 			if (m_OngoingTransaction == null)
 				m_OngoingTransaction = new Transaction();
-			ptTarget.Transaction = m_OngoingTransaction;
-			var result = m_SelectClickHit.ClickExisting(ptTarget); // in case the shape wants to do anything special
+			target.Transaction = m_OngoingTransaction;
+			Shape.VerbResult result = m_SelectClickHit.ClickExisting(target); // in case the shape wants to do anything special
 			DoVerbResult2(m_SelectClickHit, result, boundsBefore, true, Codes.ChooseExisting);
 			if (m_CurrentShape == null)
 				StoreCurrentTx();
 			m_ClickDeferredPoint = null;
 		}
+
+		/// <summary>Selects one shape (or null).  The location is the click location and is used to set SelectedPath to a target indicating one vertex/line within the selected shape.</summary>
+		private void SelectOnly(Shape shape, PointF selectPathLocation)
+		{
+			bool alreadySelected = false;
+			if (m_Page.SelectedShapes.Count == 1 && m_Page.SelectedShapes[0] == shape)
+				alreadySelected = true;
+			else
+				m_Page.SelectOnly(shape);
+			if (!Globals.Root.CurrentConfig.ReadBoolean(Config.Advanced_Graphics))
+				return;
+
+			Target oldSelected = m_Page.SelectedPath;
+			Shape.GrabSpot grabSpot = HitTestGrabSpots(selectPathLocation);
+			if (grabSpot != null)
+				m_Page.SelectedPath = Target.FromGrabSpot(grabSpot);
+			else
+			{
+				List<Target> col;
+				col = m_Page.SelectedShapes?.FirstOrDefault()?.GenerateTargets(UserSocket.CreateForPoint(selectPathLocation));
+				if (col == null)
+					return;
+				m_Page.SelectedPath = (from t in col
+									   where (t.Type == Target.Types.Vertex || t.Type == Target.Types.Line) && t.AdjustedDistance < 3 * GUIUtilities.MillimetreSize
+									   orderby t.AdjustedDistance
+									   select t).FirstOrDefault();
+			}
+			//Debug.WriteLine($"Selectonly with path={SelectedPath?.ToString() ?? "null"}");
+			if (alreadySelected && (oldSelected == null || !oldSelected.Matches(m_Page.SelectedPath)))
+				Globals.OnApplicableChanged();
+		}
+
 
 		private void m_tmrDelayedClick_Tick(object sender, EventArgs e)
 		{
@@ -1901,7 +1874,6 @@ namespace SAW
 						m_CurrentShape = null;
 						m_OngoingTransaction?.Cancel();
 					}
-					m_IterateRainbowNext = false; // don't want to always do this, only if something really cancelled
 					wasAdding = true;
 				}
 				else
@@ -2001,11 +1973,6 @@ namespace SAW
 			Globals.NotifyVerbApplicabilityChanged(); // needed for +/- on toolbar for pointer users
 		}
 
-		public Target PathTarget
-		{
-			get { return m_PathTarget; }
-		}
-
 		public void IterateSelectionTo(Shape shape)
 		{
 			// changes selection to given shape when using Shift-F9/Ctrl-F9
@@ -2021,7 +1988,6 @@ namespace SAW
 			// target is in data coordinates
 			m_CurrentBuffer.InvalidateAll(); // clear the buffer for the "current" shape in case it has something left from previously
 			Debug.Assert(m_OngoingTransaction == null);
-			m_SpawnedFrom = null;
 			m_SpawnedFrom = null;
 			if (m_Tool == Shape.Shapes.Null)
 				return;
@@ -2047,7 +2013,7 @@ namespace SAW
 			Shape.VerbResult result = m_CurrentShape.Start(target);
 			if (result == Shape.VerbResult.Completed || result == Shape.VerbResult.Continuing)
 			{
-				UpdateTargetHover(target.Exact);
+				UpdateTargetHover(target.Exact, m_CurrentShape);
 				ApplyDefaultStyles?.Invoke(m_CurrentShape);
 				if (m_CurrentShape.DefaultStylesApplied())
 				{
@@ -2068,11 +2034,6 @@ namespace SAW
 				// for some differences in the initial behaviour of shapes if this line is not included
 				DoCursorMove(target, true);
 			}
-		}
-
-		private void SelectOnlyWithJigsawExpansion(Shape only)
-		{
-			m_Page.SelectOnly(only);
 		}
 
 		private void OngoingShapeChanged()
@@ -2149,18 +2110,18 @@ namespace SAW
 									   // if neither of these styles apply, the shape is probably drawing itself anyway
 				bool visible = false; // true if either contain a genuine colour
 				Shape.StyleBase line = shape.StyleObjectForParameter(Parameters.LineColour);
-				if (line is Shape.LineStyleC)
+				if (line is Shape.LineStyleC style)
 				{
 					relevant = true;
-					Color col = ((Shape.LineStyleC)line).Colour;
+					Color col = style.Colour;
 					if (col.A > 0 && !col.Equals(m_Page.Colour))
 						visible = true;
 				}
 				Shape.StyleBase fill = shape.StyleObjectForParameter(Parameters.FillColour);
-				if (fill is Shape.FillStyleC)
+				if (fill is Shape.FillStyleC style2)
 				{
 					relevant = true;
-					Color col = ((Shape.FillStyleC)fill).Colour;
+					Color col = style2.Colour;
 					if (col.A > 0 && !col.Equals(m_Page.Colour))
 						visible = true;
 				}
@@ -2224,9 +2185,6 @@ namespace SAW
 
 		private static readonly System.Drawing.Imaging.ImageAttributes g_WhiteTransparent;
 
-		//Private Shared ReadOnly g_objRestoreFocusFont As New Font(FontFamily.GenericSansSerif, 13, FontStyle.Regular, GraphicsUnit.Point)
-		//Private m_szRestoreFocusPrompt As SizeF	' if using separate cursors this is the size of the prompt we can display showing the key to return to the drawing area
-		// Measured in ApplyConfiguration
 		private bool m_SelectedBufferUsed; // Only used during PaintEditing, but value needs to persist until PaintEditingBuffers
 		private bool m_CurrentBufferUsed;
 
@@ -2254,20 +2212,17 @@ namespace SAW
 					try
 					{
 						PrepareGraphics(gr);
-						if (m_Page.SelectedCount > 0)
+						if (!TransformationActive()) // selection highlight is not drawn while moving a transformation
 						{
-							if (!TransformationActive()) // selection highlight is not drawn while moving a transformation
-							{
-								m_Page.DrawSelected(canvas, this, m_Zoom, m_PixelsPerDocumentX, false);
-								if (!m_Page.MovingSelection)
-									DrawGrabSpots(gr, ActiveGrabSpotPhase());
-								m_SelectionBoundsDrawn = m_Page.SelectedBounds(false);
-								if (Globals.Root.CurrentConfig.ReadBoolean(Config.Selection_Bounds))
-									m_Page.DrawSelectionBoundary(m_SelectionBoundsDrawn, canvas);
-							}
-							else
-								m_SelectionBoundsDrawn = RectangleF.Empty;
+							m_Page.DrawSelected(canvas, this, m_Zoom, m_PixelsPerDocumentX, false);
+							if (!m_Page.MovingSelection)
+								DrawGrabSpots(gr, ActiveGrabSpotPhase());
+							m_SelectionBoundsDrawn = m_Page.SelectedBounds(false);
+							if (Globals.Root.CurrentConfig.ReadBoolean(Config.Selection_Bounds))
+								m_Page.DrawSelectionBoundary(m_SelectionBoundsDrawn, canvas);
 						}
+						else
+							m_SelectionBoundsDrawn = RectangleF.Empty;
 					}
 					finally
 					{
@@ -2279,15 +2234,8 @@ namespace SAW
 
 			// and finally, the current, incomplete shape (if any).
 			// Also draws ShapeSnap targets - possible that m_shpCurrent is nothing if the targets are being displayed in order to add the first point
-			PointF start90 = PointF.Empty; // defined if we need the 90 degree green hint lines
-			if (m_GrabMove != null && m_GrabMove.GrabType == Shape.GrabTypes.Move && m_SnapMode == Shape.SnapModes.Angle
-			) // if true we draw lines to indicate orthogonal movement with angle snapping on
-				start90 = m_GrabMove.Position;
-			if (m_CurrentShape is TransformMove && m_SnapMode == Shape.SnapModes.Angle)
-			{
-				start90 = ((TransformMove)m_CurrentShape).MiddleOriginalShapes();
-			} // same but using move transform (I think once it is shpcurrent, then it has picked up shapes)
-			if (m_CurrentShape != null || m_Page.HasTargets || m_Page.Sockets.Count > 0 || m_TargetHover != null || !start90.IsEmpty)
+			// same but using move transform (I think once it is shpcurrent, then it has picked up shapes)
+			if (m_CurrentShape != null || m_Page.HasTargets || m_Page.Sockets.Count > 0 || m_TargetHover != null || m_Page.RecentRotationPoints.Any())
 			{
 				gr = m_CurrentBuffer.PrepareDraw();
 				m_CurrentBufferUsed = true;
@@ -2309,17 +2257,11 @@ namespace SAW
 							}
 						}
 						m_TargetHover?.AsTarget?.DrawHover(canvas, m_Zoom, m_PixelsPerDocumentX);
-						if (!start90.IsEmpty)
-						{
-							using (var pen = canvas.CreateStroke(Color.FromArgb(128, Color.LightGreen), MillimetreLine))
-							{
-								pen.DashStyle = System.Drawing.Drawing2D.DashStyle.Dash;
-								canvas.DrawLine(start90.X, -m_Page.Size.Height, start90.X, 0, pen);
-								canvas.DrawLine(0, start90.Y, m_Page.Size.Width, start90.Y, pen);
-							}
-
-						}
 						// there is no need to draw a grey area outside the page - that is only needed in the background
+						if (m_Page.RecentRotationPoints.Any())
+						{
+							m_Page.DrawRotationPoints(gr, m_PixelsPerDocumentX);
+						}
 					}
 					finally
 					{
@@ -2373,14 +2315,14 @@ namespace SAW
 		public void NotifyIndirectChange(Shape shape, ChangeAffects affected)
 		{
 			// the current shape is given the view as a parent, so might send some notifications directly here
-			affected = affected & ~(ChangeAffects.GrabSpots | ChangeAffects.Intersections); // these can only be handled in the page
+			affected = affected & ~(ChangeAffects.GrabSpots); // these can only be handled in the page
 			Debug.Assert(shape == m_CurrentShape);
 			m_Page_ShapeNotifiedIndirectChange(shape, affected, RectangleF.Empty);
 		}
 
 		public void NotifyIndirectChange(Shape shape, ChangeAffects affected, RectangleF area)
 		{
-			affected = affected & ~(ChangeAffects.GrabSpots | ChangeAffects.Intersections); // these can only be handled in the page
+			affected = affected & ~(ChangeAffects.GrabSpots); // these can only be handled in the page
 			Debug.Assert(shape == m_CurrentShape);
 			m_Page_ShapeNotifiedIndirectChange(shape, affected, area);
 		}
@@ -2474,12 +2416,11 @@ namespace SAW
 			RequestPaletteExclusion?.Invoke(screen);
 		}
 
-		private void m_Page_SelectionChanged_Editable()
+		protected override void m_Page_SelectionChanged()
 		{
-			// also a handler in the base class
+			base.m_Page_SelectionChanged();
 			if (m_CurrentShape == null)
 				UpdateDiagnostic();
-			m_PathTarget = null;
 		}
 
 		protected override void m_Page_RefreshSelection(RectangleF dataRect, bool dataInvalid, bool updateGrabSpots)
@@ -2767,6 +2708,8 @@ namespace SAW
 				ChangeZoom(m_SpecialZoom != SpecialZooms.None ? (float)m_SpecialZoom : m_Zoom);
 			if (m_Page.HasActiveTarget)
 				InvalidateData(m_Page.TargetRefreshBoundary(m_Zoom), InvalidationBuffer.Current);
+			foreach (RectangleF rect in m_Page.GetRotationPointInvalidationAreas(m_PixelsPerDocumentX))
+				InvalidateData(rect, InvalidationBuffer.Current, false);
 			if (ActiveGrabSpot != null)
 				InvalidateData(GrabSpotRefreshBounds(ActiveGrabSpot), InvalidationBuffer.Selection);
 			if (m_PromptsDirty)
@@ -2782,6 +2725,7 @@ namespace SAW
 				return;
 			}
 			m_Status = Status.MakingSolid;
+			//	if (!(m_CurrentShape is FloatingLabel)) // mustn't do it for FloatingLabel as it want
 			m_CurrentShape.CaretLose(); // mustnt CaretDestroy, cos FreeText (eg) will already have assigned caret to another spawned shape in some cases
 										//If m_shpCurrent.Shape <> Shape.Shapes.Equation Then Shape.CaretDestroy() ' mustn't remove caret with equations if automatic F9 reset is enabled
 										//AnimationController.EnsureNoAnimation(m_shpCurrent)
@@ -3082,12 +3026,14 @@ namespace SAW
 		{
 			// called by frmMain.ApplyConfiguration
 			InvalidateAll();
+			AutoScroll = !Globals.Root.CurrentConfig.ReadBoolean(Config.Resize_Document_ToWindow, true);
 		}
 
-		public void StartSetOrigin()
+		/// <summary>Treats the given shape as if a new shape being drawn using a tool - intended for virtual shapes such as changing the rotation point </summary>
+		internal void StartCustomShape(Shape custom)
 		{
 			AbandonCurrent();
-			m_CurrentShape = new SetOrigin();
+			m_CurrentShape = custom;
 			ClickPosition pt = new ClickPosition(m_Page.Origin, m_Page, m_Zoom, Shape.SnapModes.Off, Shape.SnapModes.Off, this, ClickPosition.Sources.Irrelevant);
 			m_CurrentShape.Start(pt);
 			m_Status = Status.Adding;
@@ -3147,15 +3093,14 @@ namespace SAW
 			}
 		}
 
-		public RectangleF ForceUpdateGrabSpots()
+		/// <summary>Does SetGrabSpots, but also forces invalidation of paint buffers as needed </summary>
+		public void ForceUpdateGrabSpots()
 		{
-			// returns rectangle to invalidate
-			// internally SetGrabSpots is called - invalidation done as part of outer routine
 			RectangleF invalid = RectangleF.Empty;
 			IncludeGrabSpotsInRefresh(ref invalid);
 			SetGrabSpots();
 			IncludeGrabSpotsInRefresh(ref invalid);
-			return invalid;
+			InvalidateData(invalid, InvalidationBuffer.Selection);
 		}
 
 		private void SetGrabSpots()
@@ -3169,7 +3114,10 @@ namespace SAW
 
 				m_GrabSpots = new List<Shape.GrabSpot>();
 				m_GrabSpots.Add(new Shape.GrabSpot(null, Shape.GrabTypes.Move, m_Page.SelectedBounds(false).Centre()));
-				Shape.AddBoundingGrabSpotsForRectangle(m_GrabSpots, m_Page.SelectedBounds(true), Shape.AllowedActions.TransformScale | Shape.AllowedActions.TransformLinearStretch, m_Zoom);
+				RectangleF bounds = m_Page.SelectedBounds(true);
+				Shape.AddBoundingGrabSpotsForRectangle(m_GrabSpots, bounds, Shape.AllowedActions.TransformScale | Shape.AllowedActions.TransformLinearStretch, m_Zoom);
+				if (m_Page.SelectedShapes.All(s => (s.Allows & Shape.AllowedActions.TransformRotate) > 0))
+					Shape.AddStandardRotationGrabSpotAt(m_GrabSpots, bounds.Centre(), m_Page);
 			}
 			else
 			{
@@ -3241,7 +3189,6 @@ namespace SAW
 							// but this is more general, not assuming that the rotation point is necessarily on the horizontal axis of the shape
 							pnTransform.EndCap = System.Drawing.Drawing2D.LineCap.ArrowAnchor;
 							gr.DrawArc(pnTransform, grabSpot.Focus.X - radius, grabSpot.Focus.Y - radius, radius * 2, radius * 2, -45, 90);
-							// Dim sng45 As Single = sngRadius / Math.Sqrt(2) ' the end Arrow is at 45°
 							pnTransform.EndCap = System.Drawing.Drawing2D.LineCap.NoAnchor;
 							break;
 						case Shape.GrabTypes.Move:

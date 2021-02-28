@@ -81,6 +81,7 @@ Shape_Triangle = Triangle
 Shape_Isosceles = Isosceles triangle
 Shape_Equilateral = Equilateral triangle
 Shape_Polygon = Regular polygon
+Shape_Rhombus = Rhombus
 Shape_IrregularPolygon = Irregular polygon
 Shape_Arc = Arc
 Shape_Circle = Circle
@@ -93,8 +94,8 @@ Shape_PolyLine = Multiple connected lines
 Shape_Pencil = Curve drawn free hand
 Shape_ClosedCurve = Closed curve
 Shape_Connector = Connector
-Shape_IndependentPolyPath = Complex shape
-Shape_Label = Text in Shape
+Shape_GenericPath = Generic path
+Shape_FloatingLabel = Text label
 Shape_Curve = Curve
 Shape_TextLine = Text at any angle
 Shape_Group = Grouped shapes
@@ -102,6 +103,8 @@ Shape_UserSocket = Socket (connection point for grouped shapes)
 Shape_Button = Button
 Shape_Container = Container
 Shape_Flow = Flow layout container
+Shape_MaskedImage = Masked Image
+Shape_SetRotation = Set centre of rotation
 
 Info_Radius = Radius
 Info_Distance = Distance
@@ -130,6 +133,7 @@ Menu_Edit = &Edit
 Menu_ExportPage = E&xport page...
 Menu_Recent = R&ecent files...
 Menu_EditMode = &Edit mode
+Menu_GraphicsMode = Graphics mode
 
 Menu_Select = &Select item...
 Menu_Alignment = &Align...
@@ -177,6 +181,8 @@ Verb_Start = &Back to menu
 Verb_Quit = &Quit
 Verb_CloseDocument = Close document
 Verb_ExportSVG = Export as &SVG image
+Verb_ToggleFullScreen = Toggle full screen
+
 #Generic edits
 Verb_Undo = &Undo
 Verb_Redo = &Redo
@@ -224,6 +230,9 @@ Verb_NudgeDown = Move selection down
 Verb_DoubleClick = Custom action
 Verb_QuickAddButtons = Add buttons...
 Verb_FreeTextToTextLine = Change to Text at any angle
+Verb_ToggleBold = Bold
+Verb_ToggleUnderline = Underline
+Verb_ToggleItalic = Italic
 
 #Vertex editing/advanced graphics
 Verb_AddVertex = Add corner here
@@ -233,6 +242,8 @@ Verb_ConvertToBezier = Change section to curve
 Verb_SmoothVertex = Use smooth curve at this corner
 Verb_CornerVertex = Use sharp angle at this corner
 Verb_ConvertToPath = Convert to advanced graphics
+Verb_MakeMask = Mask image with polygon
+Verb_RemoveMask = Remove shape mask from image
 
 #pages...
 Verb_PageNext = Go to &next page
@@ -308,6 +319,7 @@ Action_SimulateKey = Press key combination...
 Action_TypeCharacter = Type character...
 Action_TypeSymbol = Type symbol
 Action_TypeText = Type text...
+Action_ShowPalette = %0 (toggle)
 
 #Intrinsic from shapes
 Add_Text = Add text to item
@@ -343,18 +355,11 @@ Custom_Style_Value = Other...
 Palette_Tool = Tools palette
 Palette_ScrollZoom = Scroll and Zoom
 Palette_DocumentOutline = Document outline
+Palette_Rotation = Rotation
+Palette_CoordEdit = Coordinate editor
+Palette_ShowScale = Scale
 
 # From the main screen advanced palettes
-Palette_Sockets = Sockets
-Sockets_FixedExit = Specify direction
-Sockets_AutoExit = Automatic direction
-Sockets_Connector = Use for connecting lines
-Sockets_ShapeSnap = Use for snap-to-shape
-# M, F for male and female - need to be abbreviated to 2 or 3 characters at most
-Sockets_M = M
-Sockets_F = F
-Sockets_IgnoreGender = Ignore
-Sockets_Classification = Socket type:
 Advanced_Alignment = Alignment
 Advanced_Transform = Quick transform
 
@@ -462,6 +467,8 @@ Export_Image = Save image
 Hide_Prompts_Click = Prompts area hidden for current document.  You can show it again and hide it by pressing '%0'.
 Config_Save_Failed = There was an error saving settings - changes to the settings might not be restored when the software is restarted.  The actual error message is below.  (Further errors will not be reported until software is restarted).
 WMF_in_SVG = Cannot produce SVG for anything containing WMF format images.
+Mask_Not_Closed = Cannot create mask: shape is not closed
+FloatingLabel_NoShapeClicked = No item clicked: to add a text label you must click on an existing element on the page.
 
 # Dialogs
 # Colours
@@ -674,6 +681,7 @@ Button_AddButtons_Header = Select from functions below and click on '%=Button_Ad
 Button_AddButtons_Press = Press key:
 Button_AddButtons_Text = Enter text:
 
+# not actually used in SAW atm
 Flow_Settings = Flow container settings
 Flow_Direction = Direction in which to place contents:
 # The values below (ones with 2 underscores) can be only a little longer than the longest English one in each group
@@ -748,6 +756,7 @@ Config_AvailableShapes = All available shapes and tools:
 Config_PalettesChoose = Choose which...
 Config_PalettesActive = [active]
 Config_PalettesNote = The items marked with * usually appear automatically for pointer-only users when using certain tools.  You shouldn't generally force these to be displayed or hidden, although selecting which version to display is useful.
+Config_PalettesToggle = Toggle display
 
 Config_Sequence = Order of tools
 Config_SequenceTitle = This page adjusts the order in which the tools appear in the palette on the left.  Tools have a default sequence, but you can modify this and specify the exact order of some or all of the tools.  Tools for which the sequence is specified (left-hand box) appear first, any not listed (right-hand box), will appear at the end.
@@ -958,19 +967,6 @@ Key_LWin = Left Win key
 Key_RWin = Right Win key
 
 
-# Standard shape folders
-Folder_General = General
-Folder_Transformations = Transformations
-Folder_Painting = Painting
-Folder_Maths = Maths
-Folder_Polygons = Polygons
-Folder_Lines = Lines
-Folder_Circular = Circular
-Folder_Text = Text
-Folder_Measurements = Measurements
-Folder_Equation_Symbols = Maths symbols
-Folder_Special = Special purpose
-
 # Prompts
 Prompts_Cancel = Click right button
 Prompts_ChooseClick = Click left button
@@ -1063,7 +1059,7 @@ Prompts_TextLine_Choose = %Choose% to place the top right of the text area
 Prompts_TextLine_Type = Type your text now
 Prompts_TextLine_Flow = The text will automatically start a new line when it reaches the right-hand side
 Prompts_TextLine_Finish = %Complete% to finish typing
-Prompts_Label_Start = %Choose% on the shape which you want to add text to
+Prompts_FloatingLabel_Start = %Choose% on the shape which you want to add text to
 
 Prompts_UserSocket_Start = %Choose% to place a socket
 Prompts_UserSocket_Start_2 = When a socket is included in a group, it becomes invisible and controls where connecting lines attach to the group and how the group shape-snaps.
@@ -1073,43 +1069,6 @@ Prompts_Button_Complete = %Choose% to place the opposite corner of the button
 
 Prompts_SetOrigin = %Choose% to set the origin for the reported coordinates for this page
 Prompts_SetOrigin_Cancel = %Cancel% to cancel
-
-ConfigPrompt_Low_Graphics_On = On: Less smoothing (and animation) is used to make Splash! run better on a slow computer.
-ConfigPrompt_Low_Graphics_Off = Off: Splash! runs normally with full quality graphics.
-ConfigPrompt_Selection_Bounds_On = On: A bright red, dashed rectangle is drawn around the selected shape(s), in addition to the usual highlight
-ConfigPrompt_Selection_Bounds_Off = Off: Only the usual highlight is used (a yellow/orange glow around the lines of each shape)
-ConfigPrompt_SelectorAfterCreate = If this option is ticked, the selector tool is selected again after each shape which is placed on the page.
-ConfigPrompt_Moving_Shadow_On = On: Shapes being moved are shown semi-transparent, and with a shadow.
-ConfigPrompt_Moving_Shadow_Off = Off: Shapes being moved are shown semi-transparent, but without any shadow.
-ConfigPrompt_KeyShortcuts_On = On: Key equivalents are generally displayed on buttons and menus (some rare ones are only displayed if the Pointer-only-user option is selected)
-ConfigPrompt_KeyShortcuts_Off = Off: Key equivalents are never displayed on buttons or menus.  This may be appropriate for a user who has no keyboard usage.
-ConfigPrompt_Smaller_Tools = If this option is selected, the buttons in the tool palette on the left are always the smallest size.  Otherwise, larger buttons are used if not too many tools are available.
-ConfigPrompt_Display_Origin = If this option is selected, the location of the page origin (used when displaying coordinates at the bottom) is indicated, IF it has been moved (by using the menu: %=Menu_Page% > %=Verb_SetOrigin%).  If the origin is still at the bottom left, this option will have no effect.
-ConfigPrompt_Shape_Resize_On = On: Clickable areas are shown on the selected shape to resize, adjust or rotate it.
-ConfigPrompt_Shape_Resize_Off = Off: Only one clickable area is shown: to move the selected shape.  Shapes can only be resized or rotated using the separate transformation tools.
-ConfigPrompt_Allow_Drag_Placement_On = On: Clicking and dragging in the drawing area will place the first line/edge of a shape.
-ConfigPrompt_Allow_Drag_Placement_Off = Off: Clicking and dragging has no effect when placing new shapes.  The user must click at each position.  This option is better for users with less precise mouse/pointer control, who may accidentally click and drag.
-ConfigPrompt_Shapes_Menu = This option adds an extra menu beside "Edit' on the menu bar at the top of the screen.  This lists all of the tools in the tools palette on the left.  For some users this menu is easier to use via keyboard or switch access that the palette.
-ConfigPrompt_Show_InfoMeasurement = Show information line containing coordinates and measurements.
-ConfigPrompt_Show_PageList = Show thumbnails of pages in document, allowing the user to move between pages in multipage documents.
-ConfigPrompt_Show_Prompts = Show this information area at the bottom of the screen
-ConfigPrompt_Show_Tools = Show tools/shapes palette on the left
-ConfigPrompt_Show_Toolbar = Show the toolbar at the top of the screen
-ConfigPrompt_Show_Toolbar_SubText = If this is shown, various parts of it can be turned on and off separately...
-ConfigPrompt_Show_TransformCopy = When a transformation tool is selected show the choice between moving the original shape and making copies.  This appears at the bottom of the tools palette on the left.
-ConfigPrompt_Advanced_Colours = In colours palettes show the extra buttons which access further colours, select transparent colours, or change colour for each shape (the latter only in the Fill Colour palette)
-ConfigPrompt_Show_ToolbarUser = Show the buttons which switch between user and teacher mode.
-ConfigPrompt_Show_ToolbarUser_SubText = If these are switched off you can change mode using the keys control+T and control+U.  If the "%=Config_DisplayToolbar%" option is switched off then this is always hidden.
-ConfigPrompt_Show_ToolbarSnap = Show the buttons which switch grid-snapping, shape-snapping or angle-snapping on and off.
-ConfigPrompt_Show_ToolbarSnap_SubText = If the "%=Config_DisplayToolbar%" option is switched off then this is always hidden.
-ConfigPrompt_Show_ToolbarVerbs = Show the remaining function buttons on the toolbar.  Exactly which buttons appear here can be changed on the %=Config_Toolbar% page of the settings.
-ConfigPrompt_Show_ToolbarVerbs_SubText = If the "%=Config_DisplayToolbar%" option is switched off then this is always hidden.
-ConfigPrompt_Show_PointerButtons = These buttons only appear if the user is a pointer-only user.  For other users this setting is ignored.  They provide the equivalent of a keyboard user pressing space, plus and minus where there is no other equivalent.
-ConfigPrompt_Angle_45_On = 45° steps are used
-ConfigPrompt_Angle_45_Off = 15° steps are used
-ConfigPrompt_Advanced_Graphics = This option enables full vector graphics-style editing, with grab handles to adjust individual points on curves.  When off (the default) graphics editing is simplified.
-ConfigPrompt_Windows_Colours_On = ON: The button at the top right of colour palettes shows the standard Windows colour chooser
-ConfigPrompt_Windows_Colours_Off = OFF: This button shows the Splash screen which gives a choice between colours similar to the current colour
 
 Verb_Prompt_Choose = This is equivalent to clicking the left mouse button when placing shapes.
 Verb_Prompt_ChooseExisting = Choose
@@ -1133,17 +1092,20 @@ Verb_Prompt_SpreadVertical = This spreads the 3 or more selected shapes out vert
 ###############
 
 App = SAW7
-Verb_ConfigUser = Edit &settings
 Palette_DocumentOutline = Selection set outline
 Document_Outline = Selection set outline
 Shape_SAWItem = Standard item
 Shape_Scriptable = Add scan button(s)
 Filter_Sound = Sound files|*.wav;*.mp3
 Palette_Main = SAW7 Toolbox
+Palette_Main_Graphics = Graphics Toolbox
 Config_Keys = Keys in editor
 Config_KeysTitle = Key assignments in editor
+Config_ResizeDocToWindow = Resizing editor window automatically sets document size to match (if no, then document fixed and can be zoomed or scrolled in editor)
+Menu_ResizeDocToWindow = Autosize set to match editor window
 Save_SAW6 = Save SAW6 file
 SAW_IRM_SaveNote = Note: saving in IRM format is unlikely to be useful unless the file was originally imported from an IRM file; this will only save content that seems relevant and makes assumptions about the division between the header and lower panel which may be meaningless if this was not an IRM file.
+Palette_Graphics = Graphics mode palette
 
 # run time
 SAW_Run_FocusWarning = SAW has typing focus.  Please select another application so that text output can be sent to it.
@@ -1151,7 +1113,7 @@ SAW_Run_FocusTitle = Target application
 Script_Fail_Alternation = Failed to access alternation value in registry: %0
 Script_Fail_Desktop = Failed to load/save desktop file: %0
 Script_Fail_CannotFindPopup = Cannot find popup item 
-Script_Fail_MissingWordListItem = Cannot find item %0 four the word prediction list; it is not a standard item (other graphical elements cannot be used for this)
+Script_Fail_MissingWordListItem = Cannot find item %0 for the word prediction list; it is not a standard item (other graphical elements cannot be used for this)
 Script_Obsolete = Command (%0) is obsolete and will do nothing in SAW7
 SAW_Run_NoHexNumpad = Cannot send key: typing this character can only be done using Alt and Numpad, but in hex format ("Alt" + "+" + "xxx").  However this is switched off by default in Windows, and only available if a (string) value, named "EnableHexNumpad" with the value "1" is added to the registry folder "HKEY_CURRENT_USER/Control Panel/Input Method".  After adding this value you must either reboot or log out the Windows user and log back in again
 SAW_Run_CloseConfirm = Really close SAW?
@@ -1168,6 +1130,7 @@ SAW_FILE_HASHSET = open selection set with ## parameter is not supported in SAW 
 
 Menu_SAWSet = Selection set
 Menu_DefaultScripts = Default scripts...
+Verb_ConfigUser = Edit &settings
 Verb_StartupScript = Edit start-up script
 Verb_DefaultItemScript = Edit default scripts for general items
 Verb_DefaultEscapeScript = Edit default scripts for escape items
@@ -1196,6 +1159,11 @@ Verb_ImportIRM = Import IRM file...
 Verb_ExportIRM = Export IRM file...
 Verb_MakeChild = Make item a child of preceding item
 Verb_MoveOutOfContainer = Take out of containing item - becomes a sibling of current container
+Verb_MakeActive = Make element active
+Verb_MakeInactive = Remove scripts, make inactive
+Verb_IncludeTextInRotation = Toggle rotate text
+Verb_SAWManual = Show manual
+Verb_YoctoTest = Yocto relays...
 
 SAW_Menu_Prompt = Choose between opening or creating a selection set
 SAW_Menu_Design = Design a new selection set
@@ -1212,6 +1180,7 @@ SAW_Highlight = Highlight
 SAW_Edit_Bounds = Bounds
 SAW_Edit_Item = Edit properties
 SAW_Edit_Item_Multiple = Edit properties: multiple items
+SAW_Edit_Scriptable = Edit functionality
 SAW_Edit_Presentation = Presentation
 SAW_Edit_Style = Colour + Style
 SAW_Edit_Layout = Text Graphic Alignment
@@ -1241,6 +1210,8 @@ SAW_Edit_Play = Play
 SAW_Edit_Stop = Stop
 SAW_Edit_Remove = Delete
 SAW_Edit_Nudge = Nudge position
+SAW_Edit_NA = (Not applicable)
+SAW_Edit_GraphicPresentation = For custom graphic objects the presentation is mostly edited in the designer.  Only the highlight colours (in the colour + style tab) and output text are edited in this screen.  Text and any images cannot be changed here.
 
 SAW_Edit_StylesDisabled = Note: the style selection currently has no effect since item styles are not enabled for the current user.
 SAW_Edit_StyleOverrides = Warning: the selections made below have no effect for the current user: item styles are enabled for this user and for this use the item will be displayed using the style selected, and not the settings below.
@@ -1330,8 +1301,29 @@ SAW_Edit_OS_SomeFailed = %0 images could not be displayed either due to errors e
 SAW_Edit_OS_Library = Library: %0
 SAW_Edit_OS_Licence = Licence: %0
 
+SAW_Rotate_About = Rotate about
+SAW_Rotate_Centres = Shapes' centres
+SAW_Rotate_Set = Select by clicking
+SAW_Rotate_How = You can rotate using the grab handle in the editor, or by entering an angle here:
+SAW_Rotate_Angle = Rotate by
+SAW_Rotate_Do = Go
+SAW_Rotate_BadAngle = Angle must be a non-zero integer from -360 to +360
+SAW_Rotate_NoPosition = No position has been set
+SAW_Rotate_Cannot = One or more of the selected objects cannot be rotated
+SAW_Rotate_IncludeText = Include text
+SAW_Rotate_Previous = Previous...
+
+SAW_Coord_Select = Select one item (only) to edit coordinates
+SAW_Coord_Centre = Centre
+SAW_Coord_Vertex = Vertex
+SAW_Coord_From = From
+SAW_Coord_To = To
+SAW_Coord_Handle1 = Handle 1
+SAW_Coord_Handle2 = Handle 2
+
 #misc
 SAW_Edit_SetHelpConfirm = Set item '%0' as the location to display help text?
+SAW_Edit_AutoActive = This shape is currently an inactive graphical item.  Do you want to make it active, scanned content with support for scripts?
 
 SAW_AddCommand_Title = Add script command
 SAW_AddCommand_Prompt = Select the script that you want to add from the list on the left
@@ -1517,6 +1509,18 @@ SAW_CommandEdit_ScrollPrompt = Select the direction to scroll:
 SAW_CommandEdit_SettingsFileNote = Note: old, SAW6 .ini files cannot be loaded or saved by SAW7.  The settings file must be saved from SAW7
 SAW_CommandEdit_MissingFilename = The filename must be provided
 SAW_CommandEdit_PageNumber = Page number:
+SAW_CommandEdit_Yocto_Relay = Which relay
+SAW_CommandEdit_Yocto_Action = Action
+SAW_CommandEdit_Yocto_Duration = Duration (ms)
+SAW_CommandEdit_Yocto_DisplayDuration = Hide info after (ms)
+SAW_CommandEdit_Yocto_DisplayDurationNote = (leave as 0 to leave the information popup on screen until the user activates a switch)
+SAW_CommandEdit_Yocto_All = All
+SAW_CommandEdit_Yocto_On = On
+SAW_CommandEdit_Yocto_Off = Off
+SAW_CommandEdit_Yocto_Toggle = Toggle
+SAW_CommandEdit_Yocto_Pulse = Pulse
+SAW_CommandEdit_Yocto_Query = Show status
+SAW_CommandEdit_Yocto_NotFound = Note: This ID does not match any relay currently connected.  The command will work correctly only if a matching relay is connected before use.
 
 #######################################
 # script commands as used in editor
@@ -1649,6 +1653,7 @@ Script_Command_OpenSelectionSet = open selection set
 Script_Command_PreviousSet = previous set
 Script_Command_DDEExe = dde exe
 Script_Command_GotoPage = Goto page
+Script_Command_YoctoRelay = yocto relay
 
 # command names for CmdKeysOut
 Script_Command_UsingKeys_SELECT_PREV = select previous application
@@ -1730,6 +1735,10 @@ Script_Error_ParamsNotExpected = Did not expect parameters for command '%0'
 Script_Error_CannotFindItem = Cannot find item '%0'
 Script_Error_WordListScrollWrong = '%=Script_Command_WordlistScroll%' must be followed by '%=Script_CommandPart_PageDown%', '%=Script_CommandPart_PageUp%', '%=Script_CommandPart_Top%' or '%=Script_CommandPart_Bottom%'
 Script_Error_BladeSettingsWrong = The Blade settings text must be in the format A=B,C=D,E=F ...
+Script_Error_UnknownYocto = Yocto relay command not recognised: relay ID must be followed by "on", "off", "toggle", "?" or a number of milliseconds.
+Script_Error_BadYoctoTime = Time not recognised.  Must be an integer greater than 0
+Script_Error_YoctoIDEmpty = Relay ID not provided.  Must be "All" or the logical ID of a relay.
+Script_Error_YoctoNotFound = Could not find yocto relay "%0"
 
 # these were copied from SAW6.  The quotes aren't actually wanted, but are an artefact of the C++ code.  They are stripped out before these items are displayed
 Script_Desc_NORMALITEM = "Unhighlight an item."
@@ -1847,7 +1856,7 @@ Script_Desc_DDEEXE = "This command is obsolete and does nothing in SAW 7"
 Script_Desc_EDITPREDICTIONWORDS = "View and edit word prediction words"
 Script_Desc_WORDLISTSCROLL = This command scrolls the displayed word predictions if there are more predictions available than can be displayed at once.
 Script_Desc_GOTOPAGE = If the file has more than one page this changes the view to a specified page number.
- 
+Script_Desc_YOCTORELAY = Changes (or queries) the state of a Yoctopuce USB relay.  The default is to turn it on for a stated number of milliseconds.
 
 #CmdKeysOut based:
 Script_Desc_CLOSE = "This will close the current window that has focus."
@@ -1945,6 +1954,19 @@ CCF_Update_Updating = Updating:
 CCF_Update_Done = Done:
 CCF_SocketError = Cannot connect to Concept Coding Framework; it might not be installed on this machine. See http://dev.conceptcoding.org/ooo/content.html
 
+########### Yocto
+
+Yocto_Relays = Relays found:
+Yocto_Refresh = Search again
+Yocto_State_A = Idle
+Yocto_State_B = Active
+Yocto_Serial = Serial #
+Yocto_Name = Logical name
+Yocto_CurrentState = Current state
+Yocto_Test = Test
+Yocto_Save = Save changes
+Yocto_EmptyName = Name cannot be empty
+Yocto_BadName = The name cannot be "all" or a number, and must contain only letters, digits, hyphen and underscore.
 
 #################### key support
 # !!!!!!!! these should possibly not be translated.  TBD

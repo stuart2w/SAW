@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.InteropServices;
+using System.Text;
 using System.Windows.Forms;
 using Blade;
 using SAW.Commands;
@@ -64,9 +66,9 @@ namespace SAW
 			base.Dispose(disposing);
 		}
 
-		public override void DisplayPage(Page objPage, Document objDocument)
+		public override void DisplayPage(Page page, Document document)
 		{ // note this may happen while scanning
-			base.DisplayPage(objPage, objDocument);
+			base.DisplayPage(page, document);
 			this.ChangeZoom((float)SpecialZooms.FitPage);
 			SelectInitialItem();
 			if (IsScanning)
@@ -192,6 +194,8 @@ namespace SAW
 
 		private void m_Engine_Iterate(object sender, SingleFieldEventClass<int> direction)
 		{
+			if (m_frmReport != null)
+				return;
 			if (m_Continuous != null) // see Activation section
 				m_Continuous.Iterate();
 			else if (m_Current != null)
@@ -204,13 +208,8 @@ namespace SAW
 		public void SetItemState(Scriptable item, ButtonShape.States state)
 		{
 			//Debug.WriteLine("SetItemState " + item.Description + " = " + state);
-			if (item.Element is Item)
-			{
-				(item.Element as Item).State = state;
-				m_Page.NotifyIndirectChange(item, ChangeAffects.RepaintNeeded, item.RefreshBounds());
-			}
-			else
-				Debug.Fail("No means of highlighting " + item.Element.ShapeCode);
+			item.State = state;
+			m_Page.NotifyIndirectChange(item, ChangeAffects.RepaintNeeded, item.RefreshBounds());
 		}
 
 		/// <summary>Selects first item on page to start scan</summary>
@@ -269,6 +268,11 @@ namespace SAW
 
 		private void m_Engine_Trigger(bool isRepeat)
 		{
+			if (m_frmReport != null)
+			{
+				m_frmReport.SwitchActivated();
+				return;
+			}
 			if (m_RepeatItem?.HasRepeatingScript ?? false)
 			{ // currently doing custom repeats scripts 
 				if (CurrentConfig.ReadBoolean(Config.Repeat_PressStop) && !isRepeat)
@@ -389,7 +393,7 @@ namespace SAW
 			{
 				//Debug.WriteLine("Execute: " + c.GetScriptWithParams(false));
 				c.Execute(context);
-				if (context.Terminate)
+				if (context?.Terminate == true)
 					break;
 			}
 		}
@@ -530,6 +534,7 @@ namespace SAW
 
 		#endregion
 
+		#region Reporting
 		/// <summary>Used to report errors in scripts.  These are unexpected, invalid situations  Messages don't always translate - not decided yet whether they should</summary>
 		public void OnError(string message)
 		{
@@ -544,6 +549,21 @@ namespace SAW
 			Console.Beep();
 			Globals.Root.Log.WriteLine(message);
 		}
+
+		/// <summary>Popup message screen shown to user over scanning.  If this is visible switches are sent to it instead. </summary>
+		private frmUserReport m_frmReport;
+		public void ShowReportWindow(string message, bool isError, int timeLimitMS = 0)
+		{
+			if (isError)
+				Globals.Root.Log.WriteLine(message);
+			m_frmReport = frmUserReport.Display(message, this, timeLimitMS, () =>
+			{// called when form is closed for any reason
+				m_frmReport = null;
+			});
+		}
+
+
+		#endregion
 
 		protected override void m_Page_ShapeNotifiedIndirectChange(Shape shape, ChangeAffects affected, RectangleF area)
 		{
@@ -598,7 +618,7 @@ namespace SAW
 		/// <summary>Called by SetWordList to define the (/an) output area.  Does not update settings</summary>
 		public void SetWordList(int itemID)
 		{
-			var item = (m_Page.FindScriptableByID(itemID).Element as Item); // must be a SAW item, since it must have contents
+			Item item = (m_Page.FindScriptableByID(itemID)?.Element as Item); // must be a SAW item, since it must have contents
 			if (item == null)
 			{
 				OnError(Strings.Item("Script_Fail_MissingWordListItem", itemID.ToString()));

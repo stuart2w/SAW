@@ -48,8 +48,11 @@ namespace SAW
 
 #if DEBUG
 			// can be used in development to start with an initial file...
-			m_InitialFile = "d:\\temp\\sss\\test.saw7";
+			m_InitialFile = "d:\\data\\ace\\saw\\test data\\test.saw7";
 			m_InitialIsRun = false;
+
+			//var switchForm = new Switches.DevelopTest();
+			//switchForm.Show();
 #endif
 
 			if (!string.IsNullOrEmpty(m_InitialFile))

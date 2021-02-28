@@ -57,7 +57,7 @@ namespace SAW
 			System.Windows.Forms.ToolStripMenuItem VerbSendBackToolStripMenuItem;
 			System.Windows.Forms.ToolStripMenuItem VerbBringFrontToolStripMenuItem;
 			System.Windows.Forms.ToolStripMenuItem VerbDuplicatePageToolStripMenuItem;
-			Label LabelWithBlend1;
+			System.Windows.Forms.Label LabelWithBlend1;
 			System.Windows.Forms.ToolStripMenuItem VerbPageSizeToolStripMenuItem;
 			System.Windows.Forms.ToolStripMenuItem mnuEditPaperContext;
 			System.Windows.Forms.ToolStripSeparator ToolStripMenuItem9;
@@ -75,6 +75,9 @@ namespace SAW
 			this.VerbExportSVGToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.VerbExportPageAsDocumentToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.mnuEdit = new System.Windows.Forms.ToolStripMenuItem();
+			this.mnuVerbActive = new System.Windows.Forms.ToolStripMenuItem();
+			this.mnuVerbInactive = new System.Windows.Forms.ToolStripMenuItem();
+			this.mnuDividerMakeActive = new System.Windows.Forms.ToolStripSeparator();
 			this.verbCopyScriptsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.verbCopyPresentationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.MenuFrontBackToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -96,8 +99,11 @@ namespace SAW
 			this.verbShowGraphicSelectionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.verbHideGraphicSelectionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.mnuDoubleClick = new System.Windows.Forms.ToolStripMenuItem();
+			this.verbConvertToPathToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.mnuFreeTextToTextLine = new System.Windows.Forms.ToolStripMenuItem();
 			this.verbCCFUpdateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.mnuMakeMask = new System.Windows.Forms.ToolStripMenuItem();
+			this.mnuRemoveMask = new System.Windows.Forms.ToolStripMenuItem();
 			this.dlgPrint = new System.Windows.Forms.PrintDialog();
 			this.dlgPageSetup = new System.Windows.Forms.PageSetupDialog();
 			this.pnlConstruction = new System.Windows.Forms.Panel();
@@ -108,7 +114,9 @@ namespace SAW
 			this.mnuFile = new System.Windows.Forms.ToolStripMenuItem();
 			this.mnuUserUser = new System.Windows.Forms.ToolStripMenuItem();
 			this.VerbStartToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.mnuGraphicsMode = new System.Windows.Forms.ToolStripMenuItem();
 			this.mnuRecent = new System.Windows.Forms.ToolStripMenuItem();
+			this.verbYoctoTestToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.verbExportAsTextToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.sAWDesktopToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.mnuSaveDesktop = new System.Windows.Forms.ToolStripMenuItem();
@@ -122,6 +130,7 @@ namespace SAW
 			this.mnuSnapGrid = new System.Windows.Forms.ToolStripMenuItem();
 			this.mnuSnapShape = new System.Windows.Forms.ToolStripMenuItem();
 			this.mnuSnapAngle = new System.Windows.Forms.ToolStripMenuItem();
+			this.mnuResizeDoc = new System.Windows.Forms.ToolStripMenuItem();
 			this.mnuZoomPage = new System.Windows.Forms.ToolStripMenuItem();
 			this.mnuZoomWidth = new System.Windows.Forms.ToolStripMenuItem();
 			this.mnuConfigUser = new System.Windows.Forms.ToolStripMenuItem();
@@ -177,7 +186,7 @@ namespace SAW
 			this.mnuPaletteHide = new System.Windows.Forms.ToolStripMenuItem();
 			this.mnuPaletteSmaller = new System.Windows.Forms.ToolStripMenuItem();
 			this.mnuPaletteLarger = new System.Windows.Forms.ToolStripMenuItem();
-			this.mnuPaletteShowSettings = new System.Windows.Forms.ToolStripMenuItem();
+			this.mnuPaletteShowSettings = new System.Windows.Forms.ToolStripSeparator();
 			this.mnuPaletteEdit = new System.Windows.Forms.ToolStripMenuItem();
 			this.mnuPaletteScale = new System.Windows.Forms.ToolStripMenuItem();
 			this.mnuPalette100 = new System.Windows.Forms.ToolStripMenuItem();
@@ -232,7 +241,7 @@ namespace SAW
 			VerbSendBackToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			VerbBringFrontToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			VerbDuplicatePageToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			LabelWithBlend1 = new Label();
+			LabelWithBlend1 = new System.Windows.Forms.Label();
 			VerbPageSizeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			mnuEditPaperContext = new System.Windows.Forms.ToolStripMenuItem();
 			ToolStripMenuItem9 = new System.Windows.Forms.ToolStripSeparator();
@@ -291,46 +300,46 @@ namespace SAW
 			// VerbNewDocumentToolStripMenuItem
 			// 
 			VerbNewDocumentToolStripMenuItem.Name = "VerbNewDocumentToolStripMenuItem";
-			VerbNewDocumentToolStripMenuItem.Size = new System.Drawing.Size(190, 22);
+			VerbNewDocumentToolStripMenuItem.Size = new System.Drawing.Size(195, 22);
 			VerbNewDocumentToolStripMenuItem.Text = "[Verb_NewDocument]";
 			// 
 			// MenuLoadToolStripMenuItem
 			// 
 			MenuLoadToolStripMenuItem.Name = "MenuLoadToolStripMenuItem";
-			MenuLoadToolStripMenuItem.Size = new System.Drawing.Size(190, 22);
+			MenuLoadToolStripMenuItem.Size = new System.Drawing.Size(195, 22);
 			MenuLoadToolStripMenuItem.Tag = "";
 			MenuLoadToolStripMenuItem.Text = "[Verb_Open]";
 			// 
 			// MenuSaveToolStripMenuItem
 			// 
 			MenuSaveToolStripMenuItem.Name = "MenuSaveToolStripMenuItem";
-			MenuSaveToolStripMenuItem.Size = new System.Drawing.Size(190, 22);
+			MenuSaveToolStripMenuItem.Size = new System.Drawing.Size(195, 22);
 			MenuSaveToolStripMenuItem.Tag = "";
 			MenuSaveToolStripMenuItem.Text = "[Verb_Save]";
 			// 
 			// MenuSaveAsToolStripMenuItem
 			// 
 			MenuSaveAsToolStripMenuItem.Name = "MenuSaveAsToolStripMenuItem";
-			MenuSaveAsToolStripMenuItem.Size = new System.Drawing.Size(190, 22);
+			MenuSaveAsToolStripMenuItem.Size = new System.Drawing.Size(195, 22);
 			MenuSaveAsToolStripMenuItem.Tag = "";
 			MenuSaveAsToolStripMenuItem.Text = "[Verb_SaveAs]";
 			// 
 			// VerbPrintToolStripMenuItem
 			// 
 			VerbPrintToolStripMenuItem.Name = "VerbPrintToolStripMenuItem";
-			VerbPrintToolStripMenuItem.Size = new System.Drawing.Size(190, 22);
+			VerbPrintToolStripMenuItem.Size = new System.Drawing.Size(195, 22);
 			VerbPrintToolStripMenuItem.Text = "[Verb_Print]";
 			// 
 			// VerbPrintPreviewToolStripMenuItem
 			// 
 			VerbPrintPreviewToolStripMenuItem.Name = "VerbPrintPreviewToolStripMenuItem";
-			VerbPrintPreviewToolStripMenuItem.Size = new System.Drawing.Size(190, 22);
+			VerbPrintPreviewToolStripMenuItem.Size = new System.Drawing.Size(195, 22);
 			VerbPrintPreviewToolStripMenuItem.Text = "[Verb_PrintPreview]";
 			// 
 			// ToolStripMenuItem6
 			// 
 			ToolStripMenuItem6.Name = "ToolStripMenuItem6";
-			ToolStripMenuItem6.Size = new System.Drawing.Size(190, 22);
+			ToolStripMenuItem6.Size = new System.Drawing.Size(195, 22);
 			ToolStripMenuItem6.Text = "[Verb_ImportImage]";
 			// 
 			// ToolStripMenuItem1
@@ -428,30 +437,30 @@ namespace SAW
 			// ToolStripMenuItem2
 			// 
 			ToolStripMenuItem2.Name = "ToolStripMenuItem2";
-			ToolStripMenuItem2.Size = new System.Drawing.Size(220, 6);
+			ToolStripMenuItem2.Size = new System.Drawing.Size(224, 6);
 			// 
 			// ToolStripMenuItem5
 			// 
 			ToolStripMenuItem5.Name = "ToolStripMenuItem5";
-			ToolStripMenuItem5.Size = new System.Drawing.Size(223, 22);
+			ToolStripMenuItem5.Size = new System.Drawing.Size(227, 22);
 			ToolStripMenuItem5.Text = "[Verb_ZoomIn]";
 			// 
 			// VerbZoomOutToolStripMenuItem
 			// 
 			VerbZoomOutToolStripMenuItem.Name = "VerbZoomOutToolStripMenuItem";
-			VerbZoomOutToolStripMenuItem.Size = new System.Drawing.Size(223, 22);
+			VerbZoomOutToolStripMenuItem.Size = new System.Drawing.Size(227, 22);
 			VerbZoomOutToolStripMenuItem.Text = "[Verb_ZoomOut]";
 			// 
 			// VerbZoom100ToolStripMenuItem
 			// 
 			VerbZoom100ToolStripMenuItem.Name = "VerbZoom100ToolStripMenuItem";
-			VerbZoom100ToolStripMenuItem.Size = new System.Drawing.Size(223, 22);
+			VerbZoom100ToolStripMenuItem.Size = new System.Drawing.Size(227, 22);
 			VerbZoom100ToolStripMenuItem.Text = "[Verb_Zoom100]";
 			// 
 			// ToolStripMenuItem4
 			// 
 			ToolStripMenuItem4.Name = "ToolStripMenuItem4";
-			ToolStripMenuItem4.Size = new System.Drawing.Size(220, 6);
+			ToolStripMenuItem4.Size = new System.Drawing.Size(224, 6);
 			// 
 			// ToolStripSeparator1
 			// 
@@ -525,7 +534,7 @@ namespace SAW
 			// VerbQuitToolStripMenuItem
 			// 
 			VerbQuitToolStripMenuItem.Name = "VerbQuitToolStripMenuItem";
-			VerbQuitToolStripMenuItem.Size = new System.Drawing.Size(190, 22);
+			VerbQuitToolStripMenuItem.Size = new System.Drawing.Size(195, 22);
 			VerbQuitToolStripMenuItem.Text = "[Verb_Quit]";
 			// 
 			// VerbSendBackToolStripMenuItem
@@ -576,12 +585,12 @@ namespace SAW
 			// ToolStripMenuItem10
 			// 
 			ToolStripMenuItem10.Name = "ToolStripMenuItem10";
-			ToolStripMenuItem10.Size = new System.Drawing.Size(187, 6);
+			ToolStripMenuItem10.Size = new System.Drawing.Size(192, 6);
 			// 
 			// ToolStripMenuItem11
 			// 
 			ToolStripMenuItem11.Name = "ToolStripMenuItem11";
-			ToolStripMenuItem11.Size = new System.Drawing.Size(187, 6);
+			ToolStripMenuItem11.Size = new System.Drawing.Size(192, 6);
 			// 
 			// mnuPageNext
 			// 
@@ -598,7 +607,7 @@ namespace SAW
             this.VerbExportSVGToolStripMenuItem,
             this.VerbExportPageAsDocumentToolStripMenuItem});
 			this.mnuExportPage.Name = "mnuExportPage";
-			this.mnuExportPage.Size = new System.Drawing.Size(190, 22);
+			this.mnuExportPage.Size = new System.Drawing.Size(195, 22);
 			this.mnuExportPage.Text = "[Menu_ExportPage]";
 			// 
 			// mnuExportEMF
@@ -634,6 +643,9 @@ namespace SAW
 			// mnuEdit
 			// 
 			this.mnuEdit.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.mnuVerbActive,
+            this.mnuVerbInactive,
+            this.mnuDividerMakeActive,
             VerbCopyToolStripMenuItem,
             this.verbCopyScriptsToolStripMenuItem,
             this.verbCopyPresentationToolStripMenuItem,
@@ -649,13 +661,33 @@ namespace SAW
             this.menuModifySelectedToolStripMenuItem,
             ToolStripSeparator3,
             this.mnuDoubleClick,
+            this.verbConvertToPathToolStripMenuItem,
             ApplyToolStripMenuItem,
             this.mnuFreeTextToTextLine,
-            this.verbCCFUpdateToolStripMenuItem});
+            this.verbCCFUpdateToolStripMenuItem,
+            this.mnuMakeMask,
+            this.mnuRemoveMask});
 			this.mnuEdit.Name = "mnuEdit";
 			this.mnuEdit.Size = new System.Drawing.Size(83, 20);
 			this.mnuEdit.Text = "[Menu_Edit]";
 			this.mnuEdit.DropDownOpening += new System.EventHandler(this.mnuEdit_DropDownOpening);
+			// 
+			// mnuVerbActive
+			// 
+			this.mnuVerbActive.Name = "mnuVerbActive";
+			this.mnuVerbActive.Size = new System.Drawing.Size(208, 22);
+			this.mnuVerbActive.Text = "[Verb_MakeActive]";
+			// 
+			// mnuVerbInactive
+			// 
+			this.mnuVerbInactive.Name = "mnuVerbInactive";
+			this.mnuVerbInactive.Size = new System.Drawing.Size(208, 22);
+			this.mnuVerbInactive.Text = "[Verb_MakeInactive]";
+			// 
+			// mnuDividerMakeActive
+			// 
+			this.mnuDividerMakeActive.Name = "mnuDividerMakeActive";
+			this.mnuDividerMakeActive.Size = new System.Drawing.Size(205, 6);
 			// 
 			// verbCopyScriptsToolStripMenuItem
 			// 
@@ -814,6 +846,12 @@ namespace SAW
 			this.mnuDoubleClick.Visible = false;
 			this.mnuDoubleClick.Click += new System.EventHandler(this.mnuDoubleClick_Click);
 			// 
+			// verbConvertToPathToolStripMenuItem
+			// 
+			this.verbConvertToPathToolStripMenuItem.Name = "verbConvertToPathToolStripMenuItem";
+			this.verbConvertToPathToolStripMenuItem.Size = new System.Drawing.Size(208, 22);
+			this.verbConvertToPathToolStripMenuItem.Text = "[Verb_ConvertToPath]";
+			// 
 			// mnuFreeTextToTextLine
 			// 
 			this.mnuFreeTextToTextLine.Name = "mnuFreeTextToTextLine";
@@ -825,6 +863,18 @@ namespace SAW
 			this.verbCCFUpdateToolStripMenuItem.Name = "verbCCFUpdateToolStripMenuItem";
 			this.verbCCFUpdateToolStripMenuItem.Size = new System.Drawing.Size(208, 22);
 			this.verbCCFUpdateToolStripMenuItem.Text = "[Verb_CCFUpdate]";
+			// 
+			// mnuMakeMask
+			// 
+			this.mnuMakeMask.Name = "mnuMakeMask";
+			this.mnuMakeMask.Size = new System.Drawing.Size(208, 22);
+			this.mnuMakeMask.Text = "[Verb_MakeMask]";
+			// 
+			// mnuRemoveMask
+			// 
+			this.mnuRemoveMask.Name = "mnuRemoveMask";
+			this.mnuRemoveMask.Size = new System.Drawing.Size(208, 22);
+			this.mnuRemoveMask.Text = "[Verb_RemoveMask]";
 			// 
 			// dlgPrint
 			// 
@@ -900,9 +950,11 @@ namespace SAW
 			this.mnuFile.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.mnuUserUser,
             this.VerbStartToolStripMenuItem,
+            this.mnuGraphicsMode,
             VerbNewDocumentToolStripMenuItem,
             MenuLoadToolStripMenuItem,
             this.mnuRecent,
+            this.verbYoctoTestToolStripMenuItem,
             ToolStripMenuItem10,
             MenuSaveToolStripMenuItem,
             MenuSaveAsToolStripMenuItem,
@@ -924,29 +976,41 @@ namespace SAW
 			// mnuUserUser
 			// 
 			this.mnuUserUser.Name = "mnuUserUser";
-			this.mnuUserUser.Size = new System.Drawing.Size(190, 22);
+			this.mnuUserUser.Size = new System.Drawing.Size(195, 22);
 			this.mnuUserUser.Text = "[Verb_UserUser]";
 			// 
 			// VerbStartToolStripMenuItem
 			// 
 			this.VerbStartToolStripMenuItem.Name = "VerbStartToolStripMenuItem";
-			this.VerbStartToolStripMenuItem.Size = new System.Drawing.Size(190, 22);
+			this.VerbStartToolStripMenuItem.Size = new System.Drawing.Size(195, 22);
 			this.VerbStartToolStripMenuItem.Text = "[Verb_Start]";
 			this.VerbStartToolStripMenuItem.Visible = false;
+			// 
+			// mnuGraphicsMode
+			// 
+			this.mnuGraphicsMode.Name = "mnuGraphicsMode";
+			this.mnuGraphicsMode.Size = new System.Drawing.Size(195, 22);
+			this.mnuGraphicsMode.Text = "[Menu_GraphicsMode]";
 			// 
 			// mnuRecent
 			// 
 			this.mnuRecent.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             PlaceholderToolStripMenuItem});
 			this.mnuRecent.Name = "mnuRecent";
-			this.mnuRecent.Size = new System.Drawing.Size(190, 22);
+			this.mnuRecent.Size = new System.Drawing.Size(195, 22);
 			this.mnuRecent.Text = "[Menu_Recent]";
 			this.mnuRecent.DropDownOpening += new System.EventHandler(this.mnuRecent_DropDownOpening);
+			// 
+			// verbYoctoTestToolStripMenuItem
+			// 
+			this.verbYoctoTestToolStripMenuItem.Name = "verbYoctoTestToolStripMenuItem";
+			this.verbYoctoTestToolStripMenuItem.Size = new System.Drawing.Size(195, 22);
+			this.verbYoctoTestToolStripMenuItem.Text = "[Verb_YoctoTest]";
 			// 
 			// verbExportAsTextToolStripMenuItem
 			// 
 			this.verbExportAsTextToolStripMenuItem.Name = "verbExportAsTextToolStripMenuItem";
-			this.verbExportAsTextToolStripMenuItem.Size = new System.Drawing.Size(190, 22);
+			this.verbExportAsTextToolStripMenuItem.Size = new System.Drawing.Size(195, 22);
 			this.verbExportAsTextToolStripMenuItem.Text = "[Verb_ExportAsText]";
 			// 
 			// sAWDesktopToolStripMenuItem
@@ -955,7 +1019,7 @@ namespace SAW
             this.mnuSaveDesktop,
             this.mnuDesktopEdit});
 			this.sAWDesktopToolStripMenuItem.Name = "sAWDesktopToolStripMenuItem";
-			this.sAWDesktopToolStripMenuItem.Size = new System.Drawing.Size(190, 22);
+			this.sAWDesktopToolStripMenuItem.Size = new System.Drawing.Size(195, 22);
 			this.sAWDesktopToolStripMenuItem.Text = "[SAW_Desktop]";
 			// 
 			// mnuSaveDesktop
@@ -978,7 +1042,7 @@ namespace SAW
             this.verbImportIRMToolStripMenuItem,
             this.verbExportIRMToolStripMenuItem});
 			this.sAWMenuIRMToolStripMenuItem.Name = "sAWMenuIRMToolStripMenuItem";
-			this.sAWMenuIRMToolStripMenuItem.Size = new System.Drawing.Size(190, 22);
+			this.sAWMenuIRMToolStripMenuItem.Size = new System.Drawing.Size(195, 22);
 			this.sAWMenuIRMToolStripMenuItem.Text = "[SAW_Menu_IRM]";
 			// 
 			// verbImportIRMToolStripMenuItem
@@ -996,7 +1060,7 @@ namespace SAW
 			// mnuUpdate
 			// 
 			this.mnuUpdate.Name = "mnuUpdate";
-			this.mnuUpdate.Size = new System.Drawing.Size(190, 22);
+			this.mnuUpdate.Size = new System.Drawing.Size(195, 22);
 			this.mnuUpdate.Text = "[Menu_Update]";
 			// 
 			// mnuOptions
@@ -1007,6 +1071,7 @@ namespace SAW
             this.mnuSnapShape,
             this.mnuSnapAngle,
             ToolStripMenuItem2,
+            this.mnuResizeDoc,
             ToolStripMenuItem5,
             VerbZoomOutToolStripMenuItem,
             VerbZoom100ToolStripMenuItem,
@@ -1029,7 +1094,7 @@ namespace SAW
 			// 
 			this.mnuSnapOff.Image = global::Resources.AM.NoSnap_16;
 			this.mnuSnapOff.Name = "mnuSnapOff";
-			this.mnuSnapOff.Size = new System.Drawing.Size(223, 22);
+			this.mnuSnapOff.Size = new System.Drawing.Size(227, 22);
 			this.mnuSnapOff.Text = "[Menu_SnapOff]";
 			this.mnuSnapOff.Click += new System.EventHandler(this.mnuSnapOff_Click);
 			// 
@@ -1037,7 +1102,7 @@ namespace SAW
 			// 
 			this.mnuSnapGrid.Image = global::Resources.AM.GridSnap_16;
 			this.mnuSnapGrid.Name = "mnuSnapGrid";
-			this.mnuSnapGrid.Size = new System.Drawing.Size(223, 22);
+			this.mnuSnapGrid.Size = new System.Drawing.Size(227, 22);
 			this.mnuSnapGrid.Text = "[Menu_SnapGrid]";
 			this.mnuSnapGrid.Click += new System.EventHandler(this.mnuSnapGrid_Click);
 			// 
@@ -1045,7 +1110,7 @@ namespace SAW
 			// 
 			this.mnuSnapShape.Image = global::Resources.AM.ShapeSnap_16;
 			this.mnuSnapShape.Name = "mnuSnapShape";
-			this.mnuSnapShape.Size = new System.Drawing.Size(223, 22);
+			this.mnuSnapShape.Size = new System.Drawing.Size(227, 22);
 			this.mnuSnapShape.Text = "[Menu_SnapShape]";
 			this.mnuSnapShape.Click += new System.EventHandler(this.mnuSnapShape_Click);
 			// 
@@ -1053,26 +1118,33 @@ namespace SAW
 			// 
 			this.mnuSnapAngle.Image = global::Resources.AM.AngleSnap_16;
 			this.mnuSnapAngle.Name = "mnuSnapAngle";
-			this.mnuSnapAngle.Size = new System.Drawing.Size(223, 22);
+			this.mnuSnapAngle.Size = new System.Drawing.Size(227, 22);
 			this.mnuSnapAngle.Text = "[Menu_SnapAngle]";
 			this.mnuSnapAngle.Click += new System.EventHandler(this.mnuSnapAngle_Click);
+			// 
+			// mnuResizeDoc
+			// 
+			this.mnuResizeDoc.Name = "mnuResizeDoc";
+			this.mnuResizeDoc.Size = new System.Drawing.Size(227, 22);
+			this.mnuResizeDoc.Text = "[Menu_ResizeDocToWindow]";
+			this.mnuResizeDoc.Click += new System.EventHandler(this.mnuResizeDoc_Click);
 			// 
 			// mnuZoomPage
 			// 
 			this.mnuZoomPage.Name = "mnuZoomPage";
-			this.mnuZoomPage.Size = new System.Drawing.Size(223, 22);
+			this.mnuZoomPage.Size = new System.Drawing.Size(227, 22);
 			this.mnuZoomPage.Text = "[Verb_ZoomPage]";
 			// 
 			// mnuZoomWidth
 			// 
 			this.mnuZoomWidth.Name = "mnuZoomWidth";
-			this.mnuZoomWidth.Size = new System.Drawing.Size(223, 22);
+			this.mnuZoomWidth.Size = new System.Drawing.Size(227, 22);
 			this.mnuZoomWidth.Text = "[Verb_ZoomWidth]";
 			// 
 			// mnuConfigUser
 			// 
 			this.mnuConfigUser.Name = "mnuConfigUser";
-			this.mnuConfigUser.Size = new System.Drawing.Size(223, 22);
+			this.mnuConfigUser.Size = new System.Drawing.Size(227, 22);
 			this.mnuConfigUser.Text = "[Verb_ConfigUser]";
 			// 
 			// sAWMenuSettingsFileToolStripMenuItem
@@ -1081,7 +1153,7 @@ namespace SAW
             this.verbSaveSettingsToolStripMenuItem,
             this.verbLoadSettingsToolStripMenuItem});
 			this.sAWMenuSettingsFileToolStripMenuItem.Name = "sAWMenuSettingsFileToolStripMenuItem";
-			this.sAWMenuSettingsFileToolStripMenuItem.Size = new System.Drawing.Size(223, 22);
+			this.sAWMenuSettingsFileToolStripMenuItem.Size = new System.Drawing.Size(227, 22);
 			this.sAWMenuSettingsFileToolStripMenuItem.Text = "[SAW_Menu_SettingsFile]";
 			// 
 			// verbSaveSettingsToolStripMenuItem
@@ -1099,19 +1171,19 @@ namespace SAW
 			// VerbResetPalettesToolStripMenuItem
 			// 
 			this.VerbResetPalettesToolStripMenuItem.Name = "VerbResetPalettesToolStripMenuItem";
-			this.VerbResetPalettesToolStripMenuItem.Size = new System.Drawing.Size(223, 22);
+			this.VerbResetPalettesToolStripMenuItem.Size = new System.Drawing.Size(227, 22);
 			this.VerbResetPalettesToolStripMenuItem.Text = "[Verb_ResetPalettes]";
 			// 
 			// verbViewPredictionWordsToolStripMenuItem
 			// 
 			this.verbViewPredictionWordsToolStripMenuItem.Name = "verbViewPredictionWordsToolStripMenuItem";
-			this.verbViewPredictionWordsToolStripMenuItem.Size = new System.Drawing.Size(223, 22);
+			this.verbViewPredictionWordsToolStripMenuItem.Size = new System.Drawing.Size(227, 22);
 			this.verbViewPredictionWordsToolStripMenuItem.Text = "[Verb_ViewPredictionWords]";
 			// 
 			// mnuSystemConfig
 			// 
 			this.mnuSystemConfig.Name = "mnuSystemConfig";
-			this.mnuSystemConfig.Size = new System.Drawing.Size(223, 22);
+			this.mnuSystemConfig.Size = new System.Drawing.Size(227, 22);
 			this.mnuSystemConfig.Text = "Edit system config";
 			this.mnuSystemConfig.Visible = false;
 			this.mnuSystemConfig.Click += new System.EventHandler(this.mnuSystemConfig_Click);
@@ -1119,7 +1191,7 @@ namespace SAW
 			// mnuActivityConfig
 			// 
 			this.mnuActivityConfig.Name = "mnuActivityConfig";
-			this.mnuActivityConfig.Size = new System.Drawing.Size(223, 22);
+			this.mnuActivityConfig.Size = new System.Drawing.Size(227, 22);
 			this.mnuActivityConfig.Text = "Edit activity config";
 			this.mnuActivityConfig.Visible = false;
 			this.mnuActivityConfig.Click += new System.EventHandler(this.mnuActivityConfig_Click);
@@ -1127,7 +1199,7 @@ namespace SAW
 			// mnuActivityConfigUser
 			// 
 			this.mnuActivityConfigUser.Name = "mnuActivityConfigUser";
-			this.mnuActivityConfigUser.Size = new System.Drawing.Size(223, 22);
+			this.mnuActivityConfigUser.Size = new System.Drawing.Size(227, 22);
 			this.mnuActivityConfigUser.Text = "Edit activity user config";
 			this.mnuActivityConfigUser.Visible = false;
 			this.mnuActivityConfigUser.Click += new System.EventHandler(this.mnuActivityConfigUser_Click);
@@ -1520,7 +1592,7 @@ namespace SAW
             this.mnuPaletteScale,
             this.mnuPaletteChoose});
 			this.ctxPalette.Name = "ctxPalette";
-			this.ctxPalette.Size = new System.Drawing.Size(164, 180);
+			this.ctxPalette.Size = new System.Drawing.Size(164, 164);
 			// 
 			// mnuPaletteReset
 			// 
@@ -1553,7 +1625,7 @@ namespace SAW
 			// mnuPaletteShowSettings
 			// 
 			this.mnuPaletteShowSettings.Name = "mnuPaletteShowSettings";
-			this.mnuPaletteShowSettings.Size = new System.Drawing.Size(163, 22);
+			this.mnuPaletteShowSettings.Size = new System.Drawing.Size(160, 6);
 			// 
 			// mnuPaletteEdit
 			// 
@@ -1607,7 +1679,6 @@ namespace SAW
 			this.ctrPromptArea.Location = new System.Drawing.Point(131, 620);
 			this.ctrPromptArea.Name = "ctrPromptArea";
 			this.ctrPromptArea.Padding = new System.Windows.Forms.Padding(4);
-			this.ctrPromptArea.Prompts = null;
 			this.ctrPromptArea.Size = new System.Drawing.Size(797, 78);
 			this.ctrPromptArea.TabIndex = 60;
 			this.ctrPromptArea.Text = "CtrPrompts1";
@@ -1751,7 +1822,6 @@ namespace SAW
 		private System.Windows.Forms.ContextMenuStrip ctxPalette;
 		internal System.Windows.Forms.ToolStripMenuItem mnuPaletteReset;
 		private System.Windows.Forms.ToolStripMenuItem mnuPaletteHide;
-		private System.Windows.Forms.ToolStripMenuItem mnuPaletteShowSettings;
 		private System.Windows.Forms.ToolStripMenuItem mnuPaletteEdit;
 		private System.Windows.Forms.ToolStripMenuItem mnuPaletteScale;
 		private System.Windows.Forms.ToolStripMenuItem mnuPalette100;
@@ -1804,6 +1874,16 @@ namespace SAW
 		private ToolStripMenuItem sAWMenuIRMToolStripMenuItem;
 		private ToolStripMenuItem verbImportIRMToolStripMenuItem;
 		private ToolStripMenuItem verbExportIRMToolStripMenuItem;
+		private ToolStripMenuItem mnuGraphicsMode;
+		private ToolStripSeparator mnuPaletteShowSettings;
+		private ToolStripMenuItem verbConvertToPathToolStripMenuItem;
+		private ToolStripMenuItem mnuMakeMask;
+		private ToolStripMenuItem mnuRemoveMask;
+		private ToolStripMenuItem mnuVerbActive;
+		private ToolStripMenuItem mnuVerbInactive;
+		private ToolStripMenuItem mnuResizeDoc;
+		private ToolStripSeparator mnuDividerMakeActive;
+		private ToolStripMenuItem verbYoctoTestToolStripMenuItem;
 	}
 
 }

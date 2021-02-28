@@ -114,7 +114,6 @@ namespace SAW.Functions
 		public static AppliedConfig.MouseSteps CurrentStep = AppliedConfig.MouseSteps.Medium;
 		/// <summary>The step which this verb object configures </summary>
 		public AppliedConfig.MouseSteps Step;
-		public static event EventHandler<EventArgs> MouseStepChanged;
 
 		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
 		{

@@ -220,7 +220,7 @@ namespace SAW
 
 		#region Coordinate calculations, GrabSpots
 
-		public override List<GrabSpot> GetGrabSpots(float scale)
+		internal override List<GrabSpot> GetGrabSpots(float scale)
 		{
 			List<GrabSpot> list = new List<GrabSpot>();
 			base.AddBoundingGrabSpots(list, scale);
@@ -273,21 +273,8 @@ namespace SAW
 			if (m_Data != null)
 			{
 				m_Data.DereferenceOnLoad(document);
-				//m_Image = m_Data.Failed ? Resources.AM.Missing_128 : m_Data.Content.GetImage();
 				m_ImageSize = m_Data.Failed ? new Size(64, 64) : m_Data.Content.GetSize();
 			}
-			//if (m_Data == null && !m_idData.IsEmpty())
-			//{
-			//	// first condition is needed because this might have been loaded from an old file, in which case the data will already be set
-			//	m_Data = objDocument.FindExistingSharedBitmap(m_idData);
-			//	if (m_Data != null)
-			//		m_Image = m_Data.GetImage();
-			//	else
-			//	{
-			//		Misc.LogSubError("Cannot find shared image: " + m_idData);
-			//		m_Image = Resources.AM.Missing_128;
-			//	}
-			//}
 		}
 
 		public override void UpdateReferencesIDsChanged(Mapping mapID, Document document)

@@ -45,10 +45,7 @@ namespace SAW
 					return Strings.Item("SAW_Visit_" + VisitType);
 			}
 
-			public override string ToString()
-			{
-				return GetDescription();
-			}
+			public override string ToString() => GetDescription();
 
 		}
 
@@ -203,10 +200,7 @@ namespace SAW
 
 		#endregion
 
-		public override string ToString()
-		{
-			return GenerateScript(false);
-		}
+		public override string ToString() => GenerateScript(false);
 
 		/// <summary>Does the output for the "output as text" command.  This should be given the description which is prefixed on the beginning.  This allows an optional call to this which will be ignored if it is null </summary>
 		public void WriteExportText(IndentStringBuilder output, string description)
@@ -223,10 +217,7 @@ namespace SAW
 		}
 
 		/// <summary>True if the script contains nothing, but runs default scripts.  ie the user has not changed anything here</summary>
-		public bool IsEmpty
-		{
-			get { return RunDefault && !CommandList.Any() && Visit.VisitType == VisitTarget.VisitTypes.None; }
-		}
+		public bool IsEmpty => RunDefault && !CommandList.Any() && Visit.VisitType == VisitTarget.VisitTypes.None;
 
 	}
 }

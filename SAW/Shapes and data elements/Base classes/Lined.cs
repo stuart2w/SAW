@@ -77,7 +77,7 @@ namespace SAW
 		{
 			get
 			{
-				var allows = base.Allows | AllowedActions.Arrowheads ;
+				var allows = base.Allows | AllowedActions.Arrowheads;
 				// cannot cope with arrowheads in paths
 				if ((StartArrowhead == null || StartArrowhead.Style == ArrowheadC.Styles.None) && (EndArrowhead == null || EndArrowhead.Style == ArrowheadC.Styles.None))
 					allows = allows | AllowedActions.ConvertToPath;
@@ -106,12 +106,11 @@ namespace SAW
 					}
 					if (Status == StatusValues.Complete)
 						Status = StatusValues.Moved; // allows splatters to detect that this has (effectively) moved
-					Parent.NotifyIndirectChange(this, ChangeAffects.Intersections);
 				}
 			}
 		}
 
-		protected virtual bool Closed()
+		protected internal virtual bool Closed()
 		{
 			// returns true if the line draws back to the start point
 			// This was only in Sequential in version 1; it is useful however for cutting
@@ -181,10 +180,9 @@ namespace SAW
 			DiscardPath();
 		}
 
-		protected List<Prompt> GetPolyPointPrompts(string prefix)
+		/// <summary>generates the prompts where the shape consists of an arbitrary sequence, with Finish to place the last vertex</summary>
+		private protected List<Prompt> GetPolyPointPrompts(string prefix)
 		{
-			// generates the prompts where the shape consists of an arbitrary sequence, with Finish
-			// to place the last vertex
 			List<Prompt> list = new List<Prompt>();
 			if (m_DefinedVertices == 1)
 			{
@@ -202,13 +200,13 @@ namespace SAW
 			return list;
 		}
 
-		protected List<Prompt> GetBaseLinePrompts(string prefix, bool flip)
+		/// <summary>generates the prompts where the shape consists a baseline mostly defining the shape.  use flip=true if remaining option is merely which side the rest of the shape is placed</summary>
+		private protected List<Prompt> GetBaseLinePrompts(string prefix, bool flip)
 		{
-			// generates the prompts where the shape consists they baseline mostly defining the shape
 			List<Prompt> list = new List<Prompt>();
 			if (m_DefinedVertices == 1)
 			{
-				if (Strings.Exists(prefix + "_Choose1"))
+				if (Strings.Exists("Prompts_" + prefix + "_Choose1"))
 					list.Add(new Prompt(ShapeVerbs.Choose, prefix + "_Choose1", prefix + "_Choose"));
 				else
 					// most shapes use the generic version...
@@ -226,13 +224,13 @@ namespace SAW
 			return list;
 		}
 
-		public override VerbResult OtherVerb(EditableView.ClickPosition position, SAW.Functions.Codes code)
+		public override VerbResult OtherVerb(EditableView.ClickPosition position, Functions.Codes code)
 		{
 			// Performs basic Add and Remove vertex.  This will only be called however if the derived class has reported that these are applicable (the default is inapplicable)
-			var target = ((EditableView)position.View).PathTarget;
+			Target target = position.Page.SelectedPath;
 			switch (code)
 			{
-				case SAW.Functions.Codes.RemoveVertex:
+				case Functions.Codes.RemoveVertex:
 					if (m_DefinedVertices <= 2)
 						return VerbResult.Rejected;
 					m_DefinedVertices -= 1;
@@ -240,7 +238,7 @@ namespace SAW
 					DiscardPath();
 					m_Bounds = RectangleF.Empty;
 					return VerbResult.Continuing;
-				case SAW.Functions.Codes.AddVertex:
+				case Functions.Codes.AddVertex:
 					Vertices.Insert(target.ShapeIndex + 1, target.Position);
 					m_DefinedVertices += 1;
 					DiscardPath();
@@ -249,12 +247,14 @@ namespace SAW
 			}
 			return base.OtherVerb(position, code);
 		}
+
 		#endregion
 
 		#region List of vertices and support therefore
 		protected List<PointF> Vertices;
-		protected int m_DefinedVertices = 0; // the number of vertices which the user has so far placed
-											 // there might be further vertices in the list - the list can be filled with temporary points as the user moves the mouse
+
+		/// <summary>the number of vertices which the user has so far placed. There might be further vertices in the list - the list can be filled with temporary points as the user moves the mouse</summary>
+		protected int m_DefinedVertices;
 		protected virtual int FixedVerticesLength()
 		{
 			// returns number of vertices in a complete shape, if this is fixed.  Otherwise -1
@@ -412,8 +412,8 @@ namespace SAW
 		protected GraphicsPath m_ExteriorPath;
 
 		protected const float WIDETHRESHOLD = 3; // mm - approx 9 ot 10pt
-												 /// <summary>True if this line is very wide, and we should use the outer path for intersections etc; i.e. it is not treated as a single line but more like a filled shape
-												 /// False if line completely transparent (eg if this is filled only - then irrelevant what the unused line thickness is set to)</summary>
+		/// <summary>True if this line is very wide, and we should use the outer path for intersections etc; i.e. it is not treated as a single line but more like a filled shape
+		/// False if line completely transparent (eg if this is filled only - then irrelevant what the unused line thickness is set to)</summary>
 		protected bool IsWide
 		{
 			get
@@ -421,35 +421,6 @@ namespace SAW
 				if (LineStyle == null)
 					return false;
 				return LineStyle.Width > WIDETHRESHOLD && LineStyle.Colour.A > 0;
-			}
-		}
-
-		protected void InternalDrawFromPath(Canvas gr, DrawResources resources)
-		{
-			if (Vertices.Count < 2 && m_Path == null)
-				return;
-			if (m_DefinedVertices < 2)
-			{
-				// must be manoeuvring the first line at the moment... ' just draw a line between them
-				if (resources.MainPen != null)
-				{
-					if (Vertices[0].ApproxEqual(Vertices[1]))
-						// if user has not move the mouse yet (particularly applies to separate keyboard cursor) at least or something visible…
-						gr.DrawLine(new PointF(Vertices[0].X - 0.25f, Vertices[0].Y), new PointF(Vertices[1].X + 0.25f, Vertices[1].Y), resources.MainPen);
-					else
-						gr.DrawLine(Vertices[0], Vertices[1], resources.MainPen);
-				}
-			}
-			else
-			{
-				EnsurePath(WireFrame); // exterior path only ever needed if drawing wire frame
-				if (WireFrame && IsWide)
-				{
-					if (resources.MainPen != null)
-						gr.Path(m_ExteriorPath, resources.MainPen);
-				}
-				else if (resources.MainBrush != null || resources.MainPen != null)
-					gr.Path(m_Path, resources.MainPen, resources.MainBrush);
 			}
 		}
 
@@ -583,6 +554,7 @@ namespace SAW
 			EnsurePath(false);
 			return (GraphicsPath)m_Path.Clone(); // Needs to be a copy because m_Path will be disposed at some point
 		}
+
 		#endregion
 
 		#region Default implementations which use the path
@@ -695,6 +667,68 @@ namespace SAW
 		internal static bool WireFrame = false; // on diagnostic menu - changes all drawing to 1-pixel wide (as close as pos) lines
 		internal const float MITRELIMIT = 2; // makes a BIG difference to thick lines, especially calc bounds of (assumes pen width * mitrelimit required, and default is 10)
 
+		protected void InternalDrawFromPath(Canvas gr, DrawResources resources)
+		{
+			if (Vertices.Count < 2 && m_Path == null)
+				return;
+			if (m_DefinedVertices < 2)
+			{
+				// must be manoeuvring the first line at the moment... ' just draw a line between them
+				if (resources.MainPen != null)
+				{
+					if (Vertices[0].ApproxEqual(Vertices[1]))
+						// if user has not move the mouse yet (particularly applies to separate keyboard cursor) at least or something visible…
+						gr.DrawLine(new PointF(Vertices[0].X - 0.25f, Vertices[0].Y), new PointF(Vertices[1].X + 0.25f, Vertices[1].Y), resources.MainPen);
+					else
+						gr.DrawLine(Vertices[0], Vertices[1], resources.MainPen);
+				}
+			}
+			else
+			{
+				EnsurePath(WireFrame); // exterior path only ever needed if drawing wire frame
+				if (resources.SingleElement != null)
+				{
+					IEnumerable<PathElement> elements = GetPathNearTarget(resources.SingleElement);
+					GraphicsPath partialPath = PathElement.CreatePath(elements);
+					gr.Path(partialPath, resources.MainPen);
+					partialPath.Dispose();
+					return;
+				}
+				if (WireFrame && IsWide)
+				{
+					if (resources.MainPen != null)
+						gr.Path(m_ExteriorPath, resources.MainPen);
+				}
+				else if (resources.MainBrush != null || resources.MainPen != null)
+					gr.Path(m_Path, resources.MainPen, resources.MainBrush);
+			}
+		}
+
+		/// <summary>Returns path for one target, for drawing selection.  If target is a line it should be that line segment.  If it is a vertex it should be the lines before and after.
+		/// Implementation is not complete for all shapes as we're only really interested for GraphicsPath</summary>
+		private protected virtual IEnumerable<PathElement> GetPathNearTarget(Target target)
+		{
+			EnsurePath(false);
+			PathElement[] elements = PathElement.WithinPath(m_Path, true, true).ToArray();
+			switch (target.Type)
+			{
+				case Target.Types.Line:
+					yield return elements[target.ShapeIndex];
+					break;
+				case Target.Types.Vertex:
+					if (target.ShapeIndex > 0)
+						yield return elements[target.ShapeIndex - 1];
+					else if (Closed())
+						yield return elements.Last();
+					if (target.ShapeIndex < elements.Length)
+						yield return elements[target.ShapeIndex];
+					else if (Closed())
+						yield return elements[0];
+					break;
+				default: throw new ArgumentException("Only Line or Vertex targets permitted in GetPathNearTarget");
+			}
+		}
+
 		protected override void PrepareDraw(DrawResources resources)
 		{
 			base.PrepareDraw(resources);
@@ -753,24 +787,7 @@ namespace SAW
 			resources.MainPen.LineJoin = LineJoin.Round; // otherwise points can stick out for miles, busting the refreshbounds
 		}
 
-		protected const float CENTREMARKRADIUS = 2;
-		protected void DrawCentre(Canvas gr, DrawResources resources)
-		{
-			// Should be called by derived InternalDraw to draw the centre marker (after any background filling)
-			if (resources.CentrePen == null)
-				return;
-			DrawCentreMarkerAt(gr, resources.CentrePen, Centre);
-		}
-
-		protected void DrawCentreMarkerAt(Canvas gr, Stroke pn, PointF pt)
-		{
-			gr.Ellipse(new RectangleF(pt.X - CENTREMARKRADIUS, pt.Y - CENTREMARKRADIUS, CENTREMARKRADIUS * 2, CENTREMARKRADIUS * 2), pn);
-			gr.DrawLine(pt.X - CENTREMARKRADIUS, pt.Y, pt.X + CENTREMARKRADIUS, pt.Y, pn);
-			gr.DrawLine(pt.X, pt.Y - CENTREMARKRADIUS, pt.X, pt.Y + CENTREMARKRADIUS, pn);
-		}
-
-		protected bool LineInvisible
-		{ get { return LineStyle != null && LineStyle.Colour.A == 0; } }
+		protected bool LineInvisible => LineStyle != null && LineStyle.Colour.A == 0;
 
 		#endregion
 
@@ -876,7 +893,6 @@ namespace SAW
 			// default implemention of GenerateTargets - subclass must specify whether to treat the list of vertices as closed
 			// centre is automatically included if it is not empty
 			List<Target> targets = new List<Target>();
-			base.AddIntersectionTargets(targets, floatSocket);
 			AddLineTargets(this, targets, floatSocket, Vertices.ToArray(), closed);
 			PointF centre = Centre;
 			if (!centre.IsEmpty)
@@ -983,7 +999,7 @@ namespace SAW
 			return null;
 		}
 
-		public override void DrawLineTarget(Target target, Graphics gr, Pen pn, int activePhase)
+		internal override void DrawLineTarget(Target target, Graphics gr, Pen pn, int activePhase)
 		{
 			// Target.ShapeIndex is the index of the first vertex on this side
 			// we need to draw a pretty much fixed length in the direction of this vertex
@@ -1003,7 +1019,7 @@ namespace SAW
 			gr.DrawLine(pn, target.X - vector.Width, target.Y - vector.Height, target.X + vector.Width, target.Y + vector.Height);
 		}
 
-		protected void AddGrabSpotsForAllVertices(List<GrabSpot> spots, Prompt usePrompt = null)
+		private protected void AddGrabSpotsForAllVertices(List<GrabSpot> spots, Prompt usePrompt = null)
 		{
 			// all vertices can be moved independently
 			for (int index = 0; index <= Vertices.Count - 1; index++)
@@ -1018,7 +1034,7 @@ namespace SAW
 			list.Add(new GrabSpot(this, GrabTypes.SingleVertex, Vertices[1], 1));
 		}
 
-		protected override void DoGrabMove(GrabMovement move)
+		protected internal override void DoGrabMove(GrabMovement move)
 		{
 			// This sort of assumes that the logic of the shape is Sequential.  However I think the only shapes which use this which are not Sequential are Line
 			// and its derivatives, for which the logic here still works
@@ -1047,676 +1063,26 @@ namespace SAW
 			DiscardPath();
 		}
 
-		public override List<UserSocket> GetPointsWhichSnapWhenMoving()
+		internal override List<UserSocket> GetPointsWhichSnapWhenMoving()
 		{
 			return (from pt in Vertices select UserSocket.CreateForPoint(pt)).ToList();
 		}
 
 		#endregion
 
-		#region Intersections
+		#region Path flags
 
-		public override void CheckIntersectionsWith(Shape shape)
-		{
-			if (IsWide && LineLogic != LineLogics.Custom) // no Custom cos can't use EnsurePath
-			{
-				EnsurePath(true);
-				CheckIntersectionsWithUsingPath(shape, m_ExteriorPath);
-				return;
-			}
-			switch (LineLogic)
-			{
-				case LineLogics.VerticesAsLines:
-					// no matter what the shape is we can check whether it intersects with any of the lines in this shape
-					// step through all the lines which make up this shape and check if intersect with the other shape
-					int last = Vertices.Count - 2; // vertex on BEGINNING of last line to check
-					var closed = Closed();
-					if (closed)
-						last += 1;
-					for (int index = 0; index <= last; index++)
-					{
-						PointF end = Vertices[(index + 1) % Vertices.Count]; // the mod is so that we get back to 0 if Closed
-						PointF start = Vertices[index];
-						shape.CheckIntersectionsWithLine(this, index, 0, start, end, closed || index < last);
-					}
-					break;
-				case LineLogics.UsePath:
-					CheckIntersectionsWithUsingPath(shape, EnsurePath(false));
-					break;
-				default:
-					Utilities.ErrorAssert(false);
-					break;
-			}
-		}
+		internal const int PATHSTART = 0; // Start of a figure; should only be used on the first item
+		internal const int PATHLINE = 1;
+		internal const int PATHBEZIER = 3;
+		internal const int PATHTYPEMASK = 7; // mask which selects the type of segment
+		internal const int PATHCLOSUREFLAG = 0x80;
 
-		public const int PATHSTART = 0; // Start of a figure; should only be used on the first item
-		public const int PATHLINE = 1;
-		public const int PATHBEZIER = 3;
-		public const int PATHTYPEMASK = 7; // mask which selects the type of segment
-		public const int PATHCLOSUREFLAG = 0x80;
-		protected void CheckIntersectionsWithUsingPath(Shape shape, GraphicsPath path)
-		{
-			// path is provided as it can be normal or wide path
-			foreach (var element in PathElement.WithinPath(path))
-			{
-				if (element.Type == PATHLINE)
-				{
-					if (!element.IsClosure || !element.IsDegenerate)
-					{
-						// skip degenerate closures (where shape already finished back at same spot, but CloseFigure adds a zero-length line).  These will give assertions in intersection code
-						shape.CheckIntersectionsWithLine(this, element.Index, 0, element.Points[0], element.Points[1], true);
-					}
-				}
-				else if (element.Type == PATHBEZIER)
-					shape.CheckIntersectionsWithBezier(this, element.Index, element.Points);
-				else
-					throw new InvalidOperationException();
-			}
-		}
-
-		public override void CheckIntersectionsWithLine(Shape shape, int shapeIndex, float shapeParameter, PointF A, PointF B, bool ignoreEnd)
-		{
-			if (IsWide && LineLogic != LineLogics.Custom && shape.ShapeCode != Shapes.Scissors) // Last condition because cutting always cuts the line, not the outline
-			{
-				EnsurePath(true);
-				CheckIntersectionsWithLineUsingPath(shape, shapeIndex, shapeParameter, A, B, ignoreEnd, false, m_ExteriorPath);
-				return;
-			}
-			switch (LineLogic)
-			{
-				case LineLogics.VerticesAsLines:
-					// a default which checks all the lines which make up this shape
-					int last = Vertices.Count - 2; // vertex on BEGINNING of last line to check
-					if (Closed())
-						last += 1;
-					for (int index = 0; index <= last; index++)
-					{
-						PointF end = Vertices[(index + 1) % Vertices.Count]; // the mod is so that we get back to 0 if Closed
-						PointF start = Vertices[index];
-						DefaultCheckIntersectionBetweenLines(shape, start, end, Closed() || index < last, index, 0, A, B, ignoreEnd, shapeIndex, shapeParameter);
-					}
-					break;
-				case LineLogics.UsePath:
-					CheckIntersectionsWithLineUsingPath(shape, shapeIndex, shapeParameter, A, B, ignoreEnd, false, EnsurePath(false));
-					break;
-				default:
-					Utilities.ErrorAssert(false);
-					break;
-			}
-		}
-
-		protected void DefaultCheckIntersectionBetweenLines(Shape shape, PointF ptMeA, PointF ptMeB, bool ignoreEndMe, int indexMe, float parameterMe, PointF ptOtherA, PointF ptOtherB, bool ignoreEndOther, int indexOther, float parameterOther)
-		{
-			// checks for an intersection once we have identified 2 straight lines to check
-			// we assume that the parameter will not be required when storing this (although the index will be)
-			PointF second = PointF.Empty; // last param can return a second intersection if lines parallel
-			float certainty = 0;
-			PointF intersection = Intersection.Line_LineIntersection(ptMeA, ptMeB, ignoreEndMe, ptOtherA, ptOtherB, ignoreEndOther, false, false, out second, out certainty);
-			if (!intersection.IsEmpty)
-			{
-				Debug.Assert(Bounds.ContainsApprox(intersection) || IsWide);
-				Intersection create = new Intersection(intersection, this, indexMe, 0, shape, indexOther, parameterOther, certainty);
-				this.m_Intersections.Add(create);
-				if (shape != this)
-					shape.AddIntersection(create);
-				if (!second.IsEmpty)
-				{
-					create = new Intersection(second, this, indexMe, 0, shape, indexOther, parameterOther, certainty);
-					this.m_Intersections.Add(create);
-					if (shape != this)
-						shape.AddIntersection(create);
-				}
-			}
-		}
-
-		protected bool CheckIntersectionsWithLineUsingPath(Shape shape, int shapeIndex, float shapeParameter, PointF ptA, PointF ptB, bool ignoreEnd, bool testOnly, GraphicsPath pth, int startFromPoint = 0)
-		{
-			// if bolTestOnly intersections are not stored, and the function returns true if there are intersections
-			// if not bolTestOnly then the return value is always false
-			// like CheckIntersectionsWithUsingPath path can be main or exterior.  However this fn also has a test mode used by derived classes
-
-			foreach (var element in PathElement.WithinPath(pth, true))
-			{
-				if (element.Index >= startFromPoint)
-				{
-					if (element.Type == PATHLINE)
-					{
-						if (!testOnly)
-							DefaultCheckIntersectionBetweenLines(shape, element.Points[0], element.Points[1], true, element.Index, 0, ptA, ptB, ignoreEnd, shapeIndex, shapeParameter);
-						else
-						{
-							if (!Intersection.Line_LineIntersection(element.Points[0], element.Points[1], true, ptA, ptB, ignoreEnd, false, false).IsEmpty)
-								return true;
-						}
-					}
-					else if (element.Type == PATHBEZIER)
-					{
-						if (!testOnly)
-							DefaultCheckMyBezierWithOneLine(element.Points, element.Index, shape, ptA, ptB, shapeIndex);
-						else
-						{
-							var colIntersections = Intersection.Bezier_LineIntersection(element.Points, ptA, ptB);
-							if (colIntersections != null && colIntersections.Count > 0)
-								return true;
-						}
-					}
-					else
-						throw new InvalidOperationException();
-				}
-			}
-			return false;
-		}
-
-		public override void CheckIntersectionsWithBezier(Shape shape, int shapeIndex, PointF[] Q)
-		{
-			if (IsWide && LineLogic != LineLogics.Custom)
-			{
-				EnsurePath(true);
-				CheckIntersectionsWithBezierUsingPath(shape, shapeIndex, Q, m_ExteriorPath);
-				return;
-			}
-			switch (LineLogic)
-			{
-				case LineLogics.VerticesAsLines:
-					int last = Vertices.Count - 2; // vertex on BEGINNING of last line to check
-					if (Closed())
-						last += 1;
-					for (int index = 0; index <= last; index++)
-					{
-						PointF end = Vertices[(index + 1) % Vertices.Count]; // the mod is so that we get back to 0 if Closed
-						PointF start = Vertices[index];
-						DefaultCheckOneLineWithBezier(start, end, index, shape, shapeIndex, Q);
-					}
-					break;
-				case LineLogics.UsePath:
-					CheckIntersectionsWithBezierUsingPath(shape, shapeIndex, Q, EnsurePath(false));
-					break;
-				default:
-					Utilities.ErrorAssert(false);
-					break;
-			}
-		}
-
-		protected void CheckIntersectionsWithBezierUsingPath(Shape shape, int shapeIndex, PointF[] Q, GraphicsPath pth, int startFromPoint = 0, bool ignoreEnds = false)
-		{
-			// bolIgnoreEnds applies to both curves (because it is used only when checking for intersections within a shape)
-			// as CheckIntersectionsWithUsingPath path may be main path or exterior one
-			foreach (var element in PathElement.WithinPath(pth, true))
-			{
-				if (element.Index < startFromPoint)
-					continue;
-				if (element.Type == PATHLINE)
-					DefaultCheckOneLineWithBezier(element.Points[0], element.Points[1], element.Index, shape, shapeIndex, Q, true);
-				else if (element.Type == PATHBEZIER)
-					DefaultCheckOneBezierWithBezier(element.Points, element.Index, shape, shapeIndex, Q, ignoreEnds);
-				else
-					throw new InvalidOperationException();
-			}
-		}
-
-		// Public Overrides Sub CheckIntersectionsWithSelf() - not done since most subclasses cannot intersect themselves.  Override and use function below if applicable:
-
-		protected void CheckIntersectionsWithSelfUsingLines()
-		{
-			// step through each line, checking against all lines later in the list
-			for (int A = 0; A <= Vertices.Count - 3; A++) // -1 as usual for list; -1 because we want start vertices only; -1 because we don't want the last line
-			{
-				for (int B = A + 2; B <= Vertices.Count - 2; B++)
-				{
-					// +2 because we assume that two sequential lines don't intersect (we don't want to detect their shared vertex!), and if they are superimposed it is probably best to ignore it
-					float certainty = 0;
-					PointF intersection = Intersection.Line_LineIntersection(Vertices[A], Vertices[A + 1], Vertices[B], Vertices[B + 1], ref certainty);
-					if (!intersection.IsEmpty) 
-						this.m_Intersections.Add(new Intersection(intersection, this, A, 0, B, 0, certainty));
-				}
-			}
-		}
-
-		protected void CheckIntersectionsWithSelfUsingPath(GraphicsPath pth)
-		{
-			Debug.Assert(pth == m_Path == !IsWide);
-			foreach (var element in PathElement.WithinPath(pth, true))
-			{
-				if (element.Type == PATHLINE)
-					CheckIntersectionsWithLineUsingPath(this, element.Index, 0, element.Points[0], element.Points[1], true, false, pth, element.Index + 1);
-				else if (element.Type == PATHBEZIER)
-					CheckIntersectionsWithBezierUsingPath(this, element.Index, element.Points, pth, element.Index + 3, true);
-				else
-					throw new InvalidOperationException();
-			}
-		}
-		#endregion
-
-		#region Segments
-		protected Intersection FindLineSegmentIntersection(int index, PointF start, ref PointF end)
-		{
-			// Used in various GetSegment functions; finds any actual intersections within the line section
-			// returns nothing if none.  Index is the index in the intersection which indicates it refers to the correct section of this shape
-			// ptStart is the point on the line (possibly the beginning, but possibly not) where the segment currently starts
-			// ptEnd is the point at the end of the line if there are no intersections; this is updated if there are intersections
-			if (start.ApproxEqual(end))
-				return null; // PointWithinLineExtent doesn't work so well like this
-			Intersection endIntersection = null; // will be intersection at end of segment if any intersections within this line
-			foreach (Intersection intersection in m_Intersections)
-			{
-				if (intersection.IsIndex(this, index))
-				{
-					// is within the current segment.  Check if outside currently used part of line
-					if (!intersection.Position.ApproxEqual(start) && Geometry.PointWithinLineExtent(start, end, intersection.Position))
-					{
-						// first condition just checks we are not detecting objFrom (or other intersections at same point - intersections can easily be multiple!)
-						// intersection within current length (checking bound rect sufficient as all points on one line).
-						//  use this vertex as end instead
-						endIntersection = intersection;
-						end = intersection.Position;
-					}
-				}
-			}
-			return endIntersection;
-		}
-
-		public override Segment GetSegment(Intersection fromIntersection, bool forward)
-		{
-			if (IsWide)
-			{
-				EnsurePath(true);
-				return GetSegmentUsingPath(m_ExteriorPath, fromIntersection, forward);
-			}
-			EnsurePath(false);
-			switch (LineLogic)
-			{
-				case LineLogics.VerticesAsLines:
-					return GetSegmentUsingLines(fromIntersection, forward);
-				case LineLogics.UsePath:
-					return GetSegmentUsingPath(m_Path, fromIntersection, forward);
-				default:
-					throw new InvalidOperationException();
-			}
-		}
-
-		private Segment GetSegmentUsingLines(Intersection fromIX, bool forward)
-		{
-			var closed = Closed();
-			int vertex = fromIX.Index(this);
-			// low index for line (regardless of direction)
-			// need to go to end of given line
-			int endVertex; // vertex at end of line IN THIS DIRECTION
-			int startVertex = vertex; // start by doing it forwards and then swap as needed
-			if (vertex >= m_DefinedVertices - 1)
-				endVertex = 0;
-			else
-				endVertex = vertex + 1;
-#if DEBUG
-			if (FixedVerticesLength() > 0)
-				Debug.Assert(FixedVerticesLength() == m_DefinedVertices);
-#endif
-			if (!forward)
-				Utilities.Swap(ref startVertex, ref endVertex);
-			PointF endPoint = Vertices[endVertex]; // start point will be intersection position
-
-			// check if we were already at end of this line, in which case we should try and iterate a further one if possible
-			if (endPoint.ApproxEqual(fromIX.Position))
-			{
-				endVertex += forward ? 0 : -1; // +0 cos already added 1 above if
-				if (endVertex < 0)
-				{
-					if (!closed)
-						return null; // starting at start of shape - no segment
-					endVertex = m_DefinedVertices - 1;
-				}
-				if (endVertex >= m_DefinedVertices - 1 && !closed)
-					return null; // off end if open (m_intDefinedVertices - 1 only allowed if closed)
-				if (endVertex > m_DefinedVertices - 1)
-					endVertex = 0;
-				Intersection objNext = new Intersection(fromIX.Position, this, endVertex, 0);
-				return this.GetSegment(objNext, forward);
-			}
-
-			// however need to check if there is a closer intersection
-			Intersection endIntersection = FindLineSegmentIntersection(vertex, fromIX.Position, ref endPoint); // will be intersection at end of segment if any intersections within this line
-
-			if (endIntersection == null)
-			{
-				// create dummy intersection at end of line, with ShapeIndex set for the next line
-				int nextLine; // will be -1 for end of shape
-				if (forward)
-				{
-					nextLine = vertex + 1;
-					if (nextLine >= m_DefinedVertices - 1)
-					{
-						if (!closed)
-							nextLine = -1;
-						if (nextLine >= m_DefinedVertices)
-							nextLine = 0; // can be m_intDefinedVertices-1 if closed - this is the section from last point back to start
-					}
-				}
-				else
-				{
-					nextLine = vertex - 1;
-					if (nextLine < 0 && closed)
-						nextLine = m_DefinedVertices - 1; // if not closed left at -1 which means none
-				}
-				if (nextLine >= 0)
-				{
-					// dummy intersection for next section...
-					endIntersection = new Intersection(endPoint, this, nextLine, 0);
-					// otherwise leave objEndIntersection = nothing, meaning end-of-shape
-				}
-			}
-			if (!fromIX.Termination && fromIX.Position.ApproxEqual(endPoint))
-			{
-				// We are working from a genuine intersection, but travelling in this direction covers no noticeable distance, i.e. the intersection is presumably
-				// at the end of this segment.  See if we can iterate to a further segment
-				if (endIntersection == null)
-					return null; // at the end of this shape, there is no segment at all
-				return this.GetSegment(endIntersection, forward);
-			}
-			return new Segment(this, fromIX.Position, endPoint, vertex, forward, endIntersection);
-		}
-
-		protected Segment GetSegmentUsingPath(GraphicsPath pth, Intersection fromIX, bool forward)
-		{
-			int vertex = 0; // low index for line (regardless of direction)
-			float startParameter = 0;
-			// first get details of the current segment, assuming the intersection is within the segment
-			fromIX.Parameters(this, ref vertex, ref startParameter); // returns vertex, param for me from intersection
-			Debug.Assert(vertex < pth.PointCount);
-			if ((pth.PathTypes[vertex] & PATHCLOSUREFLAG) > 0) // intVertex = pth.PointCount - 1 Then
-			{
-				// must be closure back to the beginning of a figure.  Cannot check path type to the next point as there isn't one
-				Debug.Assert((pth.PathTypes[vertex] & PATHCLOSUREFLAG) > 0);
-				// But this only reported as a separate segment if the final point hasn't returned anyway to the start.  Often the closure is a bit spurious
-				var start = PathElement.FindFigureStart(pth, vertex); // first point in this figure
-				if (!pth.PathPoints[start].ApproxEqual(pth.PathPoints[vertex]))
-					return GetPathLineSegment(pth, fromIX, forward);
-				else if (forward) // otherwise start back from the beginning
-					vertex = start;
-				else
-					vertex = PathPreviousSegment(pth, vertex);
-			}
-			int type = pth.PathTypes[vertex + 1];
-			switch (type & PATHTYPEMASK)
-			{
-				case PATHLINE:
-					return GetPathLineSegment(pth, fromIX, forward);
-				case PATHBEZIER:
-					return GetPathCurveSegment(pth, fromIX, forward, vertex, startParameter);
-				default:
-					Debug.WriteLine("Unexpected point type in PolyPath.GetSegment: " + type);
-					return null;
-			}
-		}
-
-		private Segment GetPathCurveSegment(GraphicsPath pth, Intersection fromIX, bool forward, int vertex, float startParameter)
-		{
-			PointF end = pth.GetSingleCurve(vertex)[forward ? 3 : 0]; // start point will be intersection position
-			int direction = forward ? 1 : -1;
-
-			// however need to check if there is a closer intersection
-			Intersection endIntersection = null; // will be intersection at end of segment if any intersections within this line
-			float bestParameter = forward ? 2 : -1; // used to restrain the intersections if several found...
-													// we don't start with 1 or 0 since we want to be sure that intersections at the very end of the line do get counted
-			foreach (Intersection intersection in m_Intersections)
-			{
-				int testVertex = 0;
-				float testParameter = 0;
-				intersection.Parameters(this, ref testVertex, ref testParameter, vertex);
-				if (testVertex == vertex)
-				{
-					// is within the current segment.  Check if outside currently used part of line
-					if (!intersection.Position.ApproxEqual(fromIX.Position))
-					{
-						if (Math.Sign(testParameter - startParameter) == direction)
-						{
-							// It is on the correct side of the start intersection
-							if (Math.Sign(testParameter - bestParameter) == -direction)
-							{
-								// And closer than the best found so far
-								endIntersection = intersection;
-								end = intersection.Position;
-								bestParameter = testParameter;
-							}
-						}
-					}
-				}
-			}
-			if (endIntersection == null)
-			{
-				// create dummy intersection at end of line, with ShapeIndex set for the next line
-				bestParameter = forward ? 1 : 0;
-				int nextLine; // will be -1 for end of shape
-				if (forward)
-				{
-					nextLine = vertex + 3;
-					PathCheckNextSegment(pth, ref nextLine);
-				}
-				else
-				{
-					nextLine = PathPreviousSegment(pth, vertex);
-				}
-				if (nextLine >= 0)
-				{
-					// dummy intersection for next section...
-					endIntersection = new Intersection(end, this, nextLine, forward ? 0 : 1);
-					// otherwise leave objEndIntersection = nothing, meaning end-of-shape
-				}
-			}
-			PointF[] line = pth.GetSingleCurve(vertex); // always forwards for the moment
-			float bestModified = bestParameter;
-			bool degenerate = false; // true if the param shows we are starting at end - the coord test below seems to fail sometimes
-			if (forward && startParameter > 0)
-			{
-				line = Bezier.Split(line, startParameter, true);
-				// need to modify the cutting point
-				bestModified = 1 - (1 - bestModified) / (1 - startParameter);
-				if (startParameter >= 1)
-					degenerate = true;
-			}
-			else if (!forward && startParameter < 1)
-			{
-				line = Bezier.Split(line, startParameter, forward);
-				bestModified = bestModified / startParameter;
-				if (startParameter <= 0)
-					degenerate = true;
-			}
-			if (forward && bestParameter < 1 || !forward && bestParameter > 0)
-				line = Bezier.Split(line, bestModified, !forward);
-			if (!forward)
-				line = Bezier.Reverse(line);
-			if (degenerate || fromIX.Position.ApproxEqual(end))
-			{
-				// We are working from a genuine intersection, but travelling in this direction covers no noticeable distance, i.e. the intersection is presumably
-				// at the end of this segment.  See if we can iterate to a further segment
-				if (endIntersection == null)
-					return null; // at the end of this shape, there is no segment at all
-				return GetSegment(endIntersection, forward);
-			}
-			return new Segment(this, line, vertex, bestParameter, forward, endIntersection);
-		}
-
-		private Segment GetPathLineSegment(GraphicsPath path, Intersection fromIX, bool forward)
-		{
-			// cannot use the base class DefaultGetSegment because we are not using the Vertices array
-			// also the closure is different and we do need to set the parameter when changing to a subsequent stage
-			// because the next segment might be a curve
-			int vertex = fromIX.Index(this); // low index for line (regardless of direction)
-											 // need to go to end of given line
-			int endVertex = (vertex + 1) % path.PointCount; // vertex at end of line IN THIS DIRECTION
-			int startVertex = vertex; // start by doing it forwards and then swap as needed
-			if (!forward)
-				Utilities.Swap(ref startVertex, ref endVertex);
-			PointF end = path.PathPoints[endVertex]; // start point will be intersection position
-
-			// however need to check if there is a closer intersection, in which case we don't run to the end of this segment
-			Intersection endIntersection = FindLineSegmentIntersection(vertex, fromIX.Position, ref end); // will be intersection at end of segment if any intersections within this line
-			if (endIntersection == null)
-			{
-				// No intersection, we go to the end of the line.  Create dummy intersection at end of line, with ShapeIndex set for the next line
-				int nextLine; // will be -1 for end of shape
-				if (forward)
-				{
-					nextLine = vertex + 1;
-					PathCheckNextSegment(path, ref nextLine);
-				}
-				else
-					nextLine = PathPreviousSegment(path, vertex);
-				if (nextLine >= 0)
-				{
-					// dummy intersection for next section...
-					endIntersection = new Intersection(end, this, nextLine, forward ? 0 : 1);
-					// otherwise leave objEndIntersection = nothing, meaning end-of-shape
-				}
-			}
-			if (!fromIX.Termination && fromIX.Position.ApproxEqual(end))
-			{
-				// We are working from a genuine intersection, but travelling in this direction covers no noticeable distance, i.e. the intersection is presumably
-				// at the end of this segment.  See if we can iterate to a further segment
-				if (endIntersection == null)
-					return null; // at the end of this shape, there is no segment at all
-				return this.GetSegment(endIntersection, forward);
-			}
-			return new Segment(this, fromIX.Position, end, vertex, forward, endIntersection);
-		}
-
-		/// <summary>Given index which is crudely updated from the previous segment (adding 1 or 3), this wraps around to the beginning as needed</summary>
-		/// <remarks>The complication is whether to allow a possible closure back to the start as a separate segment</remarks>
-		private static void PathCheckNextSegment(GraphicsPath path, ref int index)
-		{
-			var aTypes = path.PathTypes;
-			var N = path.PointCount;
-			if (index >= N)
-				index = PathElement.FindFigureStart(aTypes, path.PointCount - 1); // Genuinely off the end, and must wraparound
-			else if (index == N - 1 || (aTypes[index + 1] & PATHTYPEMASK) == PATHSTART)
-			{
-				// at last point in figure - check if closure allowed
-				var start = PathElement.FindFigureStart(path, index);
-				if ((aTypes[index] & PATHCLOSUREFLAG) == 0 || path.PathPoints[start].ApproxEqual(path.PathPoints[index]))
-					// Either the path is not closed (in which case why are we wrapping around?!) or the closure is pointless: the last point has returned to the start anyway
-					index = start;
-			}
-			else if ((aTypes[index + 1] & PATHTYPEMASK) == PATHSTART)
-				// at the start of a new figure - implies we have just jumped forrard over a closure
-				index = PathElement.FindFigureStart(aTypes, index - 1);
-		}
-
-		/// <summary>Returns the index number for the segment preceding the one starting at index, which has not yet been updated.
-		/// Can be left pointing to a genuine closure (i.e. last point in figure)</summary>
-		protected static int PathPreviousSegment(GraphicsPath path, int index)
-		{
-			var types = path.PathTypes;
-			var type = types[index] & PATHTYPEMASK;
-			if (type == PATHSTART)
-			{
-				var start = index;
-				index = PathElement.FindFigureEnd(types, index);
-				//' start of figure - find end of figure
-				if ((types[index] & PATHCLOSUREFLAG) == 0)
-					return -1; // There is nothing previous
-				else if (!path.PathPoints[start].ApproxEqual(path.PathPoints[index]))
-					return index;
-				else
-					index -= 1; // need to check for bezier below
-			}
-			else
-				index -= 1;
-			// but if this is a Bezier we need to move back another 2 points
-			if ((types[index + 1] & PATHTYPEMASK) == PATHBEZIER)
-				index -= 2;
-			return index;
-		}
-
-		public override bool ContainsSegment(Segment segment)
-		{
-			if (IsWide && LineLogic != LineLogics.Custom)
-			{
-				EnsurePath(true);
-				return ContainsSegmentUsingPath(m_ExteriorPath, segment);
-			}
-			switch (LineLogic)
-			{
-				case LineLogics.VerticesAsLines:
-					return ContainsSegmentUsingLine(segment);
-				case LineLogics.UsePath:
-					return ContainsSegmentUsingPath(m_Path, segment);
-				default:
-					Utilities.ErrorAssert(false);
-					return false;
-			}
-		}
-
-		private bool ContainsSegmentUsingLine(Segment segment)
-		{
-			if (segment.IsBezier)
-				return false; // the curves don't use this function
-			int last = m_DefinedVertices - 1;
-			if (!Closed())
-				last -= 1;
-			for (int index = 0; index <= last; index++)
-			{
-				int secondIndex = (index + 1) % m_DefinedVertices;
-				if (segment.P[0].Equals(Vertices[index]) && segment.EndPoint.Equals(Vertices[secondIndex]))
-					return true;
-				if (segment.P[0].Equals(Vertices[secondIndex]) && segment.EndPoint.Equals(Vertices[index]))
-					return true;
-			}
-			return false;
-		}
-
-		private bool ContainsSegmentUsingPath(GraphicsPath path, Segment segment)
-		{
-			foreach (var element in PathElement.WithinPath(path))
-			{
-				if (element.Type == PATHLINE)
-				{
-					if (segment.IsLine)
-					{
-						if (segment.P[0].Equals(element.Points[0]) && segment.EndPoint.Equals(element.Points[1]))
-							return true;
-						if (segment.P[0].Equals(element.Points[1]) && segment.EndPoint.Equals(element.Points[0]))
-							return true;
-					}
-				}
-				else if (element.Type == PATHBEZIER)
-				{
-					if (segment.IsBezier)
-					{
-						bool matchesForward = true;
-						bool matchesReverse = true;
-						for (int test = 0; test <= 3; test++)
-						{
-							if (segment.P[test] != element.Points[test])
-								matchesForward = false;
-							if (segment.P[3 - test] != element.Points[test])
-								matchesReverse = false;
-						}
-						if (matchesForward || matchesReverse)
-							return true;
-					}
-				}
-				else
-					throw new InvalidOperationException();
-			}
-			return false;
-		}
-
-		/// <summary>Possible implementation of GetSamplePoints using m_Path.  Currently only uses internal path (probably not strictly accurate)</summary>
-		protected IEnumerable<PointF> GetSamplePointsFromPath()
-		{
-			// Cannot return all points within the path because bezier control points might be outside the actual shape
-			EnsurePath(false);
-			List<PointF> points = new List<PointF>();
-			points.Add(m_Path.PathPoints[0]);
-			foreach (PathElement element in PathElement.WithinPath(m_Path))
-			{
-				points.Add(element.Points[element.Type == PATHLINE ? 1 : 3]);
-			}
-			return points;
-		}
 		#endregion
 
 		#region Sockets
 		// socket index is vertex*2 (even) or midpoint of line = vertex_at_start*2+1
-		public override PointF SocketPosition(int index)
+		internal override PointF SocketPosition(int index)
 		{
 			// we don't need to know if the shape is closed - if intIndex implies closed then assume that it is
 			if (index == -1)
@@ -1733,7 +1099,7 @@ namespace SAW
 			return Vertices[vertex];
 		}
 
-		public override SizeF SocketExitVector(int index)
+		internal override SizeF SocketExitVector(int index)
 		{
 			if (index < 0)
 				return new SizeF(1, 0); // just in case
@@ -1762,7 +1128,7 @@ namespace SAW
 		}
 
 		/// <summary>default socket exit vector from middle of a line</summary>
-		protected SizeF LineSocketExitVector(PointF A, PointF B)
+		private protected SizeF LineSocketExitVector(PointF A, PointF B)
 		{
 			SizeF line = A.VectorTo(B);
 			SizeF exit = line.Perpendicular(1); // the direction is not clear, we will need to just try
@@ -1775,7 +1141,7 @@ namespace SAW
 			return exit;
 		}
 
-		protected List<Socket> DefaultGetSockets(bool closed, bool omitAutomatic = false)
+		private protected List<Socket> DefaultGetSockets(bool closed, bool omitAutomatic = false)
 		{
 			List<Socket> sockets = new List<Socket>();
 			if (!omitAutomatic)

@@ -30,7 +30,7 @@ namespace SAW
 			//deltas.Add("Editor", new Config.Delta("Editor", Config.Levels.User));
 			Activities.EnsureAllActivitiesLoaded();
 			string folder = Globals.Root.ConfigFolder + "\\previous version configs"; // \\Activities";
-			foreach (Document activity in Config.ActivityConfigs())
+			foreach (Document activity in Config.ActivityConfigs)
 			{
 				if (System.IO.File.Exists(folder + "\\" + activity.ID + ".sawcfg"))
 				{
@@ -60,7 +60,6 @@ namespace SAW
 			}
 			EnableSave();
 			Config.UserUser.RecentFiles.Clear();
-			Config.UserEditor.Picture = null;
 			Globals.Root.SaveAllActivityConfigs();
 			Globals.Root.SaveUserConfigs();
 			Globals.Root.SaveSystemConfig();

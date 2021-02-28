@@ -29,18 +29,18 @@ namespace Switches
 		[System.Diagnostics.DebuggerStepThrough()]private void InitializeComponent()
 		{
 			this.Label1 = new System.Windows.Forms.Label();
-			this.pnlTimings = new System.Windows.Forms.FlowLayoutPanel();
-			this.CtrEditTiming1 = new Switches.ctrEditTiming();
 			this.cmbMethods = new System.Windows.Forms.ComboBox();
 			this.Label2 = new System.Windows.Forms.Label();
 			this.rdoOne = new System.Windows.Forms.RadioButton();
 			this.rdoTwo = new System.Windows.Forms.RadioButton();
-			this.pnlTest = new GUI.TestPanel();
 			this.Label3 = new System.Windows.Forms.Label();
+			this.tblTimings = new System.Windows.Forms.TableLayoutPanel();
+			this.CtrEditTiming1 = new Switches.ctrEditTiming();
+			this.pnlTest = new Switches.GUI.TestPanel();
 			this.ctrSwitch1 = new Switches.ctrSelectSwitch();
 			this.ctrSwitch0 = new Switches.ctrSelectSwitch();
 			this.ctrDiagram = new Switches.GUI.Diagram();
-			this.pnlTimings.SuspendLayout();
+			this.tblTimings.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// Label1
@@ -51,27 +51,6 @@ namespace Switches
 			this.Label1.Size = new System.Drawing.Size(122, 17);
 			this.Label1.TabIndex = 2;
 			this.Label1.Text = "Scanning method:";
-			// 
-			// pnlTimings
-			// 
-			this.pnlTimings.AutoSize = true;
-			this.pnlTimings.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-			this.pnlTimings.Controls.Add(this.CtrEditTiming1);
-			this.pnlTimings.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
-			this.pnlTimings.Location = new System.Drawing.Point(16, 200);
-			this.pnlTimings.MinimumSize = new System.Drawing.Size(0, 100);
-			this.pnlTimings.Name = "pnlTimings";
-			this.pnlTimings.Size = new System.Drawing.Size(276, 100);
-			this.pnlTimings.TabIndex = 3;
-			// 
-			// CtrEditTiming1
-			// 
-			this.CtrEditTiming1.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.CtrEditTiming1.Location = new System.Drawing.Point(4, 4);
-			this.CtrEditTiming1.Margin = new System.Windows.Forms.Padding(4);
-			this.CtrEditTiming1.Name = "CtrEditTiming1";
-			this.CtrEditTiming1.Size = new System.Drawing.Size(268, 33);
-			this.CtrEditTiming1.TabIndex = 0;
 			// 
 			// cmbMethods
 			// 
@@ -118,16 +97,6 @@ namespace Switches
 			this.rdoTwo.UseVisualStyleBackColor = true;
 			this.rdoTwo.CheckedChanged += new System.EventHandler(this.rdoTwo_CheckedChanged);
 			// 
-			// pnlTest
-			// 
-			this.pnlTest.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-			this.pnlTest.BackColor = System.Drawing.Color.White;
-			this.pnlTest.Location = new System.Drawing.Point(376, 456);
-			this.pnlTest.Name = "pnlTest";
-			this.pnlTest.Size = new System.Drawing.Size(616, 40);
-			this.pnlTest.TabIndex = 10;
-			// 
 			// Label3
 			// 
 			this.Label3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
@@ -137,6 +106,49 @@ namespace Switches
 			this.Label3.TabIndex = 11;
 			this.Label3.Text = "Test area:";
 			this.Label3.TextAlign = System.Drawing.ContentAlignment.TopRight;
+			// 
+			// tblTimings
+			// 
+			this.tblTimings.ColumnCount = 2;
+			this.tblTimings.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+			this.tblTimings.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 160F));
+			this.tblTimings.Controls.Add(this.CtrEditTiming1, 1, 0);
+			this.tblTimings.Location = new System.Drawing.Point(12, 193);
+			this.tblTimings.Name = "tblTimings";
+			this.tblTimings.RowCount = 10;
+			this.tblTimings.RowStyles.Add(new System.Windows.Forms.RowStyle());
+			this.tblTimings.RowStyles.Add(new System.Windows.Forms.RowStyle());
+			this.tblTimings.RowStyles.Add(new System.Windows.Forms.RowStyle());
+			this.tblTimings.RowStyles.Add(new System.Windows.Forms.RowStyle());
+			this.tblTimings.RowStyles.Add(new System.Windows.Forms.RowStyle());
+			this.tblTimings.RowStyles.Add(new System.Windows.Forms.RowStyle());
+			this.tblTimings.RowStyles.Add(new System.Windows.Forms.RowStyle());
+			this.tblTimings.RowStyles.Add(new System.Windows.Forms.RowStyle());
+			this.tblTimings.RowStyles.Add(new System.Windows.Forms.RowStyle());
+			this.tblTimings.RowStyles.Add(new System.Windows.Forms.RowStyle());
+			this.tblTimings.Size = new System.Drawing.Size(294, 303);
+			this.tblTimings.TabIndex = 12;
+			// 
+			// CtrEditTiming1
+			// 
+			this.CtrEditTiming1.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.CtrEditTiming1.Location = new System.Drawing.Point(138, 4);
+			this.CtrEditTiming1.Margin = new System.Windows.Forms.Padding(4);
+			this.CtrEditTiming1.MinimumSize = new System.Drawing.Size(100, 32);
+			this.CtrEditTiming1.Name = "CtrEditTiming1";
+			this.CtrEditTiming1.Size = new System.Drawing.Size(152, 33);
+			this.CtrEditTiming1.TabIndex = 0;
+			// 
+			// pnlTest
+			// 
+			this.pnlTest.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.pnlTest.BackColor = System.Drawing.Color.White;
+			this.pnlTest.Engine = null;
+			this.pnlTest.Location = new System.Drawing.Point(376, 456);
+			this.pnlTest.Name = "pnlTest";
+			this.pnlTest.Size = new System.Drawing.Size(616, 40);
+			this.pnlTest.TabIndex = 10;
 			// 
 			// ctrSwitch1
 			// 
@@ -148,6 +160,7 @@ namespace Switches
 			this.ctrSwitch1.Number = 1;
 			this.ctrSwitch1.Size = new System.Drawing.Size(304, 34);
 			this.ctrSwitch1.TabIndex = 7;
+			this.ctrSwitch1.UserChangedSwitch += new System.EventHandler(this.ctrSwitch1_UserChangedSwitch);
 			// 
 			// ctrSwitch0
 			// 
@@ -158,6 +171,7 @@ namespace Switches
 			this.ctrSwitch0.Number = 0;
 			this.ctrSwitch0.Size = new System.Drawing.Size(304, 34);
 			this.ctrSwitch0.TabIndex = 6;
+			this.ctrSwitch0.UserChangedSwitch += new System.EventHandler(this.ctrSwitch0_UserChangedSwitch);
 			// 
 			// ctrDiagram
 			// 
@@ -173,6 +187,7 @@ namespace Switches
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
 			this.ClientSize = new System.Drawing.Size(998, 503);
+			this.Controls.Add(this.tblTimings);
 			this.Controls.Add(this.Label3);
 			this.Controls.Add(this.pnlTest);
 			this.Controls.Add(this.rdoTwo);
@@ -181,17 +196,17 @@ namespace Switches
 			this.Controls.Add(this.ctrSwitch0);
 			this.Controls.Add(this.Label2);
 			this.Controls.Add(this.cmbMethods);
-			this.Controls.Add(this.pnlTimings);
 			this.Controls.Add(this.Label1);
 			this.Controls.Add(this.ctrDiagram);
 			this.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.KeyPreview = true;
 			this.MinimumSize = new System.Drawing.Size(600, 400);
-			this.Name = "Development test form";
+			this.Name = "DevelopTest";
+			this.ShowIcon = false;
 			this.Text = "Switch logic test screen";
 			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
 			this.Load += new System.EventHandler(this.Form1_Load);
-			this.pnlTimings.ResumeLayout(false);
+			this.tblTimings.ResumeLayout(false);
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -199,7 +214,6 @@ namespace Switches
 		private Switches.GUI.Diagram ctrDiagram;
 		internal System.Windows.Forms.Label Label1;
 		private Switches.ctrEditTiming CtrEditTiming1;
-		private System.Windows.Forms.FlowLayoutPanel pnlTimings;
 		private System.Windows.Forms.ComboBox cmbMethods;
 		private System.Windows.Forms.Label Label2;
 		private Switches.ctrSelectSwitch ctrSwitch0;
@@ -208,7 +222,7 @@ namespace Switches
 		private System.Windows.Forms.RadioButton rdoOne;
 		private GUI.TestPanel pnlTest;
 		private System.Windows.Forms.Label Label3;
-		
+		private System.Windows.Forms.TableLayoutPanel tblTimings;
 	}
 	
 }

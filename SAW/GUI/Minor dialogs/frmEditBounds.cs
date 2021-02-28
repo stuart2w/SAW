@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SAW.Functions;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -65,8 +66,8 @@ namespace SAW
 				rct = frm.Value;
 				rct.Y = (int)(rct.Y + page.Bounds.Top);
 				Transaction transaction = new Transaction();
-				if (item.Parent is Scriptable)
-					transaction.Edit((Scriptable)item.Parent);
+				if (item.Parent is Scriptable scriptable)
+					transaction.Edit(scriptable);
 				transaction.Edit(item);
 				item.SetBounds(rct.ToRectangleF(), transaction);
 				if (frm.chkAdjustContents.Checked)
@@ -79,7 +80,8 @@ namespace SAW
 
 		public static DialogResult EditWindowBounds()
 		{
-			Rectangle rect = Globals.Root.CurrentDocument.SAWHeader.MainWindowBounds;
+			Document document = Globals.Root.CurrentDocument;
+			Rectangle rect = document.IsPaletteWithin ? document.Page(0).Bounds.ToRectangle() : document.SAWHeader.MainWindowBounds;
 			Screen screen = Screen.FromPoint(rect.Centre());
 			frmEditBounds frm = new frmEditBounds(rect, Globals.Root.CurrentPage.LockARToBackgroundImage);
 			frm.Text = Strings.Item("Verb_EditWindowBounds");

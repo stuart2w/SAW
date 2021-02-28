@@ -164,19 +164,8 @@ namespace SAW
 			List<Functions.Codes> list = new List<Functions.Codes>();
 			foreach (Functions.Codes verb in Enum.GetValues(typeof(Functions.Codes)))
 			{
-				// there is no need to filter out the ones which are not allowed on the toolbar, because they will never be set in the configuration
-				if (Configurations[0].ReadBooleanEx(Config.Toolbar_OnlyExplicit))
-				{
-					// the only buttons included are those once explicitly listed in the document
-					if (Configurations[0].ReadBooleanEx(Config.ToolbarIncludeKey(verb)))
-						list.Add(verb);
-				}
-				else
-				{
-					// otherwise process as normal - each button is looked up through all configurations as usual
-					if (ReadBoolean(Config.ToolbarIncludeKey(verb)))
-						list.Add(verb);
-				}
+				if (ReadBoolean(Config.ToolbarIncludeKey(verb)))
+					list.Add(verb);
 			}
 			return list;
 		}
@@ -237,7 +226,7 @@ namespace SAW
 				m_Cache = true;
 			}
 		}
-		
+
 		private bool m_LowGraphics;
 		public bool Low_Graphics
 		{
@@ -270,7 +259,7 @@ namespace SAW
 				{
 					Shape.Shapes shape;
 					if (ID.Length <= 5)
-						shape = (Shape.Shapes) int.Parse(ID);
+						shape = (Shape.Shapes)int.Parse(ID);
 					else
 						continue;
 					if (!list.Contains(shape))
@@ -364,9 +353,9 @@ namespace SAW
 		private Dictionary<string, Document> m_CustomPalettes = null;
 		// list of all allowed palettes in this configuration.  This is not necessarily match Palettes.List, because that is based
 		// around the current configuration(s).  This must match the palettes accessible from this configuration exactly.
-		private List<Palette> m_AllPalettes; 
+		private List<Palette> m_AllPalettes;
 
-		private void CreatePaletteLists()
+		private void CreatePaletteLists(bool registerCustom = false)
 		{
 			m_CustomPalettes = new Dictionary<string, Document>();
 			m_AllPalettes = new List<Palette>();
@@ -384,16 +373,22 @@ namespace SAW
 						if (Palette.List.ContainsKey(ID))
 							m_AllPalettes.Add(Palette.List[ID]);
 						else
-							m_AllPalettes.Add(new Palette(document));
+						{
+							Palette palette = new Palette(document);
+							if (registerCustom)
+								Palette.Register(palette);
+							m_AllPalettes.Add(palette);
+						}
 					}
 				}
 			}
 		}
 
-		public Dictionary<string, Document> CustomPalettes()
+		/// <summary>If registerCustom, then Palette.Register is called for any not already registered</summary>
+		public Dictionary<string, Document> CustomPalettes(bool registerCustom)
 		{
 			if (m_CustomPalettes == null)
-				CreatePaletteLists();
+				CreatePaletteLists(registerCustom);
 			return m_CustomPalettes;
 		}
 
@@ -417,7 +412,7 @@ namespace SAW
 		public bool ShowPalette(Palette palette)
 		{
 			// Similar to ShowArea, but checks both if palette purpose is displayed, and this given palette is selected as the current one
-			if (palette == null)
+			if (palette == null || palette.PalettePurpose.ToInt32() == 9)
 				return false; // just in case
 			Debug.Assert(this == Globals.Root.CurrentConfig); // Needed to use PaletteSelection (, true)
 			string showKey = Config.ShowPaletteKey(palette);
@@ -437,9 +432,10 @@ namespace SAW
 			return state.Value;
 		}
 
+		/// <summary>returns the ID of the palette selected for the given purpose</summary>
 		public string PaletteSelection(Palette.Purpose purpose, bool verify)
 		{
-			// returns the ID of the palette selected for the given purpose
+			// 
 			// This is stored in the configuration, but we need to check for some special cases, such as if nothing is yet selected (must select something by default)
 			// or if a palette has been selected and then later deleted.  Again it is essential that we return a valid palette, assuming there is one
 			// But in the latter case, verification is difficult unless Palette.List matches this applied configuration.  This will be the case in the GUI

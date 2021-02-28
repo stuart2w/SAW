@@ -50,7 +50,7 @@ namespace SAW
 
 		// not genuine parameters, but used in Functions.Action.  Cannot be used with ParameterValue, ParameterApplicable etc
 		Action_Verb = -2,
-		/// <summary>value is itself a member of this</summary>
+		/// <summary>Value is itself a member of this.  Moves focus to the palette</summary>
 		Action_Palette = -3,
 		/// <summary>button within a palette itself.  1 = refine; 2 = transparent</summary>
 		Action_Palette_Button = -4,
@@ -62,7 +62,9 @@ namespace SAW
 		Action_Character = -9,
 		/// <summary>Types a sequence of characters (used for equation templates)</summary>
 		Action_Text = -12,
-		Action_ShowGrid = -15
+		Action_ShowGrid = -15,
+		/// <summary>Toggles display of the given palette purpose </summary>
+		Action_ShowPalette = -16
 	}
 
 	public interface IParameterConsumer

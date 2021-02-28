@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<SavedWcfConfigurationInformation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Version="9.1" CheckSum="KxuQ+JNpWKvpC7vY0XV6rYxzsnc=">
+<SavedWcfConfigurationInformation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Version="9.1" CheckSum="Tenc16EmjSmgtrKbtemPSaT++8vzLr5J8jRUDidUwC8=">
   <bindingConfigurations>
     <bindingConfiguration bindingType="basicHttpBinding" name="Repo2Soap1">
       <properties>

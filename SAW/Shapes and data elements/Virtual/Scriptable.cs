@@ -1,9 +1,12 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Text;
 using System.Linq;
+using System.Windows.Forms;
+using SAW.Functions;
 
 namespace SAW
 {
@@ -12,10 +15,20 @@ namespace SAW
 	{
 		/// <summary>The visual element for this - usually a SAW.Item, but can be anything</summary>
 		public Shape Element { get; private set; }
-		private IShapeContainer ElementAsContainer
-		{ get { return Element as IShapeContainer; } }
+		private IShapeContainer ElementAsContainer => Element as IShapeContainer;
+
+		/// <summary>Shouldn't generally be used, but unavoidable for loading SAW6 files </summary>
+		[System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
+		internal void SetElement(Shape element)
+		{
+			Element = element;
+			element.Parent = this;
+		}
 
 		#region Properties supporting active functionality
+
+		public ButtonShape.States State;
+
 		/// <summary>Was stored as string in SAW6, but appears to always behave as int, and scripts referencing an ID could only accept integers</summary>
 		public int SAWID { get; set; }
 
@@ -29,6 +42,14 @@ namespace SAW
 		/// <summary>The Auto Repeat of standard Select scripts;  not whether the repeat scripts are used;  this causes entire item to repeat</summary>
 		public bool AutoRepeat;
 		public bool ResetSwap;
+
+		// fields that were in Item in SAW7
+		public SharedReference<SharedResource> Sound;
+		public string OutputText;
+		public bool OutputAsDisplay;
+		public string SpeechText;
+		public bool SpeechAsDisplay;
+		public string PromptText;
 
 		#endregion
 
@@ -116,9 +137,12 @@ namespace SAW
 		#endregion
 
 		public Scriptable()
-		{ }
+		{
+			HighlightStyle = new HighlightStyleC();
+			HighlightStyle.SetDefaults();
+		}
 
-		public Scriptable(Shape element)
+		public Scriptable(Shape element) : this()
 		{
 			Element = element;
 			Element.Parent = this;
@@ -127,7 +151,7 @@ namespace SAW
 		#region Information
 		public override Shapes ShapeCode => Shapes.Scriptable;
 
-		public override string Description => SAWID + ": " + Element.Description;
+		internal override string Description => SAWID + ": " + Element.Description;
 
 		public override void Diagnostic(StringBuilder output)
 		{
@@ -142,10 +166,10 @@ namespace SAW
 		public override bool IsFilled => Element.IsFilled;
 
 		public override AllowedActions Allows
-		{get { return Element.Allows & ~(AllowedActions.Group | AllowedActions.ConvertToPath | AllowedActions.MoveToPixels | AllowedActions.Merge); }}
+		{ get { return Element.Allows & ~(AllowedActions.Group | AllowedActions.ConvertToPath | AllowedActions.MoveToPixels | AllowedActions.Merge); } }
 
 		public override GeneralFlags Flags
-		{get{return (Element?.Flags ?? GeneralFlags.None) | GeneralFlags.DoubleClickAfterCreation;}}
+		{ get { return (Element?.Flags ?? GeneralFlags.None) | GeneralFlags.DoubleClickAfterCreation; } }
 
 		public override string StatusInformation(bool ongoing)
 		{
@@ -165,7 +189,7 @@ namespace SAW
 		#region Verbs - just call through to content (creating a SAWItem) except DoubleClick and CompleteRetrospective can be used when created externally
 		public override VerbResult Start(EditableView.ClickPosition position)
 		{
-			Element = new Item {Parent = this};
+			Element = new Item { Parent = this };
 			SetUniqueID();
 			return Element.Start(position);
 		}
@@ -200,16 +224,42 @@ namespace SAW
 			return Element.CompleteRetrospective();
 		}
 
-		public override string DoubleClickText() => Element.DoubleClickText();
+		#endregion
 
-		public override void DoDoubleClick(EditableView view, EditableView.ClickPosition.Sources source)
+		#region Property editor stuff
+
+		internal override string DoubleClickText()
 		{
-			Element.DoDoubleClick(view, source);
+			if (Element is Item)
+				return Strings.Item("SAW_Edit_Item");
+			return Strings.Item("SAW_Edit_Scriptable");
 		}
 
-		public override bool CanDoubleClickWith(IEnumerable<Shape> selection)
+		internal override void DoDoubleClick(EditableView view, EditableView.ClickPosition.Sources source)
+		{
+			LastDoubleClickResult = frmSAWItem.Display(view) == DialogResult.OK;
+			if (!LastDoubleClickResult)
+				Parent.NotifyIndirectChange(this, ChangeAffects.RepaintNeeded);
+			// why was this added in v8 - causes it to be left this way usually, which is invalid?
+			//else
+			//	Status = StatusValues.Moved;
+		}
+
+		internal override bool CanDoubleClickWith(IEnumerable<Shape> selection)
 		{ // a group of items (within scriptables) can be edited together
-			return selection.All(shape => (shape as Scriptable)?.Element is Item);
+			bool hasItems = selection.Any(shape => (shape as Scriptable)?.Element is Item);
+			if (!hasItems && selection.Count() != 1)
+				return false;// if editing graphical objects then it's only really the scripts which are useful - so only one can be edited
+							 // (since scripts aren't edited if more than 1 is selected)
+			return selection.All(shape => (shape is Scriptable));
+		}
+
+		/// <summary>Called by editor dialog to force this to discard some cache items and repaint</summary>
+		public void WasEdited()
+		{
+			// editor also calls on each Item, which will do a repaint, so this is redundant IFF the contained Element is Item.
+			// but if it's another graphical object, then this is needed
+			Parent?.NotifyIndirectChange(this, ChangeAffects.RepaintNeeded); // note ? is needed for property editor which can make a dummy Item with no parent
 		}
 
 		#endregion
@@ -232,6 +282,16 @@ namespace SAW
 			{
 				writer.Write(Scripts[i] != null);
 				Scripts[i]?.Write(writer);
+			}
+			if (writer.Version >= 129)
+			{
+				HighlightStyle.Save(writer);
+				writer.Write(Sound?.ID ?? Guid.Empty);
+				writer.WriteBufferedString(OutputText ?? "");
+				writer.Write(OutputAsDisplay);
+				writer.Write(SpeechText ?? "");
+				writer.Write(SpeechAsDisplay);
+				writer.Write(PromptText ?? "");
 			}
 		}
 
@@ -256,6 +316,29 @@ namespace SAW
 					Scripts[i].Read(reader);
 				}
 			}
+			if (reader.Version < 129)
+			{
+				if (Element is Item item)
+				{
+					HighlightStyle = item.LoadedV7Data.HighlightStyle;
+					Sound = item.LoadedV7Data.Sound;
+					OutputText = item.LoadedV7Data.OutputText;
+					OutputAsDisplay = item.LoadedV7Data.OutputAsDisplay;
+					SpeechText = item.LoadedV7Data.SpeechText;
+					SpeechAsDisplay = item.LoadedV7Data.SpeechAsDisplay;
+					PromptText = item.LoadedV7Data.PromptText;
+				}
+			}
+			else
+			{
+				HighlightStyle = HighlightStyleC.Read(reader);
+				Sound = SharedReference<SharedResource>.FromGUID(reader.ReadGuid());
+				OutputText = reader.ReadBufferedString();
+				OutputAsDisplay = reader.ReadBoolean();
+				SpeechText = reader.ReadString();
+				SpeechAsDisplay = reader.ReadBoolean();
+				PromptText = reader.ReadString();
+			}
 		}
 
 		public override void CopyFrom(Datum other, CopyDepth depth, Mapping mapID)
@@ -264,6 +347,8 @@ namespace SAW
 			// (otherwise it will refernce differing copies of the contained element)
 			base.CopyFrom(other, depth, mapID);
 			Scriptable scriptable = (Scriptable)other;
+			if (depth > CopyDepth.Transform)
+				CopyPresentationFrom(scriptable, false);
 			//Debug.WriteLine("Scriptable.CopyFrom, depth=" + depth + " ID=" + scriptable.SAWID);
 			// contained element.  Works like ShapeStack containment - Element is tightly bound within this
 			if (depth == CopyDepth.Transform && Element != null)
@@ -315,6 +400,23 @@ namespace SAW
 			m_Bounds = RectangleF.Empty; // because content may have moved - especially on Undo	
 		}
 
+		public void CopyPresentationFrom(Scriptable item, bool noOverwriteExisting)
+		{ // see Item
+			if (HighlightStyle == null)
+				HighlightStyle = new HighlightStyleC();
+			HighlightStyle.CopyFrom(item.HighlightStyle);
+			if (!noOverwriteExisting || Sound == null)
+				Sound = item.Sound?.Clone();
+			if (!noOverwriteExisting || string.IsNullOrEmpty(OutputText))
+				OutputText = item.OutputText;
+			OutputAsDisplay = item.OutputAsDisplay;
+			if (!noOverwriteExisting || string.IsNullOrEmpty(SpeechText))
+				SpeechText = item.SpeechText;
+			SpeechAsDisplay = item.SpeechAsDisplay;
+			if (!noOverwriteExisting || string.IsNullOrEmpty(PromptText))
+				PromptText = item.PromptText;
+		}
+
 		protected override bool IdenticalToShape(Shape other)
 		{
 			if (!base.IdenticalToShape(other))
@@ -361,7 +463,30 @@ namespace SAW
 		#region Coordinates
 		protected override RectangleF CalculateBounds() => Element.Bounds;
 
-		public override RectangleF RefreshBounds(bool withShadow = false) => Element.RefreshBounds(withShadow);
+		public override RectangleF RefreshBounds(bool withShadow = false)
+		{
+			RectangleF bounds = Element.RefreshBounds(withShadow);
+			// mostly copied from Lined.RefreshBoundsFromBounds
+
+			float width = HighlightStyle.LineWidth * 2;
+			if (withShadow)
+				width += GUIUtilities.SHADOWEXTRAWIDTH;
+			if (width > GUIUtilities.SHADOWEXTRAWIDTH)
+				bounds.Inflate(width / 2, width / 2);
+			if (withShadow)
+			{
+				bounds.Width += GUIUtilities.SHADOWXOFFSET * 2; // *2 because the shadow pen is that much wider than the usual pen
+				bounds.Height += GUIUtilities.SHADOWXOFFSET * 2;
+			}
+			return bounds;
+		}
+
+		public override bool VertexVerbApplicable(Codes code, Target target)
+		{
+			if (target.Shape == Element) // can't call base as it asserts that it is the right shape
+				return Element.VertexVerbApplicable(code, target);
+			return base.VertexVerbApplicable(code, target);
+		}
 
 		public override bool HitTestDetailed(PointF clickPoint, float scale, bool treatAsFilled)
 		{
@@ -369,41 +494,150 @@ namespace SAW
 				return false;
 			return Element.HitTestDetailed(clickPoint, scale, treatAsFilled);
 		}
+		internal override List<UserSocket> GetPointsWhichSnapWhenMoving() => Element.GetPointsWhichSnapWhenMoving();
+		internal override List<Target> GenerateTargets(UserSocket floating) => Element.GenerateTargets(floating);
+		public override (GrabSpot[], string[]) GetEditableCoords(Target selectedElement) => Element.GetEditableCoords(selectedElement);
 
-		internal override void AddIntersection(Intersection intersection)
+		#endregion
+
+		#region Highlight styling
+
+		public HighlightStyleC HighlightStyle;
+
+		internal override bool DefaultStylesApplied()
 		{
-			Element.AddIntersection(intersection);
+			HighlightStyle.LineColour = Color.Red;
+			HighlightStyle.TextColour = Color.Red;
+			HighlightStyle.FillColour = Color.White;
+			HighlightStyle.LineWidth = (((LineStyleC)Element.StyleObjectForParameter(Parameters.LineWidth)).Width + 1) / 2;
+			return Element.DefaultStylesApplied();
 		}
 
-		public override void CheckIntersectionsWith(Shape shape)
+		public class HighlightStyleC : StyleBase
 		{
-			Element.CheckIntersectionsWith(shape);
+			public Color LineColour;
+			public Color FillColour;
+			public Color TextColour;
+			public float LineWidth;
+
+			public override int ParameterValue(Parameters parameter)
+			{
+				switch (parameter)
+				{
+					case Parameters.LineColour: return LineColour.ToArgb();
+					case Parameters.FillColour: return FillColour.ToArgb();
+					case Parameters.TextColour: return TextColour.ToArgb();
+					case Parameters.LineWidth: return (int)(LineWidth * 100); // the GUI parameter only uses integers
+					default:
+						Debug.Fail("Parameter not expected for this type of style object");
+						return 0;
+				}
+			}
+
+			public override void SetParameterValue(int value, Parameters parameter)
+			{
+				switch (parameter)
+				{
+					case Parameters.LineColour: LineColour = Color.FromArgb(value); break;
+					case Parameters.FillColour: FillColour = Color.FromArgb(value); break;
+					case Parameters.TextColour: TextColour = Color.FromArgb(value); break;
+					case Parameters.LineWidth:
+						LineWidth = value / 100f;
+						break;
+				}
+			}
+
+			public override void CopyFrom(StyleBase other)
+			{
+				HighlightStyleC highlight = (HighlightStyleC)other;
+				LineColour = highlight.LineColour;
+				FillColour = highlight.FillColour;
+				TextColour = highlight.TextColour;
+				LineWidth = highlight.LineWidth;
+			}
+
+			public override Parameters[] ApplicableParameters()
+			{
+				return new Parameters[] { Parameters.LineWidth, Parameters.LineColour, Parameters.FillColour, Parameters.TextColour };
+			}
+
+			public override bool IdenticalTo(StyleBase other)
+			{
+				HighlightStyleC highlight = (HighlightStyleC)other;
+				return LineColour.Equals(highlight.LineColour)
+				&& FillColour.Equals(highlight.FillColour)
+				&& TextColour.Equals(highlight.TextColour)
+				&& LineWidth == highlight.LineWidth;
+			}
+
+			/// <summary>Sets very generic defaults without knowing what the element is </summary>
+			public void SetDefaults()
+			{
+				LineColour = Color.Red;
+				FillColour = Color.White;
+				TextColour = Color.Red;
+				LineWidth = 2;
+			}
+
+			public static HighlightStyleC Read(DataReader reader)
+			{
+				HighlightStyleC newStyle = new HighlightStyleC();
+				newStyle.FillColour = reader.ReadColour();
+				newStyle.TextColour = reader.ReadColour();
+				newStyle.LineColour = reader.ReadColour();
+				newStyle.LineWidth = reader.ReadSingle();
+				if (newStyle.LineWidth < 0 || newStyle.LineWidth > 100)
+					throw new InvalidDataException("HighlightStyleC.Width out of bounds");
+				return newStyle;
+			}
+
+			public void Save(DataWriter writer)
+			{
+				writer.Write(FillColour);
+				writer.Write(TextColour);
+				writer.Write(LineColour);
+				writer.Write(LineWidth);
+			}
+
+			/// <summary>Creates an instance initialised with the current (non-highlight) styles stored in a shape</summary>
+			public static HighlightStyleC FromShape(Shape shape)
+			{
+				var highlight = new HighlightStyleC();
+				FillStyleC fill = (FillStyleC)shape.StyleObjectForParameter(Parameters.FillColour);
+				if (fill != null)
+					highlight.FillColour = fill.Colour;
+				LineStyleC line = (LineStyleC)shape.StyleObjectForParameter(Parameters.LineColour);
+				if (line != null)
+				{
+					highlight.LineColour = line.Colour;
+					highlight.LineWidth = (line.Width + 1) / 2;
+				}
+				TextStyleC text = (TextStyleC)shape.StyleObjectForParameter(Parameters.TextColour);
+				if (text != null)
+					highlight.TextColour = text.Colour;
+				return highlight;
+			}
+
+			/// <summary>Writes the styles from this object into the normal (non-highlight) styles in the shape</summary>
+			public void ApplyToShape(Shape shape)
+			{
+				FillStyleC fill = (FillStyleC)shape.StyleObjectForParameter(Parameters.FillColour);
+				if (fill != null)
+					fill.Colour = FillColour;
+				LineStyleC line = (LineStyleC)shape.StyleObjectForParameter(Parameters.LineColour);
+				if (line != null)
+				{
+					line.Colour = LineColour;
+					line.Width = LineWidth * 2 - 1;
+				}
+				TextStyleC text = (TextStyleC)shape.StyleObjectForParameter(Parameters.TextColour);
+				if (text != null)
+					text.Colour = TextColour;
+			}
+
 		}
 
-		public override void CheckIntersectionsWithBezier(Shape shape, int shapeIndex, PointF[] Q)
-		{
-			Element.CheckIntersectionsWithBezier(shape, shapeIndex, Q);
-		}
-
-		public override void CheckIntersectionsWithLine(Shape shape, int shapeIndex, float shapeParameter, PointF A, PointF B, bool ignoreEnd)
-		{
-			Element.CheckIntersectionsWithLine(shape, shapeIndex, shapeParameter, A, B, ignoreEnd);
-		}
-
-		public override void CheckIntersectionsWithSelf()
-		{
-			Element.CheckIntersectionsWithSelf();
-		}
-
-		public override List<UserSocket> GetPointsWhichSnapWhenMoving()
-		{
-			return Element.GetPointsWhichSnapWhenMoving();
-		}
-
-		public override List<Target> GenerateTargets(UserSocket floating)
-		{
-			return Element.GenerateTargets(floating);
-		}
+		public override StyleBase StyleObjectForParameter(Parameters parameter, bool applyingDefault = false) => Element?.StyleObjectForParameter(parameter, applyingDefault);
 
 		#endregion
 
@@ -413,34 +647,36 @@ namespace SAW
 			// this would draw this item itself, which has no representation.  It is the Draw et cetera methods which draw the content item
 		}
 
-		public override void Draw(Canvas gr, float scale, float coordScale, StaticView view, StaticView.InvalidationBuffer buffer, int fillAlpha = 255, int edgeAlpha = 255, bool reverseRenderOrder = false)
+		internal override void Draw(Canvas gr, float scale, float coordScale, StaticView view, StaticView.InvalidationBuffer buffer, int fillAlpha = 255, int edgeAlpha = 255, bool reverseRenderOrder = false)
 		{
 			if (!Shown)
 				return;
+			HighlightStyleC actualStyles = null;
+			if (State == ButtonShape.States.Highlight)
+			{
+				actualStyles = HighlightStyleC.FromShape(Element);
+				HighlightStyle.ApplyToShape(Element);
+			}
 			Element.Draw(gr, scale, coordScale, view, buffer, fillAlpha, edgeAlpha, reverseRenderOrder);
+			if (State == ButtonShape.States.Highlight)
+				actualStyles.ApplyToShape(Element);
 		}
 
-		public override void DrawHighlight(Canvas gr, float scale, float coordScale)
+		internal override void DrawHighlight(Canvas gr, float scale, float coordScale, Target singleElement)
 		{
-			//if (!Shown)
-			//	return;
-			Element.DrawHighlight(gr, scale, coordScale);
+			// sounds perverse, but highlighting styles not done here - this highlight always draws in glowing yellow regardless of object settings
+			Element.DrawHighlight(gr, scale, coordScale, singleElement);
 		}
 
 		#endregion
 
 		#region Other delegated to content
 
-		public override void InitialiseFreeStanding()
+		internal override void InitialiseFreeStanding()
 		{ // called by GUI if it creates one of these for info - Start will not have been called, so must create the content element
 			base.InitialiseFreeStanding();
 			Element = new Item();
 			Element.InitialiseFreeStanding();
-		}
-
-		public override StyleBase StyleObjectForParameter(Parameters parameter, bool applyingDefault = false)
-		{
-			return Element?.StyleObjectForParameter(parameter, applyingDefault);
 		}
 
 		public override void NotifyStyleChanged(Parameters parameter, int oldValue, int newValue)
@@ -448,33 +684,23 @@ namespace SAW
 			Element?.NotifyStyleChanged(parameter, oldValue, newValue);
 		}
 
-		public override bool DefaultStylesApplied()
-		{
-			return Element.DefaultStylesApplied();
-		}
+		internal override List<GrabSpot> GetGrabSpots(float scale) => Element.GetGrabSpots(scale);
 
-		public override List<GrabSpot> GetGrabSpots(float scale)
-		{
-			return Element.GetGrabSpots(scale);
-		}
-
-		public override void DoGrabAngleSnap(GrabMovement move)
+		internal override void DoGrabAngleSnap(GrabMovement move)
 		{
 			Element.DoGrabAngleSnap(move);
 		}
 
-		protected override void DoGrabMove(GrabMovement move)
+		protected internal override void DoGrabMove(GrabMovement move)
 		{
 			//base.DoGrabMove(move);
 			Element.GrabMove(move);
 		}
 
-		public override GrabMovement GetCustomGrabMove(EditableView.ClickPosition current, EditableView.ClickPosition click, Transaction transaction)
-		{
-			return Element.GetCustomGrabMove(current, click, transaction);
-		}
+		internal override GrabMovement GetCustomGrabMove(EditableView.ClickPosition current, EditableView.ClickPosition click, Transaction transaction)
+			=> Element.GetCustomGrabMove(current, click, transaction);
 
-		public override bool StartGrabMove(GrabMovement grab)
+		internal override bool StartGrabMove(GrabMovement grab)
 		{
 			base.StartGrabMove(grab);
 			return Element.StartGrabMove(grab);
@@ -492,9 +718,11 @@ namespace SAW
 		#region IShapeParent and related items
 		public void NotifyIndirectChange(Shape shape, ChangeAffects affected)
 		{
-			Parent.NotifyIndirectChange(shape, affected);
 			if ((affected & ChangeAffects.Bounds) > 0)
 				m_Bounds = Rectangle.Empty;
+			Parent.NotifyIndirectChange(shape, affected);
+			if ((affected & ChangeAffects.GrabSpots) > 0 && shape == Element)// page only responds if the element with grabspots is mentioned - but grabspots here came from Element, even if they are technically on this shape
+				Parent.NotifyIndirectChange(this, ChangeAffects.GrabSpots);
 		}
 
 		public void NotifyIndirectChange(Shape shape, ChangeAffects affected, RectangleF area)
@@ -532,6 +760,7 @@ namespace SAW
 		{
 			base.UpdateReferencesObjectsCreated(document, reader);
 			Element?.UpdateReferencesObjectsCreated(document, reader);
+			Sound?.DereferenceOnLoad(document);
 		}
 
 		public override void UpdateReferencesIDsChanged(Mapping mapID, Document document)
@@ -541,13 +770,19 @@ namespace SAW
 			// this function is called on each object when a group have been copied and pasted
 			// we can use this opportunity to set the SAW ID
 			SetUniqueID();
+			Sound?.UpdateIDsReferencesChanged();
 		}
 
-		public override void NotifyEnvironmentChanged(EnvironmentChanges change)
+		internal override void NotifyEnvironmentChanged(EnvironmentChanges change)
 		{
 			Element?.NotifyEnvironmentChanged(change);
 		}
 
+		public override void AddRequiredReferences(Action<Datum> fnAdd, Mapping mapID)
+		{
+			base.AddRequiredReferences(fnAdd, mapID);
+			fnAdd.Invoke(Sound?.Content);
+		}
 
 		#endregion
 
@@ -569,15 +804,15 @@ namespace SAW
 			return ((IEnumerable)ElementAsContainer).GetEnumerator();
 		}
 
-		public IEnumerable<Shape> Reverse
-		{ get { return (Element as IShapeContainer)?.Reverse ?? EmptyList; } }
+		public IEnumerable<Shape> Reverse => (Element as IShapeContainer)?.Reverse ?? EmptyList;
 
 		public void FinishedModifyingContents(Transaction transaction, GrabMovement move = null)
 		{
 			ElementAsContainer?.FinishedModifyingContents(transaction, move);
 		}
 
-		public List<Shape> Contents => (Element as IShapeContainer)?.Contents;
+		/// <summary>Returns the Item contents if it contains a SAW item, or an empty list </summary>
+		public List<Shape> Contents => (Element as IShapeContainer)?.Contents ?? new List<Shape>();
 
 		public bool MoveWithin(List<Shape> shapes, PointF target, GrabMovement move, Transaction transaction)
 		{

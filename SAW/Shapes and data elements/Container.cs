@@ -104,7 +104,7 @@ namespace SAW
 			return VerbResult.Continuing;
 		}
 
-		public override bool DefaultStylesApplied()
+		internal override bool DefaultStylesApplied()
 		{
 			bool changed = base.DefaultStylesApplied();
 			if (!FillStyle.Colour.IsEmpty)
@@ -258,7 +258,7 @@ namespace SAW
 
 		protected override RectangleF CalculateBounds() => throw new InvalidOperationException();
 
-		public override List<UserSocket> GetPointsWhichSnapWhenMoving()
+		internal override List<UserSocket> GetPointsWhichSnapWhenMoving()
 		{
 			List<UserSocket> sockets = new List<UserSocket>();
 			foreach (Shape shape in m_Shapes)
@@ -277,7 +277,7 @@ namespace SAW
 			return sockets;
 		}
 
-		public override bool StartGrabMove(GrabMovement grab)
+		internal override bool StartGrabMove(GrabMovement grab)
 		{
 			// Must enrol the individual shapes in the movement, so that backup copies of them are created
 			if (!base.StartGrabMove(grab))
@@ -293,7 +293,7 @@ namespace SAW
 			return true;
 		}
 
-		protected override void DoGrabMove(GrabMovement move)
+		protected internal override void DoGrabMove(GrabMovement move)
 		{
 			// Can't use the standard ApplyTransformation, because we don't want to move the individual shapes
 			// If the individual shapes are supposed to be moved, they also need to be restored to their original position via GrabMove which will move them
@@ -304,7 +304,7 @@ namespace SAW
 				case GrabTypes.EdgeMoveH:
 				case GrabTypes.EdgeMoveV:
 				case GrabTypes.CornerResize:
-					// Would usually be: Me.ApplyTransformation(objMove.Transform).  Relevant contents pasted below:
+					// Would usually be: this.ApplyTransformation(move.Transform).  Relevant contents pasted below:
 					move.Transform.TransformRectangle(ref m_Bounds);
 					base.ApplyTransformation(move.Transform); // Possibly useful because it does some decaching
 					m_Refresh = RectangleF.Empty;
@@ -313,12 +313,10 @@ namespace SAW
 					throw new InvalidOperationException();
 			}
 			if (GrabTransformsContents(move))
-			{
 				foreach (Shape shape in m_Shapes)
 				{
 					shape.GrabMove(move); // note must NOT be DoGrabMove - the outer GrabMove does the restoration of the original coordinates
 				}
-			}
 		}
 
 		protected virtual bool GrabTransformsContents(GrabMovement move) => move.GrabType == GrabTypes.Move || move.ControlKey;
@@ -341,7 +339,7 @@ namespace SAW
 			return true;// clicking anywhere within the bounds is sufficient for rectangle
 		}
 
-		public override List<GrabSpot> GetGrabSpots(float scale)
+		internal override List<GrabSpot> GetGrabSpots(float scale)
 		{
 			// from Group, but omitting rotation which is never allowed
 			// always works as rectangle, regardless of border shape
@@ -368,7 +366,7 @@ namespace SAW
 			// DoGrabMove implementation in base Shape works OK since it is transformation based, and we don't do any single vertex changes
 		}
 
-		public override List<Target> GenerateTargets(UserSocket floating)
+		internal override List<Target> GenerateTargets(UserSocket floating)
 		{
 			if (LineLogic == LineLogics.Custom)
 			{
@@ -380,55 +378,6 @@ namespace SAW
 			}
 			else
 				return base.GenerateTargetsDefault(floating, true);
-		}
-
-		public override void CheckIntersectionsWith(Shape shape)
-		{
-			if (LineLogic == LineLogics.Custom)
-			{
-				shape.CheckIntersectionsWithLine(this, 0, 0, m_Bounds.Location, m_Bounds.TopRight(), true);
-				shape.CheckIntersectionsWithLine(this, 1, 0, m_Bounds.TopRight(), m_Bounds.BottomRight(), true);
-				shape.CheckIntersectionsWithLine(this, 2, 0, m_Bounds.BottomRight(), m_Bounds.BottomLeft(), true);
-				shape.CheckIntersectionsWithLine(this, 3, 0, m_Bounds.BottomLeft(), m_Bounds.Location, true);
-			}
-			else
-			{
-				EnsurePath(false);
-				base.CheckIntersectionsWithUsingPath(shape, m_Path);
-				// this is what base.CheckIntersectionsWith(shape) does, except that changes mode if border wide - not so desirable here
-			}
-		}
-
-		public override void CheckIntersectionsWithBezier(Shape shape, int shapeIndex, PointF[] Q)
-		{
-			if (LineLogic == LineLogics.Custom)
-			{
-				DefaultCheckOneLineWithBezier(m_Bounds.Location, m_Bounds.TopRight(), 0, shape, shapeIndex, Q);
-				DefaultCheckOneLineWithBezier(m_Bounds.TopRight(), m_Bounds.BottomRight(), 1, shape, shapeIndex, Q);
-				DefaultCheckOneLineWithBezier(m_Bounds.BottomRight(), m_Bounds.BottomLeft(), 2, shape, shapeIndex, Q);
-				DefaultCheckOneLineWithBezier(m_Bounds.BottomLeft(), m_Bounds.Location, 3, shape, shapeIndex, Q);
-			}
-			else
-			{
-				EnsurePath(false);
-				CheckIntersectionsWithBezierUsingPath(shape, shapeIndex, Q, m_Path);
-			}
-		}
-
-		public override void CheckIntersectionsWithLine(Shape shape, int shapeIndex, float shapeParameter, PointF A, PointF B, bool ignoreEnd)
-		{
-			if (LineLogic == LineLogics.Custom)
-			{
-				DefaultCheckIntersectionBetweenLines(shape, m_Bounds.Location, m_Bounds.TopRight(), true, 0, 0, A, B, ignoreEnd, shapeIndex, shapeParameter);
-				DefaultCheckIntersectionBetweenLines(shape, m_Bounds.TopRight(), m_Bounds.BottomRight(), true, 1, 0, A, B, ignoreEnd, shapeIndex, shapeParameter);
-				DefaultCheckIntersectionBetweenLines(shape, m_Bounds.BottomRight(), m_Bounds.BottomLeft(), true, 2, 0, A, B, ignoreEnd, shapeIndex, shapeParameter);
-				DefaultCheckIntersectionBetweenLines(shape, m_Bounds.BottomLeft(), m_Bounds.Location, true, 3, 0, A, B, ignoreEnd, shapeIndex, shapeParameter);
-			}
-			else
-			{
-				EnsurePath(false);
-				base.CheckIntersectionsWithLineUsingPath(shape, shapeIndex, shapeParameter, A, B, ignoreEnd, false, m_Path);
-			}
 		}
 
 		protected override void CreatePath()
@@ -487,10 +436,6 @@ namespace SAW
 			// just passes along the notification to its container
 			if ((affected & ChangeAffects.Bounds) > 0)
 				m_Refresh = RectangleF.Empty; // not sure if this necessary or not
-			affected = affected & ~ChangeAffects.Intersections;
-			// because intersections are never created with children of groups.  Does this apply in open containers properly?
-			if (affected == 0)
-				return;
 			Parent.NotifyIndirectChange(shape, affected);
 		}
 
@@ -499,14 +444,10 @@ namespace SAW
 			// just passes along the notification to its container
 			if ((affected & ChangeAffects.Bounds) > 0)
 				m_Refresh = RectangleF.Empty; // not sure if this necessary or not
-			affected = affected & ~ChangeAffects.Intersections;
-			// because intersections are never created with children of groups.  Does this apply in open containers properly?
-			if (affected == 0)
-				return;
 			Parent.NotifyIndirectChange(shape, affected, area);
 		}
 
-		public override void NotifyEnvironmentChanged(EnvironmentChanges change)
+		internal override void NotifyEnvironmentChanged(EnvironmentChanges change)
 		{
 			base.NotifyEnvironmentChanged(change);
 			foreach (Shape shape in m_Shapes)
@@ -574,7 +515,7 @@ namespace SAW
 		// Unlike Group, this doesn't store the list of sockets, nor does it make the sockets refer to this shape.
 		// Instead it simply returns the sockets from the internal shapes
 
-		public override List<Socket> GetSockets()
+		internal override List<Socket> GetSockets()
 		{
 			List<Socket> sockets = new List<Socket>();
 			foreach (Shape shape in m_Shapes)
@@ -604,7 +545,7 @@ namespace SAW
 		public bool ShowHighlight = true;
 
 		// Overrides which propagate to the contained shapes:
-		public override void Draw(Canvas gr, float scale, float coordScale, StaticView view, StaticView.InvalidationBuffer buffer, int fillAlpha = 255, int edgeAlpha = 255, bool reverseRenderOrder = false)
+		internal override void Draw(Canvas gr, float scale, float coordScale, StaticView view, StaticView.InvalidationBuffer buffer, int fillAlpha = 255, int edgeAlpha = 255, bool reverseRenderOrder = false)
 		{
 			base.Draw(gr, scale, coordScale, view, buffer, fillAlpha, edgeAlpha, reverseRenderOrder);
 			//if (Overflow == OverflowModes.Clip)
@@ -649,9 +590,9 @@ namespace SAW
 		}
 
 		/// <summary>this both highlight the contained shapes and this shape itself</summary>
-		public override void DrawHighlight(Canvas gr, float scale, float coordScale)
+		internal override void DrawHighlight(Canvas gr, float scale, float coordScale, Target singleElement)
 		{
-			base.DrawHighlight(gr, scale, coordScale);
+			base.DrawHighlight(gr, scale, coordScale, singleElement);
 			//if (Overflow == OverflowModes.Clip)
 			//{
 			//	if (LineLogic == LineLogics.Custom)
@@ -661,7 +602,7 @@ namespace SAW
 			//}
 			foreach (Shape shp in m_Shapes)
 			{
-				shp.DrawHighlight(gr, scale, coordScale);
+				shp.DrawHighlight(gr, scale, coordScale, singleElement);
 			}
 			//if (Overflow == OverflowModes.Clip)
 			//	gr.RestoreClip();
@@ -698,7 +639,7 @@ namespace SAW
 			return refreshBounds;
 		}
 
-		public override bool PerformLinkedChanges(Transaction transaction, frmMain editor)
+		internal override bool PerformLinkedChanges(Transaction transaction, frmMain editor)
 		{
 			// Need to check if it is one of the contents which has been edited; this might require updating the refresh bounds
 			bool changed = base.PerformLinkedChanges(transaction, editor);
@@ -713,7 +654,7 @@ namespace SAW
 			return changed;
 		}
 
-		public override void DrawLineTarget(Target target, Graphics gr, Pen pn, int activePhase)
+		internal override void DrawLineTarget(Target target, Graphics gr, Pen pn, int activePhase)
 		{
 			// Copied from BoundsDefines
 			PointF[] points = m_Bounds.GetPoints();
@@ -766,9 +707,10 @@ namespace SAW
 		#endregion
 
 		#region Editing settings
-		public override string DoubleClickText() => Strings.Item("Flow_Settings");
 
-		public override void DoDoubleClick(EditableView view, EditableView.ClickPosition.Sources source)
+		internal override string DoubleClickText() => Strings.Item("Flow_Settings");
+
+		internal override void DoDoubleClick(EditableView view, EditableView.ClickPosition.Sources source)
 		{
 			Transaction transaction = new Transaction();
 			transaction.Edit(this);
@@ -845,7 +787,7 @@ namespace SAW
 			return move.GrabType == GrabTypes.Move;
 		}
 
-		protected override void DoGrabMove(GrabMovement move)
+		protected  internal override void DoGrabMove(GrabMovement move)
 		{
 			base.DoGrabMove(move);
 			FinishedModifyingContents(move.Transaction);
@@ -1132,7 +1074,7 @@ namespace SAW
 
 		public bool Horizontal => (byte)Direction <= LASTHORIZONTALDIRECTION;
 
-		public override bool PerformLinkedChanges(Transaction transaction, frmMain editor)
+		internal override bool PerformLinkedChanges(Transaction transaction, frmMain editor)
 		{
 			bool changed = base.PerformLinkedChanges(transaction, editor);
 			// Base class has already checked if any of the contents are included, and responds by clearing m_rctRefresh

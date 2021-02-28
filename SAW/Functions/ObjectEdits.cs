@@ -32,7 +32,6 @@ namespace SAW.Functions
 			Verb.Register(Codes.DoubleClick, new DoubleClick());
 			Verb.Register(Codes.QuickAddButtons, (source, pnlView, tx) => { frmAddButtons.Display(Globals.Root.CurrentPage); }, true, view => Globals.Root.CurrentDocument.ActivityID.Equals(Activities.PaletteID));
 			Verb.Register(Codes.FreeTextToTextLine, new FreeTextToLine());
-			Verb.Register(Codes.TypeDegree, (source, pnlView, tx) => { Globals.Root.Editor.SimulateKey((char)176); }, abandonsCurrent: false);
 			Verb.Register(Codes.SmallestHeight, new Alignment());
 			Verb.Register(Codes.SmallestWidth, new Alignment());
 			Verb.Register(Codes.LargestHeight, new Alignment());
@@ -41,11 +40,15 @@ namespace SAW.Functions
 				Verb.Register(code, new Alignment());
 			Verb.Register(Codes.MakeChild, new MakeChild());
 			Verb.Register(Codes.MoveOutOfContainer, new MoveOutOfContainer());
+			Verb.Register(Codes.ToggleBold, new ToggleBold());
+			Verb.Register(Codes.ToggleItalic, new ToggleItalic());
+			Verb.Register(Codes.ToggleUnderline, new ToggleUnderline());
 
 		}
 
 	}
 
+	/// <summary>Represents shape-specific functionality invoked by double clicking (also on menus, with shape-specific text)</summary>
 	internal class DoubleClick : Verb
 	{
 		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
@@ -61,6 +64,9 @@ namespace SAW.Functions
 				   && CurrentPage.SelectedShapes.First().CanDoubleClickWith(CurrentPage.SelectedShapes)
 				   && CurrentPage.SelectedShapes[0].DoubleClickText() != null;
 		}
+
+		public override bool HideFromContextMenuIfUnavailable => true;
+
 	}
 
 	internal class ChangeZ : Verb
@@ -106,6 +112,8 @@ namespace SAW.Functions
 			if (targetIndex < 0)
 				return;
 			IShapeContainer newContainer = oldContainer.Contents[targetIndex].AsContainer;
+			if (newContainer == null)
+				return; // item cannot accept contents
 			transaction.Edit((Datum)oldContainer);
 			transaction.Edit((Datum)newContainer);
 			transaction.Edit(moving);
@@ -119,16 +127,24 @@ namespace SAW.Functions
 			oldContainer.FinishedModifyingContents(transaction);
 			newContainer.FinishedModifyingContents(transaction);
 
-			moving.Parent.NotifyIndirectChange(moving, ChangeAffects.GrabSpots | ChangeAffects.Intersections);
+			moving.Parent.NotifyIndirectChange(moving, ChangeAffects.GrabSpots);
 		}
 
 		public override bool IsApplicable(EditableView pnlView)
 		{
 			if (CurrentPage.SelectedCount != 1)
 				return false;
-			// can't do it if it's listed first:
-			if (CurrentPage.SelectedShapes.First().Z == 0)
+
+			Shape moving = CurrentPage.SelectedShapes.First();
+			IShapeContainer oldContainer = moving.Container;
+			int targetIndex = oldContainer.Contents.IndexOf(moving) - 1; // index of new container
+																		 // can't do it if it's listed first:
+			if (targetIndex < 0)
 				return false;
+			IShapeContainer newContainer = oldContainer.Contents[targetIndex].AsContainer;
+			if (newContainer == null)
+				return false; // item cannot accept contents
+
 			return true;
 		}
 
@@ -194,6 +210,7 @@ namespace SAW.Functions
 		public override bool MightOpenModalDialog => true;
 	}
 
+	/// <summary>The QuickTransform verb, but the DoTransform function is useful as a way of applying a transform with refresh etc.</summary>
 	internal class QuickTransform : Verb
 	{
 		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
@@ -255,11 +272,11 @@ namespace SAW.Functions
 					Utilities.LogSubError("Unexpected verb in DoQuickTransform");
 					return;
 			}
-			DoTransformForVerb(pnlView, transformation, transaction);
+			DoTransformForVerb(transformation, transaction);
 		}
 
-		internal static void DoTransformForVerb(EditableView pnlView, Transformation transformation, Transaction transaction)
-		{ // part of both DoQuickTransform and DoNudge
+		internal static void DoTransformForVerb(Transformation transformation, Transaction transaction)
+		{ // part of both QuickTransform.Trigger and DoNudge.Trigger
 			RectangleF invalid = CurrentPage.SelectedRefreshBoundary();
 			foreach (Shape shape in CurrentPage.SelectedShapes)
 			{
@@ -268,8 +285,10 @@ namespace SAW.Functions
 				shape.Status = Shape.StatusValues.Moved;
 				Geometry.Extend(ref invalid, shape.RefreshBounds());
 			}
-			Geometry.Extend(ref invalid, pnlView.ForceUpdateGrabSpots());
-			pnlView.InvalidateData(invalid, StaticView.InvalidationBuffer.All);
+			CurrentPage.NotifyIndirectChange(null, ChangeAffects.RepaintNeeded, invalid);
+			CurrentPage.NotifyIndirectChange(CurrentPage.SelectedShapes.First(), ChangeAffects.GrabSpots); // I don't think it will matter much what shape is provided - but a selected one must be as the view ignores it otherwise
+																										   //pnlView.ForceUpdateGrabSpots(); // (will invalidate part of current buffer)
+																										   //pnlView.InvalidateData(invalid, StaticView.InvalidationBuffer.All);
 		}
 
 		public override bool IsApplicable(EditableView pnlView)
@@ -298,15 +317,18 @@ namespace SAW.Functions
 		{
 			if (CurrentPage == null || CurrentPage.SelectedCount < 1)
 				return;
-			float step = 1;
-			// in SAW it defaults to 1; but splash always uses grid
+			float step;
+			// in SAW it defaults to mouse step (1/5/10); but splash always uses grid
 			if (pnlView.SnapMode == Shape.SnapModes.Grid)
 				step = CurrentPage.Paper.ScalarSnapStep(0);
+			else
+				step = Globals.Root.CurrentConfig.MouseStep(MouseStep.CurrentStep);
 			TransformMove transformation = new TransformMove(X * step, Y * step);
-			QuickTransform.DoTransformForVerb(pnlView, transformation, transaction);
+			QuickTransform.DoTransformForVerb(transformation, transaction);
 		}
 
 		public override bool IsApplicable(EditableView pnlView) => CurrentPage.SelectionAllAllow(Shape.AllowedActions.TransformMove);
+
 	}
 
 	internal class ChangeTextSize : Verb
@@ -337,13 +359,12 @@ namespace SAW.Functions
 				if (shape.Tidy(Mode, CurrentPage))
 				{
 					changed = true;
-					CurrentPage.UpdateIntersectionsWith(shape, true);
 				}
 				else
 					transaction.Disregard(shape);
 			}
 			if (changed)
-				pnlView.InvalidateData(pnlView.ForceUpdateGrabSpots(), StaticView.InvalidationBuffer.Selection);
+				pnlView.ForceUpdateGrabSpots();
 			// main invalidation done automatically by tx
 		}
 
@@ -484,7 +505,7 @@ namespace SAW.Functions
 						if ((shape.Allows & Shape.AllowedActions.TransformLinearStretch) > 0)
 							shape.ApplyTransformation(new TransformLinearScale(middle, widthScale, true));
 						else
-							shape.ApplyTransformation(new TransformScale(middle, widthScale));
+							shape.ApplyTransformation(new TransformScale(middle, widthScale, true)); // changed to use centres v8
 						break;
 					case Codes.SmallestHeight:
 					case Codes.LargestHeight:
@@ -495,7 +516,7 @@ namespace SAW.Functions
 						if ((shape.Allows & Shape.AllowedActions.TransformLinearStretch) > 0)
 							shape.ApplyTransformation(new TransformLinearScale(middle, heightScale, false));
 						else
-							shape.ApplyTransformation(new TransformScale(middle, heightScale));
+							shape.ApplyTransformation(new TransformScale(middle, heightScale, true));// changed to use centres v8
 						break;
 					case Codes.SpreadHorizontal:
 						shape.ApplyTransformation(new TransformMove(spread - minimalBounds.Left, 0));
@@ -508,7 +529,6 @@ namespace SAW.Functions
 				}
 				shape.Status = Shape.StatusValues.Moved;
 				Geometry.Extend(ref refreshBoundary, shape.RefreshBounds());
-				CurrentPage.UpdateIntersectionsWith(shape);
 			}
 			pnlView.InvalidateData(refreshBoundary, StaticView.InvalidationBuffer.All);
 		}
@@ -532,4 +552,56 @@ namespace SAW.Functions
 		}
 
 	}
+
+	#region Font style changes
+	internal abstract class ChangeTextStyleVerb : Verb
+	{
+		public override sealed void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
+		{
+			foreach (Shape shape in CurrentPage.SelectedShapes)
+			{
+				if (shape.StyleObjectForParameter(Parameters.FontSize) is Shape.TextStyleC style)
+				{
+					transaction.Edit(shape);
+					ModifyStyle(style);
+					shape.NotifyStyleChanged(Parameters.FontSize, (int)(style.Size * 100), (int)(style.Size * 100));// allows shape to update bounding box
+				}
+			}
+		}
+
+		public override bool IsApplicable(EditableView pnlView)
+		{
+			return CurrentPage.SelectedShapes.Any(s => s.StyleObjectForParameter(Parameters.FontSize) is Shape.TextStyleC);
+		}
+
+		/// <summary>Derived class must make the desired change to this style object - which will be the one from the shape</summary>
+		protected abstract void ModifyStyle(Shape.TextStyleC style);
+
+	}
+
+	internal class ToggleBold : ChangeTextStyleVerb
+	{
+		protected override void ModifyStyle(Shape.TextStyleC style)
+		{
+			style.Style = style.Style ^ FontStyle.Bold;
+		}
+	}
+
+	internal class ToggleUnderline : ChangeTextStyleVerb
+	{
+		protected override void ModifyStyle(Shape.TextStyleC style)
+		{
+			style.Style = style.Style ^ FontStyle.Underline;
+		}
+	}
+
+	internal class ToggleItalic : ChangeTextStyleVerb
+	{
+		protected override void ModifyStyle(Shape.TextStyleC style)
+		{
+			style.Style = style.Style ^ FontStyle.Italic;
+		}
+	}
+	#endregion
+
 }

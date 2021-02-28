@@ -3,12 +3,13 @@ using System.Drawing;
 using System.Diagnostics;
 using System.Collections;
 using System.Drawing.Drawing2D;
+using System.Linq;
 
 
 namespace SAW
 {
 	/// <summary>Use WithinPath to iterate the elements within a GraphicsPath.  Also a few other shared utility functions</summary>
-	public struct PathElement
+	internal struct PathElement
 	{
 		/// <summary>Will only be PATHLINE or PATHBEZIER and without any flags</summary>
 		public readonly byte Type;
@@ -150,8 +151,8 @@ namespace SAW
 		public static PathElement GetElement(GraphicsPath path, int index)
 		{
 			// Approximately copied from the iterator Current, but changed a bit to find the figure start as needed
-			var types = path.PathTypes;
-			var points = path.PathPoints;
+			byte[] types = path.PathTypes;
+			PointF[] points = path.PathPoints;
 			PointF[] resultPoint = new PointF[4];
 			if ((types[index] & Lined.PATHCLOSUREFLAG) > 0)
 			{
@@ -177,6 +178,36 @@ namespace SAW
 			}
 		}
 
+		/// <summary>Creates a GraphicsPath from this set of elements.  Doesn't handle closures at the moment.  Just appends all the points with the correct type bytes
+		/// Will add straight lines between elements if they do not connect</summary>
+		public static GraphicsPath CreatePath(IEnumerable<PathElement> elements)
+		{
+			List<PointF> points = new List<PointF>();
+			List<byte> types = new List<byte>();
+			points.Add(elements.First().Points[0]);
+			types.Add(Lined.PATHSTART);
+			foreach (PathElement e in elements)
+			{
+				if (!e.Points[0].ApproxEqual(points.Last()))
+				{ // items are not continuous - add line between them
+					points.Add(e.Points[0]);
+					types.Add(Lined.PATHLINE);
+				}
+				points.Add(e.Points[1]);
+				if (e.IsBezier)
+				{
+					points.Add(e.Points[2]);
+					points.Add(e.Points[3]);
+					types.Add(Lined.PATHBEZIER);
+					types.Add(Lined.PATHBEZIER);
+					types.Add(Lined.PATHBEZIER);
+				}
+				else
+					types.Add(Lined.PATHLINE);
+			}
+			return new GraphicsPath(points.ToArray(), types.ToArray());
+		}
+
 		#endregion
 
 		#region Iterator
@@ -188,7 +219,7 @@ namespace SAW
 			private int m_Index;
 			private PointF[] m_ResultPoint = new PointF[4]; // same array used full results, to avoid creating lots of tiny objects
 			private readonly bool m_IgnoreShortClosure;
-			private int m_FigureStart ; // first index at the beginning of the current figure
+			private int m_FigureStart; // first index at the beginning of the current figure
 			private readonly bool m_DontReusePointsArray;
 
 			public PathEnumerator(GraphicsPath path, bool ignoreShortClosure, bool dontReusePointsArray)
@@ -227,8 +258,7 @@ namespace SAW
 				}
 			}
 
-			object IEnumerator.Current
-			{ get { return Current; } }
+			object IEnumerator.Current => Current;
 
 			public bool MoveNext()
 			{
@@ -269,7 +299,7 @@ namespace SAW
 				{
 					// At the end of a figure: either at the last point, or the next point is marked as StartFigure
 					if ((m_Types[m_Index] & Lined.PATHCLOSUREFLAG) > 0 && (!m_Points[m_Index].ApproxEqual(m_Points[m_FigureStart]) || !m_IgnoreShortClosure)) // Caller requested not to be given degenerate closure
-																																											 // We have a closure back to the beginning, and have excluded the possibility of it being degenerate if the caller requested them to be omitted
+																																							  // We have a closure back to the beginning, and have excluded the possibility of it being degenerate if the caller requested them to be omitted
 						return true;
 					else
 					{

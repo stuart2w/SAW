@@ -510,17 +510,15 @@ namespace SAW
 			// the above started giving problems in SAW ?!? when height=0
 			float angle = (float)Math.Atan2(vector.Width , -vector.Height);
 			//Debug.WriteLine($"Initial VectorAngle({vector.Width},{vector.Height}={angle}");
-			if (vector.Height > 0) // was >=0 with Math.Atan
-				angle += PI;
-			else if (vector.Width < 0)
+			//if (vector.Height > 0) // was >=0 with Math.Atan
+			//	angle += PI;
+			//else
+			if (vector.Width < 0)
 				angle += PI * 2;
 			return angle;
 		}
 
-		internal static float VectorAngle(PointF A, PointF B)
-		{
-			return A.VectorTo(B).VectorAngle();
-		}
+		internal static float VectorAngle(PointF A, PointF B) => A.VectorTo(B).VectorAngle();
 
 		internal static SizeF ScalarToVector(float scalar, float angle)
 		{

@@ -159,7 +159,7 @@ namespace SAW
 				if (IsSVG)
 				{
 					EnsureSVG();
-					return new Size((int)m_SVG.ViewBox.Width, (int)m_SVG.ViewBox.Height);
+					return new Size((int)m_SVG.Width, (int)m_SVG.Height);
 				}
 				return GetNetImage().Size;
 			}
@@ -187,9 +187,9 @@ namespace SAW
 				GUIUtilities.CalcDestSize(Size, ref sz);
 				// we don't rely on Draw maintaining aspect:ratio, since we can only fix one coord.  if we fixed width and the image happened to be very tall it would result in a huge image
 				var x = m_SVG.Draw(sz.Width, sz.Height);
-#if DEBUG
-				x.Save(@"d:\temp\svg draw.png");
-#endif
+				//#if DEBUG
+				//				x.Save(@"d:\temp\svg draw.png");
+				//#endif
 				return x;
 			}
 			Bitmap bmp = new Bitmap(sz.Width, sz.Height, PixelFormat.Format32bppArgb);
@@ -240,18 +240,19 @@ namespace SAW
 		{
 			if (IsSVG)
 			{
-				EnsureSVG();
-				Draw(gr, rect, new RectangleF(m_SVG.ViewBox.MinX, m_SVG.ViewBox.MinY, m_SVG.ViewBox.Width, m_SVG.ViewBox.Height), attributes);
-				// using this seemed problematic (corrupting gr state and/or not inheriting it properly into the SVG renderer.  And it turns out to be unnecessary;  the used option is just easier)
-				//using (ISvgRenderer render = SvgRenderer.FromGraphics(gr))
-				//{
-				//render.Transform = gr.Transform;
-				//render.ScaleTransform(rect.Width / m_SVG.Width, rect.Height / m_SVG.Height);
-				//render.TranslateTransform(rect.Left, rect.Top);
-				//m_SVG.Draw(render);
-				//}
-				// and then using this to get the size seemed to fail for some;  so just uses the full version below, which works
-				// m_SVG.Draw(gr, new SizeF(rect.Width, rect.Height));
+				//EnsureSVG();  // either of these following lines can be used to test function below
+				//Draw(gr, rect, new RectangleF(0, 0, m_SVG.Width, m_SVG.Height), attributes);
+				//Draw(gr, new PointF[] { rect.Location, rect.TopRight(), rect.BottomLeft() }, new RectangleF(0, 0, m_SVG.Width, m_SVG.Height), attributes);
+				//return;
+				var state = gr.Save();
+				using (ISvgRenderer render = SvgRenderer.FromGraphics(gr))
+				{
+					//render.Transform = gr.Transform; - redundant as it does this anyway.  Doing this ...Clone might be useful so the original matrix didn't get corrupted, but safer to just store entire state anyway
+					render.TranslateTransform(rect.Left, rect.Top, MatrixOrder.Prepend);
+					render.ScaleTransform(rect.Width / m_SVG.Width, rect.Height / m_SVG.Height, MatrixOrder.Prepend);
+					m_SVG.Draw(render);
+				}
+				gr.Restore(state);
 			}
 			else
 				gr.DrawImage(GetNetImage(), rect, attributes);
@@ -261,18 +262,29 @@ namespace SAW
 		{
 			if (IsSVG)
 			{
+				// largely based on function above now.  Not sure when this version is used to test it really works if source is changed
 				EnsureSVG();
-				var state = gr.Save();
-				gr.TranslateTransform(rect.Left, rect.Top, MatrixOrder.Prepend);
-				RectangleF viewbox = m_SVG.ViewBox;
-				// we must prevent SVG applying any scaling as it's in the wrong sequence, and must be BEFORE the source adjustments
-				// therefore we perform the output scale now: (and below m_SVG.Draw uses the viewbox size, so will apply a (1,1) scaling)
-				gr.ScaleTransform(rect.Width / viewbox.Width, rect.Height / viewbox.Height);
-				gr.ScaleTransform(viewbox.Width / source.Width, viewbox.Height / source.Height);
-				gr.TranslateTransform(-(source.X - viewbox.X), -(source.Y - viewbox.Y));
-				m_SVG.Draw(gr, new SizeF(viewbox.Width, viewbox.Height));
+				GraphicsState state = gr.Save();
+				using (ISvgRenderer render = SvgRenderer.FromGraphics(gr))
+				{
+					render.TranslateTransform(rect.Left, rect.Top, MatrixOrder.Prepend);
+					render.ScaleTransform(rect.Width / source.Width, rect.Height / source.Height, MatrixOrder.Prepend);
+					render.TranslateTransform(-source.Left, -source.Top);
+					m_SVG.Draw(render);
+				}
 				gr.Restore(state);
-				//gr.DrawRectangle(Pens.Salmon, rect.X, rect.Y, rect.Width, rect.Height);
+
+				//RectangleF viewbox = m_SVG.ViewBox;
+				//// we must prevent SVG applying any scaling as it's in the wrong sequence, and must be BEFORE the source adjustments
+				//// therefore we perform the output scale now: (and below m_SVG.Draw uses the viewbox size, so will apply a (1,1) scaling)
+				//// I think it's correct that this uses viewbox not bound (as above function) as we are implementing the SVG scaling for the viewbox ourselves now
+				//gr.ScaleTransform(rect.Width / viewbox.Width, rect.Height / viewbox.Height);
+				//gr.ScaleTransform(viewbox.Width / source.Width, viewbox.Height / source.Height);
+				//gr.TranslateTransform(-(source.X - viewbox.X), -(source.Y - viewbox.Y));
+				//m_SVG.Draw(gr, new SizeF(viewbox.Width, viewbox.Height));
+				//gr.DrawRectangle(Pens.LightBlue, viewbox.X, viewbox.Y, viewbox.Width, viewbox.Height);
+				//gr.Restore(state);
+				////gr.DrawRectangle(Pens.Salmon, rect.X, rect.Y, rect.Width, rect.Height);
 			}
 			else
 				gr.DrawImage(GetNetImage(), rect, source, attributes);
@@ -291,8 +303,7 @@ namespace SAW
 				 */
 				EnsureSVG();
 				gr.ResetClip();
-				var state = gr.Save();
-				var pt0 = destinationPoints[0];
+				GraphicsState state = gr.Save();
 				Matrix m = new Matrix(source, destinationPoints);
 				gr.MultiplyTransform(m, MatrixOrder.Prepend);
 				m_SVG.Draw(gr);

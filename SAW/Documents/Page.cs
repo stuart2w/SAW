@@ -11,7 +11,7 @@ using System.Linq;
 
 namespace SAW
 {
-	public partial class Page : Datum, IDisposable, IShapeContainer
+	public partial class Page : Datum, IShapeContainer, IDisposable
 	{
 
 		public delegate void ShapeNotifiedIndirectChangeEventHandler(Shape shape, ChangeAffects affected, RectangleF area);
@@ -36,7 +36,7 @@ namespace SAW
 			FitOutside = 2,
 			Centre = 3,
 			Tile = 4,
-			/// <summary>Forces set to keep AR matching image</summary>
+			/// <summary>Forces page bounds to keep AR matching image</summary>
 			LockAR = 5
 		}
 		public BackgroundImageModes BackgroundImageMode = BackgroundImageModes.Stretch;
@@ -44,10 +44,8 @@ namespace SAW
 		/// <summary>True if first item is rendered on top.  Not stored in data, rather this is written from the same item in Document.  (But must be copied here as rendering code has no reference to the document)</summary>
 		public bool ReverseRenderOrder;
 
-#if SAW
 		/// <summary>Or -1 for not set (was a string in SAW6 and stored in SAW6Doc header)</summary>
 		public int HelpSAWID = -1;
-#endif
 
 		#endregion
 
@@ -196,7 +194,6 @@ namespace SAW
 					shape.ApplyTransformation(move);
 				}
 			}
-			UpdateAllIntersections();
 		}
 
 		public bool IsLandscape => PhysicalSize.Width >= PhysicalSize.Height;
@@ -221,16 +218,18 @@ namespace SAW
 		}
 
 		/// <summary>True if the aspect ratio of the page should always be matched to the image.  But ALSO means resizing window always resizes content</summary>
-		public bool LockARToBackgroundImage => m_Background!=null && BackgroundImageMode== BackgroundImageModes.LockAR;
+		public bool LockARToBackgroundImage => m_Background != null && BackgroundImageMode == BackgroundImageModes.LockAR;
 
 		#endregion
 
 		#region Graphics
-		public delegate void RequestRefreshEventHandler(RectangleF dataRect); // fired when changes to the data will require a refreshing in any viewer.  Parameter is the invalid area in data coordinates
-		public event RequestRefreshEventHandler RequestRefresh;
 
-		public float AssumeRefreshScale = 1; // where critical is passed to each function (especially drawing).
-											 // this can be used for some things which do auto refresh - and scale not always easily available
+		internal delegate void RequestRefreshEventHandler(RectangleF dataRect); // fired when changes to the data will require a refreshing in any viewer.  Parameter is the invalid area in data coordinates
+
+		internal event RequestRefreshEventHandler RequestRefresh;
+
+		internal float AssumeRefreshScale = 1; // where critical is passed to each function (especially drawing).
+											   // this can be used for some things which do auto refresh - and scale not always easily available
 
 		public void DrawBackground(Canvas gr, float scale, bool background = true, bool grid = true, bool origin = true)
 		{
@@ -280,7 +279,7 @@ namespace SAW
 			switch (mode)
 			{
 				case BackgroundImageModes.Tile:
-					using (var brush = gr.CreateTextureBrush(image, scale)) //As New TextureBrush(objImage.GetImage)
+					using (var brush = gr.CreateTextureBrush(image, scale))
 						gr.Rectangle(bounds, null, brush);
 					break;
 				case BackgroundImageModes.Stretch: // Note that this changes the aspect ratio
@@ -288,7 +287,6 @@ namespace SAW
 					break;
 				case BackgroundImageModes.Centre:
 					imageSize = sz.ToSizeF().MultiplyBy(scale);
-					// * INCH / gr.DpiX)	' RctBounds should be in millimetres, but image will be measured in pixels
 					// the image is centred, regardless of whether it fits within the page or outside
 					PointF corner1 = bounds.Centre() + imageSize.MultiplyBy(-0.5f); // is the top left corner
 					gr.DrawImage(image, 128, new RectangleF(corner1, imageSize)); // Just using the DrawImage (..., PointF) gives some odd scaling
@@ -313,6 +311,7 @@ namespace SAW
 		}
 
 		private static readonly Fill ErrorBrush = NetCanvas.CreateSolidFill(Color.FromArgb(100, Color.Tomato));
+
 		public void DrawShapes(Canvas gr, float scale, float coordScale, StaticView view, bool omitMeasures = false, StaticView.InvalidationBuffer buffer = StaticView.InvalidationBuffer.Base)
 		{
 			//foreach (Shape shp in m_Shapes)
@@ -376,11 +375,7 @@ namespace SAW
 						else
 						{
 							shp.Draw(gr, scale, coordScale, view, StaticView.InvalidationBuffer.Selection, 45, 25, ReverseRenderOrder);
-							shp.DrawHighlight(gr, scale, coordScale);
-#if DEBUG
-							if (Shape.DiagnoseIntersections)
-								shp.DrawIntersections(gr, scale);
-#endif
+							shp.DrawHighlight(gr, scale, coordScale, SelectedPath);
 						}
 					}
 					catch (Exception ex)
@@ -412,9 +407,10 @@ namespace SAW
 
 		#region Thumbnails
 		// used by ctrPage...  Not affected by Undo or object copying, or stored in file
-		public Bitmap Thumbnail; // may be arbitrarily discarded, external code should not keep references;  call EnsureThumbnail each time this is needed
-		public static Size FILEDOCUMENTTHUMBNAILSIZE = new Size(400, 400); // the size of the thumbnail to store in files
-		public Bitmap GenerateThumbnail2(Size limit, float docCoordScale, int dpi = 72)
+		internal Bitmap Thumbnail; // may be arbitrarily discarded, external code should not keep references;  call EnsureThumbnail each time this is needed
+		internal static Size FILEDOCUMENTTHUMBNAILSIZE = new Size(400, 400); // the size of the thumbnail to store in files
+
+		internal Bitmap GenerateThumbnail2(Size limit, float docCoordScale, int dpi = 72)
 		{
 			// returned image will have aspect:ratio of page, therefore usually being smaller than szLimit
 			// NB szLimit in pixels; I am in mm;  but that's OK as graphics drawing expects a scale factor to be applied so that it is drawing in nominal mm
@@ -442,7 +438,7 @@ namespace SAW
 
 		}
 
-		public void EnsureThumbnail(Size sz, float docCoordScale)
+		internal void EnsureThumbnail(Size sz, float docCoordScale)
 		{
 			if (Thumbnail != null)
 			{
@@ -457,7 +453,7 @@ namespace SAW
 				Thumbnail = GenerateThumbnail2(sz, docCoordScale);
 		}
 
-		public void DiscardThumbnail()
+		internal void DiscardThumbnail()
 		{
 			Thumbnail?.Dispose();
 			Thumbnail = null;
@@ -513,10 +509,7 @@ namespace SAW
 		/// <param name="clickPoint">Location at which to search</param>
 		/// <param name="forShapes">List of shapes being moved/dropped. The targets are asked if they will accept these. Also t.Sleep the fifthhis list, and containers within them will not be counted. </param>
 		/// <returns>Frontmost target, Nothing if no targets (does not return self)</returns>
-		public IShapeTarget FindTarget(PointF clickPoint, List<Shape> forShapes)
-		{
-			return FindTarget(clickPoint, this, forShapes);
-		}
+		public IShapeTarget FindTarget(PointF clickPoint, List<Shape> forShapes) => FindTarget(clickPoint, this, forShapes);
 
 		private IShapeTarget FindTarget(PointF clickPoint, IShapeContainer searchIn, List<Shape> forShapes)
 		{
@@ -529,12 +522,12 @@ namespace SAW
 					// test if it itself contains another container... (if it is a container)
 					if (test.AsTarget != null)
 					{
-						var inner = FindTarget(clickPoint, (IShapeContainer)test, forShapes);
+						IShapeTarget inner = FindTarget(clickPoint, (IShapeContainer)test, forShapes);
 						if (inner != null)
 							return (IShapeTarget)inner;
 					}
 					// Check if the container/target is willing to accept all these shapes
-					var t = test.AsTarget; // to avoid lambda warning
+					IShapeTarget t = test.AsTarget; // to avoid lambda warning
 					if (forShapes.All(s => t.Accept(s)))
 						return test.AsTarget;
 				}
@@ -551,7 +544,7 @@ namespace SAW
 			}
 		}
 
-		public void FinishedModifyingContents(Transaction transaction, Shape.GrabMovement move = null)
+		void IShapeContainer.FinishedModifyingContents(Transaction transaction, Shape.GrabMovement move)
 		{
 			ResetZ();
 		}
@@ -749,7 +742,7 @@ namespace SAW
 
 		public List<Shape> Contents => m_Shapes;
 		// The page doesn't adjust the positions of shapes at all
-		public bool MoveWithin(List<Shape> shapes, PointF target, Shape.GrabMovement move, Transaction transaction) => false;
+		bool IShapeContainer.MoveWithin(List<Shape> shapes, PointF target, Shape.GrabMovement move, Transaction transaction) => false;
 		public bool AllowClick(PointF target) => true;
 
 		public IShapeContainer AsParentContainer => this;
@@ -778,8 +771,8 @@ namespace SAW
 			Scriptable found = null;
 			Iterate(element =>
 			{
-				if (element is Scriptable && (element as Scriptable).SAWID == searchID)
-					found = (Scriptable)element;
+				if (element is Scriptable scriptable && scriptable.SAWID == searchID)
+					found = scriptable;
 			});
 			return found;
 		}
@@ -905,7 +898,7 @@ namespace SAW
 		IEnumerator<Shape> IEnumerable<Shape>.GetEnumerator() => new ComplexEnumerator(false, false, m_Shapes);
 		IEnumerator IEnumerable.GetEnumerator() => new ComplexEnumerator(false, false, m_Shapes);
 
-		public class ReverseEnumerator : IEnumerator<Shape>, IEnumerable<Shape>
+		internal class ReverseEnumerator : IEnumerator<Shape>, IEnumerable<Shape>
 		{
 			// list shapes in reverse order, given a list of shapes.  This is more efficient (I think) than the Linq .reverse which would have to iterate them first
 			// Also supports IEnumerable so we can do "for each X in Page.Reverse"
@@ -947,6 +940,11 @@ namespace SAW
 
 		#region List of selected shapes
 
+		internal List<Shape> SelectedShapes { get; private set; } = new List<Shape>();
+
+		/// <summary>A target representing one vertex or line within the currently selected shape.  Usually null.  Only if a single shape is selected. </summary>
+		internal Target SelectedPath { get; set; }
+
 		// second parameter is true if this area of the image needs to be completely redrawn.  Third is true if GrabSpots need to be updated(either if selected shapes have changed or have moved; false in a few cases where the content of the shape has changed, but it is in the same position)
 		// GrabSpot update both changes the list of them and refreshes
 		public delegate void RefreshSelectionEventHandler(RectangleF dataRect, bool dataChanged, bool updateGrabSpots); //  fired when the list of selected items changes
@@ -956,8 +954,7 @@ namespace SAW
 
 		private bool m_MovingSelection = false; // true while we are applying a Transformation with Mode = Move to the selection
 
-		internal int SelectedCount
-		{ get { return SelectedShapes?.Count ?? 0; } }
+		internal int SelectedCount => SelectedShapes?.Count ?? 0;
 
 		public void ToggleSelection(Shape shape)
 		{
@@ -975,11 +972,28 @@ namespace SAW
 			SelectionChanged?.Invoke();
 		}
 
+		/// <summary>Updates which part of the shape is selected.  Shape is provided, but should be the (single) currently selected shape.  If not, this is ignored</summary>
+		public void SelectPathOnShape(Shape shape, Target selectPath)
+		{
+			if (SelectedShapes.Count != 1)
+				return;
+			if (SelectedShapes[0] != shape)
+				return;
+			if (SelectedPath == selectPath)
+				return;
+			SelectedPath = selectPath;
+			Globals.OnApplicableChanged();
+		}
+
+		/// <summary>Selects one shape (or null).</summary>
 		public void SelectOnly(Shape shape)
 		{
 #if DEBUG
 			shape?.Container.CheckZ(shape); // this is not particularly relevant to this function; it's just a random place to make this check
 #endif
+			if (!SelectedShapes.Any() && shape == null)
+				return;
+			SelectedPath = null;
 			if (SelectedShapes.Count == 1 && SelectedShapes[0] == shape)
 				return; // it and only it is already selected
 			Debug.Assert(!m_MovingSelection, "Changing selection while moving shapes - is this correct?  Can cause problems with grab moves if selected shapes are not the ones in the original shapes of the grab move");
@@ -1031,6 +1045,7 @@ namespace SAW
 		{
 			// first check if the list is actually changing; we do quite a lot of refreshing when the selection changes
 			// so it is worth filtering out a lot of null updates
+			SelectedPath = null;
 			if (selected.Count == SelectedShapes.Count)
 			{
 				if (selected.All(x => SelectedShapes.Contains(x)))
@@ -1076,6 +1091,7 @@ namespace SAW
 
 		public void DeselectAll()
 		{
+			SelectedPath = null;
 			if (SelectedShapes.Count == 0)
 				return;
 			SelectOnly((Shape)null);
@@ -1083,6 +1099,7 @@ namespace SAW
 
 		public void SelectAll()
 		{
+			SelectedPath = null;
 			List<Shape> list = (from shp in new ComplexEnumerator(false, false, m_Shapes) select shp).ToList();
 			if (list.Count > 0)
 				SelectOnly(list);
@@ -1115,14 +1132,12 @@ namespace SAW
 			return shape != null && SelectedShapes.Contains(shape);
 		}
 
-		internal List<Shape> SelectedShapes { get; private set; } = new List<Shape>();
-
 		internal RectangleF SelectedBounds(bool ignore)
 		{
 			return Geometry.UnionRectangles(from shape in SelectedShapes select shape.Bounds);
 		}
 
-		public bool MovingSelection
+		internal bool MovingSelection
 		{
 			get { return m_MovingSelection; }
 			set
@@ -1136,19 +1151,19 @@ namespace SAW
 
 		/// <summary>returns true if one or more shapes in the selection list allows all of the flags in eRequired</summary>
 		/// <remarks>always returns false if nothing selected</remarks>
-		public bool SelectionAnyAllows(Shape.AllowedActions required)
+		internal bool SelectionAnyAllows(Shape.AllowedActions required)
 		{
 			return SelectedShapes.Any(shape => (shape.Allows & required) == required);
 		}
 
 		/// <summary>returns true if all shapes in the selection list allows all of the flags in eRequired</summary>
 		/// <remarks>always returns false if nothing selected</remarks>
-		public bool SelectionAllAllow(Shape.AllowedActions required)
+		internal bool SelectionAllAllow(Shape.AllowedActions required)
 		{
 			return SelectedShapes.All(shape => (shape.Allows & required) == required);
 		}
 
-		public void FilterSelectionByAllows(Shape.AllowedActions required)
+		internal void FilterSelectionByAllows(Shape.AllowedActions required)
 		{
 			// remove any shapes which do not support the specified actions from the selection list
 			List<Shape> remove = (from shape in SelectedShapes where (shape.Allows & required) < required select shape).ToList();
@@ -1168,7 +1183,7 @@ namespace SAW
 		}
 
 		/// <summary>Returns next shape when doing shift-F9 / ctrl-F9.  Complicated by the presence of containers; the next shape may not be in the same container</summary>
-		public Shape NextSelection(int direction)
+		internal Shape NextSelection(int direction)
 		{
 			Debug.Assert(direction == 1 || direction == -1);
 			if (m_Shapes.Count == 0)
@@ -1192,7 +1207,7 @@ namespace SAW
 
 		/// <summary>Returns the container containing all of the selected shapes, or Nothing if they don't match</summary>
 		/// <returns>The IShapeContainer which is the Parent of everything in SelectedShapes</returns>
-		public IShapeContainer SelectionContainer()
+		internal IShapeContainer SelectionContainer()
 		{
 			if (SelectedShapes.Count == 0)
 				return null;
@@ -1292,7 +1307,6 @@ namespace SAW
 					newShape.Z = m_Shapes.Count;
 					m_Shapes.Add(newShape);
 				}
-				CheckIntersectionsOneShape(newShape);
 			}
 			RequestRefresh?.Invoke(newShape.RefreshBounds());
 		}
@@ -1313,7 +1327,7 @@ namespace SAW
 			}
 		}
 
-		public void NotifySettingsChanged(Shape.EnvironmentChanges change)
+		internal void NotifySettingsChanged(Shape.EnvironmentChanges change)
 		{
 			// should be passed on down through the hierarchy of shapes
 			foreach (Shape shape in m_Shapes)
@@ -1323,7 +1337,7 @@ namespace SAW
 		}
 
 #if DEBUG
-		public bool ContainsChangedShapes()
+		internal bool ContainsChangedShapes()
 		{
 			return m_Shapes.Any(shape => shape.Status != Shape.StatusValues.Complete);
 		}
@@ -1334,7 +1348,6 @@ namespace SAW
 			// objTransaction can be nothing if this is not a transactional change (e.g. loading old file version)
 			Debug.Assert(!shape.HasCaret);
 			transaction?.Edit((Datum)shape.Container);
-			shape.DeleteIntersections();
 			shape.Container.Contents.Remove(shape);
 			transaction?.Delete(shape);
 			shape.Container.FinishedModifyingContents(transaction);
@@ -1357,7 +1370,6 @@ namespace SAW
 				if (!(shape.Container is Shape) || !SelectedShapes.Contains((Shape)shape.Container)) // only delete from container if it isn't being deleted (.Edit will assert if container is already deleted)
 				{
 					transaction.Edit((Datum)shape.Container);
-					shape.DeleteIntersections();
 					shape.Container.Contents.Remove(shape);
 					if ((shape.Parent as Shape)?.Parent is Scriptable) // select scriptable if possible rather than any item within it
 						hashContainers.Add(((Shape)shape.Parent).Container);
@@ -1395,7 +1407,6 @@ namespace SAW
 			{
 				shape.Parent = this;
 			}
-			CheckAllIntersections();
 			foreach (Shape shape in m_Shapes)
 			{
 				shape.Status = Shape.StatusValues.Complete;
@@ -1413,6 +1424,11 @@ namespace SAW
 				reader.ReadOptionalPNG();
 			if (reader.Version >= 122)
 				HelpSAWID = reader.ReadInt32();
+			if (reader.Version >= 130)
+			{
+				RecentRotationPoints = reader.ReadListPoints();
+				RotationPointUsed = true; // otherwise the first would be overwritten
+			}
 		}
 
 		public override void Save(DataWriter writer)
@@ -1436,6 +1452,13 @@ namespace SAW
 				writer.WriteOptionalPNG(null);
 			if (writer.Version >= 122)
 				writer.Write(HelpSAWID);
+			if (writer.Version >= 130)
+			{
+				if (RecentRotationPoints.Count > 0 && !RotationPointUsed)
+					RecentRotationPoints.RemoveAt(0); // don't save an unused point
+				RotationPointUsed = true;
+				writer.Write(RecentRotationPoints);
+			}
 		}
 
 		public override byte TypeByte
@@ -1455,6 +1478,7 @@ namespace SAW
 			m_Background = page.m_Background;
 			HelpSAWID = page.HelpSAWID;
 			m_Shapes = new List<Shape>();
+			RecentRotationPoints = page.RecentRotationPoints.Clone();
 			if (depth >= CopyDepth.Duplicate)
 			{
 				Paper = (Paper)page.Paper.Clone(mapID);
@@ -1559,7 +1583,7 @@ namespace SAW
 
 		#endregion
 
-		#region Targets (shape snapping)
+		#region Targets (shape snapping) and rotation points
 		private List<Target> m_Targets = new List<Target>(); // GenerateTargets will only generate a single target; but when snapping a moving shape we might want to draw several intersections
 
 		public void ClearTargets()
@@ -1595,7 +1619,7 @@ namespace SAW
 			{
 				// need to make larger if working in pixels...
 				//scale = scale * (GUIUtilities.DpiX / Geometry.INCH) / Globals.Root.CurrentDocument.ApproxUnitScale;
-				scale = scale * GUIUtilities.MillimetreSize;
+				scale *= GUIUtilities.MillimetreSize;
 				float maximumDistance = Target.MaximumApplicableDistance(scale); // we don't need to bother checking some of the objects which are a long way from the mouse
 				foreach (Shape shape in this) //  does shapes and measures and within containers
 				{
@@ -1608,6 +1632,10 @@ namespace SAW
 								targets.AddRange(list);
 						}
 					}
+				}
+				foreach (PointF point in RecentRotationPoints)
+				{
+					targets.Add(new Target(null, point, Target.Types.Vertex, moving));
 				}
 				// and finally check if we are near the edge of the page
 				if (moving.Centre.X < maximumDistance)
@@ -1673,15 +1701,88 @@ namespace SAW
 				return RectangleF.Empty;
 			return Geometry.UnionRectangles(from t in m_Targets select t.RefreshBounds(scale));
 		}
+
+		/// <summary>Points used for centre of rotation, most recent first - which is effectively the selected point</summary>
+		public List<PointF> RecentRotationPoints = new List<PointF>();
+		/// <summary>Number of rotation points to maintain</summary>
+		private const int MAXROTATIONPOINTS = 12;
+		/// <summary>True if current rotation point has been used and shouldn't be amended automatically, but kept as is.  Can be set to true externally.  Not stored in data or transacted.</summary>
+		public bool RotationPointUsed;
+
+		/// <summary>Sets the given point as the one to rotate about.  Note must also change TransformRotate to have effect - this is just to record it in the data.
+		/// If replaceCurrent then the current point, if any, is updated.  If false, the given point is recorded as a new one in addition to any existing ones</summary>
+		public void SetCurrentRotationPoint(PointF point, bool replaceCurrent = false)
+		{ // currently replaceCurrent is always true.  Initially I had it false when using click to set; but it seemed odd to me - it might need to be changed back to that though.
+		  // id not the param could be removed
+			if (replaceCurrent && RecentRotationPoints.Any() && !RotationPointUsed)
+			{
+				NotifyIndirectChange(null, ChangeAffects.RepaintNeeded, GetRotationPointInvalidationArea(RecentRotationPoints[0]));
+				RecentRotationPoints[0] = point;
+			}
+			else
+			{
+				int existingIndex = RecentRotationPoints.IndexOf(point);
+				if (existingIndex == 0)
+					return; // this point is already current
+				if (existingIndex > 0) // rremove previous occurrence
+					RecentRotationPoints.RemoveAt(existingIndex);
+				RecentRotationPoints.Insert(0, point);
+				RotationPointUsed = existingIndex >= 0; // mark as unused, but only if the point wasn't already stored (in which case it is flagged as used, as we don't want to auto delete it as the user types)
+			}
+			while (RecentRotationPoints.Count > MAXROTATIONPOINTS)
+			{
+				NotifyIndirectChange(null, ChangeAffects.RepaintNeeded, GetRotationPointInvalidationArea(RecentRotationPoints.Last()));
+				RecentRotationPoints.RemoveAt(RecentRotationPoints.Count - 1);
+			}
+			NotifyIndirectChange(null, ChangeAffects.RepaintNeeded, GetRotationPointInvalidationArea(RecentRotationPoints[0]));
+		}
+
+		public void DrawRotationPoints(Graphics gr, float scale)
+		{
+			float width = GUIUtilities.MillimetreSize;
+			float offset = (float)(GUIUtilities.MillimetreSize * 4 * Math.Sqrt(scale));
+			bool first = true;
+			Pen pen = new Pen(Shape.CurrentHighlightColour, width);
+			foreach (PointF point in RecentRotationPoints)
+			{
+				gr.DrawLine(pen, point.X - offset, point.Y - offset, point.X + offset, point.Y + offset);
+				gr.DrawLine(pen, point.X + offset, point.Y - offset, point.X - offset, point.Y + offset);
+				if (first)
+				{
+					pen.Dispose();
+					pen = new Pen(Color.LightGray, width);
+					first = false;
+				}
+			}
+			pen.Dispose();
+		}
+
+		/// <summary>Returns all areas which need to be invalidated due to rotation points</summary>
+		public IEnumerable<RectangleF> GetRotationPointInvalidationAreas(float scale)
+		{
+			// include pen width (which is the 1+)
+			float size = (float)(GUIUtilities.MillimetreSize * (1 + 4 * Math.Sqrt(scale)));
+			foreach (PointF pt in RecentRotationPoints)
+				yield return Geometry.RectangleFromPoint(pt, size);
+		}
+
+		/// <summary>Gets the area that needs to be invalidated for the given point, using the assumed scale</summary>
+		private RectangleF GetRotationPointInvalidationArea(PointF point)
+		{
+			float size = (float)(GUIUtilities.MillimetreSize * (1 + 4 * Math.Sqrt(AssumeRefreshScale)));
+			return Geometry.RectangleFromPoint(point, size);
+		}
+
 		#endregion
 
 		#region Sockets
-		public List<Shape.Socket> Sockets = new List<Shape.Socket>(); // currently active sockets when moving mouse. object should always exist, but is usually empty
+
+		internal List<Shape.Socket> Sockets = new List<Shape.Socket>(); // currently active sockets when moving mouse. object should always exist, but is usually empty
 		private const float SOCKETDRAWRADIUS = 1.2f;
 
 		/// <summary>returns list of sockets near given point - based on first shape this is over which has sockets
 		/// ie always returns just sockets for one shape</summary>
-		public List<Shape.Socket> FindSockets(PointF source, float scale)
+		internal List<Shape.Socket> FindSockets(PointF source, float scale)
 		{
 			float expand = Line.LINEHITTOLERANCE / scale / 2;
 			foreach (Shape shape in new ComplexEnumerator(true, true, m_Shapes))
@@ -1701,7 +1802,7 @@ namespace SAW
 			return new List<Shape.Socket>();
 		}
 
-		public RectangleF SocketRefreshBoundary()
+		internal RectangleF SocketRefreshBoundary()
 		{
 			//if (Sockets.Count == 0)
 			//	return RectangleF.Empty;
@@ -1714,7 +1815,7 @@ namespace SAW
 			//return bounds;
 		}
 
-		public Shape.Socket NearestSocket(PointF mouse)
+		internal Shape.Socket NearestSocket(PointF mouse)
 		{
 			float nearestDistance = float.MaxValue;
 			Shape.Socket nearest = Shape.Socket.Empty; // will be returned if no sockets active
@@ -1730,7 +1831,7 @@ namespace SAW
 			return nearest;
 		}
 
-		public void DrawSockets(Graphics gr, float scale)
+		internal void DrawSockets(Graphics gr, float scale)
 		{
 			if (Sockets.Count == 0)
 				return;
@@ -1748,71 +1849,10 @@ namespace SAW
 
 		#endregion
 
-		#region Intersections
-		private void CheckIntersectionsOneShape(Shape shape)
-		{
-			if ((shape.Flags & Shape.GeneralFlags.NoIntersections) > 0)
-				return;
-			foreach (Shape test in new ComplexEnumerator(false, false, m_Shapes)) // enumerate shapes in containers, no measures
-			{
-				if (test != shape && (test.Flags & Shape.GeneralFlags.NoIntersections) == 0)
-				{
-					if (shape.Bounds.Intersects(test.Bounds))
-						test.CheckIntersectionsWith(shape);
-				}
-			}
-			shape.CheckIntersectionsWithSelf();
-		}
-
-		private void DeleteAllIntersections()
-		{
-			foreach (Shape shape in new ComplexEnumerator(false, false, m_Shapes))
-			{
-				shape.DeleteIntersections();
-			}
-		}
-
-		private void CheckAllIntersections()
-		{
-			// checks for intersections ab initio (e.g. after loading page).  Slow.
-			// must first make a flat list of shapes - in order to iterate twice over
-			List<Shape> all = Shape.FlattenList(m_Shapes, Shape.FlatListPurpose.ExposedShapes);
-			for (int index = 1; index <= all.Count - 1; index++)
-			{
-				Shape shape = all[index];
-				if ((shape.Flags & Shape.GeneralFlags.NoIntersections) > 0)
-					continue;
-				for (int otherIndex = 0; otherIndex <= index - 1; otherIndex++)
-				{
-					Shape otherShape = all[otherIndex];
-					if ((otherShape.Flags & Shape.GeneralFlags.NoIntersections) == 0 && shape.Bounds.IntersectsApprox(otherShape.Bounds))
-						shape.CheckIntersectionsWith(otherShape);
-				}
-				shape.CheckIntersectionsWithSelf();
-			}
-			if (m_Shapes.Count > 0)
-				m_Shapes[0].CheckIntersectionsWithSelf(); // was excluded by loop above
-		}
-
-		public void UpdateIntersectionsWith(Shape shape, bool calledExplicitly = false)
-		{
-			// called eg if the shape is moved.  All intersections in shape removed and it is rechecked
-			shape.DeleteIntersections();
-			CheckIntersectionsOneShape(shape);
-		}
-
-		public void UpdateAllIntersections()
-		{
-			// inefficient, but occasionally necessary.  E.g. on undo/redo when shapes could have been added or removed
-			DeleteAllIntersections();
-			CheckAllIntersections();
-		}
-
-		#endregion
-
 		#region IDisposable Support
 		// cannot rely on this being called; this does not use the standard disposable pattern
 		// this is ONLY used in the entire document is disposed (and one or two cases where dummy pages are created to do interim calculations)
+
 		public void Dispose()
 		{
 			if (m_Shapes == null)
@@ -1822,7 +1862,6 @@ namespace SAW
 			{
 				shape.Dispose();
 			}
-			// none of the measures need disposing
 			m_Shapes = null;
 			SelectedShapes = null;
 		}
@@ -1849,11 +1888,6 @@ namespace SAW
 		{
 			if (IsDisposed)
 				return;
-			if ((affected & ChangeAffects.Intersections) > 0)
-			{
-				UpdateIntersectionsWith(shape);
-				affected -= ChangeAffects.Intersections;
-			}
 			if (affected > 0)
 				// some changes that it cannot handled within the page
 				ShapeNotifiedIndirectChange?.Invoke(shape, affected, area);

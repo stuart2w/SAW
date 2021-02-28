@@ -19,8 +19,12 @@ namespace SAW
 		private readonly List<Scriptable> m_Scriptables;
 		private static readonly StyleOption[] StyleOptions;
 		private readonly Transaction m_Transaction;
+		/// <summary>True if data contains Items which can be edited.  If not many parts are disabled/removed </summary>
+		private bool EditingItems = true;
+		private Page m_Page;
 
 		#region Construct/Dispose
+
 		public frmSAWItem(List<Item> items, List<Scriptable> scriptables, Transaction transaction)
 		{
 			m_Filling = true; // cleared by Fill
@@ -30,6 +34,12 @@ namespace SAW
 			lblLargerRatio.Anchor = AnchorStyles.Right | AnchorStyles.Top;
 			ctrTextRatio.Anchor = AnchorStyles.Left | AnchorStyles.Top | AnchorStyles.Right;
 
+			m_Page = (items.FirstOrDefault() as Shape ?? scriptables.FirstOrDefault()).FindPage();
+			if (!items.Any())
+			{
+				items.Add(new Item() { StyleType = Item.ItemDisplayTypes.IDT_Item });
+				EditingItems = false;
+			}
 			m_Items = items;
 			m_Scriptables = scriptables;
 			m_Transaction = transaction;
@@ -66,6 +76,33 @@ namespace SAW
 				lblHelpHeader.Text += " " + Strings.Item("SAW_Edit_Help_IsOff");
 			else if (Globals.Root.CurrentPage.HelpSAWID <= 0)
 				lblHelpHeader.Text += " " + Strings.Item("SAW_Edit_Help_NoItem");
+
+			if (!EditingItems)
+			{
+				tcMain.TabPages.Remove(tpLayout);
+				//tcMain.TabPages.Remove(tpPresentation);
+				tcMain.SelectedIndex = 2; // start on scripts
+
+				lblStyleWarning.Enabled = false; // style is left visible to avoid having an odd gap at top of page
+				cmbStyle.Enabled = false;
+				lblItemStyle.Enabled = false;
+				lblBorderShape.Visible = false; // border shape is at bottom and can just be hidden
+				cmbShape.Visible = false;
+
+				lblLineSpacing.Visible = txtDisplay.Visible = nudLineSpacing.Visible = chkShowText.Visible = btnFont.Visible = false;
+				tablePresentation.RowStyles[2].SizeType = SizeType.AutoSize;
+				chkOutputTextSame.Visible = chkSpeechTextSame.Visible = false;
+				flowGraphic.Visible = pnlGraphic.Visible = btnImageBrowse.Visible = btnImageClear.Visible = btnCCF.Visible = btnOpenSymbol.Visible = false;
+				chkPopup.Visible = chkWordlistCustom.Visible = chkEscapeItem.Visible = false;
+
+				lblDisplayText.Text = Strings.Item("SAW_Edit_GraphicPresentation");
+				lblDisplayText.Font = new Font(lblDisplayText.Font.FontFamily, 10);
+				lblDisplayText.Padding = new Padding(0, 0, 0, 8);
+
+				// add empty row at bottom to absorb spare space
+				tablePresentation.RowCount += 1;
+				tablePresentation.RowStyles.Add(new RowStyle(SizeType.Percent, 50));
+			}
 		}
 
 		protected override void Dispose(bool disposing)
@@ -87,6 +124,7 @@ namespace SAW
 			base.Dispose(disposing);
 		}
 
+		/// <summary>One of the values in the item style dropdown list</summary>
 		public class StyleOption
 		{
 			public string Text { get; set; }
@@ -141,17 +179,22 @@ namespace SAW
 			foreach (Scriptable s in scriptables)
 				transaction.Edit(s);
 			foreach (Item i in items)
+			{
 				transaction.Edit(i);
+				i.BeingEdited = true;
+			}
 			// there must always be at least one item, but not necessarily scriptables
 			Globals.StoreEvent("Log " + items.Count + " items, " + scriptables.Count + " scriptable, first ID=" + (scriptables?.First()?.SAWID ?? 0));
 
 			using (var frm = new frmSAWItem(items, scriptables, transaction))
 			{
 				// deselect it, so that we get a better preview of what it looks like:
-				items.First().FindPage().SelectOnly((Shape)null);
+				frm.m_Page.SelectOnly((Shape)null);
 				Shape beside = scriptables.Any() ? (Shape)scriptables.First() : items.First();
 				GUIUtilities.PositionNewFormBeside(frm, view.ShapeBounds(beside, true));
 				bool ok = frm.ShowDialog() == DialogResult.OK;
+				foreach (Item i in items)
+					i.BeingEdited = false;
 				frm.SetPreviewState(ButtonShape.States.Normal);
 				view.CurrentPage.SelectOnly(scriptables.Cast<Shape>().ToList());
 				if (ok)
@@ -177,18 +220,18 @@ namespace SAW
 
 			txtHelp.Enabled = chkOutputTextSame.Enabled = chkSpeechTextSame.Enabled = txtOutputText.Enabled = txtSpeechText.Enabled = nudLineSpacing.Enabled = txtDisplay.Enabled = m_Items.Count == 1;
 			// must be before check boxes are assigned, as they can also disable
-			txtOutputText.Text = m_Items.First().OutputText;
-			chkOutputTextSame.Checked = m_Items.First().OutputAsDisplay;
+			txtOutputText.Text = m_Scriptables.First().OutputText;
+			chkOutputTextSame.Checked = m_Scriptables.First().OutputAsDisplay;
 
-			txtSpeechText.Text = m_Items.First().SpeechText;
-			chkSpeechTextSame.Checked = m_Items.First().SpeechAsDisplay;
-			txtHelp.Text = m_Items.First().PromptText;
+			txtSpeechText.Text = m_Scriptables.First().SpeechText;
+			chkSpeechTextSame.Checked = m_Scriptables.First().SpeechAsDisplay;
+			txtHelp.Text = m_Scriptables.First().PromptText;
 
 			MergeBooleansIntoCheckbox(chkShowGraphic, from i in m_Items select i.GraphicShown);
 			MergeBooleansIntoCheckbox(chkGraphicOnlyHighlight, from i in m_Items select i.GraphicOnlyOnHighlight);
 			btnImageClear.Enabled = m_Items.Count == 1 && m_Items.Any(i => i.Image != null);
 			btnCCF.Enabled = btnImageBrowse.Enabled = m_Items.Count == 1;
-			SetGraphicTooltop();
+			SetGraphicTooltip();
 
 			// attributes:
 			MergeBooleansIntoCheckbox(chkPopup, from s in m_Scriptables select s.Popup);
@@ -200,23 +243,25 @@ namespace SAW
 			chkEscapeItem.Enabled = !m_Items.Any(i => i.IsGroup); // group items will ignore escape flag
 
 			// colour + style
-			var styletype = MergeStates(from i in m_Items select i.StyleType);
+			Item.ItemDisplayTypes? styletype = MergeStates(from i in m_Items select i.StyleType);
 			if (styletype.HasValue)
 				cmbStyle.SelectedValue = styletype.Value;
 			MergeColoursIntoPicker(clrNormalText, from i in m_Items select i.TextStyle.Colour);
-			MergeColoursIntoPicker(clrHighlightText, from i in m_Items select i.HighlightTextStyle.Colour);
+			MergeColoursIntoPicker(clrHighlightText, from s in m_Scriptables select s.HighlightStyle.TextColour);
 			MergeBooleansIntoCheckbox(chkNormalFilled, from i in m_Items select i.FillStyle.Pattern != Shape.FillStyleC.Patterns.Empty);
 			MergeColoursIntoPicker(clrNormalBack, from i in m_Items select i.FillStyle.Colour);
-			MergeBooleansIntoCheckbox(chkHighlightFilled, from i in m_Items select i.HighlightFillStyle.Pattern != Shape.FillStyleC.Patterns.Empty);
-			MergeColoursIntoPicker(clrHighlightBack, from i in m_Items select i.HighlightFillStyle.Colour);
-			MergeColoursIntoPicker(clrNormalBorder, from i in m_Items select i.LineStyle.Colour);
-			MergeColoursIntoPicker(clrHighlightBorder, from i in m_Items select i.HighlightLineStyle.Colour);
+			MergeColoursIntoPicker(clrNormalBack, Parameters.FillColour);
+			//MergeBooleansIntoCheckbox(chkHighlightFilled, from s in m_Scriptables select s.HighlightStyle.FillColour.A != 0);
+			MergeColoursIntoPicker(clrHighlightBack, from s in m_Scriptables select s.HighlightStyle.FillColour);
+			//MergeColoursIntoPicker(clrNormalBorder, from i in m_Items select i.LineStyle.Colour);
+			MergeColoursIntoPicker(clrNormalBorder, Parameters.LineColour);
+			MergeColoursIntoPicker(clrHighlightBorder, from s in m_Scriptables select s.HighlightStyle.LineColour);
 			try
 			{
 				// Unlike ALL there is no "none" option.  That is implemented by setting the thickness to 0
 				cmbShape.SelectedIndex = MergeStates(from i in m_Items select (int)i.BorderShape) ?? -1;
 				cmbThicknessNormal.SelectedIndex = MergeStates(from i in m_Items select IntegerThickness(i.LineStyle.Width)) ?? -1;
-				cmbThicknessHighlight.SelectedIndex = MergeStates(from i in m_Items select IntegerThickness(i.HighlightLineStyle.Width)) ?? -1;
+				cmbThicknessHighlight.SelectedIndex = MergeStates(from s in m_Scriptables select IntegerThickness(s.HighlightStyle.LineWidth)) ?? -1;
 			}
 			catch // Any invalid values will leave all at default
 			{
@@ -224,8 +269,12 @@ namespace SAW
 				cmbThicknessNormal.SelectedIndex = 2;
 				cmbThicknessHighlight.SelectedIndex = 2;
 			}
+			// back colour enabled was set by property merge.  Copy to other controls:
+			chkNormalFilled.Enabled = chkHighlightFilled.Enabled = clrHighlightBack.Enabled = clrNormalBack.Enabled;
+			if (!clrNormalBack.Enabled)
+				lblBackColourHeader.Text += " " + Strings.Item("SAW_Edit_NA");
 
-			var arrangement = MergeStates(from i in m_Items select i.Arrangement);
+			ButtonShape.Layouts? arrangement = MergeStates(from i in m_Items select i.Arrangement);
 			if (arrangement.HasValue) // if not, then no item is selected
 				switch (arrangement.Value)
 				{ // note sense is different: Layouts enum references graphic position
@@ -236,7 +285,7 @@ namespace SAW
 					//case ButtonShape.Layouts.Above:
 					default: rdoTextBelow.Checked = true; break;
 				}
-			var textRatio = MergeStates(from i in m_Items select i.TextRatio);
+			float? textRatio = MergeStates(from i in m_Items select i.TextRatio);
 			chkRatioAutomatic.Visible = ctrTextRatio.Visible = lblLargerRatio.Visible = lblSmallerRatio.Visible = lblTextRatioTitle.Visible = textRatio.HasValue;
 			if (textRatio.HasValue)
 			{
@@ -244,11 +293,11 @@ namespace SAW
 				chkRatioAutomatic.Checked = textRatio < 0;
 			}
 
-			var textAlignAsInt = (uint?)MergeStates(from i in m_Items select i.TextAlign) ?? 0xffff;
-			var rdo = (from RadioButton r in grpTextAlignment.Controls where r.Tag.ToString() == textAlignAsInt.ToString() select r).FirstOrDefault();
+			uint textAlignAsInt = (uint?)MergeStates(from i in m_Items select i.TextAlign) ?? 0xffff;
+			RadioButton rdo = (from RadioButton r in grpTextAlignment.Controls where r.Tag.ToString() == textAlignAsInt.ToString() select r).FirstOrDefault();
 			if (rdo != null)
 				rdo.Checked = true;
-			var graphicAlignAsInt = (uint?)MergeStates(from i in m_Items select i.TextAlign) ?? 0xffff;
+			uint graphicAlignAsInt = (uint?)MergeStates(from i in m_Items select i.TextAlign) ?? 0xffff;
 			rdo = (from RadioButton r in grpGraphicAlignment.Controls where r.Tag.ToString() == graphicAlignAsInt.ToString() select r).FirstOrDefault();
 			if (rdo != null)
 				rdo.Checked = true;
@@ -289,6 +338,16 @@ namespace SAW
 				ctr.CurrentColour = colors.First();
 		}
 
+		/// <summary>Version of MergeColoursIntoPicker that uses style parameters in case individual items are not in use by some shapes and disables
+		/// control if not applicable</summary>
+		private void MergeColoursIntoPicker(ColourPicker ctr, Parameters parameter)
+		{
+			List<Shape.StyleBase> styles = (from s in m_Scriptables select s.StyleObjectForParameter(parameter)).Where(s => s != null).ToList();
+			ctr.Enabled = styles.Any();
+			if (styles.Any())
+				MergeColoursIntoPicker(ctr, from s in styles select Color.FromArgb(s.ParameterValue(parameter)));
+		}
+
 		/// <summary>Merges list of states returning value if all the same, or null if differing</summary>
 		private static T? MergeStates<T>(IEnumerable<T> states) where T : struct
 		{
@@ -311,6 +370,8 @@ namespace SAW
 		{
 			foreach (Item i in m_Items)
 				i.WasEdited();
+			foreach (Scriptable s in m_Scriptables)
+				s.WasEdited();
 		}
 
 		/// <summary>Returns an error message, or null if none</summary>
@@ -340,18 +401,17 @@ namespace SAW
 			if (chkOutputTextSame.Checked)
 			{
 				txtOutputText.Text = txtDisplay.Text;
-				m_Items.First().OutputText = txtDisplay.Text.Replace("\r\n", "\r");
+				m_Scriptables.First().OutputText = txtDisplay.Text.Replace("\r\n", "\r");
 			}
-			if (m_Filling) return;
-			m_Items.First().OutputAsDisplay = chkOutputTextSame.Checked;
+			if (m_Filling)return;
+			m_Scriptables.First().OutputAsDisplay = chkOutputTextSame.Checked;
 			Updated();
 		}
 
 		private void txtOutputText_TextChanged(object sender, EventArgs e)
 		{
-			if (m_Filling)
-				return;
-			m_Items.First().OutputText = txtOutputText.Text;
+			if (m_Filling)return;
+			m_Scriptables.First().OutputText = txtOutputText.Text;
 			Updated();
 		}
 
@@ -370,17 +430,17 @@ namespace SAW
 			if (chkSpeechTextSame.Checked)
 			{
 				txtSpeechText.Text = txtDisplay.Text;
-				m_Items.First().SpeechText = txtDisplay.Text.Replace("\r\n", "\r");
+				m_Scriptables.First().SpeechText = txtDisplay.Text.Replace("\r\n", "\r");
 			}
-			if (m_Filling) return;
-			m_Items.First().SpeechAsDisplay = chkSpeechTextSame.Checked;
+			if (m_Filling)return;
+			m_Scriptables.First().SpeechAsDisplay = chkSpeechTextSame.Checked;
 			Updated();
 		}
 
 		private void txtSpeechText_TextChanged(object sender, EventArgs e)
 		{
 			if (m_Filling) return;
-			m_Items.First().SpeechText = txtSpeechText.Text.Replace("\r\n", "\r");
+			m_Scriptables.First().SpeechText = txtSpeechText.Text.Replace("\r\n", "\r");
 			Updated();
 		}
 
@@ -391,12 +451,12 @@ namespace SAW
 			m_Items.First().LabelText = text;
 			if (chkOutputTextSame.Checked)
 			{
-				m_Items.First().OutputText = text;
+				m_Scriptables.First().OutputText = text;
 				txtOutputText.Text = text;
 			}
 			if (chkSpeechTextSame.Checked)
 			{
-				m_Items.First().SpeechText = text;
+				m_Scriptables.First().SpeechText = text;
 				txtSpeechText.Text = text;
 			}
 			Updated();
@@ -406,7 +466,7 @@ namespace SAW
 		{
 			if (m_Filling) return;
 			string text = txtHelp.Text.Replace("\r\n", "\r");
-			m_Items.First().PromptText = text;
+			m_Scriptables.First().PromptText = text;
 			Updated();
 		}
 
@@ -466,7 +526,7 @@ namespace SAW
 			pnlGraphic.Invalidate();
 			Updated();
 			btnImageClear.Enabled = true;
-			SetGraphicTooltop();
+			SetGraphicTooltip();
 		}
 
 		private void btnCCF_Click(object sender, EventArgs e)
@@ -525,10 +585,10 @@ namespace SAW
 			pnlGraphic.Invalidate();
 			Updated();
 			btnImageClear.Enabled = false;
-			SetGraphicTooltop();
+			SetGraphicTooltip();
 		}
 
-		private void SetGraphicTooltop()
+		private void SetGraphicTooltip()
 		{
 			ttGraphic.SetToolTip(pnlGraphic, m_Items.FirstOrDefault()?.ImageName ?? "");
 		}
@@ -537,19 +597,19 @@ namespace SAW
 		// player doesn't support detecting if it is playing, but we can create the effect by playing sync in background: https://stackoverflow.com/questions/27392396/how-to-know-when-soundplayer-has-finished-playing-a-sound
 		private void ReflectSoundButtons()
 		{
-			var sound = m_Items.First().Sound;
+			SharedReference<SharedResource> sound = m_Scriptables.First().Sound;
 			btnSoundPlay.Enabled = !Player.Playing && sound != null && m_Items.Count == 1;
 			btnSoundStop.Enabled = Player.Playing;
-			btnSoundDelete.Enabled = !Player.Playing && m_Items.Any(i => i.Sound != null);
+			btnSoundDelete.Enabled = !Player.Playing && m_Scriptables.Any(s => s.Sound != null);
 			btnSoundBrowse.Enabled = !Player.Playing && m_Items.Count == 1;
 			lblSoundName.Text = sound?.Content?.Filename ?? "";
 		}
 
 		private void btnSoundPlay_Click(object sender, EventArgs e)
 		{
-			if (m_Items.First().Sound == null)
+			if (m_Scriptables.First().Sound == null)
 				return;
-			Player.PlayAsync(m_Items.First().Sound.Content.GetStream(), ReflectSoundButtons, this);
+			Player.PlayAsync(m_Scriptables.First().Sound.Content.GetStream(), ReflectSoundButtons, this);
 			ReflectSoundButtons();
 		}
 
@@ -561,8 +621,8 @@ namespace SAW
 
 		private void btnSoundDelete_Click(object sender, EventArgs e)
 		{
-			foreach (Item i in m_Items)
-				i.Sound = null;
+			foreach (Scriptable s in m_Scriptables)
+				s.Sound = null;
 			ReflectSoundButtons();
 			Updated();
 		}
@@ -572,8 +632,8 @@ namespace SAW
 			string path = FileDialog.ShowOpen(FileDialog.Context.Sound);
 			if (string.IsNullOrEmpty(path))
 				return;
-			var sound = (SharedResource)Globals.Root.CurrentDocument.AddSharedResourceFromFile(path, m_Transaction, false);
-			m_Items.First().Sound = new SharedReference<SharedResource>(sound);
+			SharedResource sound = (SharedResource)Globals.Root.CurrentDocument.AddSharedResourceFromFile(path, m_Transaction, false);
+			m_Scriptables.First().Sound = new SharedReference<SharedResource>(sound);
 			pnlGraphic.Invalidate();
 			ReflectSoundButtons();
 			Updated();
@@ -647,13 +707,17 @@ namespace SAW
 				i.FillStyle.Pattern = chkNormalFilled.Checked ? Shape.FillStyleC.Patterns.Solid : Shape.FillStyleC.Patterns.Empty;
 			Updated();
 		}
-
 		private void chkHighlightFilled_CheckedChanged(object sender, EventArgs e)
 		{
 			clrHighlightBack.Visible = chkHighlightFilled.Checked;
 			if (m_Filling) return;
-			foreach (Item i in m_Items)
-				i.HighlightFillStyle.Pattern = chkHighlightFilled.Checked ? Shape.FillStyleC.Patterns.Solid : Shape.FillStyleC.Patterns.Empty;
+			foreach (Scriptable s in m_Scriptables)
+			{
+				if (!chkHighlightFilled.Checked)
+					s.HighlightStyle.FillColour = Color.Transparent;
+				else if (s.HighlightStyle.FillColour.A == 0)
+					s.HighlightStyle.FillColour = ((Shape.FillStyleC)s.Element.StyleObjectForParameter(Parameters.FillColour))?.Colour ?? Color.Red;
+			}
 			Updated();
 		}
 
@@ -667,8 +731,8 @@ namespace SAW
 
 		private void clrHighlightText_UserChangedColour(object sender, EventArgs e)
 		{
-			foreach (Item i in m_Items)
-				i.HighlightTextStyle.Colour = clrHighlightText.CurrentColour;
+			foreach (Scriptable s in m_Scriptables)
+				s.HighlightStyle.TextColour = clrHighlightText.CurrentColour;
 			clrHighlightText.DisplayCurrentColour = true;
 			Updated();
 		}
@@ -684,8 +748,8 @@ namespace SAW
 
 		private void clrHighlightBack_UserChangedColour(object sender, EventArgs e)
 		{
-			foreach (Item i in m_Items)
-				i.HighlightFillStyle.Colour = clrHighlightBack.CurrentColour;
+			foreach (Scriptable s in m_Scriptables)
+				s.HighlightStyle.FillColour = clrHighlightBack.CurrentColour;
 			chkHighlightFilled.Checked = !clrHighlightBack.CurrentColour.IsEmpty;
 			clrHighlightBack.DisplayCurrentColour = true;
 			Updated();
@@ -701,8 +765,8 @@ namespace SAW
 
 		private void clrHighlightBorder_UserChangedColour(object sender, EventArgs e)
 		{
-			foreach (Item i in m_Items)
-				i.HighlightLineStyle.Colour = clrHighlightBorder.CurrentColour;
+			foreach (Scriptable s in m_Scriptables)
+				s.HighlightStyle.LineColour = clrHighlightBorder.CurrentColour;
 			clrHighlightBack.DisplayCurrentColour = true;
 			Updated();
 		}
@@ -718,8 +782,8 @@ namespace SAW
 		private void cmbThicknessHighlight_SelectedIndexChanged(object sender, EventArgs e)
 		{
 			if (m_Filling) return;
-			foreach (Item i in m_Items)
-				i.HighlightLineStyle.Width = cmbThicknessHighlight.SelectedIndex;
+			foreach (Scriptable s in m_Scriptables)
+				s.HighlightStyle.LineWidth = cmbThicknessHighlight.SelectedIndex;
 			Updated();
 		}
 
@@ -831,7 +895,7 @@ namespace SAW
 
 		#region Preview state
 
-		private Timer tmrPreview = new Timer() { Interval = 1500, Enabled = false };
+		private readonly Timer tmrPreview = new Timer() { Interval = 1500, Enabled = false };
 		private void rdoNormal_CheckedChanged(object sender, EventArgs e)
 		{
 			if (rdoNormal.Checked)
@@ -857,7 +921,7 @@ namespace SAW
 
 		private void m_tmrPreview_Tick(object sender, EventArgs e)
 		{
-			if (m_Items.First().State == ButtonShape.States.Normal)
+			if (m_Scriptables.First().State == ButtonShape.States.Normal)
 				SetPreviewState(ButtonShape.States.Highlight);
 			else
 				SetPreviewState(ButtonShape.States.Normal);
@@ -865,10 +929,10 @@ namespace SAW
 
 		private void SetPreviewState(ButtonShape.States state)
 		{
-			foreach (Item i in m_Items)
+			foreach (Scriptable s in m_Scriptables)
 			{
-				i.State = state;
-				i.NotifyIndirectChange(i, ChangeAffects.RepaintNeeded);
+				s.State = state;
+				s.NotifyIndirectChange(s, ChangeAffects.RepaintNeeded);
 			}
 		}
 

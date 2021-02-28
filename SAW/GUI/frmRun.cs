@@ -36,7 +36,7 @@ namespace SAW
 		private void CurrentPageChanged()
 		{
 			m_Page = Globals.Root.CurrentPage;
-			MainView.DisplayPage(m_Page, m_Document);
+			MainView.DisplayPage(m_Page, Globals.Root.CurrentDocument);
 		}
 
 		protected override CreateParams CreateParams

@@ -11,7 +11,8 @@ namespace Switches
 		public event EventHandler UserChangedValue;
 		// not raised if user enters an invalid number
 
-		public Engine.Timings Meaning = Engine.Timings.AcceptanceTime; // not used internally; GUI may like to store this
+		/// <summary>not used internally; GUI may like to store this </summary>
+		public Engine.Timings Meaning = Engine.Timings.AcceptanceTime; 
 
 		private int m_Value;
 		private bool m_Filling;

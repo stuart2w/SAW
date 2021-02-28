@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Windows.Forms;
 using System.Linq;
 using System.Drawing.Drawing2D;
+using SAW.Functions;
 
 // this file contains the abstract base classes for the various shapes
 #pragma warning disable CS0659 // Type overrides Object.Equals(object o) but does not override Object.GetHashCode()
@@ -24,7 +25,7 @@ namespace SAW
 			// The numbers cannot be changed as they are stored in data, but the order of items is not significant, so gaps can be filled in later
 			// Although this is integer it is also returned to TypeByte, so 0-255 is permitted for genuine shapes
 			Null = 0, // used in tool selection to mean that there is no tool, not even the selector
-					  /// <summary>Only used when changing tools - uses Selector if available, otherwise Null.  ie forces current tool to be deselected</summary>
+			/// <summary>Only used when changing tools - uses Selector if available, otherwise Null.  ie forces current tool to be deselected</summary>
 			SelectorOrNull = 1,
 			Selector = 2, // can't actually create one of these - it is the selection arrow
 			SelectionBox = 3,
@@ -44,21 +45,28 @@ namespace SAW
 			Semicircle = 18,
 			FreeText = 19, // closest to old one
 			OrthogonalRectangle = 20,
+			Rhombus = 21,
 			Image = 37,
 			PolyLine = 45,
+			MaskedImage = 46,
 
 			Flow = 74,
 			Container = 75,
 			Scissors = 77,
 			Button = 78,
-			SetOrigin = 80, // not in UserShapes, and cannot be created by the user.  The shape is Created directly by the view, and cannot be created by CreateShape
-							// It is never selected as the current tool
+			/// <summary>Not in UserShapes, and cannot be created by the user.  The shape is created directly by the view, and cannot be created by CreateShape
+			/// It is never selected as the current tool </summary>
+			SetOrigin = 80,
+			/// <summary>Not in UserShapes, and cannot be created by the user.  The shape is created directly by the UI, and cannot be created by CreateShape
+			/// It is never selected as the current tool </summary>
+			SetRotation = 81,
 			UserSocket = 83,
+			Pencil = 86,
 			ClosedCurve = 88,
 			Connector = 89,
-			IndependentPolyPath = 91, // created from merging several other shapes
-									  //Ant = 92,
-			Label = 95, // not real shape; adds label to an existing shape
+			GenericPath = 91,
+			/// <summary>Diverges from Splash.  A text label beside another object that it moves with </summary>
+			FloatingLabel = 94,  // Splash label is 95 and virtual
 			Curve = 96,
 			TextLine = 97,
 			Group = 99,
@@ -84,12 +92,12 @@ namespace SAW
 
 		// shapes visible to the user (omits anything which cannot be added to the toolbar)
 		// In the order that we want them displayed, unless in folders etc...
-		public static Shapes[] UserShapes = {Shapes.Selector, Shapes.Scriptable, Shapes.SelectionBox, 
+		public static Shapes[] UserShapes = {Shapes.Selector, Shapes.Scriptable, Shapes.SelectionBox,
 			Shapes.Line, Shapes.Orthogonal, Shapes.Arrow, Shapes.PolyLine, Shapes.Connector,
-			Shapes.Square, Shapes.Rectangle, Shapes.OrthogonalRectangle, Shapes.Parallelogram,
+			Shapes.Square, Shapes.Rectangle, Shapes.OrthogonalRectangle, Shapes.Parallelogram, Shapes.Rhombus,
 			Shapes.Triangle, Shapes.Isosceles, Shapes.Equilateral, Shapes.Polygon, Shapes.IrregularPolygon,
-			Shapes.Circle, Shapes.Ellipse, Shapes.Semicircle, Shapes.Curve, Shapes.ClosedCurve,
-			Shapes.FreeText, Shapes.TextLine, Shapes.Label,Shapes.UserSocket,Shapes.Button,
+			Shapes.Circle, Shapes.Ellipse, Shapes.Semicircle, Shapes.Curve, Shapes.ClosedCurve, Shapes.Pencil, Shapes.GenericPath,
+			Shapes.FreeText, Shapes.TextLine, Shapes.FloatingLabel,Shapes.UserSocket,Shapes.Button,
 			Shapes.Container, Shapes.Flow};
 		// In no particular order (and see also GetClass)
 		public static Shapes[] Transformations = {Shapes.TransformCopy, Shapes.TransformLinearScale, Shapes.TransformMirror,
@@ -110,132 +118,90 @@ namespace SAW
 			}
 		}
 
-		public static Shape CreateShape(Shapes eShape)
+		public static Shape CreateShape(Shapes shape)
 		{
 			// constructs an empty object for the given type of shape
-			switch (eShape)
+			switch (shape)
 			{
-				case Shapes.Line:
-					return new Line();
-				case Shapes.Orthogonal:
-					return new Orthogonal();
-				case Shapes.Square:
-					return new Square();
-				case Shapes.Rectangle:
-					return new RectangleShape();
-				case Shapes.OrthogonalRectangle:
-					return new OrthogonalRectangle();
-				case Shapes.Parallelogram:
-					return new Parallelogram();
-				case Shapes.Selector:
-					throw new ArgumentException("Cannot create \'Selector\' shape");
-				case Shapes.Triangle:
-					return new Triangle();
-				case Shapes.Isosceles:
-					return new Isosceles();
-				case Shapes.Equilateral:
-					return new Equilateral();
-				case Shapes.Polygon:
-					return new Polygon();
-				case Shapes.IrregularPolygon:
-					return new IrregularPolygon();
-				case Shapes.PolyLine:
-					return new PolyLine();
-				case Shapes.Circle:
-					return new Circle();
-				case Shapes.Ellipse:
-					return new Ellipse();
-				case Shapes.Semicircle:
-					return new Semicircle();
-				case Shapes.Arrow:
-					return new Arrow();
-				case Shapes.SelectionBox:
-					return new SelectionBox();
-				case Shapes.Image:
-					return new ImportedImage();
-				case Shapes.Group:
-					return new Group();
+				case Shapes.Line: return new Line();
+				case Shapes.Orthogonal: return new Orthogonal();
+				case Shapes.Square: return new Square();
+				case Shapes.Rectangle: return new RectangleShape();
+				case Shapes.OrthogonalRectangle: return new OrthogonalRectangle();
+				case Shapes.Parallelogram: return new Parallelogram();
+				case Shapes.Selector: throw new ArgumentException("Cannot create \'Selector\' shape");
+				case Shapes.Triangle: return new Triangle();
+				case Shapes.Isosceles: return new Isosceles();
+				case Shapes.Equilateral: return new Equilateral();
+				case Shapes.Polygon: return new Polygon();
+				case Shapes.IrregularPolygon: return new IrregularPolygon();
+				case Shapes.Rhombus: return new Rhombus();
+				case Shapes.Pencil: return new Pencil();
+				case Shapes.PolyLine: return new PolyLine();
+				case Shapes.Circle: return new Circle();
+				case Shapes.Ellipse: return new Ellipse();
+				case Shapes.Semicircle: return new Semicircle();
+				case Shapes.Arrow: return new Arrow();
+				case Shapes.SelectionBox: return new SelectionBox();
+				case Shapes.Image: return new ImportedImage();
+				case Shapes.Group: return new Group();
 
 				// new shapes...
-				case Shapes.Flow:
-					return new Flow();
-				case Shapes.Container:
-					return new Container();
-				case Shapes.Button:
-					return new ButtonShape();
-				case Shapes.UserSocket:
-					return new UserSocket();
-				case Shapes.ClosedCurve:
-					return new Curve(true);
-				case Shapes.Connector:
-					return new Connector();
-				case Shapes.IndependentPolyPath:
-					return new IndependentPolyPath();
-				case Shapes.FreeText:
-					return new FreeText();
-				case Shapes.TextLine:
-					return new TextLine();
-				case Shapes.Curve:
-					return new Curve(false);
+				case Shapes.Flow: return new Flow();
+				case Shapes.Container: return new Container();
+				case Shapes.Button: return new ButtonShape();
+				case Shapes.UserSocket: return new UserSocket();
+				case Shapes.ClosedCurve: return new Curve(true);
+				case Shapes.Connector: return new Connector();
+				case Shapes.GenericPath: return new GenericPath();
+				case Shapes.FreeText: return new FreeText();
+				case Shapes.TextLine: return new TextLine();
+				case Shapes.Curve: return new Curve(false);
+				case Shapes.MaskedImage: return new MaskedImage();
+				case Shapes.FloatingLabel: return new FloatingLabel();
 
 				// transformations ...
-				case Shapes.TransformMove:
-					return new TransformMove(Transformation.Modes.UseSystem);
-				case Shapes.TransformMoveVH:
-					return new TransformMoveVH(Transformation.Modes.UseSystem);
-				case Shapes.TransformCopy:
-					return new TransformMove(Transformation.Modes.Copy);
-				case Shapes.TransformRotate:
-					return new TransformRotate(Transformation.Modes.UseSystem);
-				case Shapes.TransformScale:
-					return new TransformScale(Transformation.Modes.UseSystem);
-				case Shapes.TransformMirror:
-					return new TransformMirror(Transformation.Modes.UseSystem);
+				case Shapes.TransformMove: return new TransformMove(Transformation.Modes.UseSystem);
+				case Shapes.TransformMoveVH: return new TransformMoveVH(Transformation.Modes.UseSystem);
+				case Shapes.TransformCopy: return new TransformMove(Transformation.Modes.Copy);
+				case Shapes.TransformRotate: return new TransformRotate(Transformation.Modes.UseSystem);
+				case Shapes.TransformScale: return new TransformScale(Transformation.Modes.UseSystem);
+				case Shapes.TransformMirror: return new TransformMirror(Transformation.Modes.UseSystem);
 
 				//SAW:
-				case Shapes.SAWItem: return new SAW.Item();
-				case Shapes.Scriptable: return new SAW.Scriptable();
+				case Shapes.SAWItem: return new Item();
+				case Shapes.Scriptable: return new Scriptable();
 
 				default:
-					throw new ArgumentException("Unexpected shape: " + eShape);
+					throw new ArgumentException("Unexpected shape: " + shape);
 			}
 		}
 
-		public static Classes GetClass(Shapes eShape)
+		public static Classes GetClass(Shapes shape)
 		{
 			// Note that this needs to be a shared function because we want to use this when doing configuration etc (i.e. without a shape)
 			// it would have been nice if this could have been overridable
-			if ((int)eShape >= 100 && (int)eShape <= 110)
-			{
+			if ((int)shape >= 100 && (int)shape <= 110)
 				return Classes.Transformation;
-			}
-			switch (eShape)
+			switch (shape)
 			{
 				case Shapes.SelectionBox:
 				case Shapes.Selector:
 					return Classes.Selection;
-				case Shapes.Label:
 				case Shapes.SetOrigin:
 					return Classes.Modifier; // Shapes.Crayon including this would prevent it receiving styles.  Seems to work OK as a real shape
-				case Shapes.Null:
-					return Classes.Null;
+				case Shapes.Null: return Classes.Null;
 				default:
 					return Classes.Real;
 			}
 		}
 
-		public static bool AutostartType(Shapes eShape)
-		{
-			// returns true if the shape is one which should be automatically started once the user has selected the tool that moved the mouse over the drawing area
-			// If false (the usual) then the user must click before the shape is created and Start is triggered
-			return false;
-		}
 
 		/// <summary>Only applicable to UserShapes.  Returns true if the option to include the shape should not generally be shown in configuration</summary>
-		public static bool HideShapeType(Shapes eShape)
+		internal static bool HideShapeType(Shapes shape)
 		{
-			Debug.Assert(UserShapes.Contains(eShape));
-			switch (eShape)
+			Debug.Assert(UserShapes.Contains(shape));
+			switch (shape)
 			{
 				case Shapes.Button:
 				case Shapes.Scriptable:
@@ -246,7 +212,7 @@ namespace SAW
 		}
 
 		/// <summary>Returns true if the shape is the selector which selects on clicking (or any equivalent.  Does not include SelectionBox and similar)</summary>
-		public static bool ShapeIsDirectSelector(Shapes shape)
+		internal static bool ShapeIsDirectSelector(Shapes shape)
 		{
 			switch (shape)
 			{
@@ -256,15 +222,14 @@ namespace SAW
 			}
 		}
 
-
-		public virtual void InitialiseFreeStanding()
+		internal virtual void InitialiseFreeStanding()
 		{
 			// shape not used in document; Start will not be called.  Some shapes need to do some init
 		}
 
-		public bool TransformationType() => GetClass(ShapeCode) == Classes.Transformation;
+		internal bool TransformationType() => GetClass(ShapeCode) == Classes.Transformation;
 
-		public static bool TransformationTypeWhichSnapsFirstPoint(Shapes type)
+		internal static bool TransformationTypeWhichSnapsFirstPoint(Shapes type)
 		{
 			// returns true if parameter is one of the transforms which places a focal point first (which snaps;  others select a shape and so don't snap the initial point)
 			switch (type)
@@ -277,7 +242,7 @@ namespace SAW
 			}
 		}
 
-		public enum FlatListPurpose
+		internal enum FlatListPurpose
 		{
 			Style,
 			/// <summary>must include all shapes</summary>
@@ -290,7 +255,7 @@ namespace SAW
 			ExposedShapes
 		}
 
-		public static List<Shape> FlattenList(List<Shape> list, FlatListPurpose purpose)
+		internal static List<Shape> FlattenList(List<Shape> list, FlatListPurpose purpose)
 		{
 			// if the parameter is a list of top-level shapes (e.g. selected shapes on the page) then this returns a list of all shapes
 			// within that list as a single list, including shapes within groups.  Where there is a group both the group itself and its contents appear in the output list
@@ -395,20 +360,6 @@ namespace SAW
 			if ((Flags & GeneralFlags.ProtectBounds) == 0)
 				m_Bounds = RectangleF.Empty; // it is not valid to transform this because this rectangle is larger than the constituent shape
 											 // if the shape is, for example, rotated the bounding rectangle could actually get smaller (or larger or...)
-
-			//// text formatting only changes if size changes...
-			//if (!string.IsNullOrEmpty(m_Label)) // This is required because some shapes don't support linear stretch and will reject TransformScalar
-			//{
-			//	float test = 1;
-			//	transformation.TransformScalar(ref test);
-			//	if (test == 1 && (LabelPosition == LabelPositions.RotatedRectangle || LabelPosition == LabelPositions.Bounds))
-			//	{
-			//		// except RotatedRectangle, the orientation of the text within the container can change
-			//		// and Bounds - the bounding box may change size under rotation
-			//		transformation.TransformAngle(ref test);
-			//	}
-			//	ClearTextCache(test != 1); // text Matrices ALWAYS change however; param shows whether the text within TEXT COORDS also has to be reformatted
-			//}
 			bool reformatText = ((transformation.RequiredAllowed & (AllowedActions.TransformScale | AllowedActions.TransformRotate | AllowedActions.TransformLinearStretch)) > 0);
 			ClearTextCache(reformatText); // text Matrices ALWAYS change however; param shows whether the text within TEXT COORDS also has to be reformatted
 		}
@@ -436,7 +387,7 @@ namespace SAW
 			return pt;
 		}
 
-		public virtual float[] GetRelevantAngles()
+		internal virtual float[] GetRelevantAngles()
 		{
 			// should return any angles applicable to the subject, e.g. the angles of lines in the object
 			// used for snapping the angle of a reflection transformation
@@ -445,7 +396,7 @@ namespace SAW
 		}
 
 		[Flags()]
-		public enum EnvironmentChanges
+		internal enum EnvironmentChanges
 		{
 			Settings = 1,
 			User = 2, // and in this case Settings should always be set as well
@@ -455,9 +406,23 @@ namespace SAW
 								 // it is called for things like grouping and ungrouping
 		}
 
-		public virtual void NotifyEnvironmentChanged(EnvironmentChanges change)
+		internal virtual void NotifyEnvironmentChanged(EnvironmentChanges change)
 		{
 			// Called, but only on current page, if user mode changes or configuration is edited
+		}
+
+		/// <summary>Returns the possible edits given the selected part of the shape.  Base class only acts on Centre, regardless of the provided target.
+		/// The shape must support Grab movement for any grab spots that are returned - the usual grab dragging functions will be used to perform any data changes that the user makes </summary>
+		/// <remarks>For EdgeMoveH/V spots, the editor will use the Focus, if set, to do Width/Height logic.  Leave Focus=PointF.Empty to show X/Y values rather than W/H to user</remarks>
+		public virtual (GrabSpot[], string[]) GetEditableCoords(Target selectedElement)
+		{
+			if (selectedElement is Target.ForGrabSpot forGrabSpot)
+				switch (forGrabSpot.Grab.GrabType)
+				{
+					case GrabTypes.EdgeMoveH: return (new[] { forGrabSpot.Grab }, new[] { "[Width]" });
+					case GrabTypes.EdgeMoveV: return (new[] { forGrabSpot.Grab }, new[] { "[Height]" });
+				}
+			return (new[] { new GrabSpot(this, GrabTypes.Move, Centre) }, new[] { "[SAW_Coord_Centre]" });
 		}
 
 		#endregion
@@ -504,10 +469,10 @@ namespace SAW
 		/// <param name="code">Verbs are Increment, Decrement, CountUpOne, CountDownOne, and all vertex editing</param>
 		/// <returns>Return Rejected if this verb is not used by this shape</returns>
 		/// <remarks>AllowVerbWhenComplete may be required in order to receive verbs once completed</remarks>
-		public virtual VerbResult OtherVerb(EditableView.ClickPosition position, SAW.Functions.Codes code)
+		public virtual VerbResult OtherVerb(EditableView.ClickPosition position, Functions.Codes code)
 		{
-			Debug.Assert(code == SAW.Functions.Codes.Increment || code == SAW.Functions.Codes.Decrement || 
-						 code >= SAW.Functions.Codes.AddVertex && code <= SAW.Functions.Codes.CornerVertex);
+			Debug.Assert(code == Functions.Codes.Increment || code == Functions.Codes.Decrement ||
+						 code >= Functions.Codes.AddVertex && code <= Functions.Codes.CornerVertex);
 			return VerbResult.Rejected;
 		}
 
@@ -600,9 +565,9 @@ namespace SAW
 		}
 
 		/// <summary>Return true if shape still wants to recieve this verb when completed.  Only main 5 allowed and ChooseExisting</summary>
-		public virtual bool AllowVerbWhenComplete(SAW.Functions.Codes code)
+		public virtual bool AllowVerbWhenComplete(Functions.Codes code)
 		{
-			Debug.Assert(code >= SAW.Functions.Codes.Choose && code <= SAW.Functions.Codes.ChooseExisting);
+			Debug.Assert(code >= Functions.Codes.Choose && code <= Functions.Codes.ChooseExisting);
 			return false;
 		}
 
@@ -622,9 +587,9 @@ namespace SAW
 
 		#region Drawing
 
-		public static readonly Color HIGHLIGHTCOLOUR1 = Color.FromArgb(130, 220, 220, 80);
-		public static Color HIGHLIGHTCOLOUR2 = Color.FromArgb(110, 255, 110, 110);
-		public static Color CurrentHighlightColour = Color.FromArgb(130, 220, 220, 80); // is animated between 2 colours above
+		internal static readonly Color HIGHLIGHTCOLOUR1 = Color.FromArgb(130, 220, 220, 80);
+		internal static Color HIGHLIGHTCOLOUR2 = Color.FromArgb(110, 255, 110, 110);
+		internal static Color CurrentHighlightColour = Color.FromArgb(130, 220, 220, 80); // is animated between 2 colours above
 
 		protected internal sealed class DrawResources : IDisposable // sealed due to limited implementation of IDisposable
 		{
@@ -653,11 +618,14 @@ namespace SAW
 			/// <summary>Is currently drawing the highlight</summary>
 			public bool Highlight;
 
+			/// <summary>If defined then preferably only this element should be drawn.  Only used with highlight.  If not supported whole shape should be drawn.
+			/// (Used with editing single vertices to show selection;  if single vertex editing doesn't make sense in a shape it works fine that the whole shape is shown as highlighted)</summary>
+			public Target SingleElement;
+
 			public Stroke MainPen;
 			public Fill MainBrush;
 			public Fill TextBrush;
 			public Stroke TextBoundsPen;
-			public Stroke CentrePen;
 			public Stroke CustomPen;
 			public Fill CustomBrush;
 			public Font Font; // the default in this class is to store the font permanently; if other shapes want to do so temporarily it can be placed here
@@ -674,7 +642,7 @@ namespace SAW
 				Graphics = gr;
 				Buffer = buffer;
 				CoordScale = coordScale;
-				Millimetre = gr.DpiX * Geometry.INCH / Geometry.MILLIMETRE / coordScale;
+				Millimetre = gr.DpiX * Geometry.MILLIMETRE / Geometry.INCH / coordScale;
 			}
 
 			/// <summary>Highlight constructor</summary>
@@ -727,7 +695,6 @@ namespace SAW
 					MainBrush?.Dispose();
 					TextBrush?.Dispose();
 					TextBoundsPen?.Dispose();
-					CentrePen?.Dispose();
 					CustomPen?.Dispose();
 					CustomBrush?.Dispose();
 					Font?.Dispose();
@@ -740,7 +707,7 @@ namespace SAW
 
 		}
 
-		public virtual void Draw(Canvas gr, float scale, float coordScale, StaticView view, StaticView.InvalidationBuffer buffer, int fillAlpha = 255, int edgeAlpha = 255, bool reverseRenderOrder = false)
+		internal virtual void Draw(Canvas gr, float scale, float coordScale, StaticView view, StaticView.InvalidationBuffer buffer, int fillAlpha = 255, int edgeAlpha = 255, bool reverseRenderOrder = false)
 		{
 			// intAlpha should be applied to the fill (presumably if we are using transparent colours later, the transparency should be adjusted accordingly
 			// e.g. transparency * intAlpha/255).  But at the moment only solid colours are used
@@ -772,7 +739,7 @@ namespace SAW
 			}
 		}
 
-		public virtual void DrawHighlight(Canvas gr, float scale, float coordScale)
+		internal virtual void DrawHighlight(Canvas gr, float scale, float coordScale, Target singleElement)
 		{
 			// draw the transparent copy with highlight border for the shape
 			// selected shapes are drawn three times:
@@ -782,6 +749,8 @@ namespace SAW
 			// - followed by DrawHighlight (which draws the yellow/orange glowing highlight)
 			// not usually overridden
 			DrawResources resources = new DrawResources(gr, scale, coordScale);
+			if (singleElement != null && singleElement.Type != Target.Types.GrabSpot)
+				resources.SingleElement = singleElement;
 			PrepareHighlight(resources);
 			try
 			{
@@ -794,7 +763,7 @@ namespace SAW
 			}
 		}
 
-		public virtual void DrawShadow(Canvas gr, float scale)
+		internal virtual void DrawShadow(Canvas gr, float scale)
 		{
 			DrawResources resources = new DrawResources(scale, 255, 255, false, false, gr, StaticView.InvalidationBuffer.SelectionHighlightOnly, 1); // CoordScale won't matter - only really used for text
 			if (PrepareShadow(resources))
@@ -856,6 +825,7 @@ namespace SAW
 		}
 
 		// note that during InternalDraw the shape should not assume that any pens or brushes necessarily exist - there are different Prepare functions used to draw in different circumstances
+
 		protected abstract void InternalDraw(Canvas gr, DrawResources resources);
 
 		protected virtual void ReleaseDraw() // release the pens and brushes
@@ -933,22 +903,20 @@ namespace SAW
 			Shape test = this;
 			while (true)
 			{
-				var parentShape = test.Parent as Shape;
-				if (parentShape == null) // if parent is page then it must have failed
+				if (!(test.Parent is Shape parentShape)) // if parent is page then it must have failed
 					return false;
 				if (list.Contains(test.Parent as Shape))
 					return true;
 				test = parentShape;
 			}
 		}
-		
+
 		public virtual bool IsFilled => false;
 
 		/// <summary>True if the shape is rendered.  may be false due to !Shown</summary>
 		public virtual bool IsVisible => true;
 
 		#region Diagnostic etc
-		internal static bool DiagnoseIntersections = true; // if true, details of all intersections are shown
 		internal static string DiagnosticFormat = "0.#";
 
 		[Conditional("DEBUG")]
@@ -979,30 +947,6 @@ namespace SAW
 					}
 				}
 				output.AppendLine("------");
-			}
-			if (DiagnoseIntersections && m_Intersections.Count > 0)
-			{
-				output.AppendLine("Intersections:");
-				foreach (Intersection objIntersection in m_Intersections)
-				{
-					output.Append("@ (").Append(objIntersection.Position.X.ToString(DiagnosticFormat)).Append(",").Append(objIntersection.Position.Y.ToString(DiagnosticFormat));
-					output.Append(") with ");
-					Shape other = objIntersection.OtherShape(this);
-					if (other == null)
-						output.Append("NULL");
-					else
-						output.Append(other.ShapeCode).Append("/").Append(other.GetHashCode().ToString("x"));
-					if (objIntersection.ShapeA == this)
-						output.Append(" is A");
-					else
-						output.Append(" is B");
-					output.Append(".  Params A/B: [").Append(objIntersection.IndexA.ToString()).Append(",");
-					output.Append(objIntersection.ParameterA.ToString("0.###")).Append("] ");
-					output.Append(" [").Append(objIntersection.IndexB.ToString()).Append(",");
-					output.Append(objIntersection.ParameterB.ToString("0.###")).Append("] ");
-					output.Append("C=").Append(objIntersection.Certainty.ToString("0.##"));
-					output.AppendLine("");
-				}
 			}
 		}
 
@@ -1073,8 +1017,8 @@ namespace SAW
 			{
 				if (parent == null)
 					return null;
-				if (parent is EditableView)
-					return ((EditableView)parent).CurrentPage;
+				if (parent is EditableView editableView)
+					return editableView.CurrentPage;
 				if (!(parent is Shape))
 					return null;
 				parent = ((Shape)parent).Parent;
@@ -1164,7 +1108,7 @@ namespace SAW
 									// default is on for Filled shapes.  The actual Protect flag indicates whether this shape is an allowed area; this just shows whether the shape supports this
 			MirrorFlipOnly = 0x4000, // yes if the shape can be flipped horizontally or vertically, but cannot be arbitrarily mirrored (which effectively requires rotation)
 									 // This is ignored if TransformMirror is set.  If checking if flipping is allowed, then check for either this or TransformMirror
-									 /// <summary>Shape can be converted to an IndependentPolyPath</summary>
+			/// <summary>Shape can be converted to an GenericPath</summary>
 			ConvertToPath = 0x8000,
 			/// <summary>Can be converted to pixels.</summary>
 			/// <remarks>Currently no distinction between explicit user request and auto action when Always_Pixels - so this is rejected for some shapes
@@ -1191,10 +1135,10 @@ namespace SAW
 
 		/// <summary>a shape should return true if it is empty and can be discarded
 		/// this mechanism is used to tidy up some text items, in particular NumberGrid cells which have been left behind empty</summary>
-		public virtual bool Degenerate
+		internal virtual bool Degenerate
 		{ get { return false; } }
 
-		public virtual string Description
+		internal virtual string Description
 		{
 			get
 			{
@@ -1237,7 +1181,7 @@ namespace SAW
 			return newPoint;
 		}
 
-		public struct Socket
+		internal struct Socket
 		{
 			// a location at which the connecting line can attach.  Also used for shape snapping groups together
 			public Shape Shape;
@@ -1261,7 +1205,7 @@ namespace SAW
 
 		}
 
-		public virtual PointF SocketPosition(int index)
+		internal virtual PointF SocketPosition(int index)
 		{
 			// returns PointF.empty if unavailable.  Should return centre of shape if -1
 			if (index == -1)
@@ -1269,13 +1213,13 @@ namespace SAW
 			return PointF.Empty;
 		}
 
-		public virtual List<Socket> GetSockets()
+		internal virtual List<Socket> GetSockets()
 		{
 			// Can return nothing if none.  This returns actual sockets for the connector tool
 			return null;
 		}
 
-		public virtual SizeF SocketExitVector(int index)
+		internal virtual SizeF SocketExitVector(int index)
 		{
 			// must return a vector that a connector can use to exit the shape from this socket.  The length of the vector is not important
 			// only the angle is used
@@ -1299,7 +1243,7 @@ namespace SAW
 
 		public override byte TypeByte => (byte)ShapeCode;
 
-		private List<Guid> m_IDsForLinks; // only used when loading. Ids which need to be attached to objects later
+		private protected List<Guid> m_IDsForLinks; // only used when loading. Ids which need to be attached to objects later
 		public override void Load(DataReader reader)
 		{
 			// reads label info.  Overridden functions must all call Mybase.Load...
@@ -1484,33 +1428,19 @@ namespace SAW
 		#region Targets
 		/// <summary>can return nothing if no points are available
 		/// The source position is expressed as a socket to allow angle/gender/class constraints.  Most shapes ignore this and just use .Centre</summary>
-		public virtual List<Target> GenerateTargets(UserSocket floating)
+		internal virtual List<Target> GenerateTargets(UserSocket floating)
 		{
 			return null;
 		}
 
-		public virtual void DrawLineTarget(Target target, Graphics gr, Pen pn, int activePhase)
+		internal virtual void DrawLineTarget(Target target, Graphics gr, Pen pn, int activePhase)
 		{
 			// the pen can be modified by this function - it will be discarded after each target
 			// intActivePhase is < 0 if not active
 			Debug.Fail("A shape has returned a line Target, without overriding DrawLineTarget");
 		}
 
-		protected void AddIntersectionTargets(List<Target> targets, UserSocket floating)
-		{
-			// this can be used by GenerateTargets to include any targets for intersections between shapes
-			// the target is only added if this is the first shaped listed in the intersection (to avoid adding the intersection twice)
-			foreach (Intersection intersection in m_Intersections)
-			{
-				if (intersection.ShapeA == this)
-				{
-					Target target = new Target(this, intersection.Position, Target.Types.Intersection, floating, Target.Priorities.Intersection, intersection.Certainty);
-					targets.Add(target);
-				}
-			}
-		}
-
-		public virtual List<UserSocket> GetPointsWhichSnapWhenMoving()
+		internal virtual List<UserSocket> GetPointsWhichSnapWhenMoving()
 		{
 			// when moving this shape (either dragging or using the transform tool), this returns a list of vertices to which shape snap can be applied
 			// points are expressed as UserSockets;  extra info is redundant for regular shape snap, but is used when snapping sockets in one group
@@ -1518,239 +1448,32 @@ namespace SAW
 			// default is nothing, which means there are no such points
 			return null;
 		}
-		#endregion
-
-		#region Intersections, complex shape iteration, cutting, segments, vertex editing
-
-		#region Intersections
-		// we can store a list of when the shape intersects with other shapes.  The intersection will be stored by both shapes
-		protected List<Intersection> m_Intersections = new List<Intersection>();
-
-		public void DeleteIntersections()
-		{
-			// delete all intersections, notifying the other object for each intersection that it has been removed
-			// this is called, for example, if this shape is deleted (or even if the shape is moved)
-			foreach (Intersection intersection in m_Intersections)
-			{
-				Shape other = intersection.OtherShape(this);
-				if (other != null && other != this)
-					other.m_Intersections.Remove(intersection);
-			}
-			m_Intersections.Clear();
-		}
-
-		public virtual void CheckIntersectionsWith(Shape shape)
-		{
-			// checks intersections with the other shape, and adds them to the list in both shapes
-			// the page would only call this on one of the pair of shapes.  In practice this is not implemented in both directions
-			// (e.g. line - circle and circle - line) one of the shapes will call through to the other one to do the implemention
-			// there are some utility functions in Intersection
-			// this is only called if the bounding boxes intersect - that was already tested by the page
-			// This is only called if neither shape has the flag NoIntersections
-		}
-
-		public virtual void CheckIntersectionsWithSelf()
-		{
-			// most shapes ignore this, a few, especially the more artistic ones may want to do this in order to better support the splatter
-			// "Me" is never passed to CheckIntersectionsWith because the standard behaviour when detecting an intersection in that function
-			// is to also added to the other shape (which would create a duplicate if other shape is me)
-		}
-
-		public virtual void CheckIntersectionsWithLine(Shape shape, int shapeIndex, float shapeParameter, PointF A, PointF B, bool ignoreEnd) //, Optional ByRef bolTest As Boolean = False)
-		{
-			// checks for any (and all) intersections with the line A-B which is part of shape
-			// if they exist, they should be added to both shapes.  Usually this is called by the other shape during its CheckIntersectionsWith
-			// intShapeIndex gives the index of the line within shape (this is needed when doing complex iterations)
-			// if bolIgnoreEndPoint then any intersection at B should be ignored (this is used with shapes made up of a sequence of lines
-			// any intersection here will be found when checking the next line in the sequence.  Returning an intersection now would create a duplicate
-		}
-
-		public virtual void CheckIntersectionsWithBezier(Shape shape, int shapeIndex, PointF[] Q)
-		{
-			// like the above, but checks for intersections with the Bezier curve Q
-			// the shape parameter is not given - the Bezier parameter is automatically stored
-			Debug.WriteLineIf(ShapeCode != Shapes.Image, "CheckIntersectionsWithBezier ignored by " + ShapeCode);
-		}
-
-		public bool HasIntersectionWith(Shape other)
-		{
-			return m_Intersections.Any(intersection => intersection.OtherShape(this) == other);
-		}
-
-		/// <summary>Checks one line in this shape against a Bezier curve in the other shape</summary>
-		protected void DefaultCheckOneLineWithBezier(PointF start, PointF end, int myIndex, Shape shape, int shapeIndex, PointF[] P, bool ignoresEnds = false)
-		{
-			List<Intersection.BezierParameterPair> intersections = Intersection.Bezier_LineIntersection(P, start, end);
-			if (intersections != null && intersections.Count > 0)
-			{
-				foreach (Intersection.BezierParameterPair pair in intersections)
-				{
-					float parameter = pair.Tp;
-					PointF pt = Bezier.GetPoint(P, parameter);
-					if (ignoresEnds)
-					{
-						if (parameter >= 0.999f)
-							continue;
-						if (pt.ApproxEqual(end))
-							continue;
-					}
-					Debug.Assert(Geometry.PointWithinLineExtent(start, end, pt));
-
-					Intersection intersection = new Intersection(pt, this, myIndex, 0, shape, shapeIndex, parameter, Intersection.CertaintyFromDepth(pair.Recursion));
-					m_Intersections.Add(intersection);
-					if (shape != this)
-						shape.AddIntersection(intersection);
-				}
-			}
-		}
-
-		protected void DefaultCheckMyBezierWithOneLine(PointF[] P, int myIndex, Shape shape, PointF start, PointF end, int shapeIndex)
-		{
-			// Checks one line in this shape against a Bezier curve in the other shape
-			List<Intersection.BezierParameterPair> intersections = Intersection.Bezier_LineIntersection(P, start, end);
-			if (intersections != null && intersections.Count > 0)
-			{
-				foreach (Intersection.BezierParameterPair pair in intersections)
-				{
-					float parameter = pair.Tp;
-					PointF pt = Bezier.GetPoint(P, parameter);
-					Debug.Assert(pt.ApproxEqual(pair.Position));
-					Intersection intersection = new Intersection(pt, this, myIndex, parameter, shape, shapeIndex, 0, Intersection.CertaintyFromDepth(pair.Recursion));
-					m_Intersections.Add(intersection);
-					if (shape != this)
-						shape.AddIntersection(intersection);
-				}
-			}
-		}
-
-		/// <summary>Checks one Bezier in this shape (P) against a Bezier curve in the other shape (Q)</summary>
-		protected void DefaultCheckOneBezierWithBezier(PointF[] P, int myIndex, Shape shape, int shapeIndex, PointF[] Q, bool ignoreEnd = false)
-		{
-			// If bolIgnoreEnd then any intersections at the end of either are ignored
-			//  applies to both curves because it is used only when checking for intersections within a shape
-			List<Intersection.BezierParameterPair> intersections = Intersection.FatClip(P, Q);
-			if (intersections != null && intersections.Count > 0)
-			{
-				foreach (Intersection.BezierParameterPair pair in intersections)
-				{
-					if (ignoreEnd && (pair.Tp >= 0.999 || pair.Tq >= 0.999))
-						continue; // don't need to check the actual location; the parameter gives how far down the curve it is!
-					PointF pt = Bezier.GetPoint(P, pair.Tp);
-					Debug.Assert(pt.ApproxEqual(Bezier.GetPoint(Q, pair.Tq)));
-					Intersection intersection = new Intersection(pt, this, myIndex, pair.Tp, shape, shapeIndex, pair.Tq, Intersection.CertaintyFromDepth(pair.Recursion));
-					m_Intersections.Add(intersection);
-					if (shape != this)
-						shape.AddIntersection(intersection);
-				}
-			}
-		}
-
-		internal virtual void AddIntersection(Intersection intersection)
-		{
-			// called by the "other" shape when it has created an intersection with this shape
-			// not usually overridden; the Ant overrides this because it doesn't want to actually create intersections
-			if (m_Intersections == null)
-				m_Intersections = new List<Intersection>(); // can happen after deserialisation
-			Debug.Assert(intersection.ShapeA == this || intersection.ShapeB == this);
-			Debug.Assert(!m_Intersections.Contains(intersection)); // implies self checking has added it both ways
-			m_Intersections.Add(intersection);
-		}
-
-		internal void RemoveIntersection(Intersection intersection)
-		{
-			Debug.Assert(m_Intersections.Contains(intersection), "Shape.RemoveIntersection: intersection is not in the list for this shape");
-			m_Intersections.Remove(intersection);
-		}
-
-		public virtual void ConcurrentIntersections(PointF ptIntersection, List<Intersection> list)
-		{
-			// adds all intersections stored by this shape which are concurrent with the given point
-			// the list is not indexed, because usually there will be nothing to add anyway, and even if there are concurrent intersections there should be very few
-			foreach (Intersection intersection in m_Intersections)
-			{
-				if (ptIntersection.ApproxEqual(intersection.Position) && !list.Contains(intersection))
-					list.Add(intersection);
-			}
-		}
-
-		[System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
-		internal void DrawIntersections(Canvas gr, float scale)
-		{
-			scale = 1 / scale; //  Math.Sqrt ' counteract scaling which is already applied to some extent
-			float halfWidth = 1 * scale; // 2mm across normally
-			foreach (Intersection objIntersection in m_Intersections)
-			{
-				int blue = Convert.ToInt32((objIntersection.Certainty + 1) * 255 / (Geometry.ANGLE90 + 1)); // entirely blue if certain; entirely red if not
-				blue = Math.Max(0, Math.Min(blue, 255));
-				using (Stroke pn = gr.CreateStroke(Color.FromArgb(255 - blue, 0, blue), Geometry.SINGLELINE * scale))
-				{
-					gr.Ellipse(new RectangleF(objIntersection.Position.X - halfWidth, objIntersection.Position.Y - halfWidth, halfWidth * 2, halfWidth * 2), pn);
-				}
-
-			}
-		}
 
 		#endregion
 
-		public virtual Segment GetSegment(Intersection fromIntersection, bool forward)
-		{
-			// should be implemented if called.  Only shapes which dont report any intersections should leave this default
-			Debug.Fail("GetSegment not implemented on shape: " + ShapeCode);
-			return null;
-		}
-
-		/// <summary>Should return true if this segment represents any of the parts of the shape</summary>
-		public virtual bool ContainsSegment(Segment segment)
-		{
-			Debug.Fail("ContainsSegment not implemented for " + this.ShapeCode);
-			return false;
-		}
-
-		#region Miscellaneous advanced geometric
-
-		/// <summary>Call this with a shape and an empty list to add the shape and everything it intersects with (recursively) to the list</summary>
-		protected static void AddIntersectingShapes(Shape shp, List<Shape> list)
-		{
-			Debug.Assert(!list.Contains(shp));
-			list.Add(shp);
-			foreach (Intersection intersection in shp.m_Intersections)
-			{
-				var other = intersection.OtherShape(shp);
-				if (other != shp) // quite possible if the intersection is within the shape
-				{
-					if (!list.Contains(other))
-						AddIntersectingShapes(other, list);
-				}
-			}
-		}
-
-		/// <summary>Returns the equivalent graphics path for the shape</summary>
-		public virtual GraphicsPath ConvertToPath()
-		{
-			return null;
-		}
-
-		#endregion
+		/// <summary>Returns the equivalent graphics path for the shape. May return null if not supported</summary>
+		public virtual GraphicsPath ConvertToPath() => null;
 
 		#region Vertex editing
 		/// <summary>Returns whether the particular verb can be applied to this shape, given the target for where the user clicked.
 		/// If true the verb will be sent to OtherVerb.  The caller will already have checked that objTarget is of the right basic type.
 		/// This needs to report true if the shape supports the functionality, and if the segment is appropriate in other ways (e.g. not ConvertToBezier if it is already a Bezier)</summary>
-		public virtual bool VertexVerbApplicable(SAW.Functions.Codes code, Target target)
+		public virtual bool VertexVerbApplicable(Functions.Codes code, Target target)
 		{
 			Debug.Assert(target.Shape == this);
-			Debug.Assert(target.Type == Target.Types.Line || target.Type == Target.Types.Vertex);
+			Debug.Assert(target.Type == Target.Types.Line || target.Type == Target.Types.Vertex
+						 || (target.Type == Target.Types.GrabSpot && (target as Target.ForGrabSpot)?.Grab.GrabType == GrabTypes.Move));
 			switch (code)
 			{
-				case SAW.Functions.Codes.AddVertex:
-				case SAW.Functions.Codes.ConvertToBezier:
-				case SAW.Functions.Codes.ConvertToLine:
-					Debug.Assert(target.Type == Target.Types.Line);
+				case Functions.Codes.AddVertex:
+				case Functions.Codes.ConvertToBezier:
+				case Functions.Codes.ConvertToLine:
+					//Debug.Assert(target.Type == Target.Types.Line);
 					break;
-				case SAW.Functions.Codes.RemoveVertex:
-				case SAW.Functions.Codes.SmoothVertex:
-				case SAW.Functions.Codes.CornerVertex:
-					Debug.Assert(target.Type == Target.Types.Vertex);
+				case Functions.Codes.RemoveVertex:
+				case Functions.Codes.SmoothVertex:
+				case Functions.Codes.CornerVertex:
+					//Debug.Assert(target.Type == Target.Types.Vertex);
 					break;
 				default:
 					Debug.Fail("Unexpected verb in VertexVerbApplicable.  Check all overridden functions");
@@ -1761,7 +1484,6 @@ namespace SAW
 
 		#endregion
 
-		#endregion
 
 		#region IDisposable Support
 		// cannot rely on this being called.  This is only used in the entire document is disposed (otherwise even deleted shapes will exist in the undo buffer)
@@ -2014,7 +1736,7 @@ namespace SAW
 			/// <summary>Actual graphical width.  Not *100</summary>
 			public float Width;
 			// although we use the .net patterns (which seem to match the Windows API ones) we only use these for drawing if the line is reasonably wide
-			// if the line is only one pixel wide (after scaling?) The spacing is so small as to make the line look almost continuous
+			// if the line is only one pixel wide (after scaling?) the spacing is so small as to make the line look almost continuous
 			// therefore we sometimes generate custom patterns
 			public DashStyle Pattern; // = Drawing2D.DashStyle.Solid
 
@@ -2090,12 +1812,9 @@ namespace SAW
 			{
 				switch (parameter)
 				{
-					case Parameters.LineColour:
-						return Colour.ToArgb();
-					case Parameters.LinePattern:
-						return (int)Pattern;
-					case Parameters.LineWidth:
-						return (int)(Width * 100); // the GUI parameter only uses integers
+					case Parameters.LineColour: return Colour.ToArgb();
+					case Parameters.LinePattern: return (int)Pattern;
+					case Parameters.LineWidth: return (int)(Width * 100); // the GUI parameter only uses integers
 					default:
 						Debug.Fail("Parameter not expected for this type of style object");
 						return 0;
@@ -2322,71 +2041,6 @@ namespace SAW
 		}
 		#endregion
 
-				#region Marker - redundant in SAW, but needed so Document compiles
-		public class MarkerStyleC : StyleBase
-		{
-
-			public byte Size;
-			public enum Types : byte
-			{
-				Plus = 0,
-				Cross,
-				Square,
-				Circle,
-				Triangle
-			}
-			public Types MarkerType;
-
-			public void SetDefaults()
-			{
-				Size = 2;
-				MarkerType = Types.Plus;
-			}
-
-			public void Write(DataWriter writer)
-			{
-				writer.Write((byte)MarkerType);
-				writer.Write(Size);
-			}
-
-			public static MarkerStyleC Read(DataReader reader)
-			{
-				MarkerStyleC style = new MarkerStyleC();
-				style.MarkerType = (Types)reader.ReadByte();
-				style.Size = reader.ReadByte();
-				return style;
-			}
-
-			public override void CopyFrom(StyleBase other)
-			{
-				MarkerStyleC style = (MarkerStyleC)other;
-				MarkerType = style.MarkerType;
-				Size = style.Size;
-			}
-
-			public override int ParameterValue(Parameters parameter)
-			{
-				return 0;
-			}
-			public override void SetParameterValue(int value, Parameters parameter)
-			{
-			
-			}
-
-			public override Parameters[] ApplicableParameters()
-			{
-				return null;;
-			}
-
-			public override bool IdenticalTo(StyleBase other)
-			{
-				return false;
-			}
-
-		}
-		#endregion
-
-
 		public virtual StyleBase StyleObjectForParameter(Parameters parameter, bool applyingDefault = false)
 		{
 			// Returns nothing if this styling information does not apply to this shape
@@ -2441,20 +2095,20 @@ namespace SAW
 
 		/// <summary>This is called after the GUI applies the default styles; a few objects might want to force different values</summary>
 		/// <remarks>must return true if it has made any changes</remarks>
-		public virtual bool DefaultStylesApplied()
+		internal virtual bool DefaultStylesApplied()
 		{
 			return false;
 		}
 
-		public void CopyAllStylesFrom(Shape objOther)
+		public void CopyAllStylesFrom(Shape other)
 		{
-			//	Debug.Assert(objOther.Shape = Me.Shape) ' cutting now uses this, and the shape types might not match
+			//	Debug.Assert(other.Shape = Me.Shape) ' cutting now uses this, and the shape types might not match
 			for (Parameters style = Parameters.FirstStyle; style <= Parameters.LastStyle; style++)
 			{
 				StyleBase styleBase = StyleObjectForParameter(style);
 				if (styleBase != null)
 				{
-					StyleBase objOtherStyle = objOther.StyleObjectForParameter(style);
+					StyleBase objOtherStyle = other.StyleObjectForParameter(style);
 					if (objOtherStyle != null)
 						styleBase.SetParameterValue(objOtherStyle.ParameterValue(style), style);
 				}
@@ -2490,7 +2144,7 @@ namespace SAW
 			Invisible,
 			/// <summary>only used when moving (there is never a GrabSpot of this type).  Used when dragging out a part of the text to select it</summary>
 			TextSelection,
-			/// <summary>Grab handle in traditional Bezier editing style</summary>
+			/// <summary>Grab handle in traditional Bezier editing style.  ShapeParameter will indicate whether it is first (+1) or second (-1) withn pathelement</summary>
 			Bezier,
 			/// <summary>Similar to Bezier, but not currently usable.  Drawn in grey</summary>
 			BezierInactive
@@ -2501,7 +2155,7 @@ namespace SAW
 		{
 			public readonly GrabTypes GrabType;
 			/// <summary>Position of the GrabSpot itself (before movement when inherited in GrabMovement)</summary>
-			public readonly PointF Position;
+			public PointF Position;
 			/// <summary>Used by shape if necessary to further specify exact item being moved</summary>
 			public int ShapeIndex;
 			/// <summary>Can also be used by the shape.  Not passed to constructor (is only rarely used as GrabSpots are usually at corners so don't need to specify part way down a line)</summary>
@@ -2515,7 +2169,7 @@ namespace SAW
 			/// <summary>original shape on which this GrabSpot appeared; maybe nothing.  GrabSpot will act on all selected shapes, not just this shape.</summary>
 			public readonly Shape Shape;
 			/// <summary>Prompts to use when the mouse is hovering over this.  Will be set automatically for some types in the constructor and can be reassigned.  May be Nothing</summary>
-			public Prompt[] Prompts;
+			internal Prompt[] Prompts;
 
 			internal const float DRAWSIZE = 1; // half diameter of a GrabSpot rectangle
 			internal const float HITTOLERANCE = 3; // allowed distance from centre to count as a hit (uses DirtyDistance)
@@ -2541,6 +2195,7 @@ namespace SAW
 						break;
 					case GrabTypes.EdgeMoveH:
 						Prompts = new[] { new Prompt(ShapeVerbs.Choose, "StretchH") };
+						//Focus = 
 						break;
 					case GrabTypes.EdgeMoveV:
 						Prompts = new[] { new Prompt(ShapeVerbs.Choose, "StretchV") };
@@ -2573,7 +2228,7 @@ namespace SAW
 			public PointF PositionMouseUnsnapped;
 			/// <summary>whether the points used when generating the transformations should be snapped (Current.Snapped is the snapped point)</summary>
 			public SnapModes SnapMode;
-			/// <summary>the current location both snapped and unsnapped</summary>
+			/// <summary>the current location both snapped and unsnapped.  View willnot be defined</summary>
 			public EditableView.ClickPosition Current;
 			/// <summary>True if the control key was pressed when the GrabSpots were created</summary>
 			/// <remarks>This can change their behaviour for some shapes, and it is important to use the value from when they were created otherwise there may be errors due to the inconsistency.</remarks>
@@ -2585,15 +2240,16 @@ namespace SAW
 			/// <remarks>Wanted to use Transaction.GetObjectPrevious instead, but when shapes pulled from stack they are already in Tx as a new object, with no previous.</remarks>
 			private readonly Dictionary<Shape, Shape> OriginalShapes = new Dictionary<Shape, Shape>();
 
+			/// <summary>Page can be null and will be inferred from grabSpot shape</summary>
 			public GrabMovement(GrabSpot grabSpot, Page page, SnapModes snapMode, Transaction transaction) : base(grabSpot.Shape, grabSpot.GrabType, grabSpot.Position)
 			{
 				ShapeParameter = grabSpot.ShapeParameter;
 				// the entire Current object is replaced when the mouse moves, so we can just fill in dummy values for the the zoom etc
-				Current = new EditableView.ClickPosition(grabSpot.Position, page, 1, snapMode, snapMode, null, EditableView.ClickPosition.Sources.Irrelevant);
+				Current = new EditableView.ClickPosition(grabSpot.Position, page ?? grabSpot.Shape.FindPage(), 1, snapMode, snapMode, null, EditableView.ClickPosition.Sources.Irrelevant);
 				ShapeIndex = grabSpot.ShapeIndex;
 				Focus = grabSpot.Focus;
 				SnapMode = snapMode;
-				PositionGridSnapped = base.Position;
+				PositionGridSnapped = Position;
 				Transaction = transaction;
 				switch (GrabType)
 				{
@@ -2652,12 +2308,48 @@ namespace SAW
 				//Return Transaction.GetObjectPrevious(shp)
 			}
 
+			public void SetGrabMoveTransform(Page page, GrabSpot grabSpotHit)
+			{
+				RectangleF bounds = page.SelectedBounds(true);
+				switch (GrabType)
+				{
+					case Shape.GrabTypes.Move:
+					case Shape.GrabTypes.SingleVertex:
+					case Shape.GrabTypes.Invisible:
+					case Shape.GrabTypes.Bezier:
+						Transform = new TransformMove(Transformation.Modes.Move);
+						break;
+					case Shape.GrabTypes.Rotate:
+						Transform = TransformRotate.CreateForGrabMove(grabSpotHit.Focus, Position, page.SelectedShapes);
+						break;
+					case Shape.GrabTypes.Radius:
+						Transform = TransformScale.CreateForGrabMove(grabSpotHit.Focus, Position);
+						break;
+					case Shape.GrabTypes.CornerResize:
+						PointF focus1 = new PointF(bounds.Right - grabSpotHit.Position.X + bounds.X, bounds.Bottom - grabSpotHit.Position.Y + bounds.Y);
+						Transform = TransformScale.CreateForGrabMove(focus1, grabSpotHit.Position);
+						break;
+					case Shape.GrabTypes.EdgeMoveV:
+					case Shape.GrabTypes.EdgeMoveH:
+						Debug.Assert(!Focus.IsEmpty); // should be set when creating grabspot
+						Transform = TransformLinearScale.CreateForGrabMove(Focus, grabSpotHit.Position);
+						break;
+					case Shape.GrabTypes.TextSelection:
+						Transform = null;
+						break;
+					case Shape.GrabTypes.BezierInactive: // this doesn't actually do any dragging, rather it prompts to convert to a path - should have been done by UI
+					default:
+						throw new ArgumentException("GrabType");
+				}
+			}
+
+
 		}
 		#endregion
 
 		/// <summary>Called for each shape in Grab.</summary>
 		/// <returns>if any shape involved in the grab movement returns false it is abandoned</returns>
-		public virtual bool StartGrabMove(GrabMovement grab)
+		internal virtual bool StartGrabMove(GrabMovement grab)
 		{
 			if (grab.GrabType == GrabTypes.Undefined)
 				throw new InvalidOperationException("Can\'t StartGrabMove(undefined)");
@@ -2667,7 +2359,7 @@ namespace SAW
 			return true;
 		}
 
-		public void GrabMove(GrabMovement move)
+		internal void GrabMove(GrabMovement move)
 		{
 			// this is called each time the mouse moves to adjust the position
 			// objMove.OriginalShapes is the backup buffer returned from StartGrabMove.
@@ -2684,7 +2376,7 @@ namespace SAW
 				ClearTextCache(move.GrabType != GrabTypes.Move); // on move the formatting will remain unchanged
 		}
 
-		protected virtual void DoGrabMove(GrabMovement move)
+		protected internal virtual void DoGrabMove(GrabMovement move)
 		{
 			// Does the body of the GrabMove function allowing individual shapes to override some of the movement while keeping the framework
 			switch (move.GrabType)
@@ -2694,14 +2386,16 @@ namespace SAW
 				case GrabTypes.Move:
 				case GrabTypes.Rotate:
 				case GrabTypes.Radius:
-					ApplyTransformation(move.Transform);
+					move.Transform.DoTransform(this);
 					break;
+				case GrabTypes.Bezier:
+				case GrabTypes.BezierInactive:
 				case GrabTypes.SingleVertex:
-					throw new InvalidOperationException("GrabMove must be overridden if SingleVertex GrabSpots are used");
+					throw new InvalidOperationException("GrabMove must be overridden if SingleVertex GrabSpots/Bezier are used");
 				case GrabTypes.EdgeMoveH:
 				case GrabTypes.EdgeMoveV:
 				case GrabTypes.CornerResize:
-					this.ApplyTransformation(move.Transform);
+					move.Transform.DoTransform(this);
 					break;
 				case GrabTypes.Fixed:
 					break;
@@ -2718,11 +2412,11 @@ namespace SAW
 						Utilities.LogSubError("DoGrabMove::TextSelection when the shape does not have the Caret");
 					break;
 				default:
-					throw new InvalidOperationException("Unexpected GrabType: " + move.GrabType);
+					throw new ArgumentException("Unexpected GrabType: " + move.GrabType);
 			}
 		}
 
-		public virtual void DoGrabAngleSnap(GrabMovement move)
+		internal virtual void DoGrabAngleSnap(GrabMovement move)
 		{
 			// called when angular snapping is enabled
 			switch (move.GrabType)
@@ -2745,7 +2439,7 @@ namespace SAW
 			}
 		}
 
-		public virtual List<GrabSpot> GetGrabSpots(float scale)
+		internal virtual List<GrabSpot> GetGrabSpots(float scale)
 		{
 			// returns all possible specialist grab spots for this shape
 			// Can return nothing  rather than empty list if none
@@ -2753,66 +2447,44 @@ namespace SAW
 			return null;
 		}
 
-		protected void AddBoundingGrabSpots(List<GrabSpot> list, float scale, bool allowAll = false)
+		/// <summary>adds 8 GrabSpots on the bounding rectangle allowing moving the corners and edges, Depending on the Allows property
+		/// 0 is the top left, and they count clockwise from there
+		/// if allowAll then Allows is ignored, and all possible GrabSpots are added</summary>
+		/// <remarks>Implemented in static AddBoundingGrabSpotsForRectangle to which rectangle and Allows need to be supplied</remarks>
+		private protected void AddBoundingGrabSpots(List<GrabSpot> list, float scale, bool allowAll = false)
 		{
-			// adds 8 GrabSpots on the bounding rectangle allowing moving the corners and edges, Depending on Allows
-			// 0 is the top left, and they count clockwise from there
-			// if bolAllowAll then Allows is ignored, and all possible GrabSpots are added
 			EnsureBounds();
-			if ((Allows & AllowedActions.TransformScale) > 0 || allowAll)
-			{
-				// If this is not set, calling this function was a bit pointless.  However it does drop through to here for Jigsaw.Piece at the moment
-				list.Add(new GrabSpot(this, GrabTypes.CornerResize, new PointF(m_Bounds.X, m_Bounds.Y), 0));
-				list.Add(new GrabSpot(this, GrabTypes.CornerResize, new PointF(m_Bounds.Right, m_Bounds.Y), 2));
-				list.Add(new GrabSpot(this, GrabTypes.CornerResize, new PointF(m_Bounds.Right, m_Bounds.Bottom), 4));
-				list.Add(new GrabSpot(this, GrabTypes.CornerResize, new PointF(m_Bounds.X, m_Bounds.Bottom), 6));
-			}
-			// and the GrabSpots in the middle of the lines...
-			if ((Allows & AllowedActions.TransformLinearStretch) > 0 || allowAll) // not all shapes can stretch in one direction
-			{
-				float minimum = Convert.ToSingle(12 / Math.Sqrt(scale)); // How long managed knees to be displayed intermediate GrabSpots; changes somewhat scale
-																		 // Will also check for each GrabSpot that the edge it is on is not too short (if the edge is very short it just gets too crowded)
-				if (m_Bounds.Width > minimum) // width is OK; include the up and down ones
-				{
-					list.Add(new GrabSpot(this, GrabTypes.EdgeMoveV, new PointF(m_Bounds.X + m_Bounds.Width / 2, m_Bounds.Y), 1));
-					list.Add(new GrabSpot(this, GrabTypes.EdgeMoveV, new PointF(m_Bounds.X + m_Bounds.Width / 2, m_Bounds.Bottom), 5));
-				}
-				if (m_Bounds.Height > minimum)
-				{
-					list.Add(new GrabSpot(this, GrabTypes.EdgeMoveH, new PointF(m_Bounds.Right, m_Bounds.Y + m_Bounds.Height / 2), 3));
-					list.Add(new GrabSpot(this, GrabTypes.EdgeMoveH, new PointF(m_Bounds.X, m_Bounds.Y + m_Bounds.Height / 2), 7));
-				}
-			}
+			AddBoundingGrabSpotsForRectangle(list, m_Bounds, Allows, scale, allowAll, this);
 		}
 
 		/// <summary>adds 8 GrabSpots on the bounding rectangle allowing moving the corners and edges, Depending on the Allows given
 		/// 0 is the top left, and they count clockwise from there
-		/// if bolAllowAll then Allows is ignored, and all possible GrabSpots are added</summary>
+		/// if allowAll then allows is ignored, and all possible GrabSpots are added</summary>
 		/// <remarks>Used by AddBoundingGrabSpots and also view for multi-shape version</remarks>
-		public static void AddBoundingGrabSpotsForRectangle(List<GrabSpot> list, RectangleF bounds, AllowedActions allows, float scale, bool allowAll = false)
+		internal static void AddBoundingGrabSpotsForRectangle(List<GrabSpot> list, RectangleF bounds, AllowedActions allows, float scale, bool allowAll = false, Shape shape = null)
 		{
 			if ((allows & AllowedActions.TransformScale) > 0 || allowAll)
 			{
 				// If this is not set, calling this function was a bit pointless.  However it does drop through to here for Jigsaw.Piece at the moment
-				list.Add(new GrabSpot(null, GrabTypes.CornerResize, new PointF(bounds.X, bounds.Y), 0));
-				list.Add(new GrabSpot(null, GrabTypes.CornerResize, new PointF(bounds.Right, bounds.Y), 2));
-				list.Add(new GrabSpot(null, GrabTypes.CornerResize, new PointF(bounds.Right, bounds.Bottom), 4));
-				list.Add(new GrabSpot(null, GrabTypes.CornerResize, new PointF(bounds.X, bounds.Bottom), 6));
+				list.Add(new GrabSpot(shape, GrabTypes.CornerResize, new PointF(bounds.X, bounds.Y), 0));
+				list.Add(new GrabSpot(shape, GrabTypes.CornerResize, new PointF(bounds.Right, bounds.Y), 2));
+				list.Add(new GrabSpot(shape, GrabTypes.CornerResize, new PointF(bounds.Right, bounds.Bottom), 4));
+				list.Add(new GrabSpot(shape, GrabTypes.CornerResize, new PointF(bounds.X, bounds.Bottom), 6));
 			}
 			// and the GrabSpots in the middle of the lines...
 			if ((allows & AllowedActions.TransformLinearStretch) > 0 || allowAll) // not all shapes can stretch in one direction
 			{
-				float minimum = Convert.ToSingle(12 / Math.Sqrt(scale)); // How long managed knees to be displayed intermediate GrabSpots; changes somewhat scale
+				float minimum = Convert.ToSingle(12 / Math.Sqrt(scale)); // How long it needs to be to display intermediate GrabSpots; changes somewhat with scale
 																		 // Will also check for each GrabSpot that the edge it is on is not too short (if the edge is very short it just gets too crowded)
 				if (bounds.Width > minimum) // width is OK; include the up and down ones
 				{
-					list.Add(new GrabSpot(null, GrabTypes.EdgeMoveV, new PointF(bounds.X + bounds.Width / 2, bounds.Y), 1));
-					list.Add(new GrabSpot(null, GrabTypes.EdgeMoveV, new PointF(bounds.X + bounds.Width / 2, bounds.Bottom), 5));
+					list.Add(new GrabSpot(shape, GrabTypes.EdgeMoveV, new PointF(bounds.X + bounds.Width / 2, bounds.Y), 1) { Focus = new PointF(bounds.X + bounds.Width / 2, bounds.Bottom) });
+					list.Add(new GrabSpot(shape, GrabTypes.EdgeMoveV, new PointF(bounds.X + bounds.Width / 2, bounds.Bottom), 5) { Focus = new PointF(bounds.X + bounds.Width / 2, bounds.Y) });
 				}
 				if (bounds.Height > minimum)
 				{
-					list.Add(new GrabSpot(null, GrabTypes.EdgeMoveH, new PointF(bounds.Right, bounds.Y + bounds.Height / 2), 3));
-					list.Add(new GrabSpot(null, GrabTypes.EdgeMoveH, new PointF(bounds.X, bounds.Y + bounds.Height / 2), 7));
+					list.Add(new GrabSpot(shape, GrabTypes.EdgeMoveH, new PointF(bounds.Right, bounds.Y + bounds.Height / 2), 3) { Focus = new PointF(bounds.X, bounds.Y + bounds.Height / 2) });
+					list.Add(new GrabSpot(shape, GrabTypes.EdgeMoveH, new PointF(bounds.X, bounds.Y + bounds.Height / 2), 7) { Focus = new PointF(bounds.Right, bounds.Y + bounds.Height / 2) });
 				}
 			}
 		}
@@ -2823,28 +2495,48 @@ namespace SAW
 			// adds a rotational spot to the right of the centre
 			Debug.Assert((Allows & AllowedActions.TransformRotate) > 0, "Adding rotation grabspot to shape with Allow Rotate = false");
 			EnsureBounds();
-			PointF pt;
 			PointF centre = Middle();
-			if (Math.Abs(m_Bounds.Right - centre.X - ROTATIONGRABSPOTOFFSET) < 2)
+			float offset = GUIUtilities.MillimetreSize * ROTATIONGRABSPOTOFFSET;
+			PointF pt;
+			Page page = FindPage();
+			if (page.RecentRotationPoints.Any() && !TransformRotate.RotateAboutCentres) // SAW8: position is specified, use that regardless of this shape
+			{
+				pt = page.RecentRotationPoints.First();
+				pt.X += offset * 2;
+			}
+			if (Math.Abs(m_Bounds.Right - centre.X - offset) < 2)
 			{
 				// usual position would roughly coincide with the right-hand edge of the bounding box - which will usually have something drawn on it
 				pt = new PointF(m_Bounds.Right + 2, centre.Y);
 			}
 			else
-				pt = new PointF(centre.X + ROTATIONGRABSPOTOFFSET, centre.Y);
+				pt = new PointF(centre.X + offset, centre.Y);
 			spots.Add(new GrabSpot(this, GrabTypes.Rotate, pt, centre));
+		}
+
+		/// <summary>Adds a rotation handle right of the centre point.  Shapes themselves should use non-static version which has some collision detection </summary>
+		internal static void AddStandardRotationGrabSpotAt(List<GrabSpot> spots, PointF centre, Page page)
+		{
+			float offset = GUIUtilities.MillimetreSize * ROTATIONGRABSPOTOFFSET;
+			if (page.RecentRotationPoints.Any() && !TransformRotate.RotateAboutCentres)
+			{
+				centre = page.RecentRotationPoints.First();
+				offset *= 2;
+			}
+			PointF pt = new PointF(centre.X + offset, centre.Y);
+			spots.Add(new GrabSpot(null, GrabTypes.Rotate, pt, centre));
 		}
 
 		/// <summary>Can optionally start a custom GrabMovement when the mouse is used directly, rather than the usual one</summary>
 		/// <returns>Usually Nothing, otherwise the GrabMovement to use instead of the default</returns>
 		/// <remarks>Used for text selection dragging</remarks>
-		public virtual GrabMovement GetCustomGrabMove(EditableView.ClickPosition current, EditableView.ClickPosition click, Transaction transaction)
+		internal virtual GrabMovement GetCustomGrabMove(EditableView.ClickPosition current, EditableView.ClickPosition click, Transaction transaction)
 		{
 			if (HasText(true) && HasCaret && click != null) // Last condition should not be needed; just for safety
 			{
-				TextLocation objLocation = TextHitLocation(click.Exact);
-				if (objLocation.IsValid)
-					SetCaretLocation(objLocation, true);
+				TextLocation location = TextHitLocation(click.Exact);
+				if (location.IsValid)
+					SetCaretLocation(location, true);
 				return new GrabMovement(new GrabSpot(this, GrabTypes.TextSelection, current.Exact), current.Page, SnapModes.Off, transaction);
 			}
 			return null;
@@ -2879,7 +2571,7 @@ namespace SAW
 			Allowed, // the default, can have a text label added, but does not start with any text
 			Always, // the shape should always be treated as having a label from the moment it is created; effectively these are the intrinsic text shapes
 			IntrinsicTextPlusLabel, // the shape draws text and so wants to configure the font style, it can also add a text label in addition to this
-									/// <summary>the shape draws intrinsic text and wants the styling information for this, but cannot add a text label</summary>
+			/// <summary>the shape draws intrinsic text and wants the styling information for this, but cannot add a text label</summary>
 			IntrinsicOnly //
 		}
 
@@ -3124,19 +2816,21 @@ namespace SAW
 		#region Fragments
 		protected List<Fragment> m_Fragments; // = nothing by default (most shapes have no text)
 
-		internal protected class Fragment // stores one 'line' of text
+		/// <summary>stores one 'line' of text </summary>
+		internal protected class Fragment
 		{
-			// overridden in Equation to do a load of complex stuff, but quite simple in text mode
 			/// <summary>will exclude trailing Whitespace</summary>
-			public string Text; //
-			public RectangleF Bounds; // in text space
-									  /// <summary>index of this within the list - just used for faster lookup than calling IndexOf</summary>
-			public int Index; // index of this within the list - just used for faster lookup than calling IndexOf
-							  // the remainder are not used in equations
-			public int StartOffset; // index into Label of this Text.  Must be 0 for first
-									/// <summary>true if this fragment ends with vbCr (ie forces new line, even if there is no more text)</summary>
+			public string Text;
+			/// <summary>NOTE: in text space</summary>
+			public RectangleF Bounds;
+			/// <summary>index of this within the list - just used for faster lookup than calling IndexOf</summary>
+			public int Index;
+			// the remainder are not used in equations
+			/// <summary>index into Label of this Text.  Must be 0 for first </summary>
+			public int StartOffset;
+			/// <summary>true if this fragment ends with vbCr (ie forces new line, even if there is no more text)</summary>
 			public bool HardBreak; // true if this fragment ends with vbCr (ie forces new line, even if there is no more text)
-								   /// <summary>only set on last - true if more text has been discarded</summary>
+			/// <summary>only set on last - true if more text has been discarded</summary>
 			public bool Truncated; // only set on last - true if more text has been discarded
 
 			/// <summary>finds X location of character (ie coord to left of intCharacter). eg intCharacter = 0 will return 0</summary>
@@ -3151,6 +2845,7 @@ namespace SAW
 				//Debug.WriteLine("Text ('" + Text + "') measured: " + rctSize.ToString + " @ scale=" + NetCanvas.MeasurementInstance.Transform.Elements(0).ToString + ", with font=" + shp.TextFragmentFont(Me).Size.ToString)
 				return size.Right; // note not width - X since rectangle.X may be >0 indicating dead space to left; but this dead space IS drawn, so needs to be included
 			}
+
 		}
 
 		protected virtual void RepositionAllFragments()
@@ -3823,20 +3518,20 @@ namespace SAW
 		// don't want this to be instance info - just cluttering up Shape - of which there can be thousands.
 		// so although I don't like globals, for the caret it probably DOES make sense - there is only one within an app after all
 		/// <summary>Shape containing caret</summary>
-		protected static Shape g_CaretShape;
+		private protected static Shape g_CaretShape;
 		/// <summary>only defined if g_CaretShape is defined (otherwise the value is meaningless).  Note that this can be Empty even if the Caret exists (if this contains no text)</summary>
 		protected static TextLocation Caret = TextLocation.Empty.SetPurpose(TextLocation.Purposes.Caret);
 		/// <summary>currently drawn position.  This is based on Invalidation not called to Draw (i.e. this is the last position for which we did CaretInvalidateMe)</summary>
-		protected static TextLocation CaretDrawn = TextLocation.Empty;
+		private protected static TextLocation CaretDrawn = TextLocation.Empty;
 		/// <summary>whether currently drawn</summary>
-		protected static bool g_CaretAnimateState = true;
+		private protected static bool g_CaretAnimateState = true;
 		/// <summary>true skips next animation</summary>
-		protected static bool g_CaretSkipAnimate;
-		protected const float CARETWIDTH = 0.7f;
+		private protected static bool g_CaretSkipAnimate;
+		private protected const float CARETWIDTH = 0.7f;
 		/// <summary>Left edge of caret rectangle/symbol relative to actual location</summary>
-		protected const float CARETLEFTOFFSET = 0.25f;
+		private protected const float CARETLEFTOFFSET = 0.25f;
 
-		public static void CaretDestroy()
+		internal static void CaretDestroy()
 		{
 			if (g_CaretShape != null)
 			{
@@ -3844,7 +3539,7 @@ namespace SAW
 			}
 		}
 
-		public virtual void CaretLose()
+		internal virtual void CaretLose()
 		{
 			if (this == g_CaretShape)
 			{
@@ -3863,7 +3558,7 @@ namespace SAW
 			}
 		}
 
-		public static void CaretAnimate() // called continuously by GUI - ignore if no caret
+		internal static void CaretAnimate() // called continuously by GUI - ignore if no caret
 		{
 			if (g_CaretShape == null)
 				return;
@@ -3890,7 +3585,7 @@ namespace SAW
 		}
 
 		/// <summary>acts on a shape; forces this to own caret</summary>
-		public virtual void CaretGain()
+		internal virtual void CaretGain()
 		{
 			if (g_CaretShape == this)
 				return;
@@ -3920,12 +3615,12 @@ namespace SAW
 		}
 
 		/// <summary>Positions the caret at the given location.  Will Invalidate</summary>
-		protected void SetCaretLocation(TextLocation objLocation, bool bolForceDisplay)
+		protected void SetCaretLocation(TextLocation location, bool forceDisplay)
 		{
-			Caret = objLocation;
+			Caret = location;
 			Caret.Purpose = TextLocation.Purposes.Caret;
 			ClearSelection();
-			CaretUpdateCoords(bolForceDisplay);
+			CaretUpdateCoords(forceDisplay);
 		}
 
 		/// <summary>Called when the caret indices are correct, but the coordinates may have changed.  Will Invalidate</summary>
@@ -3940,7 +3635,7 @@ namespace SAW
 		{
 			// Although the Location is part of the Caret object, it is not necessarily calculated until it is accessed
 			// this will do so, so that the coordinate is stored.  It will also invalidate if the coordinate has changed
-			// if bolForceDisplay, it sets state to forced on so that it displays immediately.  This is used when cursoring around
+			// if forceDisplay, it sets state to forced on so that it displays immediately.  This is used when cursoring around
 			// (looks odd otherwise)
 			Debug.Assert(g_CaretShape == this && Caret.IsValid);
 			EnsureTextFormatted();
@@ -3979,20 +3674,20 @@ namespace SAW
 			}
 		}
 
-		public bool HasCaret
+		internal bool HasCaret
 		{ get { return this == g_CaretShape; } }
 
-		public static Shape CaretShape
+		internal static Shape CaretShape
 		{ get { return g_CaretShape; } }
 
 		/// <summary>Optionally called at some point early in a transaction to record the caret state</summary>
 		/// <remarks>This is not called by default for all transactions, therefore foremost transactions the caret is not restored</remarks>
-		public static void StoreCaretState(Transaction transaction)
+		internal static void StoreCaretState(Transaction transaction)
 		{
 			transaction.CaretState = new Tuple<Shape, TextLocation, TextLocation>(g_CaretShape, Caret, SelectionLocation);
 		}
 
-		public static void RestoreCaretState(Transaction transaction)
+		internal static void RestoreCaretState(Transaction transaction)
 		{
 			if (transaction.CaretState == null)
 				return; // position was not specified in this transaction
@@ -4139,7 +3834,6 @@ namespace SAW
 			}
 			// may need to format from previous line, as this can change line breaking.
 			if (fragmentIndex > 0 && m_Fragments != null && m_Fragments[fragmentIndex - 1].HardBreak == false) // but no need if there was a return on end of previous
-
 				fragmentIndex -= 1;
 			Caret = TextLocation.Empty; // otherwise the formatting may try and update it
 			FormatText(fragmentIndex);
@@ -4380,42 +4074,55 @@ namespace SAW
 
 		#region Double-click
 		// this happens when the user double clicks a shape and the selector is enabled
-		// default behaviour is to add a label, if possible
+		// text within shapes not really supported in SAW now - not much need for it, and this function is used as a way of adding scripting
 
 		/// <summary>Should return Nothing if not supported; can return "" to enable double-click with no menu entry</summary>
-		public virtual string DoubleClickText()
+		internal virtual string DoubleClickText()
 		{
-			if (SupportsTextLabel)
-			{
-				if (!HasText(true))
-					return Strings.Item("Add_Text");
-				else
-				{
-					if (!string.IsNullOrEmpty(m_Label) && AnimationController.HasAnimation(this))
-						return Strings.Item("Edit_Text_Popup");
-					return Strings.Item("Edit_Text");
-				}
-			}
-			return "";
+			if (Parent is Scriptable)
+				return null;
+			//if (SupportsTextLabel)
+			//{
+			//	if (!HasText(true))
+			//		return Strings.Item("Add_Text");
+			//	else
+			//	{
+			//		if (!string.IsNullOrEmpty(m_Label) && AnimationController.HasAnimation(this))
+			//			return Strings.Item("Edit_Text_Popup");
+			//		return Strings.Item("Edit_Text");
+			//	}
+			//}
+			return ""; // no need to have it on menu - there is an existing entry for it Strings.Item("Verb_MakeActive");
 		}
 
-		// subclass should set LocationChanged if appropriate - GUI doesn't
-		public virtual void DoDoubleClick(EditableView view, EditableView.ClickPosition.Sources source)
-		{
-			if (!SupportsTextLabel)
+		internal virtual void DoDoubleClick(EditableView view, EditableView.ClickPosition.Sources source)
+		{// in SAW this converts any dumb element into active content (with a Scriptable around it)
+			Verb verb = Verb.Find(Codes.MakeActive);
+			if (!verb.IsApplicable(view))
 				return;
-			if (HasCaret && !string.IsNullOrEmpty(m_Label))
-			{ // Splash revised text in popup, but not so useful here
-			}
-			else
+
+			if (GUIUtilities.QuestionBox(Strings.Item("SAW_Edit_AutoActive"), MessageBoxButtons.YesNo) != DialogResult.Yes)
+				return;
+
+			Globals.Root.PerformAction(verb);
+			if (Parent is Scriptable scriptable)
 			{
-				CreateLabel((TextStyleC)Globals.StyleParameterDefaultObject(Parameters.TextColour));
-				Parent.NotifyIndirectChange(this, ChangeAffects.RepaintNeeded | ChangeAffects.StyleInformation);
+				scriptable.DoDoubleClick(view, source);
 			}
+			//if (!SupportsTextLabel)
+			//	return;
+			//if (HasCaret && !string.IsNullOrEmpty(m_Label))
+			//{ // Splash revised text in popup, but not so useful here
+			//}
+			//else
+			//{
+			//	CreateLabel((TextStyleC)Globals.StyleParameterDefaultObject(Parameters.TextColour));
+			//	Parent.NotifyIndirectChange(this, ChangeAffects.RepaintNeeded | ChangeAffects.StyleInformation);
+			//}
 		}
 
 		/// <summary>Returns true if it is possible to DoDoubleClick with the given set of items selected.  This is called on first item.  Default is to only return true if 1 item (this) is selected</summary>
-		public virtual bool CanDoubleClickWith(IEnumerable<Shape> selection)
+		internal virtual bool CanDoubleClickWith(IEnumerable<Shape> selection)
 		{
 			return selection.Count() == 1;
 		}
@@ -4438,7 +4145,7 @@ namespace SAW
 				Index = index;
 			}
 
-			public Link(Socket socket)
+			internal Link(Socket socket)
 			{
 				Shape = socket.Shape;
 				Index = socket.Index;
@@ -4460,7 +4167,7 @@ namespace SAW
 			RequiresLinkUpdate
 		}
 
-		public StatusValues Status = StatusValues.Complete;
+		internal StatusValues Status = StatusValues.Complete;
 		// not stored in data.  Set by GUI
 		// used when objects link - if Moved other objects which link to this still need to be notified
 		// not always set on creation (can be no links in!).  Usually set by gui NOT internally (cos lots of shapes but only a few GUI places need to set this)
@@ -4499,7 +4206,7 @@ namespace SAW
 		/// Must do objTransaction.Edit (me) if changing.
 		/// Default implementation calls OnLinkedChanged if one or more linked shapes have changed
 		/// NOTE: this requires that shapes which we link to do not themselves have further links; the function below will not correctly cascade</remarks>
-		public virtual bool PerformLinkedChanges(Transaction transaction, frmMain editor)
+		internal virtual bool PerformLinkedChanges(Transaction transaction, frmMain editor)
 		{
 			bool changed;
 			if (Status == StatusValues.RequiresLinkUpdate)
@@ -4547,7 +4254,7 @@ namespace SAW
 			NotDrag = 512, // only used in prompting; indicates to ignore the prompt if dragging
 		}
 
-		public class Prompt
+		internal class Prompt
 		{
 			public readonly ShapeVerbs Verbs;
 			private readonly string TextID;
@@ -4659,32 +4366,21 @@ namespace SAW
 			public string SecondText => Strings.Item(SecondTextID);
 		}
 
-		public virtual List<Prompt> GetPrompts()
+		internal virtual List<Prompt> GetPrompts()
 		{
-			List<Prompt> list = new List<Prompt>();
-			// This base implementation usually returns nothing, except in the case of autostart shapes, most of which have one more click to complete
-			// And use a prompt called "..._Start" which comes from the time before AutoStart was included
-			if (AutostartType(ShapeCode))
-				list.Add(new Prompt(ShapeVerbs.Complete, ShapeCode + "_Start", ShapeCode + "_Start"));
-			return list;
+			return new List<Prompt>();
 		}
 
 		#endregion
 
 		#region Sorting
 
-		public static int XSort(Shape A, Shape B)
-		{
-			return A.Bounds.X.CompareTo(B.Bounds.X);
-		}
+		internal static int XSort(Shape A, Shape B) => A.Bounds.X.CompareTo(B.Bounds.X);
 
-		public static int YSort(Shape A, Shape B)
-		{
-			return A.Bounds.Y.CompareTo(B.Bounds.Y);
-		}
+		internal static int YSort(Shape A, Shape B) => A.Bounds.Y.CompareTo(B.Bounds.Y);
 
 		/// <summary>Sorts by Y then X</summary>
-		public static int YXSort(Shape A, Shape B)
+		internal static int YXSort(Shape A, Shape B)
 		{
 			int result = A.Bounds.Y.CompareTo(B.Bounds.Y);
 			if (result == 0)

@@ -25,6 +25,7 @@
 			this.ctxEdit = new System.Windows.Forms.ContextMenuStrip(this.components);
 			this.verbCopyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.verbCutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.verbPasteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.verbDeleteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.toolStripMenuItem2 = new System.Windows.Forms.ToolStripSeparator();
 			this.menuFrontBackToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -41,11 +42,8 @@
 			this.verbDoubleClickToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.txtInfo = new System.Windows.Forms.TextBox();
 			this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
-			this.picSizeGrip = new System.Windows.Forms.PictureBox();
-			this.verbPasteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.ctxEdit.SuspendLayout();
 			this.tableLayoutPanel1.SuspendLayout();
-			((System.ComponentModel.ISupportInitialize)(this.picSizeGrip)).BeginInit();
 			this.SuspendLayout();
 			// 
 			// lblTop
@@ -83,7 +81,7 @@
 			this.tvOutline.Margin = new System.Windows.Forms.Padding(3, 0, 3, 0);
 			this.tvOutline.Name = "tvOutline";
 			this.tvOutline.SelectedImageIndex = 0;
-			this.tvOutline.Size = new System.Drawing.Size(271, 248);
+			this.tvOutline.Size = new System.Drawing.Size(271, 257);
 			this.tvOutline.TabIndex = 1;
 			this.tvOutline.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.tvOutline_AfterSelect);
 			this.tvOutline.MouseDown += new System.Windows.Forms.MouseEventHandler(this.tvOutline_MouseDown);
@@ -118,7 +116,7 @@
             this.toolStripMenuItem3,
             this.verbDoubleClickToolStripMenuItem});
 			this.ctxEdit.Name = "ctxEdit";
-			this.ctxEdit.Size = new System.Drawing.Size(194, 264);
+			this.ctxEdit.Size = new System.Drawing.Size(194, 242);
 			// 
 			// verbCopyToolStripMenuItem
 			// 
@@ -131,6 +129,12 @@
 			this.verbCutToolStripMenuItem.Name = "verbCutToolStripMenuItem";
 			this.verbCutToolStripMenuItem.Size = new System.Drawing.Size(193, 22);
 			this.verbCutToolStripMenuItem.Text = "[Verb_Cut]";
+			// 
+			// verbPasteToolStripMenuItem
+			// 
+			this.verbPasteToolStripMenuItem.Name = "verbPasteToolStripMenuItem";
+			this.verbPasteToolStripMenuItem.Size = new System.Drawing.Size(193, 22);
+			this.verbPasteToolStripMenuItem.Text = "[Verb_Paste]";
 			// 
 			// verbDeleteToolStripMenuItem
 			// 
@@ -242,7 +246,6 @@
 			this.tableLayoutPanel1.Controls.Add(this.lblTop, 0, 0);
 			this.tableLayoutPanel1.Controls.Add(this.tvOutline, 0, 1);
 			this.tableLayoutPanel1.Controls.Add(this.txtInfo, 0, 2);
-			this.tableLayoutPanel1.Controls.Add(this.picSizeGrip, 2, 2);
 			this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
 			this.tableLayoutPanel1.Name = "tableLayoutPanel1";
@@ -252,27 +255,6 @@
 			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.tableLayoutPanel1.Size = new System.Drawing.Size(277, 300);
 			this.tableLayoutPanel1.TabIndex = 3;
-			// 
-			// picSizeGrip
-			// 
-			this.picSizeGrip.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.picSizeGrip.Image = global::Resources.AM.SizeGrip_24;
-			this.picSizeGrip.Location = new System.Drawing.Point(261, 278);
-			this.picSizeGrip.Margin = new System.Windows.Forms.Padding(4, 4, 0, 0);
-			this.picSizeGrip.Name = "picSizeGrip";
-			this.picSizeGrip.Size = new System.Drawing.Size(16, 22);
-			this.picSizeGrip.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-			this.picSizeGrip.TabIndex = 3;
-			this.picSizeGrip.TabStop = false;
-			this.picSizeGrip.MouseDown += new System.Windows.Forms.MouseEventHandler(this.picSizeGrip_MouseDown);
-			this.picSizeGrip.MouseMove += new System.Windows.Forms.MouseEventHandler(this.picSizeGrip_MouseMove);
-			this.picSizeGrip.MouseUp += new System.Windows.Forms.MouseEventHandler(this.picSizeGrip_MouseUp);
-			// 
-			// verbPasteToolStripMenuItem
-			// 
-			this.verbPasteToolStripMenuItem.Name = "verbPasteToolStripMenuItem";
-			this.verbPasteToolStripMenuItem.Size = new System.Drawing.Size(193, 22);
-			this.verbPasteToolStripMenuItem.Text = "[Verb_Paste]";
 			// 
 			// ctrDocumentOutline
 			// 
@@ -285,7 +267,6 @@
 			this.ctxEdit.ResumeLayout(false);
 			this.tableLayoutPanel1.ResumeLayout(false);
 			this.tableLayoutPanel1.PerformLayout();
-			((System.ComponentModel.ISupportInitialize)(this.picSizeGrip)).EndInit();
 			this.ResumeLayout(false);
 
 		}
@@ -310,7 +291,6 @@
 		private System.Windows.Forms.ToolStripSeparator toolStripMenuItem3;
 		private System.Windows.Forms.TextBox txtInfo;
 		private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
-		private System.Windows.Forms.PictureBox picSizeGrip;
 		private System.Windows.Forms.ToolStripMenuItem menuFrontBackToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem verbSendBackToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem verbBringFrontToolStripMenuItem;

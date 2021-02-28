@@ -176,7 +176,7 @@ namespace SAW
 			}
 		}
 
-		public override List<GrabSpot> GetGrabSpots(float scale)
+		internal override List<GrabSpot> GetGrabSpots(float scale)
 		{
 			AllowedActions allows = Allows; // this is potentially somewhat slow to calculate
 			if ((allows & AllowedActions.TransformMove) == 0)
@@ -190,7 +190,8 @@ namespace SAW
 		}
 
 		public const float MAXIMUMSNAPROTATION = Geometry.ANGLE45 / 2; // most to autorotate a moving shape
-		public override List<Target> GenerateTargets(UserSocket floating)
+
+		internal override List<Target> GenerateTargets(UserSocket floating)
 		{
 			List<Target> list = new List<Target>();
 			EnsureSocketList();
@@ -218,7 +219,7 @@ namespace SAW
 			return list;
 		}
 
-		public override List<UserSocket> GetPointsWhichSnapWhenMoving()
+		internal override List<UserSocket> GetPointsWhichSnapWhenMoving()
 		{
 			EnsureSocketList();
 			if (m_Sockets.Count == 0)
@@ -253,7 +254,7 @@ namespace SAW
 			}
 		}
 
-		public override List<Socket> GetSockets()
+		internal override List<Socket> GetSockets()
 		{
 			EnsureSocketList();
 			List<Socket> list = new List<Socket>();
@@ -268,7 +269,7 @@ namespace SAW
 			return list;
 		}
 
-		public override PointF SocketPosition(int index)
+		internal override PointF SocketPosition(int index)
 		{
 			EnsureSocketList();
 			if (index < 0 || index >= m_Sockets.Count)
@@ -276,7 +277,7 @@ namespace SAW
 			return m_Sockets[index].Centre;
 		}
 
-		public override SizeF SocketExitVector(int index)
+		internal override SizeF SocketExitVector(int index)
 		{
 			EnsureSocketList();
 			if (index < 0 || index >= m_Sockets.Count)
@@ -298,7 +299,8 @@ namespace SAW
 		#endregion
 
 		#region Graphics
-		public override void Draw(Canvas gr, float scale, float coordScale, StaticView view, StaticView.InvalidationBuffer buffer, int fillAlpha = 255, int edgeAlpha = 255, bool reverseRenderOrder = false)
+
+		internal override void Draw(Canvas gr, float scale, float coordScale, StaticView view, StaticView.InvalidationBuffer buffer, int fillAlpha = 255, int edgeAlpha = 255, bool reverseRenderOrder = false)
 		{
 			foreach (Shape shp in Contents)
 			{
@@ -306,7 +308,7 @@ namespace SAW
 			}
 		}
 
-		public override void DrawHighlight(Canvas gr, float scale, float coordScale)
+		internal override void DrawHighlight(Canvas gr, float scale, float coordScale, Target singleElement)
 		{
 			// draws the highlight of the entire group; the individual shapes are not marked as highlighted
 			// we don't bother using the PrepareHighlight etc functions - since we have no functionality to share between this and standard drawing there is no point
@@ -317,7 +319,7 @@ namespace SAW
 
 			foreach (Shape shp in Contents)
 			{
-				shp.DrawHighlight(gr, scale, coordScale);
+				shp.DrawHighlight(gr, scale, coordScale, singleElement);
 			}
 		}
 
@@ -357,8 +359,7 @@ namespace SAW
 		public void NotifyIndirectChange(Shape shape, ChangeAffects affected)
 		{
 			// just passes along the notification to its container
-			affected = affected & ~(ChangeAffects.Intersections | ChangeAffects.GrabSpots);
-			// because intersections are never created with children of groups
+			affected = affected & ~( ChangeAffects.GrabSpots);
 			if (affected == 0 || Parent == null)
 				return; // Parent can be null - if this is floating to be placed
 			Parent.NotifyIndirectChange(shape, affected);
@@ -367,14 +368,13 @@ namespace SAW
 		public void NotifyIndirectChange(Shape shape, ChangeAffects affected, RectangleF area)
 		{
 			// just passes along the notification to its container
-			affected = affected & ~(ChangeAffects.Intersections | ChangeAffects.GrabSpots);
-			// because intersections are never created with children of groups
+			affected = affected & ~(ChangeAffects.GrabSpots);
 			if (affected == 0 || Parent == null)
 				return;
 			Parent.NotifyIndirectChange(shape, affected, area);
 		}
 
-		public override void NotifyEnvironmentChanged(EnvironmentChanges change)
+		internal override void NotifyEnvironmentChanged(EnvironmentChanges change)
 		{
 			base.NotifyEnvironmentChanged(change);
 			foreach (Shape shape in Contents)
@@ -392,6 +392,7 @@ namespace SAW
 				Debug.Assert(Contents[index].Parent == this);
 			}
 		}
+
 		#endregion
 
 	}

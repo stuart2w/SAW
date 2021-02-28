@@ -4,11 +4,11 @@ using System.Drawing;
 
 namespace SAW
 {
+	/// <summary>Base class for any shape which is drawn by joining up the vertices.  This basically extends the functionality in Lined for
+	/// shapes which are a series of lines (e.g. not circle)</summary>
 	public abstract class Sequential : Filled
 	{
-		// base class for any shape which is drawn by joining up the vertices.  This basically extends the functionality in Lined for
-		// shapes which are a series of lines (e.g. not circle).  We don't want all this functionality in Lined
-		// because then any Filled shape would inherit this (e.g. circle)
+		// We don't want all this functionality in Lined  because then any Filled shape would inherit this (e.g. circle)
 		// the single line does not derive from this because it is not Filled
 		// all subtypes should specify FixedVerticesLength (although the actual number might change dynamically e.g. polygon)
 		// this implements most of the verbs:
@@ -59,7 +59,6 @@ namespace SAW
 
 		public override VerbResult Complete(EditableView.ClickPosition position)
 		{
-			//If Choose(objPosition) = VerbResult.Rejected Then Return VerbResult.Rejected
 			Choose(position);
 			return CompleteRetrospective();
 		}
@@ -152,7 +151,6 @@ namespace SAW
 		protected override void InternalDraw(Canvas gr, DrawResources resources)
 		{
 			base.InternalDrawFromPath(gr, resources);
-			base.DrawCentre(gr, resources); // can't be done by Lined.InternalDrawFromPath - only implemented in Filled
 			if ((Allows & AllowedActions.Arrowheads) > 0)
 				base.DrawArrowheads(resources);
 		}
@@ -162,12 +160,12 @@ namespace SAW
 			m_Path = GetLinearPath(Vertices, Closed());
 		}
 
-		public override List<Target> GenerateTargets(UserSocket floating)
+		internal override List<Target> GenerateTargets(UserSocket floating)
 		{
 			return base.GenerateTargetsDefault(floating, Closed());
 		}
 
-		public override float[] GetRelevantAngles()
+		internal override float[] GetRelevantAngles()
 		{
 			if (Vertices.Count > 8)
 				return null; // too many lines to make it meaningful to snap an angle to any one line
@@ -179,7 +177,7 @@ namespace SAW
 			return angles;
 		}
 
-		public override void DoGrabAngleSnap(GrabMovement move)
+		internal override void DoGrabAngleSnap(GrabMovement move)
 		{
 			if (move.GrabType == GrabTypes.SingleVertex)
 			{
@@ -201,9 +199,7 @@ namespace SAW
 				}
 			}
 			else
-			{
 				base.DoGrabAngleSnap(move);
-			}
 		}
 
 		protected override void SetLength(int length)
@@ -229,21 +225,19 @@ namespace SAW
 			base.NotifyStyleChanged(parameter, oldValue, newValue);
 		}
 
-		public override List<Socket> GetSockets() => base.DefaultGetSockets(Closed());
+		internal override List<Socket> GetSockets() => base.DefaultGetSockets(Closed());
 
 		#endregion
 
 		#region Geometry utilities - calls through to things in Geometry using the points as parameters
-		protected bool VerticesFormLine(int intFirstIndex)
+		protected bool VerticesFormLine(int firstIndex)
 		{
 			// a utility function for base classes - many shapes cannot be drawn if three of the vertices former line (usually the first three)
-			return Geometry.PointApproxOnLine(Vertices[intFirstIndex], Vertices[intFirstIndex + 1], Vertices[intFirstIndex + 2]);
+			return Geometry.PointApproxOnLine(Vertices[firstIndex], Vertices[firstIndex + 1], Vertices[firstIndex + 2]);
 		}
 
-		protected int TurnDirection()
-		{
-			return Geometry.TurnDirection(Vertices[0], Vertices[1], Vertices[2]);
-		}
+		protected int TurnDirection() => Geometry.TurnDirection(Vertices[0], Vertices[1], Vertices[2]);
+
 		#endregion
 
 		public override void CopyFrom(Datum other, CopyDepth depth, Mapping mapID)

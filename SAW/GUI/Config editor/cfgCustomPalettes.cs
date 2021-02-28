@@ -44,7 +44,7 @@ namespace SAW
 			if (!chkShowSystem.Checked || Level == Config.Levels.System)
 				m_DisplayedPalettes.AddRange(m_Config.CustomPalettes.Values.Cast<Document>());
 			else
-				m_DisplayedPalettes.AddRange(m_Applied.CustomPalettes().Values);
+				m_DisplayedPalettes.AddRange(m_Applied.CustomPalettes(false).Values);
 			m_DisplayedPalettes.Sort(new Document.PaletteNameSort());
 			foreach (Document palette in m_DisplayedPalettes)
 			{
@@ -124,11 +124,11 @@ namespace SAW
 			}
 
 			m_Config.CustomPalettes.Add(document);
-			Palette objRegistration = new Palette(document);
+			Palette registration = new Palette(document);
 			if (document.PalettePurpose.IsCustom) // ensure new custom one shown
-				m_Config.Write(Config.ShowPaletteKey(objRegistration), true.ToString());
+				m_Config.Write(Config.ShowPaletteKey(registration), true.ToString());
 			WrittenToCurrent();
-			Palette.Register(objRegistration, null);
+			Palette.Register(registration);
 			Form.CloseAndEditPalette(document);
 		}
 
@@ -168,6 +168,7 @@ namespace SAW
 				m_Config.Write("Show_Palette_" + Config.PaletteKeyFragment(newDocument.PalettePurpose), true.ToString());
 				m_Config.Write(Config.SelectPaletteKey(newDocument.PalettePurpose), newDocument.ID.ToString());
 			}
+			WrittenToCurrent();
 			Form.CloseAndEditPalette(newDocument);
 		}
 
@@ -183,9 +184,13 @@ namespace SAW
 			{
 				palette.PaletteTitle = title;
 				palette.PaletteDescription = description;
-				if (!palette.PalettePurpose.Equals(oldPurpose))
+				if (!purpose.Equals(oldPurpose))
+				{
+					palette.PalettePurpose = purpose;
 					Form.m_PalettePurposeChanged = true;
+				}
 				OnDisplay();
+				WrittenToCurrent();
 			}
 		}
 

@@ -4,14 +4,17 @@ using System;
 
 namespace SAW.Commands
 {
-	abstract public class Param : IArchivable
+	/// <summary>Represents a parameter on a script command, once parsed</summary>
+	public abstract class Param : IArchivable
 	{
 		public enum ParamTypes
 		{
 			Integer,
 			Float,
 			String,
-			Bool
+			Bool,
+			/// <summary>Makes little, if any, difference in expected params</summary>
+			UnquotedString
 		}
 
 		#region Data
@@ -28,6 +31,7 @@ namespace SAW.Commands
 				case 1: return new FloatParam(reader.ReadSingle());
 				case 2: return new StringParam(reader.ReadString());
 				case 3: return new BoolParam(reader.ReadBoolean());
+				case 4: return new StringParam(reader.ReadString(), false);
 				default: throw new InvalidDataException("Unexpected param type");
 			}
 		}
@@ -133,6 +137,7 @@ namespace SAW.Commands
 			return Value;
 		}
 		#endregion
+
 	}
 
 	public class FloatParam : Param
@@ -209,9 +214,21 @@ namespace SAW.Commands
 	public class StringParam : Param
 	{
 		public StringParam() { }
-		public StringParam(string s) { Value = s; }
+		public StringParam(string s, bool quoted = true) { Value = s; m_PreferQuotes = quoted; }
 
 		public string Value;
+
+		#region Quotes
+		private bool m_PreferQuotes;
+
+		/// <summary>True if this was/should be quoted in the text version.  Defaults to true.  Assigning to false may be ignored if the text contains spaces </summary>
+		public bool Quoted
+		{
+			get { return m_PreferQuotes || Value.Contains(" "); }
+			set { m_PreferQuotes = value; }
+		}
+
+		#endregion
 
 		#region Data methods
 		public override void Read(ArchiveReader ar)
@@ -225,32 +242,18 @@ namespace SAW.Commands
 
 		public override void Write(DataWriter writer)
 		{
-			writer.WriteByte(2);
+			writer.WriteByte(Quoted ? 2 : 4);
 			writer.Write(Value);
 		}
 
-		public override Param Clone()
-		{
-			return new StringParam(Value);
-		}
-
-		public override bool Equals(object obj)
-		{
-			return Value == (obj as StringParam)?.Value;
-		}
-
-		public override int GetHashCode()
-		{
-			return Value.GetHashCode();
-		}
+		public override Param Clone() => new StringParam(Value);
+		public override bool Equals(object obj) => Value == (obj as StringParam)?.Value;
+		public override int GetHashCode() => Value.GetHashCode();
 
 		#endregion
 
 		#region Value reading
-		public override string ValueAsString()
-		{
-			return Value;
-		}
+		public override string ValueAsString() => Value;
 
 		public override short ValueAsInt()
 		{
@@ -267,7 +270,9 @@ namespace SAW.Commands
 				return result;
 			return base.ValueAsFloat();
 		}
+
 		#endregion
+
 	}
 
 	public class BoolParam : Param

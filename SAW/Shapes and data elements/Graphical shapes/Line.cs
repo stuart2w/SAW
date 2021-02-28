@@ -35,7 +35,7 @@ namespace SAW
 
 		public override AllowedActions Allows => base.Allows | AllowedActions.Tidy;
 
-		protected override bool Closed() => false;
+		protected internal override bool Closed() => false;
 
 		#endregion
 
@@ -96,16 +96,8 @@ namespace SAW
 		}
 		#endregion
 
-		#region Intersections, sockets
-		public override void CheckIntersectionsWith(Shape shape)
-		{
-			if (IsWide)
-				base.CheckIntersectionsWith(shape); // Will use path
-			else
-				shape.CheckIntersectionsWithLine(this, 0, 0, Vertices[0], Vertices[1], false);
-		}
-
-		public override List<Socket> GetSockets()
+		#region sockets
+		internal override List<Socket> GetSockets()
 		{
 			return base.DefaultGetSockets(false, true);
 			// omits the centre = automatic socket, because there may also be a genuine socket in the centre of the line
@@ -144,7 +136,7 @@ namespace SAW
 			return distance < LineStyle.Width + LINEHITTOLERANCE / scale;
 		}
 
-		public override List<Target> GenerateTargets(UserSocket floating) => base.GenerateTargetsDefault(floating, false);
+		internal override List<Target> GenerateTargets(UserSocket floating) => base.GenerateTargetsDefault(floating, false);
 
 		protected override RectangleF CalculateBounds()
 		{
@@ -155,9 +147,9 @@ namespace SAW
 		}
 
 		public override RectangleF RefreshBounds(bool withShadow = false) => base.RefreshBoundsFromBounds(withShadow); // Can use the simpler version
-		public override float[] GetRelevantAngles() => new[] { Geometry.VectorAngle(Vertices[0], Vertices[1]) };
+		internal override float[] GetRelevantAngles() => new[] { Geometry.VectorAngle(Vertices[0], Vertices[1]) };
 
-		public override void DoGrabAngleSnap(GrabMovement move)
+		internal override void DoGrabAngleSnap(GrabMovement move)
 		{
 			if (move.GrabType == GrabTypes.SingleVertex)
 				move.Current.Snapped = Geometry.AngleSnapPoint(move.Current.Exact, Vertices[1 - move.ShapeIndex]);
@@ -174,14 +166,14 @@ namespace SAW
 
 		// Load/Save/CopyFrom in base class are sufficient
 
-		public override List<GrabSpot> GetGrabSpots(float scale)
+		internal override List<GrabSpot> GetGrabSpots(float scale)
 		{
 			List<GrabSpot> list = new List<GrabSpot>();
 			base.AddGrabSpotsForAllVertices(list);
 			return list;
 		}
 
-		public override List<Prompt> GetPrompts()
+		internal override List<Prompt> GetPrompts()
 		{
 			// if we are being asked, then the first vertex must have been placed
 			List<Prompt> list = new List<Prompt>();
@@ -203,6 +195,12 @@ namespace SAW
 			m_DefinedVertices = 2;
 		}
 
+		public override (GrabSpot[], string[]) GetEditableCoords(Target selectedElement)
+		{
+			return (new[] { new GrabSpot(this, GrabTypes.SingleVertex, Vertices[0],0),
+				new GrabSpot(this, GrabTypes.SingleVertex, Vertices[1],1)}, new[] { "[SAW_Coord_From]", "[SAW_Coord_To]" });
+		}
+
 	}
 
 	/// <summary>a line which can only be drawn at angles of multiples of 45</summary>
@@ -211,7 +209,7 @@ namespace SAW
 
 		public override Shapes ShapeCode => Shapes.Orthogonal;
 
-		public override List<Prompt> GetPrompts()
+		internal override List<Prompt> GetPrompts()
 		{
 			// if we are being asked, then the first vertex must have been placed
 			return new List<Prompt>
@@ -277,7 +275,7 @@ namespace SAW
 
 		protected virtual float GetAngularStep(Page objPage) => Geometry.PI / 4; // 1 eighth of a circle - ie any multiple of 45°
 
-		protected override void DoGrabMove(GrabMovement move)
+		protected internal override void DoGrabMove(GrabMovement move)
 		{
 			switch (move.GrabType)
 			{
@@ -317,7 +315,7 @@ namespace SAW
 
 		public override Shapes ShapeCode => Shapes.Line;
 
-		public override bool DefaultStylesApplied()
+		internal override bool DefaultStylesApplied()
 		{
 			EndArrowhead = new ArrowheadC(true)
 			{

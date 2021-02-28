@@ -54,9 +54,9 @@ namespace Switches.Switching
 		protected Scriptable m_Current;
 		private void View_MouseMove(object sender, MouseEventArgs e)
 		{
-			if (View==null) // can happen if this event was queued from before window closed
+			if (View == null) // can happen if this event was queued from before window closed
 				return;
-			var hit = View.HitTest(e.Location);
+			Scriptable hit = View.HitTest(e.Location);
 			if (hit != m_Current)
 			{
 				m_Current = hit;
@@ -106,12 +106,12 @@ namespace Switches.Switching
 			View.MouseUp -= View_MouseUp;
 		}
 
-		private void View_MouseUp(object sender, System.Windows.Forms.MouseEventArgs e)
+		private void View_MouseUp(object sender, MouseEventArgs e)
 		{
 			OnStateChange(false);
 		}
 
-		private void View_MouseDown(object sender, System.Windows.Forms.MouseEventArgs e)
+		private void View_MouseDown(object sender, MouseEventArgs e)
 		{
 			if (m_Current != null)
 				OnStateChange(true);
@@ -134,6 +134,7 @@ namespace Switches.Switching
 		}
 
 		public override int Param => (int)Engine.Methods.DwellPointer;
+
 	}
 
 	/// <summary>Switch for dwell averaging.  Requires an outgoing logical switch with no delay - dwell time is done internally
@@ -147,17 +148,16 @@ namespace Switches.Switching
 
 		public PointerDwellAverageSwitch()
 		{
-			PhysicalSwitch.MasterSwitchChanged += PhysicalSwitch_MasterSwitchChanged;
+			MasterSwitchChanged += PhysicalSwitch_MasterSwitchChanged;
 			PointerSwitch.View.MouseLeave += View_MouseLeave;
 			PointerSwitch.View.MouseMove += View_MouseMove;
-			m_Timer = new Timer();
-			m_Timer.Interval = 1;
+			m_Timer = new Timer { Interval = 1 };
 			m_Timer.Tick += m_Timer_Tick;
 		}
 
 		public override void Destroy()
 		{
-			PhysicalSwitch.MasterSwitchChanged -= PhysicalSwitch_MasterSwitchChanged;
+			MasterSwitchChanged -= PhysicalSwitch_MasterSwitchChanged;
 			PointerSwitch.View.MouseLeave -= View_MouseLeave;
 			PointerSwitch.View.MouseMove -= View_MouseMove;
 			m_Timer.Tick -= m_Timer_Tick;
@@ -179,7 +179,7 @@ namespace Switches.Switching
 
 		private Scriptable m_Selected;
 
-		private void View_MouseMove(object sender, System.Windows.Forms.MouseEventArgs e)
+		private void View_MouseMove(object sender, MouseEventArgs e)
 		{
 			m_MouseOver = PointerSwitch.View.HitTest(e.Location);
 			if (m_Clicked != null && m_Clicked != m_MouseOver)
@@ -251,7 +251,7 @@ namespace Switches.Switching
 
 		private void PhysicalSwitch_MasterSwitchChanged()
 		{
-			m_Timer.Enabled = (PhysicalSwitch.MasterSwitch == MasterModes.On);
+			m_Timer.Enabled = (MasterSwitch == MasterModes.On);
 		}
 
 		#endregion

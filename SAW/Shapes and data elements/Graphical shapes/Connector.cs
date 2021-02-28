@@ -18,7 +18,7 @@ namespace SAW
 		public override Shapes ShapeCode => Shapes.Connector;
 		public override SnapModes SnapNext(SnapModes requested) => SnapModes.Socket;
 		public override AllowedActions Allows => AllowedActions.Arrowheads ;
-		protected override bool Closed() => false;
+		protected internal override bool Closed() => false;
 		public override GeneralFlags Flags => base.Flags | GeneralFlags.NumberLinksFixed;
 
 		private bool EndsEqual
@@ -74,7 +74,7 @@ namespace SAW
 		}
 
 
-		public override List<Prompt> GetPrompts()
+		internal override List<Prompt> GetPrompts()
 		{
 			// if we are being asked, then the first vertex must have been placed
 			return new List<Prompt>
@@ -535,7 +535,7 @@ namespace SAW
 		protected override RectangleF CalculateBounds() => base.BoundsOfVertices();
 		public override RectangleF RefreshBounds(bool withShadow = false) => new Rectangle(0, -1000, 1000, 1000);
 
-		public override List<GrabSpot> GetGrabSpots(float scale)
+		internal override List<GrabSpot> GetGrabSpots(float scale)
 		{
 			return new List<GrabSpot> {
 				new GrabSpot(this, GrabTypes.SingleVertex, Vertices[0], 0),
@@ -543,7 +543,7 @@ namespace SAW
 			};
 		}
 
-		protected override void DoGrabMove(GrabMovement move)
+		protected  internal override void DoGrabMove(GrabMovement move)
 		{
 			// Cannot use the base version, because it will try and move vertices (1) rather than the last vertex
 			if (move.GrabType != GrabTypes.SingleVertex)
@@ -571,12 +571,12 @@ namespace SAW
 			PositionLine();
 		}
 
-		public override void DoGrabAngleSnap(GrabMovement move)
+		internal override void DoGrabAngleSnap(GrabMovement move)
 		{
 			// can be ignored
 		}
 
-		public override bool StartGrabMove(GrabMovement grab)
+		internal override bool StartGrabMove(GrabMovement grab)
 		{
 			base.StartGrabMove(grab);
 			grab.SnapMode = SnapModes.Socket;
@@ -588,7 +588,7 @@ namespace SAW
 			m_Path = GetLinearPath(Vertices, false);
 		}
 
-		public override List<Target> GenerateTargets(UserSocket floating)
+		internal override List<Target> GenerateTargets(UserSocket floating)
 		{
 			return base.GenerateTargetsDefault(floating, false);
 		}

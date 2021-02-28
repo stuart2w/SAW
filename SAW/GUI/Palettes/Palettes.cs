@@ -124,6 +124,10 @@ namespace SAW
 		public Accordion Accordion;
 		public frmPalette Form;
 
+		/// <summary>The tooltip to use if not overridden by a specific container.  Applied to palette via IPalette.SetToolTips during Register using this.  Palette form may call that again with its own.
+		/// Main editor form sets this once on construction</summary>
+		public static ToolTip DefaultTooltip;
+
 		public Bitmap Preview;
 		// can be used when moving to display the palette even if the actual control is elsewhere
 		/// <summary>the name of the shortcut key; whether it is displayed still depends on the settings this is updated in frmMain.ApplyConfigurationVisibility</summary>
@@ -138,6 +142,7 @@ namespace SAW
 		/// <summary>this now has priority (user palettes can possibly have both this and parameter set later) </summary>
 		private readonly string m_CustomID = "";
 
+		/// <summary>is the CustomID if defined, and if not it is based on the parameter</summary>
 		public string ID
 		{
 			get
@@ -214,7 +219,7 @@ namespace SAW
 		#region Shared list
 		/// <summary>all of the created palettes.  Items are added by their constructors</summary>
 		public static Dictionary<string, Palette> List = new Dictionary<string, Palette>();
-		public static void Register(Palette palette, ToolTip ttMain)
+		public static void Register(Palette palette)
 		{
 			if (List.ContainsKey(palette.ID))
 			{
@@ -226,9 +231,10 @@ namespace SAW
 				palette.Position.Dock = DockStyle.Right;
 			if (palette.Position.DockIndex == 0)
 				palette.Position.DockIndex = palette.PalettePurpose.DefaultDockIndex();
-			Strings.Translate(palette.Control, ttMain);
-			if (ttMain != null)
-				((IPalette)palette.Control).SetToolTips(ttMain);
+			Debug.Assert(DefaultTooltip != null);
+			Strings.Translate(palette.Control, DefaultTooltip);
+			if (DefaultTooltip != null)
+				((IPalette)palette.Control).SetToolTips(DefaultTooltip);
 		}
 
 		public static void Deregister(string ID)
@@ -247,7 +253,12 @@ namespace SAW
 
 		public static Palette Item(Parameters parameter)
 		{
-			Palette palette = List["Parameter_" + (int)parameter];
+			string key = "Parameter_" + (int) parameter;
+			Palette palette;
+			if (List.ContainsKey(key))
+				palette = List[key];
+			else
+				palette = List[Globals.Root.CurrentConfig.PaletteSelection(new Purpose(parameter), false)];
 			if (palette != null && !palette.IsValid)
 				palette = null;
 			return palette;
@@ -277,24 +288,25 @@ namespace SAW
 			}
 			return null;
 		}
+
 		#endregion
 
-		public static void UpdateCustomPalettes(AppliedConfig applied, ToolTip ttMain)
+		public static void UpdateCustomPalettes(AppliedConfig applied)
 		{
 			// should be called (by frmMain) when the configuration changes.  Adds any new custom palettes to the list.
 			// Any custom palettes listed here which are no longer valid are not deleted, rather just marked Valid = false.  The chances are they will come back in scope again
 			// if we are moving between user and teacher mode or changing between documents in a multi-document view.  Deleting the palette completely would delete its position information
 			// causing it to reappear somewhere else.  So these records are kept.  This is analogous to what happens with the system palettes - the Palette object isn't wiped!
-			Dictionary<string, Document> customPalettes = applied.CustomPalettes();
+			Dictionary<string, Document> customPalettes = applied.CustomPalettes(true);
 			// First check any palettes already in our list, to see if they are still valid
 			foreach (Palette palette in List.Values.Where(x => x.UserDefined))
 			{
 				palette.IsValid = customPalettes.ContainsKey(palette.ID);
 			}
-			foreach (string custom in applied.CustomPalettes().Keys)
+			foreach (string custom in customPalettes.Keys)
 			{
 				if (!List.ContainsKey(custom))
-					Register(new Palette(customPalettes[custom]), ttMain);
+					Register(new Palette(customPalettes[custom]));
 			}
 		}
 
@@ -323,7 +335,10 @@ namespace SAW
 				Number=1009, // Numbers tools, as opposed to the number pad (was Number in IParameterGUI in version 1)
 
 				Sockets=2002,
-				DocumentOutline
+				DocumentOutline,
+				Rotation,
+				CoordEdit,
+				Scale
 			}
 
 			#region Constructors and conversion to/from Purpose/Special enums
@@ -417,14 +432,11 @@ namespace SAW
 				{
 					switch (Special)
 					{
-						case Specials.Custom:
-							return Strings.Item("Palette_Custom");
-						case Specials.Transform:
-							return Strings.Item("Advanced_Transform");
-						case Specials.Alignment:
-							return Strings.Item("Advanced_Alignment");
-						case Specials.Number:
-							return Strings.Item("Palette_Numbers");
+						case Specials.Custom:return Strings.Item("Palette_Custom");
+						case Specials.Transform:return Strings.Item("Advanced_Transform");
+						case Specials.Alignment:return Strings.Item("Advanced_Alignment");
+						case Specials.Number:return Strings.Item("Palette_Numbers");
+						case Specials.Scale: return Strings.Item("Palette_ShowScale"); // because Palette_Scale was already used for something else
 						default:
 							if ((Parameters)Special == Parameters.LinePattern)
 								return Strings.Item("Palette_LineStyle"); // the GetParameterTypeName returns "Dot/Dash" pattern which is a bit daft

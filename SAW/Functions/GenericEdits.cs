@@ -279,10 +279,6 @@ namespace SAW.Functions
 					}
 				}
 				List<Shape> newShapes = newList.Values.OfType<Shape>().ToList();
-				foreach (Shape shape in newShapes)
-				{
-					CurrentPage.UpdateIntersectionsWith(shape, true);
-				}
 				if (newShapes.Count > 0 && container == CurrentPage) // don't select the shapes when pasting into a container - leaves the container selected, which allows for more pastes
 					CurrentPage.SelectOnly(newShapes);
 				pnlView.InvalidateData(CurrentPage.SelectedRefreshBoundary(), StaticView.InvalidationBuffer.All);
@@ -410,13 +406,6 @@ namespace SAW.Functions
 
 			if (IsCut)
 				CurrentPage.DeleteSelected(transaction);
-
-			// This works to put the image on the clipboard as a metafile, but it ONLY appears as a metafile and the above ones are lost.  drat.
-			// for putting metafiles on clipboard: http://support.microsoft.com/kb/323530
-			//Dim objImage As Image = pnlView.CreateImage(True, False)
-			//ClipboardMetafileHelper.PutEnhMetafileOnClipboard(Me.Handle, objImage)
-			//objImage.Dispose()
-			// saving as a file first, reloading and adding a byte array or memorystream didn't work either
 		}
 
 		public override bool IsApplicable(EditableView pnlView)

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Diagnostics;
@@ -14,7 +15,7 @@ namespace SAW
 		public override Shapes ShapeCode => Shapes.Parallelogram;
 		protected override int FixedVerticesLength() => 4;
 		public override PointF Centre => base.CalculateCentreFromPoints();
-		public override List<Prompt> GetPrompts() => base.GetBaseLinePrompts("Parallelogram", false);
+		internal override List<Prompt> GetPrompts() => base.GetBaseLinePrompts("Parallelogram", false);
 
 		#endregion
 
@@ -37,7 +38,7 @@ namespace SAW
 			return VerbResult.Continuing;
 		}
 
-		public override List<GrabSpot> GetGrabSpots(float scale)
+		internal override List<GrabSpot> GetGrabSpots(float scale)
 		{
 			List<GrabSpot> list = new List<GrabSpot>();
 			base.AddStandardRotationGrabSpot(list);
@@ -45,7 +46,7 @@ namespace SAW
 			return list;
 		}
 
-		protected override void DoGrabMove(GrabMovement move)
+		protected  internal override void DoGrabMove(GrabMovement move)
 		{
 			// although any point can be moved, we cannot use the base class which assumes they are completely independent
 			if (move.GrabType == GrabTypes.SingleVertex)
@@ -110,7 +111,7 @@ namespace SAW
 		#region Information
 		public override Shapes ShapeCode => Shapes.Rectangle;
 
-		public override List<Prompt> GetPrompts() => base.GetBaseLinePrompts("Rectangle", false);
+		internal override List<Prompt> GetPrompts() => base.GetBaseLinePrompts("Rectangle", false);
 
 		public override SnapModes SnapNext(SnapModes requested)
 		{
@@ -151,7 +152,7 @@ namespace SAW
 
 		#region Coordinates
 
-		public override List<GrabSpot> GetGrabSpots(float scale)
+		internal override List<GrabSpot> GetGrabSpots(float scale)
 		{
 			List<GrabSpot> list = new List<GrabSpot>();
 			base.AddStandardRotationGrabSpot(list);
@@ -165,7 +166,7 @@ namespace SAW
 			return list;
 		}
 
-		protected override void DoGrabMove(GrabMovement move)
+		protected  internal override void DoGrabMove(GrabMovement move)
 		{
 			switch (move.GrabType)
 			{
@@ -296,7 +297,7 @@ namespace SAW
 
 		public override VerbResult Cancel(EditableView.ClickPosition position) => VerbResult.Destroyed;
 
-		public override List<Prompt> GetPrompts()
+		internal override List<Prompt> GetPrompts()
 		{
 			return new List<Prompt>
 			{
@@ -325,7 +326,7 @@ namespace SAW
 		#region Information
 		public override Shapes ShapeCode => Shapes.Square;
 		public override AllowedActions Allows => base.Allows & ~AllowedActions.TransformLinearStretch;
-		public override List<Prompt> GetPrompts() => base.GetBaseLinePrompts("Square", true);
+		internal override List<Prompt> GetPrompts() => base.GetBaseLinePrompts("Square", true);
 
 		public override string StatusInformation(bool ongoing)
 		{
@@ -385,7 +386,7 @@ namespace SAW
 			m_Bounds = CalculateBounds();
 		}
 
-		public override List<GrabSpot> GetGrabSpots(float scale)
+		internal override List<GrabSpot> GetGrabSpots(float scale)
 		{
 			List<GrabSpot> list = new List<GrabSpot>();
 			base.AddStandardRotationGrabSpot(list);
@@ -393,7 +394,7 @@ namespace SAW
 			return list;
 		}
 
-		protected override void DoGrabMove(GrabMovement move)
+		protected  internal override void DoGrabMove(GrabMovement move)
 		{
 			if (move.GrabType == GrabTypes.SingleVertex || move.GrabType == GrabTypes.Radius) // not sure how I want to display them graphically yet, but the functionality will be the same
 			{
@@ -416,7 +417,7 @@ namespace SAW
 				base.DoGrabMove(move);
 		}
 
-		public override void DoGrabAngleSnap(GrabMovement move)
+		internal override void DoGrabAngleSnap(GrabMovement move)
 		{
 			if (move.GrabType == GrabTypes.SingleVertex)
 				move.Current.Snapped = Geometry.AngleSnapPoint(move.Current.Exact, Vertices[0]);
@@ -436,4 +437,120 @@ namespace SAW
 
 		// Load/Save/CopyFrom in base class are sufficient
 	}
+
+		public class Rhombus : Sequential
+	{
+
+		#region Info
+		public override Shapes ShapeCode => Shapes.Rhombus;
+		protected override int FixedVerticesLength() => 4;
+		public override PointF Centre => base.CalculateCentreFromPoints();
+		internal override List<Prompt> GetPrompts() => base.GetBaseLinePrompts("Rhombus", false);
+		#endregion
+
+		#region Verbs
+
+		// let the base class take care of positioning the first line
+		// however after choosing the end of that line becomes point 2 and point 1 is then moved (and point 3 is automatic)
+
+		public override VerbResult Choose(EditableView.ClickPosition position)
+		{
+			PointF pt = position.Snapped;
+			if (pt.ApproxEqual(LastDefined))
+				return VerbResult.Rejected;
+			DiscardPath();
+
+			switch (m_DefinedVertices)
+			{
+				case 1:
+					SetLength(4);
+					Vertices[2] = pt;
+					Vertices[1] = Geometry.MidPoint(Vertices[0], Vertices[2]);
+					m_DefinedVertices = 2;
+					Float(position);
+					return VerbResult.Continuing;
+				case 2:
+					Float(position);
+					if (Geometry.PointApproxOnLine(Vertices[0], Vertices[2], Vertices[1]))
+						return VerbResult.Rejected;
+					return VerbResult.Completed;
+				default: throw new InvalidOperationException();
+			}
+		}
+
+		public override VerbResult Float(EditableView.ClickPosition position)
+		{
+			if (m_DefinedVertices < 2)
+				return base.Float(position);
+			// actually floating point 1 in this case and 0 and 2 are fixed
+			PointF pt = position.Snapped;
+			if (pt.Equals(Vertices[1]))
+				return VerbResult.Unchanged;
+
+			// find point on base line closest to floating point.
+			PointF closest = Geometry.ClosestPointOnLine(Vertices[0], Vertices[2], pt);
+			// vector from that to float gives us the vector for the second axis (effectively it's ony the length that matters)
+			PointF centre = Geometry.MidPoint(Vertices[0], Vertices[2]);
+			SizeF halfSecondAxis = closest.VectorTo(pt);
+			Vertices[1] = centre + halfSecondAxis;
+			Vertices[3] = centre - halfSecondAxis;
+			m_Acceptable = !Geometry.PointApproxOnLine(Vertices[0], Vertices[2], Vertices[1]);
+
+			m_Bounds = CalculateBounds();
+			DiscardPath();
+			return VerbResult.Continuing;
+		}
+
+		#endregion
+
+		#region Coords
+
+		internal override List<GrabSpot> GetGrabSpots(float scale)
+		{
+			List<GrabSpot> list = new List<GrabSpot>();
+			base.AddStandardRotationGrabSpot(list);
+			base.AddGrabSpotsForAllVertices(list);
+			return list;
+		}
+
+		protected  internal override void DoGrabMove(GrabMovement move)
+		{
+			// although any point can be moved, we cannot use the base class which assumes they are completely independent
+			if (move.GrabType == GrabTypes.SingleVertex)
+			{
+				PointF centre = Geometry.MidPoint(Vertices[0], Vertices[2]);
+				if (move.Current.Snapped.ApproxEqual(centre))
+					return;
+				int index = move.ShapeIndex;
+				// calculation is done on the vector from centre point to the moving point.  The direction of this is maintained (so this cannot rotate the rhombus)
+				// (technically, it would be possible to do a rotation and update all 4 points, but it's probably a bit odd from a UI perspective)
+				SizeF existingVector = centre.VectorTo(Vertices[index]);
+				SizeF requested = centre.VectorTo(move.Current.Snapped);
+				SizeF resultVector = Geometry.ProjectionVector(requested, existingVector);
+
+				int opposite = (index + 2) % 4;
+				// check it is not degenerate:
+				Vertices[index] = centre + resultVector;
+				Vertices[opposite] = centre - resultVector;
+				m_Bounds = CalculateBounds();
+				DiscardPath();
+			}
+			else
+				base.DoGrabMove(move);
+		}
+
+		protected override RectangleF CalculateBounds() => BoundsOfVertices();
+
+		#endregion
+
+		protected override void PrepareDraw(DrawResources resources)
+		{
+			base.PrepareDraw(resources);
+			// when drawing base line draw it dashed as it's not actually one of the final lines
+			if (resources.MainPen != null && m_DefinedVertices == 1)
+				resources.MainPen.DashStyle = System.Drawing.Drawing2D.DashStyle.Dash;
+		}
+
+	}
+
 }

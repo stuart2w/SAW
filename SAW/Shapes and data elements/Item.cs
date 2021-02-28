@@ -11,6 +11,8 @@ using SAW.Commands;
 
 namespace SAW
 {
+	/// <summary>The standard SAW button.  This implements the graphical parts.  It is usually contained in a scriptable which does the active bits - and can contain other shapes instead of this.
+	/// An Item may contain other scriptables</summary>
 	public class Item : Container
 	{
 
@@ -69,29 +71,23 @@ namespace SAW
 		#endregion
 
 		#region Properties
-		public ButtonShape.States State;
 
 		// content...
 		public SharedReference<SharedImage> Image;
 
-		public SharedReference<SharedResource> Sound;
 		/// <summary>Only defined if loaded from an old SAW file.  Will be leaf filename</summary>
 		public string ImageName;
 
-		public string OutputText;
 		public uint LineSpace;
-		public bool OutputAsDisplay;
-		public string SpeechText;
-		public bool SpeechAsDisplay;
-		public string PromptText;
 
 		// logic...
 		public ItemTypes ItemType = ItemTypes.IT_Item;
 
 		// other appearance... (some in styling section)
-		public FillStyleC HighlightFillStyle;
-		public LineStyleC HighlightLineStyle;
-		public TextStyleC HighlightTextStyle;
+		//public FillStyleC HighlightFillStyle;
+		//public LineStyleC HighlightLineStyle;
+		//public TextStyleC HighlightTextStyle;
+
 		/// <summary>SAW 7.02.x - image only renders when highlighted </summary>
 		public bool GraphicOnlyOnHighlight;
 
@@ -191,26 +187,16 @@ namespace SAW
 
 		#region Verb etc overrides (mostly few)
 
-		public override bool DefaultStylesApplied()
+		internal override bool DefaultStylesApplied()
 		{
 			base.DefaultStylesApplied();
-			//if (Globals.Root.CurrentConfig.Compatibility == Config.CompatibilityModes.SAW6)
-			//{
-				FillStyle.Colour = Color.LightGoldenrodYellow;
-				FillStyle.Pattern = FillStyleC.Patterns.Solid;
-				TextStyle.Colour = Color.Black;
-				TextStyle.Size = 10;
-				LineStyle.Colour = Color.Black;
-				LineStyle.Width = 1;
-				LineStyle.Pattern = DashStyle.Solid;
-			//}
-			HighlightFillStyle.CopyFrom(FillStyle);
-			HighlightTextStyle.CopyFrom(TextStyle);
-			HighlightLineStyle.CopyFrom(LineStyle);
-			HighlightLineStyle.Colour = Color.Red;
-			HighlightLineStyle.Width = 3;
-			if (HighlightLineStyle.Colour.Equals(LineStyle.Colour))
-				HighlightTextStyle.Colour = Color.Red;
+			FillStyle.Colour = Color.LightGoldenrodYellow;
+			FillStyle.Pattern = FillStyleC.Patterns.Solid;
+			TextStyle.Colour = Color.Black;
+			TextStyle.Size = 10;
+			LineStyle.Colour = Color.Black;
+			LineStyle.Width = 1;
+			LineStyle.Pattern = DashStyle.Solid;
 			return true;
 		}
 
@@ -221,15 +207,24 @@ namespace SAW
 
 		public Item()
 		{
-			HighlightFillStyle = new FillStyleC();
-			HighlightLineStyle = new LineStyleC();
-			HighlightTextStyle = new TextStyleC();
 			TextStyle.SetDefaults();
 			LineStyle.SetDefaults();
 			FillStyle.SetDefaults();
-			HighlightFillStyle.SetDefaults();
-			HighlightLineStyle.SetDefaults();
-			HighlightTextStyle.SetDefaults();
+		}
+
+		/// <summary>Only defined when loading as SAW7 file - this is the highlight style data that was stored in the Item in SAW7 but has now moved to the Scriptable.
+		/// Scriptable will use this and clear it after calling Load</summary>
+		internal V7Fields LoadedV7Data;
+
+		internal class V7Fields
+		{
+			public Scriptable.HighlightStyleC HighlightStyle;
+			public string OutputText;
+			public bool OutputAsDisplay;
+			public string SpeechText;
+			public bool SpeechAsDisplay;
+			public SharedReference<SharedResource> Sound;
+			public string PromptText;
 		}
 
 		public override void Load(DataReader reader)
@@ -237,25 +232,35 @@ namespace SAW
 			base.Load(reader);
 			Image = SharedReference<SharedImage>.FromGUID(reader.ReadGuid());
 			ImageName = reader.ReadBufferedString();
-			Sound = SharedReference<SharedResource>.FromGUID(reader.ReadGuid());
-			// State is not stored
-			//if (Sound != null)
-			//	Debug.WriteLine("Read sound: " + Sound.ID + " = " + (LabelText ?? ""));
-			OutputText = reader.ReadBufferedString();
-			OutputAsDisplay = reader.ReadBoolean();
-			SpeechText = reader.ReadString();
-			SpeechAsDisplay = reader.ReadBoolean();
-			PromptText = reader.ReadString();
+			if (reader.Version < 129)
+				LoadedV7Data = new V7Fields()
+				{
+					Sound = SharedReference<SharedResource>.FromGUID(reader.ReadGuid()),
+					OutputText = reader.ReadBufferedString(),
+					OutputAsDisplay = reader.ReadBoolean(),
+					SpeechText = reader.ReadString(),
+					SpeechAsDisplay = reader.ReadBoolean(),
+					PromptText = reader.ReadString()
+				};
 			WordlistDoesntFill = reader.ReadBoolean();
 			ItemType = (ItemTypes)reader.ReadInt32();
-			HighlightFillStyle = FillStyleC.Read(reader);
-			HighlightLineStyle = LineStyleC.Read(reader);
-			HighlightTextStyle = TextStyleC.Read(reader);
+			if (reader.Version < 129)
+			{
+				FillStyleC HighlightFillStyle = FillStyleC.Read(reader);
+				LineStyleC HighlightLineStyle = LineStyleC.Read(reader);
+				TextStyleC HighlightTextStyle = TextStyleC.Read(reader);
+				LoadedV7Data.HighlightStyle = new Scriptable.HighlightStyleC
+				{
+					FillColour = HighlightFillStyle.Colour,
+					TextColour = HighlightTextStyle.Colour,
+					LineColour = HighlightLineStyle.Colour,
+					LineWidth = HighlightLineStyle.Width
+				};
+			}
 			StyleType = (ItemDisplayTypes)reader.ReadInt32();
 			m_idStyle = reader.ReadGuid();
 			TextRatio = reader.ReadSingle();
 			Arrangement = (ButtonShape.Layouts)reader.ReadInt32();
-			//TextAlign = (Alignment)reader.ReadInt32();
 			GraphicAlign = (Alignment)reader.ReadInt32();
 			TextShown = reader.ReadBoolean();
 			GraphicShown = reader.ReadBoolean();
@@ -270,19 +275,24 @@ namespace SAW
 			base.Save(writer);
 			writer.Write(Image?.ID ?? Guid.Empty);
 			writer.WriteBufferedString(ImageName);
-			writer.Write(Sound?.ID ?? Guid.Empty);
-			//if (Sound != null)
-			//	Debug.WriteLine("Write sound: " + Sound.ID + " = " + (LabelText ?? ""));
-			writer.WriteBufferedString(OutputText);
-			writer.Write(OutputAsDisplay);
-			writer.Write(SpeechText ?? "");
-			writer.Write(SpeechAsDisplay);
-			writer.Write(PromptText ?? "");
+			if (writer.Version < 129)
+			{
+				Scriptable s = (Scriptable)Parent;
+				writer.Write(s.Sound?.ID ?? Guid.Empty);
+				writer.WriteBufferedString(s.OutputText);
+				writer.Write(s.OutputAsDisplay);
+				writer.Write(s.SpeechText ?? "");
+				writer.Write(s.SpeechAsDisplay);
+				writer.Write(s.PromptText ?? "");
+			}
 			writer.Write(WordlistDoesntFill);
 			writer.Write((int)ItemType);
-			HighlightFillStyle.Write(writer);
-			HighlightLineStyle.Write(writer);
-			HighlightTextStyle.Write(writer);
+			if (writer.Version < 129)
+			{ // shouldn't be used, but filled in just in case.  Fill in default values as we don't have the true values here
+				(new FillStyleC() { Colour = Color.White }).Write(writer);
+				(new LineStyleC() { Colour = Color.Red, Width = 2 }).Write(writer);
+				(new TextStyleC() { Colour = Color.Red }).Write(writer);
+			}
 			writer.Write((int)StyleType);
 			writer.Write(m_idStyle);
 			writer.Write(TextRatio);
@@ -320,24 +330,8 @@ namespace SAW
 				Image = item.Image?.Clone();
 				ImageName = item.ImageName;
 			}
-			if (!noOverwriteExisting || Sound == null)
-				Sound = item.Sound?.Clone();
-			if (!noOverwriteExisting || string.IsNullOrEmpty(OutputText))
-				OutputText = item.OutputText;
-			OutputAsDisplay = item.OutputAsDisplay;
-			if (!noOverwriteExisting || string.IsNullOrEmpty(SpeechText))
-				SpeechText = item.SpeechText;
-			SpeechAsDisplay = item.SpeechAsDisplay;
-			if (!noOverwriteExisting || string.IsNullOrEmpty(PromptText))
-				PromptText = item.PromptText;
 			WordlistDoesntFill = item.WordlistDoesntFill;
 			ItemType = item.ItemType;
-			if (HighlightFillStyle == null) HighlightFillStyle = new FillStyleC();
-			if (HighlightLineStyle == null) HighlightLineStyle = new LineStyleC();
-			if (HighlightTextStyle == null) HighlightTextStyle = new TextStyleC();
-			HighlightFillStyle.CopyFrom(item.HighlightFillStyle);
-			HighlightLineStyle.CopyFrom(item.HighlightLineStyle);
-			HighlightTextStyle.CopyFrom(item.HighlightTextStyle);
 			StyleType = item.StyleType;
 			m_idStyle = item.m_idStyle;
 			m_Style = item.m_Style; // it is OK to share the object; it will be transacted separately
@@ -357,7 +351,6 @@ namespace SAW
 		{
 			base.UpdateReferencesObjectsCreated(document, reader);
 			Image?.DereferenceOnLoad(document);
-			Sound?.DereferenceOnLoad(document);
 			if (m_Style == null)
 			{
 				m_Style = ButtonStyle.UserDefaultByID(m_idStyle); // Will still be nothing unless the ID was one of the defaults
@@ -393,7 +386,6 @@ namespace SAW
 				m_Style.UpdateReferencesIDsChanged(mapID, document);
 			}
 			Image?.UpdateIDsReferencesChanged();
-			Sound?.UpdateIDsReferencesChanged();
 		}
 
 		public override void AddRequiredReferences(Action<Datum> fnAdd, Mapping mapID)
@@ -405,7 +397,6 @@ namespace SAW
 				mapID.AddUnchangedObject(m_Style);
 			}
 			fnAdd.Invoke(Image?.Content);
-			fnAdd.Invoke(Sound?.Content);
 		}
 
 		// The image and style are not contained, it is only a shared reference - unless style is not shared
@@ -432,20 +423,26 @@ namespace SAW
 			base.WriteExportText(output);
 			// this is not like the item number header since the Scriptable will already have done that
 			output.Append("Display = \"").AppendEncoded(LabelText ?? "").AppendLine("\"");
-			if (!string.IsNullOrEmpty(OutputText))
-				output.Append("Output = \"").AppendEncoded(OutputText).AppendLine("\"");
-			if (!string.IsNullOrEmpty(PromptText))
-				output.Append("Help text = \"").AppendEncoded(PromptText).AppendLine("\"");
+			Scriptable s = Parent as Scriptable;
+			if (!string.IsNullOrEmpty(s?.OutputText))
+				output.Append("Output = \"").AppendEncoded(s.OutputText).AppendLine("\"");
+			if (!string.IsNullOrEmpty(s?.PromptText))
+				output.Append("Help text = \"").AppendEncoded(s.PromptText).AppendLine("\"");
 			if (Image != null)
+			{
+				if (!string.IsNullOrEmpty(ImageName))
+					output.Append("Image = ").AppendLine(ImageName);
 				output.AppendLine("Has image");
-			if (Sound != null)
+			}
+			//string file = Image.
+			if (s?.Sound != null)
 				output.AppendLine("Has recorded sound");
 			output.Append("Font size = ").AppendLine(TextStyle.Size);
 			output.Append("Item type = ").AppendLine(ItemType.ToString());
 			output.Append("Item display type = ").AppendLine(StyleType.ToString());
-			if (OutputAsDisplay)
+			if (s?.OutputAsDisplay ?? false)
 				output.AppendLine("Output as display");
-			if (SpeechAsDisplay)
+			if (s?.SpeechAsDisplay ?? false)
 				output.AppendLine("Speech as display");
 		}
 
@@ -473,26 +470,20 @@ namespace SAW
 
 		#region Editor Interaction
 
-		private bool m_BeingEdited;
-		public override string DoubleClickText()
-		{
-			return Strings.Item("SAW_Edit_Item");
-		}
+		/// <summary>True while being edited in dialog.  Blocks display of Highlight draw (so that the user style highlight is better represented) </summary>
+		internal bool BeingEdited;
 
-		public override void DoDoubleClick(EditableView view, EditableView.ClickPosition.Sources source)
+		internal override string DoubleClickText() => Strings.Item("SAW_Edit_Item");
+
+		internal override void DoDoubleClick(EditableView view, EditableView.ClickPosition.Sources source)
 		{
-			m_BeingEdited = true; // blocks highlight
-			try
-			{
-				// Scriptable can also be passed to editor, but can be null if not present
-				LastDoubleClickResult = frmSAWItem.Display(view) == DialogResult.OK;
-				if (LastDoubleClickResult)
-					Status = StatusValues.Moved;
-				else
-					Parent.NotifyIndirectChange(this, ChangeAffects.RepaintNeeded);
-			}
-			finally
-			{ m_BeingEdited = false; }
+			// Scriptable can also be passed to editor, but can be null if not present
+			// note that scriptable does its own version of this
+			LastDoubleClickResult = frmSAWItem.Display(view) == DialogResult.OK;
+			if (LastDoubleClickResult)
+				Status = StatusValues.Moved;
+			else
+				Parent.NotifyIndirectChange(this, ChangeAffects.RepaintNeeded);
 		}
 
 		/// <summary>Called by editor dialog to force this to discard some cache items and repaint</summary>
@@ -501,7 +492,7 @@ namespace SAW
 			DiscardPath();
 			ClearTextCache();
 			FormatText();
-			Parent.NotifyIndirectChange(this, ChangeAffects.RepaintNeeded);
+			Parent?.NotifyIndirectChange(this, ChangeAffects.RepaintNeeded); // note ? is needed for property editor which can make a dummy Item with no parent
 		}
 
 		#endregion
@@ -532,6 +523,20 @@ namespace SAW
 			base.CheckTextVerticalPositions(bolVerticalAlignChanged, LineSpace / 2f);
 		}
 
+		public override (GrabSpot[], string[]) GetEditableCoords(Target selectedElement)
+		{
+			float midX = Bounds.X + Bounds.Width / 2;
+			float midY = Bounds.Y + Bounds.Height / 2;
+			return (new[]
+				{
+					new GrabSpot(this, GrabTypes.EdgeMoveH, new PointF(Bounds.X, midY), 7) ,//{ Focus = new PointF(Bounds.Right, midY) }
+					new GrabSpot(this, GrabTypes.EdgeMoveV, new PointF(midX, Bounds.Y), 1),// { Focus = new PointF(midX, Bounds.Bottom) }
+					new GrabSpot(this, GrabTypes.EdgeMoveH, new PointF(Bounds.Right, midY), 3) { Focus = new PointF(Bounds.Left, midY) },
+					new GrabSpot(this, GrabTypes.EdgeMoveV, new PointF(midX, Bounds.Bottom), 1) { Focus = new PointF(midX, Bounds.Y) }
+				},
+				new[] { "X", "Y", "Width", "Height" });
+		}
+
 		#endregion
 
 		#region Graphics
@@ -543,7 +548,7 @@ namespace SAW
 			{
 				if (resources.EdgeAlpha == 0)
 					return; // can crash trying to draw text with A=0, so this is essential
-				Color c = State == ButtonShape.States.Highlight ? HighlightTextStyle.Colour : TextStyle.Colour;
+				Color c = TextStyle.Colour; // State == ButtonShape.States.Highlight ? HighlightTextStyle.Colour : TextStyle.Colour;
 				if (c.A == 0)
 					c = GetDefaultTextColour(); // c.a=0 is safer than IsEmpty
 				resources.TextBrush = resources.Graphics.CreateFill(Color.FromArgb(resources.EdgeAlpha * c.A / 255, c));
@@ -552,11 +557,11 @@ namespace SAW
 			bool useStyle = Config.UserUser.ReadBooleanEx(Config.SAW_EnableItemStyles) && StyleType != ItemDisplayTypes.IDT_Item;
 			if (!useStyle)
 			{
-				LineStyleC lineStyle = State == ButtonShape.States.Highlight ? HighlightLineStyle : LineStyle;
-				// from: DefaultPrepareLineDraw( ... ) without WireFrame, support for thin dashed patterns (see base), DisplayCentres
+				LineStyleC lineStyle = LineStyle; // State == ButtonShape.States.Highlight ? HighlightLineStyle : LineStyle;
+												  // from: DefaultPrepareLineDraw( ... ) without WireFrame, support for thin dashed patterns (see base), DisplayCentres
 				float width = lineStyle.Width;
-				if (State == ButtonShape.States.Highlight)
-					width = width * 2 - 1; // highlight widths were greater in SAW 6
+				//if (State == ButtonShape.States.Highlight)
+				//	width = width * 2 - 1; // highlight widths were greater in SAW 6
 				if (width > 0)
 				{
 					if (IsFilled && lineStyle.Colour.A == 0 && m_DefinedVertices < 2 && Status == StatusValues.Creating)
@@ -576,18 +581,18 @@ namespace SAW
 					resources.MainPen = resources.Graphics.CreateStroke(Color.Gray, 2);
 					resources.MainPen.DashStyle = DashStyle.Dot;
 				}
-				DefaultPrepareFillDraw(State == ButtonShape.States.Highlight ? HighlightFillStyle : FillStyle, resources, HasText(true));
+				DefaultPrepareFillDraw(FillStyle, resources, HasText(true)); // State == ButtonShape.States.Highlight ? HighlightFillStyle :
 			}
 			else
 			{
-				var style = Config.UserUser.ButtonStyle[(int)StyleType + 2];
-				style.PrepareResources(State, resources);
+				ButtonStyle style = Config.UserUser.ButtonStyle[(int)StyleType + 2];
+				style.PrepareResources((Parent as Scriptable)?.State ?? ButtonShape.States.Normal, resources);
 			}
 		}
 
 		protected override void PrepareHighlight(DrawResources resources)
 		{
-			if (m_BeingEdited)
+			if (BeingEdited)
 				return;
 			base.PrepareHighlight(resources);
 		}
@@ -595,6 +600,7 @@ namespace SAW
 		protected override void InternalDraw(Canvas gr, DrawResources resources)
 		{
 			bool useStyle = Config.UserUser.ReadBooleanEx(Config.SAW_EnableItemStyles) && StyleType != ItemDisplayTypes.IDT_Item;
+			ButtonShape.States state = (Parent as Scriptable)?.State ?? ButtonShape.States.Normal;
 			if (!useStyle || resources.Buffer == StaticView.InvalidationBuffer.Selection)
 			{
 				if (resources.MainBrush != null || resources.MainPen != null) // from Container
@@ -612,11 +618,11 @@ namespace SAW
 			}
 			else
 			{
-				var style = Config.UserUser.ButtonStyle[(int)StyleType + 2];
-				style.Draw(gr, resources, m_Bounds, State);
+				ButtonStyle style = Config.UserUser.ButtonStyle[(int)StyleType + 2];
+				style.Draw(gr, resources, m_Bounds, state);
 			}
 			if (Image != null && GraphicShown
-				&& (!GraphicOnlyOnHighlight || State == ButtonShape.States.Highlight))
+				&& (!GraphicOnlyOnHighlight || state == ButtonShape.States.Highlight))
 			{
 				RectangleF imageArea = GetImageArea();
 				RectangleF destination = imageArea;
@@ -649,7 +655,7 @@ namespace SAW
 		  // actually sometimes we need to reflect what previous state was, so this just uses the larger of the 2 widths always (and highlight one renders with larger value than is stored)
 			if (!withShadow && !m_Refresh.IsEmpty)
 				return m_Refresh;
-			RectangleF refreshBounds = base.RefreshBoundsFromBounds(withShadow, Math.Max(LineStyle.Width, HighlightLineStyle.Width * 2 - 1) + 1);
+			RectangleF refreshBounds = base.RefreshBoundsFromBounds(withShadow, LineStyle.Width);
 			// but then had to add the random +1 because an artefact was being left behind when highlight removed???
 			foreach (Shape shape in m_Shapes)
 			{
@@ -709,20 +715,19 @@ namespace SAW
 			public virtual void Read(ArchiveReader ar)
 			{
 				Main = new Item();
+				Scripting = new Scriptable();
 
 				Main.LineStyle.SetDefaults();
 				Main.FillStyle.SetDefaults();
 				Main.TextStyle.SetDefaults();
-				Main.HighlightFillStyle = new FillStyleC();
-				Main.HighlightLineStyle = new LineStyleC();
-				Main.HighlightTextStyle = new TextStyleC();
-
+				Scripting.HighlightStyle = new Scriptable.HighlightStyleC();
+				bool filledHighlight = true;
 				if (ar.SAWVersion >= 6100)
 					Main.ConceptID = ar.ReadStringL();
 				if (ar.SAWVersion >= 6001)
 				{
 					Main.FillStyle.Pattern = ar.ReadBool32() ? FillStyleC.Patterns.Solid : FillStyleC.Patterns.Empty;
-					Main.HighlightFillStyle.Pattern = ar.ReadBool32() ? FillStyleC.Patterns.Solid : FillStyleC.Patterns.Empty;
+					filledHighlight = ar.ReadBool32(); // ? FillStyleC.Patterns.Solid : FillStyleC.Patterns.Empty;
 				}
 				string soundFile = ar.ReadStringL();
 				var file = SAW6.LocateResourceFile(soundFile, SAW6.GetDefaultSoundsFolders(), ar.FileFolder);
@@ -731,7 +736,7 @@ namespace SAW
 				else if (!string.IsNullOrEmpty(file))
 					try
 					{
-						Main.Sound = (SharedResource)ar.IntoDocument.AddSharedResourceFromFile(file, ar.ReadTransaction, false);
+						Scripting.Sound = (SharedResource)ar.IntoDocument.AddSharedResourceFromFile(file, ar.ReadTransaction, false);
 					}
 					catch (Exception ex)
 					{
@@ -741,8 +746,8 @@ namespace SAW
 
 				Main.ItemType = (ItemTypes)ar.ReadInt32();
 				Main.StyleType = (ItemDisplayTypes)ar.ReadInt32();
-				Main.OutputAsDisplay = ar.ReadBool32();
-				Main.SpeechAsDisplay = ar.ReadBool32();
+				Scripting.OutputAsDisplay = ar.ReadBool32();
+				Scripting.SpeechAsDisplay = ar.ReadBool32();
 				Main.TextRatio = (float)ar.ReadDouble();
 
 				string idText = ar.ReadStringL(); // need to convert safely to number
@@ -758,13 +763,12 @@ namespace SAW
 				//Main.m_rcSavedBound = Main.Bounds;
 
 				// should be after SetBounds which has extra logic if it has a parent
-				Scripting = new Scriptable(Main)
-				{
-					SAWID = id,
-					VisitScript = (Script)ar.ReadObject(),
-					SelectScript = (Script)ar.ReadObject(),
-					NextScript = (Script)ar.ReadObject()
-				};
+				Scripting.SetElement(Main);
+				Main.Parent = Scripting;
+				Scripting.SAWID = id;
+				Scripting.VisitScript = (Script)ar.ReadObject();
+				Scripting.SelectScript = (Script)ar.ReadObject();
+				Scripting.NextScript = (Script)ar.ReadObject();
 				if (ar.SAWVersion >= 6200)
 				{
 					Scripting.PreRepeatScript = (Script)ar.ReadObject();
@@ -798,6 +802,7 @@ namespace SAW
 							image = new MemoryImage(create);
 						}
 						Main.Image = ar.IntoDocument.AddSharedBitmapFromMemoryImage(image, ar.ReadTransaction);
+						Main.ImageName = Path.GetFileName(file);
 					}
 					catch (Exception ex)
 					{
@@ -805,9 +810,9 @@ namespace SAW
 					}
 
 
-				Main.SpeechText = ar.ReadStringL();
-				Main.PromptText = ar.ReadStringL();
-				Main.OutputText = ar.ReadStringL();
+				Scripting.SpeechText = ar.ReadStringL();
+				Scripting.PromptText = ar.ReadStringL();
+				Scripting.OutputText = ar.ReadStringL();
 
 				// If the speech is a wav file then move to sound file for previous versions.
 				//CheckSpeechForSound();
@@ -834,9 +839,11 @@ namespace SAW
 				Main.TextStyle.Colour = GUIUtilities.ColorFromWin32RGB(ar.ReadInt32());
 				Main.FillStyle.Colour = GUIUtilities.ColorFromWin32RGB(ar.ReadInt32());
 				Main.LineStyle.Colour = GUIUtilities.ColorFromWin32RGB(ar.ReadInt32());
-				Main.HighlightTextStyle.Colour = GUIUtilities.ColorFromWin32RGB(ar.ReadInt32());
-				Main.HighlightFillStyle.Colour = GUIUtilities.ColorFromWin32RGB(ar.ReadInt32());
-				Main.HighlightLineStyle.Colour = GUIUtilities.ColorFromWin32RGB(ar.ReadInt32());
+				Scripting.HighlightStyle.TextColour = GUIUtilities.ColorFromWin32RGB(ar.ReadInt32());
+				Scripting.HighlightStyle.FillColour = GUIUtilities.ColorFromWin32RGB(ar.ReadInt32());
+				Scripting.HighlightStyle.LineColour = GUIUtilities.ColorFromWin32RGB(ar.ReadInt32());
+				if (!filledHighlight)
+					Scripting.HighlightStyle.FillColour = Color.Empty;
 				int border = (int)ar.ReadUInt32(); // /Doesn't have a "no" border, but we can just do this by setting the width to 0
 				if (border == 0) // There is no need to have it possible to remove the border in either the width or the shape
 				{
@@ -849,7 +856,7 @@ namespace SAW
 					Main.BorderShape = (Borders)(border - 1);
 					Main.LineStyle.Width = ar.ReadUInt32(); // 0-4
 				}
-				Main.HighlightLineStyle.Width = ar.ReadUInt32();
+				Scripting.HighlightStyle.LineWidth = ar.ReadUInt32();
 				Main.Arrangement = (ButtonShape.Layouts)ar.ReadUInt32(); // luckily seems to use same values (at least 0-3)
 				Debug.Assert(Main.Arrangement >= 0 && Main.Arrangement <= (ButtonShape.Layouts)3);
 				Main.TextAlign = (Alignment)ar.ReadUInt32();
@@ -886,9 +893,9 @@ namespace SAW
 					ar.WriteBool32(Main.FillStyle.Pattern != FillStyleC.Patterns.Empty);
 				}
 
-				if (Main.Sound?.HasContent ?? false)
+				if (Scripting.Sound?.HasContent ?? false)
 				{ // must pick a unique filename in the save destination folder
-					string name = Main.Sound?.Content.Filename;
+					string name = Scripting.Sound?.Content.Filename;
 					var extension = Path.GetExtension(name);
 					name = Path.GetFileNameWithoutExtension(name); // strip off extension if ImageName had one
 					int index = 0; // will actually start at 1, as it is incremented before test below
@@ -898,7 +905,7 @@ namespace SAW
 						index += 1;
 						file = Path.Combine(ar.FileFolder, name + " " + index + extension);
 					} while (File.Exists(file));
-					Main.Sound.Content.SaveContent(file);
+					Scripting.Sound.Content.SaveContent(file);
 					ar.WriteStringL(Path.GetFileName(file), true);
 				}
 				else
@@ -906,8 +913,8 @@ namespace SAW
 
 				ar.Write((int)Main.ItemType);
 				ar.Write((int)Main.StyleType);
-				ar.WriteBool32(Main.OutputAsDisplay);
-				ar.WriteBool32(Main.SpeechAsDisplay);
+				ar.WriteBool32(Scripting.OutputAsDisplay);
+				ar.WriteBool32(Scripting.SpeechAsDisplay);
 
 				ar.Write(Main.TextRatio <= 0 ? DEFAULTTEXTRATIO : (double)Main.TextRatio); // was a double in SAW
 				ar.WriteStringL(Scripting.SAWID.ToString());
@@ -953,9 +960,9 @@ namespace SAW
 				}
 				else
 					ar.WriteStringL("");
-				ar.WriteStringL(Main.SpeechText, true);
-				ar.WriteStringL(Main.PromptText, true);
-				ar.WriteStringL(Main.OutputText, true);
+				ar.WriteStringL(Scripting.SpeechText, true);
+				ar.WriteStringL(Scripting.PromptText, true);
+				ar.WriteStringL(Scripting.OutputText, true);
 				ar.WriteBool32(Scripting.AutoRepeat);
 				ar.WriteBool32(Scripting.ResetSwap);
 				ar.WriteBool32(Main.TextShown);
@@ -976,12 +983,12 @@ namespace SAW
 				ar.Write(Main.TextStyle.Colour.ToWin32RGB());
 				ar.Write(Main.FillStyle.Colour.ToWin32RGB());
 				ar.Write(Main.LineStyle.Colour.ToWin32RGB());
-				ar.Write(Main.HighlightTextStyle.Colour.ToWin32RGB());
-				ar.Write(Main.HighlightFillStyle.Colour.ToWin32RGB());
-				ar.Write(Main.HighlightLineStyle.Colour.ToWin32RGB());
+				ar.Write(Scripting.HighlightStyle.TextColour.ToWin32RGB());
+				ar.Write(Scripting.HighlightStyle.FillColour.ToWin32RGB());
+				ar.Write(Scripting.HighlightStyle.LineColour.ToWin32RGB());
 				ar.Write((int)Main.BorderShape + 1);
 				ar.Write((int)Main.LineStyle.Width);
-				ar.Write((int)Main.HighlightLineStyle.Width);
+				ar.Write((int)Scripting.HighlightStyle.LineWidth);
 				ar.Write((int)Main.Arrangement & 3); // &3 is just a bodge.  Removes the 128 superimpose flag.  Will give random result for any other values we have that SAW doesn't support
 				ar.Write((uint)Main.TextAlign);
 				ar.Write((uint)Main.GraphicAlign);
@@ -1079,18 +1086,21 @@ namespace SAW
 			int index = m_WordListScroll;
 			foreach (Item child in WordListEntryChildren)
 			{
+				Scriptable scriptable = child.Parent as Scriptable;
 				if (index >= m_Predictions.Count)
 				{
 					// no more predictions
 					child.WordIndex = 0;
 					child.LabelText = "";
-					child.SpeechText = "";
+					if (scriptable != null)
+						scriptable.SpeechText = "";
 				}
 				else
 				{
 					child.WordIndex = index + 1;
 					child.LabelText = m_Predictions[index];
-					child.SpeechText = m_Predictions[index];
+					if (scriptable != null)
+						scriptable.SpeechText = m_Predictions[index];
 					child.MaximiseFontSize();
 					index++;
 				}

@@ -9,6 +9,9 @@ using System.Drawing.Drawing2D;
 // if adding, update Shape.TransformationType and related
 namespace SAW
 {
+	// transformation are implemented as virtual shapes.  In Splash these can be used as tools which modify the existing content rather than being added to the page themselves.
+	// in SAW this functionality isn't used, but the remainder of the transformation logic is applicable
+
 	public abstract class Transformation : Shape
 	{
 		// base class for all of the transformations.  This actually does most of the work; the individual versions mostly just need to set the matrix
@@ -32,7 +35,7 @@ namespace SAW
 		protected class Victim
 		{
 			public readonly Shape Original;
-			public  Shape Transformed;
+			public Shape Transformed;
 
 			public Victim(Shape original)
 			{
@@ -68,10 +71,7 @@ namespace SAW
 		}
 
 		/// <summary>Returns the transformed copy of the given original or Null</summary>
-		public Shape Transformed(Shape original)
-		{
-			return m_Shapes.Where(v => v.Original == original).Select(v => v.Transformed).FirstOrDefault();
-		}
+		public Shape Transformed(Shape original) => m_Shapes.Where(v => v.Original == original).Select(v => v.Transformed).FirstOrDefault();
 
 		#endregion
 
@@ -121,7 +121,6 @@ namespace SAW
 			// nothing selected.  The page should have selected the shape that the user clicked on if nothing was already selected
 			// previously this check that the user had clicked within the bounding box of one of the selected shapes.  But because pt is already snapped
 			// this is inaccurate; so now this is done within the View instead
-			bool stack = false;
 			bool inappropriateShapes = false; // true if the selection included any shapes not appropriate for the current transformation
 			foreach (Shape shp in page.SelectedShapes)
 			{
@@ -129,12 +128,6 @@ namespace SAW
 					m_Shapes.Add(new Victim(shp));
 				else
 					inappropriateShapes = true;
-			}
-			if (stack)
-			{
-				m_Mode = Modes.Move;
-				// update page selection to reflect new shape...
-				page.SelectOnly((from objVictim in m_Shapes select objVictim.Original).ToList());
 			}
 			if (inappropriateShapes)
 			{
@@ -172,10 +165,17 @@ namespace SAW
 
 		#region transformation functions
 
+		/// <summary>Applies the transform to the one shape - updating the provided copy (which may well BE a COPY).
+		/// By default it just shape.ApplyTransformation, but can be overridden</summary>
+		public virtual void DoTransform(Shape shape)
+		{
+			shape.ApplyTransformation(this);
+		}
+
 		protected VerbResult DoTransform(EditableView.ClickPosition position, bool complete)
 		{
 			// should be called once the transformation is finally applied to the data
-			// bolComplete = true if one copy is made and the transaction is finished.  If false, then further copies can be made.  Has no effect if not copying
+			// complete = true if one copy is made and the transaction is finished.  If false, then further copies can be made.  Has no effect if not copying
 			// call MatrixChanged again first if necessary
 			Transaction transaction = position.Transaction;
 			Debug.Assert(position.Transaction != null);
@@ -190,26 +190,19 @@ namespace SAW
 				if (!complete)
 				{
 					// but allow continuation with new shapes
-					Parent?.NotifyIndirectChange(this, ChangeAffects.IterateRainbowOnTransform);
-					// GUI now set, so can set fill colour on these shapes (needed for rainbow).
-					// if rainbow off, then GUI should have correct colour for this object
-					// don't want to do this if original is group (could be multi colours) or NumberLine (FillColour returns a different class).
-					// these have the NoColourOnTransformCopy flag set
-					// or original is protected against colouring - in which case GUI won't have updated with it's colour
-					// or multi shapes - could be diff colours
 					if (m_Shapes.Count == 1)
 					{
 						Victim victim = m_Shapes[0];
 						if ((victim.Original.Flags & GeneralFlags.NoColourOnTransformCopy) == 0)
 						{
-							FillStyleC fill = (FillStyleC) victim.Transformed.StyleObjectForParameter(Parameters.FillColour);
+							FillStyleC fill = (FillStyleC)victim.Transformed.StyleObjectForParameter(Parameters.FillColour);
 							if (fill != null)
 							{
 								int oldValue = fill.ParameterValue(Parameters.FillColour);
 								fill.Colour = Color.FromArgb(Globals.ParameterValue(Parameters.FillColour));
 								victim.Transformed.NotifyStyleChanged(Parameters.FillColour, oldValue, Globals.ParameterValue(Parameters.FillColour));
 							} // not group
-						} 
+						}
 					}
 					NewCopy();
 					Float(position);
@@ -228,25 +221,20 @@ namespace SAW
 				{
 					transaction.Edit(victim.Original);
 					victim.Original.Status = StatusValues.Moved;
-					victim.Original.ApplyTransformation(this);
-				}
-				foreach (Victim victim in m_Shapes)
-				{
-					// must be separate loop so that all coords are correct before starting intersection tests
-					position.Page.UpdateIntersectionsWith(victim.Original);
+					DoTransform(victim.Original);
 				}
 				m_Shapes.Clear(); // so that we do not dispose of the new copies
 				return VerbResult.TransformationComplete;
 			}
 		}
 
+		/// <summary>the individual transformations should call this (probably during Float) as they alter the matrix</summary>
 		protected void MatrixChanged()
 		{
-			// the individual transformations should call this (probably during Float) as they alter the matrix
 			foreach (Victim victim in m_Shapes)
 			{
 				victim.Transformed.CopyFrom(victim.Original, CopyDepth.Transform, null);
-				victim.Transformed.ApplyTransformation(this);
+				DoTransform(victim.Transformed);
 			}
 			m_Bounds = RectangleF.Empty;
 		}
@@ -314,8 +302,10 @@ namespace SAW
 		public abstract void TransformDirection(ref int direction);
 		// some shapes use a direction (1 or -1) as a sort of winding direction
 
-		public Matrix Matrix
-		{ get { return m_Transformation; } }
+		public void TransformPath(GraphicsPath path)
+		{
+			path.Transform(m_Transformation);
+		}
 
 		#endregion
 
@@ -348,6 +338,7 @@ namespace SAW
 		{
 			Debug.Fail("Should not be transforming a transformation!");
 		}
+
 		#endregion
 
 		#region Coordinates
@@ -406,10 +397,10 @@ namespace SAW
 		protected override void InternalDraw(Canvas gr, DrawResources resources)
 		{ }
 
-		public override void DrawShadow(Canvas gr, float scale)
+		internal override void DrawShadow(Canvas gr, float scale)
 		{ }
 
-		public override void Draw(Canvas gr, float scale, float coordScale, StaticView view, StaticView.InvalidationBuffer buffer, int fillAlpha = 255, int edgeAlpha = 255, bool reverseRenderOrder = false)
+		internal override void Draw(Canvas gr, float scale, float coordScale, StaticView view, StaticView.InvalidationBuffer buffer, int fillAlpha = 255, int edgeAlpha = 255, bool reverseRenderOrder = false)
 		{
 			if (Globals.Root.CurrentConfig.ReadBoolean(Config.Moving_Shadow, true))
 				foreach (Victim victim in m_Shapes)
@@ -438,7 +429,7 @@ namespace SAW
 			throw new InvalidOperationException("Transformation of type " + this.GetType() + " does not support grab spot adjustment");
 		}
 
-		public override List<UserSocket> GetPointsWhichSnapWhenMoving()
+		internal override List<UserSocket> GetPointsWhichSnapWhenMoving()
 		{
 			if (m_Shapes.Count != 1)
 				return new List<UserSocket>();
@@ -535,7 +526,7 @@ namespace SAW
 			// allows the vertical or horizontal ones to modify the vector
 		}
 
-		public override List<Prompt> GetPrompts()
+		internal override List<Prompt> GetPrompts()
 		{
 			List<Prompt> list = new List<Prompt>();
 			if (m_Mode == Modes.Copy)
@@ -868,7 +859,7 @@ namespace SAW
 	{
 		// Base class for transformations which need to pick a focus point before starting
 		// unlike the movement transformations, the initial click does not need to be inside the selected shapes
-		// mybase.m_ptInitial is the focus point
+		// mybase.m_Initial is the focus point
 		// m_ptStart is now the position clicked to select the shape and trigger the xform
 
 		protected PointF m_Start = PointF.Empty;
@@ -956,7 +947,8 @@ namespace SAW
 		#endregion
 
 		internal const int FOCUSSIZE = 3;
-		public override void Draw(Canvas gr, float scale, float coordScale, StaticView view, StaticView.InvalidationBuffer buffer, int fillAlpha = 255, int edgeAlpha = 255, bool reverseRenderOrder = false)
+
+		internal override void Draw(Canvas gr, float scale, float coordScale, StaticView view, StaticView.InvalidationBuffer buffer, int fillAlpha = 255, int edgeAlpha = 255, bool reverseRenderOrder = false)
 		{
 			base.Draw(gr, scale, coordScale, view, buffer, fillAlpha, edgeAlpha, reverseRenderOrder);
 			// we need to draw the focal point as well
@@ -989,26 +981,38 @@ namespace SAW
 	#endregion
 
 	#region TransformRotate
+	/// <summary>Performs rotation;  implementation as tool is not used in SAW.
+	/// Unlike most transforms this also has some static state which changes the default behaviour (see rotation palette)</summary>
 	public class TransformRotate : TransformFocal
 	{
 
-		private float m_Angle; // current angle of rotation
+		/// <summary>Angle of rotation in radians</summary>
+		private float m_Radians;
+
+		/// <summary>If false all rotation is done about the given point.</summary>
+		public static bool RotateAboutCentres = true;
+		/// <summary>Point on the page to rotate about if RotateAboutCentres == false</summary>
+		public static PointF RotationPoint;
+		/// <summary>Whether text objects should be included when rotating</summary>
+		public static bool IncludeText = false;
+		/// <summary>Set during a single transform if there is only text and we probably do want to act on it (eg user is manipulating the grabhandle on that text).
+		/// If true then IncludeText flag is ignored and text always rotated. </summary>
+		private bool IgnoreTextFlag;
 
 		public TransformRotate(Modes mode) : base(mode)
 		{ }
 
-		public TransformRotate(PointF focus, float angle) : base(Modes.Move)
+		public TransformRotate(PointF focus, float radians) : base(Modes.Move)
 		{
 			// version for when the code wants to modify shapes
-			m_Angle = angle;
+			m_Radians = radians;
 			m_Initial = focus;
 			m_Transformation = new Matrix();
-			m_Transformation.RotateAt(Geometry.Degrees(m_Angle), m_Initial);
+			m_Transformation.RotateAt(Geometry.Degrees(m_Radians), m_Initial);
 		}
 
 		#region Basic information
-		public override Shapes ShapeCode
-		{ get { return Shapes.TransformRotate; } }
+		public override Shapes ShapeCode => Shapes.TransformRotate;
 
 		public override SnapModes SnapNext(SnapModes requested)
 		{
@@ -1018,10 +1022,7 @@ namespace SAW
 			return SnapModes.Off;
 		}
 
-		public override PointF DoSnapAngle(PointF newPoint)
-		{
-			return Geometry.AngleSnapPointRelative(newPoint, m_Initial, m_Start);
-		}
+		public override PointF DoSnapAngle(PointF newPoint) => Geometry.AngleSnapPointRelative(newPoint, m_Initial, m_Start);
 
 		public override AllowedActions RequiredAllowed => AllowedActions.TransformRotate;
 		protected override string RequiredAllowedMessage => Strings.Item("Cannot_Rotate");
@@ -1035,13 +1036,24 @@ namespace SAW
 			return VerbResult.Continuing;
 		}
 
-		public static TransformRotate CreateForGrabMove(PointF centre, PointF start)
+		protected override VerbResult StartSelection(PointF pt, Page page, Transaction transaction)
+		{
+			IgnoreTextFlag = page.SelectedShapes.All(ShapeCountsAsText); // if only text is selected then ignore the text only flag
+			if (!RotateAboutCentres)
+				page.RotationPointUsed = true;
+			return base.StartSelection(pt, page, transaction);
+		}
+
+		#region Grabs and prompts
+
+		public static TransformRotate CreateForGrabMove(PointF centre, PointF start, IEnumerable<Shape> selected)
 		{
 			return new TransformRotate(Modes.Move)
 			{
 				m_Initial = centre,
 				m_Start = start,
-				m_StartFixed = true
+				m_StartFixed = true,
+				IgnoreTextFlag = selected.All(ShapeCountsAsText)
 			};
 			// not actually essential that this is stored as it is provided each time
 		}
@@ -1050,13 +1062,12 @@ namespace SAW
 		{
 			float startAngle = Geometry.VectorAngle(m_Initial, startPoint);
 			float currentAngle = Geometry.VectorAngle(m_Initial, current);
-			m_Angle = Geometry.AngleBetween(startAngle, currentAngle);
-			//Dim szVector As SizeF = m_ptInitial.VectorTo(ptCurrent)
+			m_Radians = Geometry.AngleBetween(startAngle, currentAngle);
 			m_Transformation = new Matrix();
-			m_Transformation.RotateAt(Geometry.Degrees(m_Angle), m_Initial);
+			m_Transformation.RotateAt(Geometry.Degrees(m_Radians), m_Initial);
 		}
 
-		public override List<Prompt> GetPrompts()
+		internal override List<Prompt> GetPrompts()
 		{
 			List<Prompt> list = new List<Prompt>();
 			if (!m_StartFixed)
@@ -1079,10 +1090,33 @@ namespace SAW
 			return list;
 		}
 
-		#region Making scalar modifications
+		#endregion
+
+		#region Doing transforms
+
+		public override void DoTransform(Shape shape)
+		{ // this differs in that each shape might be rotated about its own centre - ie each using a different matrix
+			if (!IncludeText && !IgnoreTextFlag && ShapeCountsAsText(shape))
+				return;
+			if (!RotateAboutCentres)
+			{
+				Page page = shape.FindPage(); // doing this per shape isn't necessary, but is harmless and this is the easiest place to put it
+				if (page.RecentRotationPoints.Any())
+					page.RotationPointUsed = true;
+				base.DoTransform(shape);
+				return;
+			}
+			// need to create a new matrix for this shape which rotates about its centre:
+			Matrix originalMatrix = m_Transformation;
+			m_Transformation = new Matrix();
+			m_Transformation.RotateAt(Geometry.Degrees(m_Radians), shape.Centre);
+			shape.ApplyTransformation(this);
+			m_Transformation = originalMatrix;
+		}
+
 		public override void TransformAngle(ref float angle)
 		{
-			angle += m_Angle;
+			angle += m_Radians;
 		}
 
 		public override void TransformDirection(ref int direction)
@@ -1097,6 +1131,10 @@ namespace SAW
 
 		#endregion
 
+		/// <summary>True if the given shape counts as text for the IncludeText flag (currently only FloatingLabel, but that might change)</summary>
+		internal static bool ShapeCountsAsText(Shape s) => s is FloatingLabel;
+
+
 	}
 	#endregion
 
@@ -1105,16 +1143,19 @@ namespace SAW
 	{
 
 		private float m_Scale; // although 0 indicates not valid.  Can be negative
+		/// <summary>If true each shape is scaled from its own centre </summary>
+		private bool m_ShapeCentres;
 
 		public TransformScale(Modes mode) : base(mode)
 		{ }
 
-		public TransformScale(PointF focus, float scale) : base(Modes.Move)
+		public TransformScale(PointF focus, float scale, bool useShapeCentres) : base(Modes.Move)
 		{
 			// version for when the code wants to modify shapes
 			m_Initial = focus;
 			m_StartFixed = true;
 			m_Scale = scale;
+			m_ShapeCentres = useShapeCentres;
 			m_Transformation = new Matrix();
 			m_Transformation.Translate(m_Initial.X * (1 - m_Scale), m_Initial.Y * (1 - m_Scale));
 			m_Transformation.Scale(m_Scale, m_Scale);
@@ -1128,6 +1169,22 @@ namespace SAW
 		protected override string RequiredAllowedMessage => Strings.Item("Cannot_Resize");
 
 		#endregion
+
+		public override void DoTransform(Shape shape)
+		{
+			if (!m_ShapeCentres)
+				base.DoTransform(shape);
+			else
+			{
+				// need to create a new matrix for this shape which focuses on its centre:
+				Matrix originalMatrix = m_Transformation;
+				m_Transformation = new Matrix();
+				m_Transformation.Translate(shape.Centre.X * (1 - m_Scale), shape.Centre.Y * (1 - m_Scale));
+				m_Transformation.Scale(m_Scale, m_Scale);
+				shape.ApplyTransformation(this);
+				m_Transformation = originalMatrix;
+			}
+		}
 
 		private const float MAXIMUMSHRINKAGE = 100f;
 		protected override VerbResult FloatFinal(PointF pt)
@@ -1176,7 +1233,7 @@ namespace SAW
 			return create;
 		}
 
-		public override List<Prompt> GetPrompts()
+		internal override List<Prompt> GetPrompts()
 		{
 			List<Prompt> list = new List<Prompt>();
 			if (!m_StartFixed)
@@ -1345,7 +1402,7 @@ namespace SAW
 			SetMatrix(Geometry.VectorAngle(ptLineA, ptLineB));
 		}
 
-		public override List<Prompt> GetPrompts()
+		internal override List<Prompt> GetPrompts()
 		{
 			List<Prompt> list = new List<Prompt>();
 			if (m_Second.IsEmpty)
@@ -1519,7 +1576,7 @@ namespace SAW
 			return base.RefreshBounds(withShadow);
 		}
 
-		public override void Draw(Canvas gr, float scale, float coordScale, StaticView view, StaticView.InvalidationBuffer buffer, int fillAlpha = 255, int edgeAlpha = 255, bool reverseRenderOrder = false)
+		internal override void Draw(Canvas gr, float scale, float coordScale, StaticView view, StaticView.InvalidationBuffer buffer, int fillAlpha = 255, int edgeAlpha = 255, bool reverseRenderOrder = false)
 		{
 			if (m_Mode == Modes.Move && !m_Second.IsEmpty)
 			{

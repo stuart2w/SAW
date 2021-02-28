@@ -36,6 +36,7 @@ namespace SAW
 			Globals.ApplicabilityChanged += ApplicabilityChanged;
 			Globals.KeyApplicabilityChanged += KeyApplicabilityChanged;
 			ApplicabilityChanged(); // to get the initial states correct.  This also updates the selected status where applicable
+			UpdateVerbApplicability();
 			Globals.Root.CurrentDocumentChanged += CurrentDocumentChanged;
 
 			this.HoverShapeChanged += PaletteView_HoverShapeChanged;
@@ -45,9 +46,11 @@ namespace SAW
 				if (Visible && m_Dirty)
 				{
 					UpdateVerbApplicability();
+					ApplicabilityChanged();
 					m_Dirty = false;
 				}
 			};
+			Globals.VerbApplicabilityChanged += UpdateVerbApplicability;
 		}
 
 		protected override void Dispose(bool disposing)
@@ -57,10 +60,11 @@ namespace SAW
 			Globals.ApplicabilityChanged -= ApplicabilityChanged;
 			Globals.KeyApplicabilityChanged -= KeyApplicabilityChanged;
 			Globals.Root.CurrentDocumentChanged -= CurrentDocumentChanged;
+			Globals.VerbApplicabilityChanged -= UpdateVerbApplicability;
 		}
 
-		private bool BeingEdited // true if the palette is currently being edited
-		{ get { return Globals.Root.CurrentDocument == m_Document; } }
+		/// <summary>true if the palette is currently being edited </summary>
+		private bool BeingEdited => Globals.Root.CurrentDocument == m_Document;
 
 		private bool m_WasBeingEdited;
 		private void CurrentDocumentChanged()
@@ -87,8 +91,7 @@ namespace SAW
 			}
 		}
 
-		protected override bool UseActiveContent
-		{ get { return !BeingEdited; } }
+		protected override bool UseActiveContent => !BeingEdited;
 
 		protected override void ShapePressed(Shape shape)
 		{
@@ -97,6 +100,7 @@ namespace SAW
 			ButtonShape buttonShape = (ButtonShape)shape;
 			if (buttonShape.State == ButtonShape.States.Disabled)
 				return;
+			Accessed?.Invoke(this, EventArgs.Empty);
 			switch (buttonShape.Action.Change)
 			{
 				case Parameters.Action_Key:
@@ -146,8 +150,6 @@ namespace SAW
 							gr.Clear(Color.FromKnownColor(KnownColor.Control));
 							//gr.Clear(m_Page.Colour)
 							//m_Page.DrawBackground(gr, m_zoom)' Would also draw grid and (possibly) origin
-							if (!Globals.Root.CurrentConfig.Low_Graphics)
-								gr.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
 							if (!BeingEdited)
 								m_Page.DrawShapes(canvas, m_Zoom, m_PixelsPerDocumentX, this);
 							else
@@ -178,10 +180,7 @@ namespace SAW
 		}
 
 		/// <summary>True if this contains a document which can flow, and therefore does not scale</summary>
-		public bool IsFlow
-		{               // If the page contains only a flow layout, then it is allowed to resize itself
-			get { return m_Page.IsSingleAutoSize; }
-		}
+		public bool IsFlow => m_Page.IsSingleAutoSize;
 
 		protected override void StaticView_Resize(object sender, EventArgs e)
 		{
@@ -227,9 +226,8 @@ namespace SAW
 				m_Dirty = true;
 				return;
 			}
-			foreach (ButtonShape button in m_Verbs)
+			foreach (ButtonShape button in m_OtherApplicable)
 			{
-				Debug.Assert(button.Action.Change == Parameters.Action_Verb);
 				button.State = Globals.ActionApplicable(button.Action) ? ButtonShape.States.Normal : ButtonShape.States.Disabled;
 			}
 		}
@@ -278,7 +276,7 @@ namespace SAW
 		/// All actions on contained buttons will be of type ValueSelectableAction</summary>
 		private readonly Dictionary<Parameters, List<ButtonShape>> m_Parameters = new Dictionary<Parameters, List<ButtonShape>>();
 		// and these need to be updated when the main form changes verb applicability
-		private readonly List<ButtonShape> m_Verbs = new List<ButtonShape>();
+		private readonly List<ButtonShape> m_OtherApplicable = new List<ButtonShape>();
 		/// <summary>List of shapes which generate keys and could be disabled when KeyApplicabilityChanged</summary>
 		private readonly List<ButtonShape> m_KeyShapes = new List<ButtonShape>();
 
@@ -286,7 +284,7 @@ namespace SAW
 		{
 			base.DisplayPage(page, document);
 			m_Parameters.Clear();
-			m_Verbs.Clear();
+			m_OtherApplicable.Clear();
 			page.Iterate(AddShapeForParameters); // Will iterate through all nested shapes
 			if (Globals.Root.CurrentMainScreen() is frmMain)
 				UpdateVerbApplicability();
@@ -305,10 +303,10 @@ namespace SAW
 					m_Parameters.Add(action.Change, new List<ButtonShape>());
 				m_Parameters[action.Change].Add((ButtonShape)obj);
 			}
-			else if (action.Change == Parameters.Action_Verb)
-				m_Verbs.Add((ButtonShape)obj);
 			else if (action.Change == Parameters.Action_Key || action.Change == Parameters.Action_Character || action.Change == Parameters.Action_Text)
 				m_KeyShapes.Add((ButtonShape)obj);
+			else// if (action.Change == Parameters.Action_Verb)
+				m_OtherApplicable.Add((ButtonShape)obj);
 		}
 
 		private void ParameterChanged(Parameters parameter)
@@ -329,15 +327,17 @@ namespace SAW
 			// This does not specify the parameter as it is called once when everything updates
 			if (BeingEdited)
 				return;
+			if (!Visible)
+			{ m_Dirty = true; return; }
 			foreach (Parameters parameter in m_Parameters.Keys)
 			{
 				bool applicable = Globals.ParameterApplicable(parameter);
 				foreach (ButtonShape button in m_Parameters[parameter])
 				{
+					if (parameter == Parameters.Tool) // bit of a bodge at the moment, but tools can be individually applicable
+						applicable = button.Action.IsApplicable(null);
 					if (applicable)
-					{
 						button.State = Globals.ParameterValue(parameter) == (button.Action as ValueSelectableAction).ValueAsInteger ? ButtonShape.States.Selected : ButtonShape.States.Normal;
-					}
 					else
 						button.State = ButtonShape.States.Disabled;
 				}

@@ -2032,54 +2032,6 @@
   <data name="RoundButtonNoUser_80" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>Resources\RoundButtonNoUser_80.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="ConfigPrompt_Display_Centres_2" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>Resources\ConfigPrompt_Display_Centres_2.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ConfigPrompt_Display_Origin" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>Resources\ConfigPrompt_Display_Origin.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ConfigPrompt_KeyShortcuts_Off" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>Resources\ConfigPrompt_KeyShortcuts_Off.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ConfigPrompt_KeyShortcuts_On" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>Resources\ConfigPrompt_KeyShortcuts_On.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ConfigPrompt_Key_Shortcuts_Off" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>Resources\ConfigPrompt_Key_Shortcuts_Off.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ConfigPrompt_Key_Shortcuts_On" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>Resources\ConfigPrompt_Key_Shortcuts_On.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ConfigPrompt_Low_Graphics_Off" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>Resources\ConfigPrompt_Low_Graphics_Off.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ConfigPrompt_Low_Graphics_On" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>Resources\ConfigPrompt_Low_Graphics_On.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ConfigPrompt_Moving_Shadow_Off" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>Resources\ConfigPrompt_Moving_Shadow_Off.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ConfigPrompt_Moving_Shadow_On" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>Resources\ConfigPrompt_Moving_Shadow_On.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ConfigPrompt_Selection_Bounds_Off" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>Resources\ConfigPrompt_Selection_Bounds_Off.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ConfigPrompt_Selection_Bounds_On" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>Resources\ConfigPrompt_Selection_Bounds_On.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ConfigPrompt_SelectorAfterCreate" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>Resources\ConfigPrompt_SelectorAfterCreate.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ConfigPrompt_Separate_Cursors_Off" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>Resources\ConfigPrompt_Separate_Cursors_Off.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ConfigPrompt_Separate_Cursors_On" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>Resources\ConfigPrompt_Separate_Cursors_On.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ConfigPrompt_Smaller_Tools" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>Resources\ConfigPrompt_Smaller_Tools.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
   <data name="AddUser" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>Resources\AddUser.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
@@ -2149,36 +2101,6 @@
   <data name="RedCross" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>Resources\RedCross.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="ConfigPrompt_Advanced_Colours" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>Resources\ConfigPrompt_Advanced_Colours.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ConfigPrompt_Show_InfoMeasurement" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>Resources\ConfigPrompt_Show_InfoMeasurement.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ConfigPrompt_Show_PageList" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>Resources\ConfigPrompt_Show_PageList.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ConfigPrompt_Show_PointerButtons" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>Resources\ConfigPrompt_Show_PointerButtons.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ConfigPrompt_Show_Prompts" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>Resources\ConfigPrompt_Show_Prompts.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ConfigPrompt_Show_ToolbarSnap" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>Resources\ConfigPrompt_Show_ToolbarSnap.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ConfigPrompt_Show_ToolbarVerbs" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>Resources\ConfigPrompt_Show_ToolbarVerbs.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ConfigPrompt_Show_Tools" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>Resources\ConfigPrompt_Show_Tools.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ConfigPrompt_Show_TransformCopy" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>Resources\ConfigPrompt_Show_TransformCopy.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ConfigPrompt_Show_Toolbar" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>Resources\ConfigPrompt_Show_Toolbar.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
   <data name="AngleSnap_64" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>Resources\AngleSnap_64.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
@@ -2187,12 +2109,6 @@
   </data>
   <data name="ShapeSnap_64" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>Resources\ShapeSnap_64.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ConfigPrompt_Angle_45_Off" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>Resources\ConfigPrompt_Angle_45_Off.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ConfigPrompt_Angle_45_On" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>Resources\ConfigPrompt_Angle_45_On.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="TYPEKEY" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>Resources\TYPEKEY.WAV;System.IO.MemoryStream, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
@@ -2211,9 +2127,6 @@
   </data>
   <data name="Prompts_OrthogonalRectangle_Start" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>Resources\Prompts_OrthogonalRectangle_Start.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ConfigPrompt_Advanced_Graphics" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>Resources\ConfigPrompt_Advanced_Graphics.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="Verb_AddVertex" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>Resources\Verb_AddVertex.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -2259,12 +2172,6 @@
   </data>
   <data name="AngleSnapMove_64" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>Resources\AngleSnapMove_64.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ConfigPrompt_Windows_Colours_Off" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>Resources\ConfigPrompt_Windows_Colours_Off.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ConfigPrompt_Windows_Colours_On" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>Resources\ConfigPrompt_Windows_Colours_On.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="Document_16" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>Resources\Document_16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -2469,5 +2376,26 @@
   </data>
   <data name="Nudge_Wider" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>Resources\Nudge_Wider.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="TOOLIMG_64_RHOMBUS" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\TOOLIMG_64_RHOMBUS.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="TOOLIMG_RHOMBUS" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\TOOLIMG_RHOMBUS.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="TOOLIMG_GENERICPATH" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\TOOLIMG_GENERICPATH.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="TOOLIMG_FLOATINGLABEL" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\TOOLIMG_FLOATINGLABEL.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="CoordEdit_64" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\CoordEdit_64.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Rotate_64" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\Rotate_64.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Scale_64" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\Scale_64.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
 </root>

@@ -32,24 +32,19 @@ namespace SAW.Commands
 		internal static void ProcessOutputDirective(ref string requested, ExecutionContext context)
 		{
 			if (requested == USEOUTPUT && context.TargetItem.Element is Item)
-				requested = (context.TargetItem.Element as Item).OutputText;
+				requested = context.TargetItem.OutputText;
 		}
 
 		/// <summary>If the app is this, then the item output field is used instead</summary>
 		public const string USEOUTPUT = ":output";
 
-		public override ICommandEditor GetEditor()
-		{
-			return new AppCommandEditor();
-		}
-
+		public override ICommandEditor GetEditor() => new AppCommandEditor();
 	}
 
 	public class CmdParamApp : ParamBasedCommand
 	{
 		public CmdParamApp() : base(new[] { Param.ParamTypes.String, Param.ParamTypes.String })
-		{
-		}
+		{}
 
 		public override void Execute(ExecutionContext context)
 		{
@@ -64,18 +59,13 @@ namespace SAW.Commands
 			{ context.View.OnError(e.Message); }
 		}
 
-		public override ICommandEditor GetEditor()
-		{
-			return new AppCommandEditor();
-		}
-
+		public override ICommandEditor GetEditor() => new AppCommandEditor();
 	}
 
 	public class CmdAlternateApp : ParamBasedCommand
 	{
 		public CmdAlternateApp() : base(new[] { Param.ParamTypes.String, Param.ParamTypes.String, Param.ParamTypes.String, Param.ParamTypes.String })
-		{
-		}
+		{ }
 
 		public override void Execute(ExecutionContext context)
 		{
@@ -103,22 +93,15 @@ namespace SAW.Commands
 			{ context.View.OnError(e.Message); }
 		}
 
-		public override ICommandEditor GetEditor()
-		{
-			return new AppCommandEditor();
-		}
+		public override ICommandEditor GetEditor() => new AppCommandEditor();
 	}
 
 	public class CmdSwitchToApp : ParamBasedCommand
 	{
 		public CmdSwitchToApp() : base(new[] { Param.ParamTypes.String })
-		{
-		}
+		{ }
 
-		public override ICommandEditor GetEditor()
-		{
-			return new AppCommandEditor();
-		}
+		public override ICommandEditor GetEditor() => new AppCommandEditor();
 
 		public override void Execute(ExecutionContext context)
 		{

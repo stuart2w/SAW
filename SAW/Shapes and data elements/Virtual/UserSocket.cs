@@ -111,7 +111,7 @@ namespace SAW
 		public override bool HitTestDetailed(PointF clickPoint, float scale, bool treatAsFilled) => !Grouped;
 		// don't think this is actually called when grouped anyway
 
-		public override List<GrabSpot> GetGrabSpots(float scale)
+		internal override List<GrabSpot> GetGrabSpots(float scale)
 		{
 			if (Grouped)
 				return null; //!
@@ -144,17 +144,17 @@ namespace SAW
 			}
 		}
 
-		public override List<UserSocket> GetPointsWhichSnapWhenMoving()
+		internal override List<UserSocket> GetPointsWhichSnapWhenMoving()
 		{
 			return new List<UserSocket> {this};
 		}
 
-		public override List<Target> GenerateTargets(UserSocket floating)
+		internal override List<Target> GenerateTargets(UserSocket floating)
 		{
 			return new List<Target> {new Target(this, m_Centre, Target.Types.Centre, floating)};
 		}
 
-		public override void NotifyEnvironmentChanged(EnvironmentChanges change)
+		internal override void NotifyEnvironmentChanged(EnvironmentChanges change)
 		{
 			if ((change & EnvironmentChanges.ParentReassigned) > 0)
 				m_Bounds = RectangleF.Empty; // bounds collapses if parent is group
@@ -207,7 +207,7 @@ namespace SAW
 
 		#region graphics
 
-		public override void Draw(Canvas gr, float scale, float coordScale, StaticView view, StaticView.InvalidationBuffer buffer, int fillAlpha = 255, int edgeAlpha = 255, bool reverseRenderOrder = false)
+		internal override void Draw(Canvas gr, float scale, float coordScale, StaticView view, StaticView.InvalidationBuffer buffer, int fillAlpha = 255, int edgeAlpha = 255, bool reverseRenderOrder = false)
 		{
 			if (Grouped)
 				return; // does not draw if grouped
@@ -215,11 +215,11 @@ namespace SAW
 			base.Draw(gr, scale, coordScale, view, buffer, fillAlpha, edgeAlpha, reverseRenderOrder);
 		}
 
-		public override void DrawHighlight(Canvas gr, float scale, float coordScale)
+		internal override void DrawHighlight(Canvas gr, float scale, float coordScale, Target singleElement)
 		{
 			if (Grouped)
 				return; // does not draw if grouped
-			base.DrawHighlight(gr, scale, coordScale);
+			base.DrawHighlight(gr, scale, coordScale, singleElement);
 		}
 
 		protected override void PrepareDraw(DrawResources resources)

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Windows.Forms;
 using System.Media;
 using System.Threading.Tasks;
@@ -21,7 +22,8 @@ namespace SAW
 		internal frmRun Run;
 
 		/// <summary>must be suitable for use as a folder name, so some characters cannot be used</summary>
-		public const string AppName = "SAW7";
+		public const string AppName = "SAW7";// "SAWPROTOTYPE"; // 
+											 // TODO: put this back
 
 		/// <summary>true if #DEBUG (easier to use in Catch When)</summary>
 		public bool IsDebug = false;
@@ -111,7 +113,6 @@ namespace SAW
 			Strings.Load();
 			Log.WriteLine("SystemDPI = " + GUIUtilities.SystemDPI);
 
-
 			Functions.Verb.CreateList(); // must before any configs loaded
 			Functions.SAWVerbs.RegisterVerbs();
 
@@ -126,6 +127,8 @@ namespace SAW
 #if !DEBUG
 			AppDomain.CurrentDomain.UnhandledException += frmErrorReport.UnhandledException;
 			Application.ThreadException += frmErrorReport.ThreadException;
+#else
+			Config.Delta.ApplyV8Changes();
 #endif
 			CurrentConfig = new AppliedConfig();
 			CurrentConfig.AddConfigAtEnd(Config.SystemConfig);
@@ -187,26 +190,32 @@ namespace SAW
 		/// this is needed if this is called during frmMenu_Load when it tends to end up with neither window focused</summary>
 		public void ShowEditScreen(Document document, bool forceRefocus = false)
 		{
-			Globals.StoreEvent("ShowMainScreen bolForceRefocus=" + forceRefocus);
-			if (Editor == null)
+			try
 			{
-				Editor = new frmMain();
-				Globals.SetEditor(Editor);
+				Globals.StoreEvent("ShowMainScreen forceRefocus=" + forceRefocus);
+				if (Editor == null)
+				{
+					Editor = new frmMain();
+					Globals.SetEditor(Editor);
+				}
+				User = Users.Editor;
+				Run?.Stop(); // safe if not running
+				Run?.Hide();
+				m_DocumentIndex = 0;
+				m_CurrentDocument = null; // sensible due to change in index, but also forces engine documentchanged event to fire which will pass this to main screen
+				CurrentDocument = document; // Must be assigned before Editor.Display
+				Editor.Display();
+				Menu?.Hide();
+				if (forceRefocus)
+				{
+					m_tmrRefocus = new Timer { Interval = 500, Enabled = true };
+					m_tmrRefocus.Tick += Refocus;
+				}
 			}
-			User = Users.Editor;
-			Run?.Stop(); // safe if not running
-			Run?.Hide();
-			m_DocumentIndex = 0;
-			m_CurrentDocument = null; // sensible due to change in index, but also forces engine documentchanged event to fire which will pass this to main screen
-			CurrentDocument = document; // Must be assigned before Editor.Display
-			Editor.Display();
-			Menu?.Hide();
-			if (forceRefocus)
+			catch (Exception e)
 			{
-				m_tmrRefocus = new Timer();
-				m_tmrRefocus.Interval = 500;
-				m_tmrRefocus.Enabled = true;
-				m_tmrRefocus.Tick += Refocus;
+				frmErrorReport.DoErrorReport(e);
+				Application.Exit();
 			}
 		}
 
@@ -310,7 +319,7 @@ namespace SAW
 			// defaultFile can be the name of the file used as a default - ie the one in InternalFolder which will be copied in.
 			Debug.Assert(!file.StartsWith("\\"));
 			if (level == Config.Levels.DocumentBoth || level == Config.Levels.ActivityBoth)
-				throw new ArgumentException("LoadConfig (eLevel)");
+				throw new ArgumentException("level");
 			if (string.IsNullOrEmpty(defaultFile))
 				defaultFile = file;
 			string path = ConfigFolder + System.IO.Path.DirectorySeparatorChar + (level == Config.Levels.ActivityUser ? "Activities" + System.IO.Path.DirectorySeparatorChar : "");
@@ -450,7 +459,7 @@ namespace SAW
 
 		public void SaveAllActivityConfigs()
 		{
-			foreach (Document config in Config.ActivityConfigs())
+			foreach (Document config in Config.ActivityConfigs)
 			{
 				config.UserSettings.SaveTo(ConfigFolder + System.IO.Path.DirectorySeparatorChar + "Activities" + System.IO.Path.DirectorySeparatorChar + config.ID + Config.Extension);
 			}
@@ -473,7 +482,7 @@ namespace SAW
 
 		#region Documents, CurrentDocument etc
 		/// <summary>index of currently displayed within current document</summary>
-		// support for multiple documents... (most of the GUI should just use CurrentDocument)
+		// support for multiple documents... (most of the GUI should just use CurrentDocument) - not actually used in SAW atm, which only ever has one document
 		private readonly List<Document> m_Documents = new List<Document>(); // There is always at least one entry, although it might be Nothing
 		private int m_DocumentIndex = 0;
 		private Document m_CurrentDocument;
@@ -500,7 +509,9 @@ namespace SAW
 				SetCurrentDocument(value);
 				m_Documents[m_DocumentIndex] = value;
 				Globals.OnSettingsChanged(); // event is on timer, so comes after document
+				m_InhibitPageEvent = true;
 				CurrentDocumentChanged?.Invoke();
+				m_InhibitPageEvent = false;
 				CurrentPageChanged?.Invoke();
 			}
 		}
@@ -512,10 +523,10 @@ namespace SAW
 			{
 				if (Menu.Visible)
 				{
-					Document objDocument = Document.FromFile(file, true);
+					Document document = Document.FromFile(file, true);
 					// remembered because this is used in two places - opening a file double clicked in Windows (which should be remembered)
 					// and from review resources (probably shouldn't be remembered, but only used by distributors)
-					ShowEditScreen(objDocument);
+					ShowEditScreen(document);
 				}
 				else
 					// if the edit is open we must ask nicely to show the document, in case it has an existing, unsaved document
@@ -571,7 +582,8 @@ namespace SAW
 			else
 			{
 				bool asNewTab = false;
-				if (Globals.Root.CurrentConfig.ReadBoolean(Config.Multiple_Documents) && m_CurrentDocument != null && (!m_CurrentDocument.IsEmpty || m_CurrentDocument.IsPaletteWithin || document.IsPaletteWithin))
+				if (Globals.Root.CurrentConfig.ReadBoolean(Config.Multiple_Documents) && m_CurrentDocument != null && User == Users.Editor
+																					  && (!m_CurrentDocument.IsEmpty || m_CurrentDocument.IsPaletteWithin || document.IsPaletteWithin))
 				{
 					// Last condition is needed because we don't want to replace a real document with a palette tab - a palette should always be in a new tab
 					// penultimate condition is just because it looks a bit odd to automatically close the palette editor - better to treat these slightly differently
@@ -621,22 +633,6 @@ namespace SAW
 
 		#endregion
 
-		public void ClearDocuments()
-		{
-			Globals.StoreEvent("ClearDocuments");
-			foreach (Document document in m_Documents)
-			{
-				CloseDocument(document);
-			}
-			m_Documents.Clear();
-			m_Documents.Add(null);
-			m_CurrentDocument = null;
-			m_CurrentPageIndex = 0;
-			Globals.Root.m_DocumentIndex = 0;
-			CurrentDocumentChanged?.Invoke();
-			CurrentPageChanged?.Invoke();
-		}
-
 		public void RemoveDocument(int index)
 		{
 			Globals.StoreEvent("Remove document " + index + ", current = " + m_DocumentIndex);
@@ -681,12 +677,17 @@ namespace SAW
 						RemoveDocument(index);
 				}
 				// And remove from the positioning system:
-				foreach (Document objRemove in removedPalettes)
+				foreach (Document remove in removedPalettes)
 				{
-					Palette.Deregister(objRemove.ID.ToString());
+					Palette.Deregister(remove.ID.ToString());
 				}
 				// This must be after the palette test above (which clears the config properties)
 				document.Dispose();
+			}
+			else
+			{// if it was from an activity, make sure it gets saved
+				if (Config.ActivityConfigs.Contains(document.PaletteWithin.Document))
+					SaveAllActivityConfigs();
 			}
 		}
 
@@ -698,6 +699,8 @@ namespace SAW
 		/// <summary>Always fires after CurrentDocumentChanged (if applicable)</summary>
 		public event NullEventHandler CurrentPageChanged;
 		private int m_CurrentPageIndex;
+		/// <summary>If true the CurrentPageChanged event is not fired by assigning the index (it is set when the outer code is going to trigger the event anyway)</summary>
+		private bool m_InhibitPageEvent;
 
 		public int CurrentPageIndex
 		{
@@ -705,7 +708,8 @@ namespace SAW
 			set
 			{
 				m_CurrentPageIndex = value;
-				CurrentPageChanged?.Invoke();
+				if (!m_InhibitPageEvent)
+					CurrentPageChanged?.Invoke();
 			}
 		}
 
@@ -751,11 +755,11 @@ namespace SAW
 			Editor.StoreNewTransaction(transaction, autoRefresh);
 		}
 
-		[DebuggerStepThrough()]
 		public void PerformAction(Functions.Action action, EditableView.ClickPosition.Sources source = EditableView.ClickPosition.Sources.Irrelevant)
 		{
 			Editor.PerformAction(action, source);
 		}
+
 		#endregion
 
 		#region ShellExecute
@@ -932,8 +936,5 @@ namespace SAW
 		Editor,
 		Undefined = -1
 	}
-
-
-
 
 }

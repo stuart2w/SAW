@@ -96,10 +96,7 @@ namespace SAW.Commands
 	public class CmdPopupItem : Command
 	{
 
-		public override ICommandEditor GetEditor()
-		{
-			return new PopupItemEditor();
-		}
+		public override ICommandEditor GetEditor() => new PopupItemEditor();
 
 		public override void Execute(ExecutionContext context)
 		{
@@ -170,10 +167,13 @@ namespace SAW.Commands
 			Globals.Root.CurrentPageIndex = page - 1; // data is 1-based
 		}
 
-		public override ICommandEditor GetEditor()
-		{
-			return new GotoPageEditor();
+		public override void EnsureParams(int count)
+		{// overrides base because the param can't have the default value (0)
+			if (m_ParamList.Count < 1)
+				m_ParamList.Add(new IntegerParam(1));
 		}
+
+		public override ICommandEditor GetEditor() => new GotoPageEditor();
 
 	}
 }

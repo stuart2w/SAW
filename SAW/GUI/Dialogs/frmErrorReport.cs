@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System;
 using System.Windows.Forms;
 using SAW.Repo2;
+using System.Linq;
 
 namespace SAW
 {
@@ -103,10 +104,10 @@ namespace SAW
 		public static void DoErrorReport(Exception ex)
 		{
 			NumberErrors += 1;
-			frmErrorReport frmNew = new frmErrorReport();
-			frmNew.lblErrorMessage.Text = Strings.Item("Error_Message") + ex.Message;
-			DialogResult eResult = frmNew.ShowDialog();
-			ProcessErrorReport(ex.ToString(), frmNew.txtInfo.Text, eResult == DialogResult.OK);
+			frmErrorReport form = new frmErrorReport();
+			form.lblErrorMessage.Text = Strings.Item("Error_Message") + ex.Message;
+			DialogResult eResult = form.ShowDialog();
+			ProcessErrorReport(ex.ToString(), form.txtInfo.Text, eResult == DialogResult.OK);
 		}
 
 		public static void ProcessErrorReport(string content, string user, bool send)
@@ -241,5 +242,7 @@ namespace SAW
 		{
 			Application.Exit();
 		}
+
+
 	}
 }

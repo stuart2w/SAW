@@ -43,10 +43,10 @@ namespace SAW
 			foreach (var p in m_ParamList)
 			{
 				output.Append(' ');
-				if (p is StringParam)
+				if ((p as StringParam)?.Quoted ?? false)
 					output.Append('"');
 				output.Append(p.ValueAsString());
-				if (p is StringParam)
+				if ((p as StringParam)?.Quoted ?? false)
 					output.Append('"');
 			}
 			return output.ToString();
@@ -72,7 +72,7 @@ namespace SAW
 			string simplified = string.Join(" ", tokens).ToLower();
 			foreach (var pair in CommandList.CommandTextLookup) // Dictionary pair of command text and the record
 			{
-				if (simplified.StartsWith(pair.Key) && (simplified.Length == pair.Key.Length || simplified[pair.Key.Length]== ' '))
+				if (simplified.StartsWith(pair.Key) && (simplified.Length == pair.Key.Length || simplified[pair.Key.Length] == ' '))
 				{ // the ( || ) is needed to check that the script "say speech text" doesn't match the script "s", for example
 					Command created = pair.Value.CreateInstance();
 					created.InitialiseFromCommandUsed(pair.Key);
@@ -118,7 +118,7 @@ namespace SAW
 				{// ignore multiple terminators (this is an expected condition as there will be a space following a closing quote typically)
 				 // and multiple spaces are counted as one between tokens
 				 // however something in quotes must always be stored when the end quote is encountered, even if the contained string was 0-length
-					if (buffer.Length > 0 || c=='"') 
+					if (buffer.Length > 0 || c == '"')
 						output.Add(buffer.ToString());
 					buffer.Clear();
 					terminator = ' '; // revert to space as the default terminator
@@ -489,11 +489,11 @@ namespace SAW
 			{
 				if (ExpectedParams.Length == 1 && TreatParametersAsSingleString)
 				{ // combined back into a single  string
-					string combined = String.Join(" ", possibleParams.ToArray());
-					possibleParams = new List<string>(new[] {combined});
+					string combined = string.Join(" ", possibleParams.ToArray());
+					possibleParams = new List<string>(new[] { combined });
 				}
 				else
-				throw new UserException(Strings.Item("Script_Error_TooManyParameters").Replace("%0", GetCommandName()));
+					throw new UserException(Strings.Item("Script_Error_TooManyParameters").Replace("%0", GetCommandName()));
 			}
 			for (int i = 0; i < ExpectedParams.Length; i++)
 			{
@@ -509,7 +509,8 @@ namespace SAW
 						m_ParamList.Add(new IntegerParam(possibleParams[i]));
 						break;
 					case Param.ParamTypes.String:
-						m_ParamList.Add(new StringParam(possibleParams[i]));
+					case Param.ParamTypes.UnquotedString:
+						m_ParamList.Add(new StringParam(possibleParams[i], ExpectedParams[i] != Param.ParamTypes.UnquotedString));
 						break;
 					default:
 						throw new InvalidOperationException("Unexpected param type: " + ExpectedParams[i]);
@@ -517,12 +518,9 @@ namespace SAW
 			}
 		}
 
-		public override void InitialiseDefaultsForCreation()
+		public override sealed void InitialiseDefaultsForCreation()
 		{
-			for (int i = 0; i < ExpectedParams.Length; i++)
-			{
-				m_ParamList.Add(CreateParamOfType(ExpectedParams[i]));
-			}
+			EnsureParams(ExpectedParams.Length);
 		}
 
 		public static Param CreateParamOfType(Param.ParamTypes type)
@@ -549,6 +547,7 @@ namespace SAW
 				m_ParamList.Add(CreateParamOfType(ExpectedParams[m_ParamList.Count]));
 			}
 		}
+
 	}
 
 	#region Null command - placeholder for comments

@@ -17,7 +17,7 @@ namespace SAW
 			m_Document = document;
 			Strings.Translate(this);
 			FillList(lstSystem, systemTextures);
-			// can't just use objDocument.SharedBitmapsList because that is all sorts of imported images
+			// can't just use document.SharedBitmapsList because that is all sorts of imported images
 			DatumList colUsed = document.TexturesUsed();
 			FillList(lstDocument, colUsed);
 			if (colUsed.Count == 0)

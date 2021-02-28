@@ -33,7 +33,6 @@ namespace SAW
 			System.Windows.Forms.Label Label46;
 			System.Windows.Forms.Label Label47;
 			this.pnlSpeech = new System.Windows.Forms.TableLayoutPanel();
-			this.chkUseSpeech = new System.Windows.Forms.CheckBox();
 			this.cmbSpeechVoice = new System.Windows.Forms.ComboBox();
 			this.ctrSpeed = new System.Windows.Forms.TrackBar();
 			this.ctrVolume = new System.Windows.Forms.TrackBar();
@@ -64,7 +63,7 @@ namespace SAW
 			// 
 			Label45.AutoSize = true;
 			Label45.Dock = System.Windows.Forms.DockStyle.Fill;
-			Label45.Location = new System.Drawing.Point(3, 50);
+			Label45.Location = new System.Drawing.Point(3, 20);
 			Label45.Name = "Label45";
 			Label45.Size = new System.Drawing.Size(221, 27);
 			Label45.TabIndex = 3;
@@ -75,7 +74,7 @@ namespace SAW
 			// 
 			Label46.AutoSize = true;
 			Label46.Dock = System.Windows.Forms.DockStyle.Fill;
-			Label46.Location = new System.Drawing.Point(3, 77);
+			Label46.Location = new System.Drawing.Point(3, 47);
 			Label46.Name = "Label46";
 			Label46.Size = new System.Drawing.Size(221, 40);
 			Label46.TabIndex = 4;
@@ -86,7 +85,7 @@ namespace SAW
 			// 
 			Label47.AutoSize = true;
 			Label47.Dock = System.Windows.Forms.DockStyle.Fill;
-			Label47.Location = new System.Drawing.Point(3, 117);
+			Label47.Location = new System.Drawing.Point(3, 87);
 			Label47.Name = "Label47";
 			Label47.Size = new System.Drawing.Size(221, 40);
 			Label47.TabIndex = 7;
@@ -99,7 +98,6 @@ namespace SAW
 			this.pnlSpeech.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 40F));
 			this.pnlSpeech.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 60F));
 			this.pnlSpeech.Controls.Add(Label44, 0, 0);
-			this.pnlSpeech.Controls.Add(this.chkUseSpeech, 0, 1);
 			this.pnlSpeech.Controls.Add(Label45, 0, 2);
 			this.pnlSpeech.Controls.Add(Label46, 0, 3);
 			this.pnlSpeech.Controls.Add(this.cmbSpeechVoice, 1, 2);
@@ -127,22 +125,11 @@ namespace SAW
 			this.pnlSpeech.Size = new System.Drawing.Size(568, 499);
 			this.pnlSpeech.TabIndex = 63;
 			// 
-			// chkUseSpeech
-			// 
-			this.chkUseSpeech.Checked = true;
-			this.pnlSpeech.SetColumnSpan(this.chkUseSpeech, 2);
-			this.chkUseSpeech.Dock = System.Windows.Forms.DockStyle.Top;
-			this.chkUseSpeech.Location = new System.Drawing.Point(3, 23);
-			this.chkUseSpeech.Name = "chkUseSpeech";
-			this.chkUseSpeech.Size = new System.Drawing.Size(562, 24);
-			this.chkUseSpeech.TabIndex = 2;
-			this.chkUseSpeech.Text = "[Config_UseSpeech]";
-			// 
 			// cmbSpeechVoice
 			// 
 			this.cmbSpeechVoice.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.cmbSpeechVoice.FormattingEnabled = true;
-			this.cmbSpeechVoice.Location = new System.Drawing.Point(230, 53);
+			this.cmbSpeechVoice.Location = new System.Drawing.Point(230, 23);
 			this.cmbSpeechVoice.Name = "cmbSpeechVoice";
 			this.cmbSpeechVoice.Size = new System.Drawing.Size(335, 21);
 			this.cmbSpeechVoice.TabIndex = 6;
@@ -151,7 +138,7 @@ namespace SAW
 			// ctrSpeed
 			// 
 			this.ctrSpeed.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.ctrSpeed.Location = new System.Drawing.Point(230, 120);
+			this.ctrSpeed.Location = new System.Drawing.Point(230, 90);
 			this.ctrSpeed.Maximum = 100;
 			this.ctrSpeed.Name = "ctrSpeed";
 			this.ctrSpeed.Size = new System.Drawing.Size(335, 34);
@@ -163,7 +150,7 @@ namespace SAW
 			// ctrVolume
 			// 
 			this.ctrVolume.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.ctrVolume.Location = new System.Drawing.Point(230, 80);
+			this.ctrVolume.Location = new System.Drawing.Point(230, 50);
 			this.ctrVolume.Maximum = 100;
 			this.ctrVolume.Name = "ctrVolume";
 			this.ctrVolume.Size = new System.Drawing.Size(335, 34);
@@ -175,7 +162,7 @@ namespace SAW
 			// btnSpeechTest
 			// 
 			this.btnSpeechTest.AutoSize = true;
-			this.btnSpeechTest.Location = new System.Drawing.Point(230, 165);
+			this.btnSpeechTest.Location = new System.Drawing.Point(230, 135);
 			this.btnSpeechTest.Name = "btnSpeechTest";
 			this.btnSpeechTest.Size = new System.Drawing.Size(150, 27);
 			this.btnSpeechTest.TabIndex = 12;
@@ -196,7 +183,6 @@ namespace SAW
 
 		}
 		private System.Windows.Forms.TableLayoutPanel pnlSpeech;
-		private System.Windows.Forms.CheckBox chkUseSpeech;
 		private System.Windows.Forms.ComboBox cmbSpeechVoice;
 		private System.Windows.Forms.TrackBar ctrSpeed;
 		private System.Windows.Forms.TrackBar ctrVolume;

@@ -59,11 +59,9 @@ namespace Switches.Engines
 			}
 		}
 
-		public override Methods Method
-		{ get { return m_Method; } }
+		public override Methods Method => m_Method;
 
-		public override int NumberSwitchInputs
-		{ get { return 0; } }
+		public override int NumberSwitchInputs => 0;
 
 		#endregion
 

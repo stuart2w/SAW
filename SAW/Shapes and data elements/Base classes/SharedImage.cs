@@ -65,10 +65,7 @@ namespace SAW
 		}
 
 		/// <summary>Can implicitly accept a SharedReference&lt;SharedImage&gt; wherever a SharedImage is expected</summary>
-		public static implicit operator SharedImage(SharedReference<SharedImage> reference)
-		{
-			return reference?.Content;
-		}
+		public static implicit operator SharedImage(SharedReference<SharedImage> reference) => reference?.Content;
 
 		#endregion
 
@@ -179,7 +176,7 @@ namespace SAW
 	{
 		public byte[] Buffer;
 		private MemoryStream m_strm;
-		/// <summary>Original filename if known.  The file extension is important even if not known</summary>
+		/// <summary>Original filename if known.  The file extension is important even if [filename?] not known</summary>
 		public string Filename { get; private set; }
 
 		#region Creators
@@ -277,7 +274,6 @@ namespace SAW
 			m_strm.Seek(0, SeekOrigin.Begin);
 			return m_strm;
 		}
-
 
 		public override byte TypeByte
 		{

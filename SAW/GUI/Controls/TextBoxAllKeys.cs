@@ -2,19 +2,24 @@
 
 namespace SAW
 {
-	#region Modified text box to intercept all keys
-	public class TextBoxAllKeys : TextBox
+	/// <summary>Modified text box to intercept all keys so that they are reported to the normal key events on the control </summary>
+	public class TextBoxAllKeys : TextBox, IKeyControl
 	{
-		protected override bool IsInputChar(char charCode)
+		protected override bool IsInputChar(char charCode) => true;
+
+		protected override bool IsInputKey(Keys keyData) => true;
+
+		// also prevents Splash's own handlers from interfering
+		public void CombinedKeyDown(CombinedKeyEvent e)
 		{
-			return true;
+			e.DoNotHandle = true;
 		}
 
-		protected override bool IsInputKey(Keys keyData)
+		public void CombinedKeyUp(CombinedKeyEvent e)
 		{
-			return true;
+			e.DoNotHandle = true;
 		}
 	}
-	#endregion
+
 
 }

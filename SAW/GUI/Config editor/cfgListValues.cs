@@ -16,6 +16,7 @@ namespace SAW
 		public override void OnDisplay()
 		{
 			base.OnDisplay();
+			m_Filling=true;
 			lblTitle.Text = "Values (" + (m_Config.SourceFile ?? "?") + ")";
 			lstValues.Items.Clear();
 			List<string> keys = m_Config.Values.Keys.ToList();
@@ -26,6 +27,7 @@ namespace SAW
 				create.SubItems.Add(m_Config.ReadString(key));
 				create.SubItems.Add(ConfigKeyDescription(key, m_Config));
 			}
+			m_Filling=false;
 		}
 #endif
 

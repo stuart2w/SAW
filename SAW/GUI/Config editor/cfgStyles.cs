@@ -35,8 +35,8 @@ namespace SAW
 
 		public override void OnDisplay()
 		{
-			m_Filling = true;
 			base.OnDisplay();
+			m_Filling = true;
 			rdoOff.Checked = !m_Applied.ReadBoolean(Config.SAW_EnableItemStyles);
 			rdoOn.Checked = m_Applied.ReadBoolean(Config.SAW_EnableItemStyles);
 			m_Filling = false;

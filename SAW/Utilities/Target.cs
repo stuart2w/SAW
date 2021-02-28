@@ -2,10 +2,9 @@ using System;
 using System.Drawing;
 using System.Diagnostics;
 
-//  the snap to shape mechanism stores the possible snapping positions as a series of Target objects
-
 namespace SAW
 {
+	/// <summary>Used initially for snap to shape, this is also used to indicate parts of a shape that have been selected for manual coordinate editing</summary>
 	public class Target : IComparable<Target>
 	{
 
@@ -32,7 +31,9 @@ namespace SAW
 			Vertex, // a joint of two lines within this shape
 			Intersection,
 			PageEdgeV, // works rather like line, but Shape will not be defined
-			PageEdgeH // we need to distinguish horizontal and vertical in order to know which direction to draw it
+			PageEdgeH, // we need to distinguish horizontal and vertical in order to know which direction to draw it
+			/// <summary>Wraps a GrabSpot - must be derived class (which stores the GrabSpot) </summary>
+			GrabSpot
 		}
 		public readonly Shape Shape;
 		/// <summary>The exact coordinates of this snapping point</summary>
@@ -66,8 +67,11 @@ namespace SAW
 			Debug.Assert(priority == Priorities.Intersection || intersectionCertainty == Geometry.ANGLE90); // certainty has no effect unless it is an intersection
 			if (type == Types.Intersection)
 				Uncertainty = Geometry.ANGLE90 - intersectionCertainty;
-			Distance = Geometry.DistanceBetween(source.Centre, position);
+			if (source != null)
+				Distance = Geometry.DistanceBetween(source.Centre, position); // otherwise Distance left as 0.  Not used for real snapping targets, but can be used for some dummy ones
 			ShapeIndex = shapeIndex;
+			if (type == Types.GrabSpot && !(this is ForGrabSpot))
+				throw new ArgumentException(nameof(type));
 		}
 
 		public int CompareTo(Target other)
@@ -76,7 +80,7 @@ namespace SAW
 			return AdjustedDistance.CompareTo(other.AdjustedDistance);
 		}
 
-		public float AdjustedDistance => Distance - (float)Priority / 4 + Uncertainty;
+		public float AdjustedDistance => Distance - ((float)Priority / 4 + Uncertainty) * GUIUtilities.MillimetreSize;
 		public float ActualDistance => Distance;
 
 		/// <summary>if the picture is displayed at more than 100% then the drawing code might draw larger than usual </summary>
@@ -152,7 +156,7 @@ namespace SAW
 							float dimension1 = DISPLAYDIMENSION * GUIUtilities.MillimetreSize / (float)Math.Sqrt(scale); // we compromise on scaling
 							if (activePhase >= 0)
 							{
-								dimension1 = (DISPLAYDIMENSION / 2 + (ACTIVEMAXIMUMPHASE - activePhase)) * PHASESTEP / (float)Math.Sqrt(scale);
+								dimension1 = (DISPLAYDIMENSION / 2 + (ACTIVEMAXIMUMPHASE - activePhase)) * PHASESTEP / (float)Math.Sqrt(scale) * GUIUtilities.MillimetreSize;
 								Debug.Assert(dimension1 < MAXIMUMDRAWDISTANCE / Math.Sqrt(scale) - 1);
 							}
 							gr.DrawEllipse(pn, Position.X - dimension1, Position.Y - dimension1, dimension1 * 2, dimension1 * 2);
@@ -160,7 +164,7 @@ namespace SAW
 						case Types.Vertex:
 							float dimension2 = DISPLAYDIMENSION * GUIUtilities.MillimetreSize / (float)Math.Sqrt(scale);
 							if (activePhase >= 0)
-								dimension2 = (float)((DISPLAYDIMENSION / 2 + (ACTIVEMAXIMUMPHASE - activePhase)) * PHASESTEP / Math.Sqrt(scale));
+								dimension2 = (float)((DISPLAYDIMENSION / 2 + (ACTIVEMAXIMUMPHASE - activePhase)) * PHASESTEP / Math.Sqrt(scale)) * GUIUtilities.MillimetreSize;
 							gr.DrawRectangle(pn, Position.X - dimension2, Position.Y - dimension2, dimension2 * 2, dimension2 * 2);
 							break;
 						case Types.Intersection:
@@ -183,17 +187,13 @@ namespace SAW
 		#endregion
 
 		#region Distances
-		public static float MaximumApplicableDistance(float scale)
-		{
-			return MaximumInterestDistance * (float)Math.Sqrt(scale);
-		}
+		public static float MaximumApplicableDistance(float scale) => MaximumInterestDistance * (float)Math.Sqrt(scale);
 
 		/// <summary>any point outside this distance is of no interest</summary>
-		public static float MaximumInterestDistance
-		{ get { return ActivationThreshold + (float)Priorities.Intersection; } }
+		public static float MaximumInterestDistance => (ActivationThreshold + (float)Priorities.Intersection) * GUIUtilities.MillimetreSize;
 
-		/// <summary>this is compared to the target Distance - Priority.  The value is different for eyegaze users</summary>
-		public static int ActivationThreshold => 2;
+		/// <summary>this is compared to the target Distance - Priority.</summary>
+		public static float ActivationThreshold => 3 * GUIUtilities.MillimetreSize;
 
 		/// <summary>reduced amount when snapping entire shapes (because multiple priorities can be subtracted from this)</summary>
 		public static float ActivationThresholdMoveShape => 0.5F;
@@ -204,6 +204,49 @@ namespace SAW
 
 		#endregion
 
+		public override string ToString()
+		{
+			return $"{Type} target in {Shape} at {Position} index = {ShapeIndex}";
+		}
+
+		/// <summary>True if these refer to the same thing (can be different target objects).  Doesn't check coordinates match - only that they are targetting the same part of the same shape</summary>
+		/// <remarks>Doesn't override Equals because that requires GetHashCode is replaced, which is all a pain</remarks>
+		public bool Matches(Target other)
+		{
+			if (other == null)
+				return false;
+			return Shape == other.Shape
+				   && Type == other.Type
+				   && ShapeIndex == other.ShapeIndex
+				   && ShapeParameter == other.ShapeParameter;
+		}
+
+		/// <summary>Wraps a GrabSpot.  Not used in snapping, only in part path selection</summary>
+		public sealed class ForGrabSpot : Target
+		{
+			public readonly Shape.GrabSpot Grab;
+
+			public ForGrabSpot(Shape.GrabSpot grab) : base(grab.Shape, grab.Position, Types.GrabSpot, null)
+			{
+				Grab = grab;
+			}
+		}
+
+		public static Target FromGrabSpot(Shape.GrabSpot grab)
+		{
+			switch (grab.GrabType)
+			{
+				case Shape.GrabTypes.SingleVertex:
+					return new Target(grab.Shape, grab.Position, Types.Vertex, null, Priorities.Standard, Geometry.PI / 2, grab.ShapeIndex);
+				case Shape.GrabTypes.Bezier:
+					return new Target(grab.Shape, grab.Position, Types.Line, null, Priorities.Standard, Geometry.PI / 2,
+						grab.ShapeIndex - (grab.ShapeParameter == -1 ? 2 : 1)); // shapeParameter indicates whether bezier is first (+1) or second (-1) in segment
+				default:
+					return new ForGrabSpot(grab);
+			}
+		}
 	}
+
+
 
 }

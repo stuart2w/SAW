@@ -23,6 +23,7 @@ namespace SAW
 		{
 			m_Filling = true;
 			InitializeComponent();
+			AddGripper();
 			Globals.Root.CurrentDocumentChanged += CurrentDocumentChanged;
 			Globals.TransactionStored += Engine_TransactionStored;
 			Globals.UpdateInfo += UpdateInfo;
@@ -133,15 +134,15 @@ namespace SAW
 
 		public void ReflectSelection()
 		{ // mostly only called on selection change (also when tree rebuilt)
-			var selected = Globals.Root.CurrentPage.SelectedShapes;
-			foreach (var node in NodeList.Values)
+			List<Shape> selected = Globals.Root.CurrentPage.SelectedShapes;
+			foreach (TreeNode node in NodeList.Values)
 			{
 				node.BackColor = selected.Contains(node.Tag) ? Color.Cyan : Color.White;
 			}
 			UpdateInfo();
 			if (selected?.Count == 1 && NodeList.ContainsKey(selected.First())) // second condition should be redundant, but kept in case we have selected as Item not the scriptable
 			{
-				var nodeForSelected = NodeList[selected.First()];
+				TreeNode nodeForSelected = NodeList[selected.First()];
 				nodeForSelected.EnsureVisible();
 			}
 		}
@@ -168,7 +169,7 @@ namespace SAW
 
 		private void txtInfo_Click(object sender, EventArgs e)
 		{
-			var selected = Globals.Root.CurrentPage.SelectedShapes;
+			List<Shape> selected = Globals.Root.CurrentPage.SelectedShapes;
 			if (selected.Count != 1)
 				return;
 			Globals.PerformAction(Functions.Verb.Find(Functions.Codes.EditItemBounds), EditableView.ClickPosition.Sources.Irrelevant);
@@ -211,8 +212,8 @@ namespace SAW
 			node.Tag = shape;
 			StyleNode(node, shape);
 			NodeList.Add(shape, node);
-			if (shape is IShapeContainer)
-				FillTreeNode((IShapeContainer)shape, node.Nodes);
+			if (shape is IShapeContainer container) // && !(shape is Scriptable))
+				FillTreeNode(container, node.Nodes);
 		}
 
 		/// <summary>Updates the general appearance of the node.  Both used when creating the tree and if a node is edited</summary>
@@ -316,6 +317,7 @@ namespace SAW
 
 		#region Gripper and mouse events passed out to make resize in palette container work
 		// all of these need to raise the click as if on this control, not the TV, so the palette form can do resizing
+		// gripper now done by base class
 		private void tvOutline_MouseDown(object sender, MouseEventArgs e)
 		{
 			if (e.Button == MouseButtons.Left)
@@ -339,23 +341,6 @@ namespace SAW
 		{
 			if (e.Button == MouseButtons.Left)
 				OnMouseUp(new MouseEventArgs(e.Button, 1, e.X + tvOutline.Left, e.Y + tvOutline.Top, e.Delta));
-		}
-
-		private void picSizeGrip_MouseDown(object sender, MouseEventArgs e)
-		{
-			if (e.Button == MouseButtons.Left)
-				OnMouseDown(new MouseEventArgs(e.Button, 1, e.X + picSizeGrip.Left, e.Y + picSizeGrip.Top, e.Delta));
-		}
-
-		private void picSizeGrip_MouseMove(object sender, MouseEventArgs e)
-		{
-			OnMouseMove(new MouseEventArgs(e.Button, 1, e.X + picSizeGrip.Left, e.Y + picSizeGrip.Top, e.Delta));
-		}
-
-		private void picSizeGrip_MouseUp(object sender, MouseEventArgs e)
-		{
-			if (e.Button == MouseButtons.Left)
-				OnMouseUp(new MouseEventArgs(e.Button, 1, e.X + picSizeGrip.Left, e.Y + picSizeGrip.Top, e.Delta));
 		}
 
 		#endregion

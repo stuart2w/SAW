@@ -372,7 +372,7 @@ namespace SAW
 			InvalidateData(dataRect, InvalidationBuffer.All);
 		}
 
-		private void m_Page_SelectionChanged()
+		protected virtual void m_Page_SelectionChanged()
 		{
 			// mostly the page will request an update using m_Page_RefreshSelection
 			// however, it does not take account of the selection boundary, and only requests for the area covering the shapes which have changed
@@ -382,7 +382,7 @@ namespace SAW
 				m_SelectionBoundsDrawn.Inflate(1, 1); // to account for the fact that the line is quite wide
 				InvalidateData(m_SelectionBoundsDrawn, InvalidationBuffer.Selection);
 				m_SelectionBoundsDrawn = RectangleF.Empty; // because there is no need to make this request again until it actually gets drawn
-				// (which sets m_rctSelectionBoundsDrawn).  In particular if we allow to repeat it might get repeatedly inflated
+														   // (which sets m_rctSelectionBoundsDrawn).  In particular if we allow to repeat it might get repeatedly inflated
 			}
 		}
 
@@ -514,7 +514,7 @@ namespace SAW
 				m_Zoom = newZoom;
 				return;
 			}
-			AutoScroll = newZoom > 1;
+			AutoScroll = newZoom > 1 || !Globals.Root.CurrentConfig.ReadBoolean(Config.Resize_Document_ToWindow, true);
 			InvalidateAll();
 			PointF ptMaintainData = MouseToData(ptMaintainLocal); // the data coordinates for the points which should be maintained
 			m_Zoom = newZoom;
@@ -643,7 +643,7 @@ namespace SAW
 			private Rectangle m_InvalidArea = Rectangle.Empty; // the part if any of this buffer which is out of date
 			private bool m_TotalInvalid = false; // just flags if the entire image is invalid - in which case it won't bother setting a clipping region
 			public bool StartTransparent; // if true the buffer is automatically cleared to transparent
-			// (not needed for the background buffer - which will always be filled by the main graphics functionality; however buffers for individual objects will want this)
+										  // (not needed for the background buffer - which will always be filled by the main graphics functionality; however buffers for individual objects will want this)
 
 			public Buffer(bool startTransparent)
 			{

@@ -77,26 +77,25 @@ namespace SAW
 		{
 			DrawInternalBackground(e, true);
 
-			Image objImage = null;
+			Image image = null;
 			if (!string.IsNullOrEmpty(m_ImageName ))
-				objImage = (Bitmap)GUIUtilities.RM.GetObject(m_ImageName);
+				image = (Bitmap)GUIUtilities.RM.GetObject(m_ImageName);
 			else if (m_eVerb != Codes.None)
-				objImage = GUIUtilities.VariableSizeImage("Verb", "_" + m_eVerb, this.Width - EXCESSSIZE);
+				image = GUIUtilities.VariableSizeImage("Verb", "_" + m_eVerb, this.Width - EXCESSSIZE);
 			if (m_Image != null)
-				objImage = m_Image;
+				image = m_Image;
 
-			if (objImage != null)
+			if (image != null)
 			{
-				DrawStandardImage(e.Graphics, objImage);
-				if (objImage != m_Image)
-					objImage.Dispose();
+				DrawStandardImage(e.Graphics, image);
+				if (image != m_Image)
+					image.Dispose();
 			}
 
 			DrawHighlightAndKey(e);
 		}
 
-		protected override string BackgroundImagePrefix
-		{ get { return "CustomButton"; } }
+		protected override string BackgroundImagePrefix => "CustomButton";
 
 		protected override void SetSelectionGUI(bool selected)
 		{

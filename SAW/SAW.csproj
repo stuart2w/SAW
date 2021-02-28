@@ -87,6 +87,9 @@
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.Speech" />
+    <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.ValueTuple.4.5.0\lib\netstandard1.0\System.ValueTuple.dll</HintPath>
+    </Reference>
     <Reference Include="System.Web" />
     <Reference Include="System.Web.Services" />
     <Reference Include="System.Xml.Linq" />
@@ -110,6 +113,7 @@
     <Compile Include="Documents\Page.cs" />
     <Compile Include="Documents\Paper.cs" />
     <Compile Include="Documents\Transaction.cs" />
+    <Compile Include="Functions\AdvancedGraphics.cs" />
     <Compile Include="Functions\IRM.cs" />
     <Compile Include="GUI\Controls\WrappingCheckBox.cs">
       <SubType>Component</SubType>
@@ -120,6 +124,42 @@
     <Compile Include="GUI\DevelopmentDialogs\frmDeltas.Designer.cs">
       <DependentUpon>frmDeltas.cs</DependentUpon>
     </Compile>
+    <Compile Include="GUI\Dialogs\frmYocto.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\Dialogs\frmYocto.Designer.cs">
+      <DependentUpon>frmYocto.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\frmTest.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\frmTest.Designer.cs">
+      <DependentUpon>frmTest.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\Minor dialogs\frmUserReport.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\Minor dialogs\frmUserReport.Designer.cs">
+      <DependentUpon>frmUserReport.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\Palettes\ctrCoordEdit.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="GUI\Palettes\ctrCoordEdit.Designer.cs">
+      <DependentUpon>ctrCoordEdit.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\Palettes\ctrRotation.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="GUI\Palettes\ctrRotation.Designer.cs">
+      <DependentUpon>ctrRotation.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\Palettes\ctrScale.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="GUI\Palettes\ctrScale.Designer.cs">
+      <DependentUpon>ctrScale.cs</DependentUpon>
+    </Compile>
     <Compile Include="GUI\StaticView.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -129,12 +169,23 @@
     <Compile Include="SAW\CommandEditors\GotoPageEditor.Designer.cs">
       <DependentUpon>GotoPageEditor.cs</DependentUpon>
     </Compile>
+    <Compile Include="SAW\CommandEditors\YoctoEditor.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="SAW\CommandEditors\YoctoEditor.Designer.cs">
+      <DependentUpon>YoctoEditor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SAW\Commands\YoctoCommand.cs" />
     <Compile Include="SAW\SAW6 Compatibility\Header.cs" />
     <Compile Include="Shapes and data elements\Base classes\Filled.cs" />
     <Compile Include="Shapes and data elements\Base classes\Interfaces.cs" />
     <Compile Include="Shapes and data elements\Base classes\Sequential.cs" />
     <Compile Include="Shapes and data elements\Base classes\SharedReference.cs" />
     <Compile Include="Shapes and data elements\Base classes\AbstractRectangle.cs" />
+    <Compile Include="Shapes and data elements\Graphical shapes\FloatingLabel.cs" />
+    <Compile Include="Shapes and data elements\Graphical shapes\MaskedImage.cs" />
+    <Compile Include="Shapes and data elements\Graphical shapes\Pencil.cs" />
+    <Compile Include="Shapes and data elements\Virtual\SetRotation.cs" />
     <Compile Include="Utilities\Geometry\Bezier.cs" />
     <Compile Include="Utilities\Geometry\Geometry.cs" />
     <Compile Include="Utilities\Geometry\Intersection.cs" />
@@ -205,12 +256,6 @@
     </Compile>
     <Compile Include="GUI\Dialogs\frmButton.Designer.cs">
       <DependentUpon>frmButton.cs</DependentUpon>
-    </Compile>
-    <Compile Include="GUI\Dialogs\frmCreateActivity.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="GUI\Dialogs\frmCreateActivity.Designer.cs">
-      <DependentUpon>frmCreateActivity.cs</DependentUpon>
     </Compile>
     <Compile Include="GUI\Dialogs\frmErrorReport.cs">
       <SubType>Form</SubType>
@@ -412,11 +457,11 @@
     <Compile Include="GUI\Config editor\cfgOutput.Designer.cs">
       <DependentUpon>cfgOutput.cs</DependentUpon>
     </Compile>
-    <Compile Include="GUI\Config editor\cfgShowInEditing.cs">
+    <Compile Include="GUI\Config editor\cfgEditing.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="GUI\Config editor\cfgShowInEditing.Designer.cs">
-      <DependentUpon>cfgShowInEditing.cs</DependentUpon>
+    <Compile Include="GUI\Config editor\cfgEditing.Designer.cs">
+      <DependentUpon>cfgEditing.cs</DependentUpon>
     </Compile>
     <Compile Include="GUI\Config editor\cfgSpeech.cs">
       <SubType>UserControl</SubType>
@@ -790,12 +835,13 @@
     <Compile Include="Shapes and data elements\Container.cs" />
     <Compile Include="Shapes and data elements\Base classes\Datum.cs" />
     <Compile Include="Shapes and data elements\Group.cs" />
-    <Compile Include="Shapes and data elements\Base classes\Segment.cs" />
     <Compile Include="Shapes and data elements\Virtual\SelectionBox.cs" />
     <Compile Include="Shapes and data elements\Virtual\SetOrigin.cs" />
     <Compile Include="Shapes and data elements\Base classes\SharedImage.cs" />
     <Compile Include="Shapes and data elements\Virtual\Transformation.cs" />
     <Compile Include="Shapes and data elements\Virtual\UserSocket.cs" />
+    <Compile Include="Utilities\Yocto\yocto_api.cs" />
+    <Compile Include="Utilities\Yocto\yocto_relay.cs" />
     <EmbeddedResource Include="AM.resx">
       <CustomToolNamespace>Resources</CustomToolNamespace>
       <Generator>ResXFileCodeGenerator</Generator>
@@ -818,8 +864,8 @@
     <EmbeddedResource Include="GUI\Config editor\cfgOutput.resx">
       <DependentUpon>cfgOutput.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="GUI\Config editor\cfgShowInEditing.resx">
-      <DependentUpon>cfgShowInEditing.cs</DependentUpon>
+    <EmbeddedResource Include="GUI\Config editor\cfgEditing.resx">
+      <DependentUpon>cfgEditing.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="GUI\Config editor\cfgSpeech.resx">
       <DependentUpon>cfgSpeech.cs</DependentUpon>
@@ -845,9 +891,6 @@
     <EmbeddedResource Include="GUI\Dialogs\frmButton.resx">
       <DependentUpon>frmButton.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="GUI\Dialogs\frmCreateActivity.resx">
-      <DependentUpon>frmCreateActivity.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="GUI\Dialogs\frmErrorReport.resx">
       <DependentUpon>frmErrorReport.cs</DependentUpon>
     </EmbeddedResource>
@@ -872,6 +915,9 @@
     <EmbeddedResource Include="GUI\Dialogs\frmUpdate.resx">
       <DependentUpon>frmUpdate.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="GUI\Dialogs\frmYocto.resx">
+      <DependentUpon>frmYocto.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="GUI\frmMain.resx">
       <DependentUpon>frmMain.cs</DependentUpon>
     </EmbeddedResource>
@@ -880,6 +926,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="GUI\frmRun.resx">
       <DependentUpon>frmRun.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\frmTest.resx">
+      <DependentUpon>frmTest.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="GUI\MajorControls\ctrActionSelect.resx">
       <DependentUpon>ctrActionSelect.cs</DependentUpon>
@@ -923,8 +972,14 @@
     <EmbeddedResource Include="GUI\Minor dialogs\frmUserButtonStyle.resx">
       <DependentUpon>frmUserButtonStyle.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="GUI\Minor dialogs\frmUserReport.resx">
+      <DependentUpon>frmUserReport.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="GUI\Palettes\ctrArrowheadsPalette.resx">
       <DependentUpon>ctrArrowheadsPalette.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\Palettes\ctrCoordEdit.resx">
+      <DependentUpon>ctrCoordEdit.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="GUI\Palettes\ctrDocumentOutline.resx">
       <DependentUpon>ctrDocumentOutline.cs</DependentUpon>
@@ -934,6 +989,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="GUI\DevelopmentDialogs\frmShowErrorReport.resx">
       <DependentUpon>frmShowErrorReport.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\Palettes\ctrRotation.resx">
+      <DependentUpon>ctrRotation.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\Palettes\ctrScale.resx">
+      <DependentUpon>ctrScale.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -1044,6 +1105,9 @@
     <EmbeddedResource Include="SAW\CommandEditors\OnOffEditor.resx">
       <DependentUpon>OnOffEditor.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="SAW\CommandEditors\YoctoEditor.resx">
+      <DependentUpon>YoctoEditor.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Switches\ctrEditTiming.resx">
       <DependentUpon>ctrEditTiming.cs</DependentUpon>
     </EmbeddedResource>
@@ -1110,6 +1174,10 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Flaws.txt" />
+    <ContentWithTargetPath Include="Utilities\Yocto\yapi.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <TargetPath>yapi.dll</TargetPath>
+    </ContentWithTargetPath>
     <None Include="Resources\Warning.png" />
     <None Include="Resources\SizeGrip_24.png" />
     <None Include="Resources\Verb_NudgeUp.png" />
@@ -1985,6 +2053,13 @@
     <None Include="Resources\Nudge_Shorter.png" />
     <None Include="Resources\Nudge_Taller.png" />
     <None Include="Resources\Nudge_Wider.png" />
+    <None Include="Resources\TOOLIMG_64_RHOMBUS.png" />
+    <None Include="Resources\TOOLIMG_RHOMBUS.png" />
+    <None Include="Resources\TOOLIMG_GENERICPATH.png" />
+    <None Include="Resources\TOOLIMG_FLOATINGLABEL.png" />
+    <None Include="Resources\CoordEdit_64.png" />
+    <None Include="Resources\Rotate_64.png" />
+    <None Include="Resources\Scale_64.png" />
     <Content Include="strings.txt" />
   </ItemGroup>
   <ItemGroup>

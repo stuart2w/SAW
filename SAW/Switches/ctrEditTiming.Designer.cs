@@ -81,7 +81,7 @@ namespace Switches
 			this.Margin = new System.Windows.Forms.Padding(4);
 			this.MinimumSize = new System.Drawing.Size(100, 32);
 			this.Name = "ctrEditTiming";
-			this.Size = new System.Drawing.Size(320, 33);
+			this.Size = new System.Drawing.Size(283, 33);
 			this.ResumeLayout(false);
 			this.PerformLayout();
 

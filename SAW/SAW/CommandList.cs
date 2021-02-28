@@ -111,6 +111,7 @@ namespace SAW
 			Add("Wait", typeof(CmdWait), "SAW");
 			Add("DisplayPromptText", typeof(CmdDisplayPromptText), "SAW");
 			Add("GotoPage", typeof(CmdGotoPage), "SAW").SAW6 = false;
+			Add("YoctoRelay", typeof(CmdYocto), "SAW").SAW6 = false;
 			Add("OutText", typeof(CmdOutText), "SAW/Output");
 			Add("SAWMoveToEdge", typeof(CmdSawMoveToEdge), "SAW/SAWWindow");
 			Add("ShowSAW", typeof(CmdShowSAW), "SAW/SAWWindow");
