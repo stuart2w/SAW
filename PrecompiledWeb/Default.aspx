@@ -11,7 +11,7 @@
     <div>
     <h1>Special Access to Windows</h1>
 		<div>This site provides the technical services to SAW7, such as the online update.</div>
-		<div>However the latest installer is available <a href="Files/Installer.exe">here</a></div>
+		<div>However the latest installer is available <a href="Files/Installer.exe">here</a>.  This is now updated to version 8 which adds considerable graphical functionality to the initial SAW7 release</div>
 		<div>There is also a <a href="History.aspx">change log here</a></div>
     </div>
     </form>

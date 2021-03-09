@@ -50,10 +50,7 @@ namespace SAW.Commands
 		}
 
 		#region Meta
-		public override ICommandEditor GetEditor()
-		{
-			return new AnyItemStateEditor();
-		}
+		public override ICommandEditor GetEditor() => new AnyItemStateEditor();
 
 		#endregion
 
@@ -61,7 +58,7 @@ namespace SAW.Commands
 		{
 			if (AffectsThis)
 				return context.TargetItem;
-			var result = context.Page.FindScriptableByID(ItemID);
+			Scriptable result = context.Page.FindScriptableByID(ItemID);
 			if (result == null)
 				throw new UserException(Strings.Item("Script_Error_CannotFindItem").Replace("%0", ItemID.ToString()));
 			return result;
@@ -109,15 +106,9 @@ namespace SAW.Commands
 		{
 		}
 
-		public override ICommandEditor GetEditor()
-		{
-			return new PickItemEditor();
-		}
+		public override ICommandEditor GetEditor() => new PickItemEditor();
 
-		public override ExecutionTimes ExecutionTime
-		{
-			get { return ExecutionTimes.Deferred; }
-		}
+		public override ExecutionTimes ExecutionTime => ExecutionTimes.Deferred;
 
 		public override void Execute(ExecutionContext context)
 		{
@@ -125,7 +116,7 @@ namespace SAW.Commands
 			Scriptable item = context.Page.FindScriptableByID(id);
 			if (item == null)
 				throw new UserException(Strings.Item("Script_Error_CannotFindItem").Replace("%0", GetParamAsString(0)));
-			context.View.InvokeScript(item, Scriptable.ScriptTypes.Select);
+			context.View.InvokeScript(item, Scriptable.ScriptTypes.Select, false, context.TargetItem);
 		}
 
 	}
@@ -136,24 +127,17 @@ namespace SAW.Commands
 		// BUT... we have files containing them in the main list.  Therefore we need to be able to load them at least
 		protected Script.VisitTarget.VisitTypes m_Target;
 
-		public override string GetCommandName()
-		{
-			return Strings.Item("Script_CommandPart_Visit") + " " + Strings.Item("SAW_Visit_" + m_Target).ToLower();
-		}
+		public override string GetCommandName() => Strings.Item("Script_CommandPart_Visit") + " " + Strings.Item("SAW_Visit_" + m_Target).ToLower();
 
 		internal override void CompleteCommandListEntry(CommandList.Entry entry)
 		{
 			entry.PossibleCommandsLower = new[] { Strings.Item("Script_CommandPart_Visit") + " " + Strings.Item("SAW_Visit_" + m_Target).ToLower() };
 		}
 
-		public override string GetDescription()
-		{
-			return Strings.Item("Script_Desc_VISIT_" + m_Target.ToString().ToUpper());
-		}
+		public override string GetDescription() => Strings.Item("Script_Desc_VISIT_" + m_Target.ToString().ToUpper());
 
 		#region Other meta
-		public override ExecutionTimes ExecutionTime
-		{ get { return ExecutionTimes.MouseUp; } }
+		public override ExecutionTimes ExecutionTime => ExecutionTimes.MouseUp;
 
 		protected override void InitialiseFromParams(List<string> possibleParams, string commandUsed)
 		{
@@ -188,7 +172,7 @@ namespace SAW.Commands
 			Script.VisitTarget temp = new Script.VisitTarget() { VisitType = m_Target };
 			if (m_Target == Script.VisitTarget.VisitTypes.Item)
 				temp.ItemID = GetParamAsInt(0);
-			var item = context.View.ResolveVisitTarget(temp, context.TargetItem);
+			Scriptable item = context.View.ResolveVisitTarget(temp, context.TargetItem);
 			if (item != null) // i think a  null here is not any sort of error.  Eg Down in an item with no contents is just ignored
 				context.View.SelectItem(item, false); // must be false or View will enter infinite loop as the leave script calls back to this
 		}

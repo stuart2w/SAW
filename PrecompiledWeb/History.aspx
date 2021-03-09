@@ -9,6 +9,16 @@
 <body>
 	<form id="form1" runat="server">
 		<h2>Version history</h2>
+		<h3>8.00.5</h3>
+		<ul>
+			Major upgrade adding significant graphical functionality to create non-rectangular shapes that can be scanned.  Selecting "Graphics mode" from the file menu displays extra options to draw and edit various shapes.
+			Arbitrary shapes can be scanned supporting the normal scripts and colour or line changes to indicate when selected.
+			All graphical shapes can be moved manually, stretched, rotated both with the mouse or by entering coordinates (or rotation amounts etc)
+			Closed shapes can be used to create a masked image: displaying only the part of an image within the bounding shape
+			Addition of nudge buttons in the item property to slightly move the selected item(s)
+			Text labels which attach to another button/shape and move with it when the set is edited
+			Support for Yoctopuce relay switches
+		</ul>
 		<h3>7.02.2</h3>
 		<ul>
 			<li>Minor fixes</li>

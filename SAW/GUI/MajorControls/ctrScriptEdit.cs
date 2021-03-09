@@ -104,7 +104,6 @@ namespace SAW
 		/// <summary>Called when the user has made changes; the changes have already been written to the data object</summary>
 		private void Edited()
 		{
-
 		}
 
 		/// <summary>Returns an error message, or null if none</summary>
@@ -112,7 +111,7 @@ namespace SAW
 		{ // not using the in-built validation as it mostly works on LostFocus on internal controls, and is a pain
 			if (!m_ItemIDValid)
 				return Strings.Item("SAW_Edit_VisitItemInvalid");
-			var error = StoreTextChanges();
+			string error = StoreTextChanges();
 			if (rdoList.Checked)
 				error = error ?? ctrCommandEditor.GetValidationError();
 			return error;

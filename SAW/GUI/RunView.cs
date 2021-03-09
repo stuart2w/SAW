@@ -70,9 +70,11 @@ namespace SAW
 		{ // note this may happen while scanning
 			base.DisplayPage(page, document);
 			this.ChangeZoom((float)SpecialZooms.FitPage);
-			SelectInitialItem();
 			if (IsScanning)
+			{
+				SelectInitialItem();
 				StartScanOnDocument();
+			}
 		}
 
 		private Timer m_ZoomTimer; // used for some things which run continously
@@ -363,6 +365,7 @@ namespace SAW
 			Script def = null;
 			if (script?.RunDefault ?? true) // if object missing entirely(?!?) default is used
 				def = item.GetDefaultScript(which, m_Document);
+			Scriptable originalCurrent = m_Current;// used below to detect if a custom visit script changed the selection
 			Command.ExecutionContext context = new Command.ExecutionContext(contextItem, this, m_Page, m_Document, m_Engine, which);
 			if (def != null)
 				InvokeScriptCommands(def, context);
@@ -374,11 +377,11 @@ namespace SAW
 			// however the default visit is done after any custom commands
 			Scriptable target = null;
 			if (script != null)
-				target = ResolveVisitTarget(script.Visit, item);
+				target = ResolveVisitTarget(script.Visit, contextItem); // 8.0.4 changed to context from Item - 
 			if (target == null && def != null) // default is only used if self is set to None:
-				target = ResolveVisitTarget(def.Visit, item);
-			if (target == null && which == Scriptable.ScriptTypes.Next)
-				target = item; // a Next script which references nothing useful should re-select the same item
+				target = ResolveVisitTarget(def.Visit, contextItem);
+			if (target == null && which == Scriptable.ScriptTypes.Next && originalCurrent == m_Current)
+				target = item; // a Next script which references nothing useful should re-select the same item // but only if a custom script didn't make a selection
 			if (target != null)
 				SelectItem(target, false);
 		}
@@ -674,6 +677,8 @@ namespace SAW
 
 		public void SelectPrediction(string text)
 		{
+			if (string.IsNullOrEmpty(text))
+				return;
 			m_Blade.Type(text, true);
 			//UpdateWordPredictions();
 		}
