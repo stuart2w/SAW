@@ -93,24 +93,15 @@ namespace SAW.Commands
 			ar.Write((short)m_Action);
 		}
 
-		public override string GetCommandName()
-		{
-			return Strings.Item("Script_Command_Output_" + m_Action);
-		}
+		public override string GetCommandName() => Strings.Item("Script_Command_Output_" + m_Action);
 
-		public override string GetDescription()
-		{
-			return Strings.Item("Script_Desc_OUTPUT_TO_" + m_Action.ToString().ToUpper());
-		}
+		public override string GetDescription() => Strings.Item("Script_Desc_OUTPUT_TO_" + m_Action.ToString().ToUpper());
 
 		#endregion
 
 		#region Other meta stuff
 
-		public override ICommandEditor GetEditor()
-		{
-			return new OnOffEditor();
-		}
+		public override ICommandEditor GetEditor() => new OnOffEditor();
 
 		public override void InitialiseDefaultsForCreation()
 		{
@@ -148,46 +139,45 @@ namespace SAW.Commands
 
 	}
 
-	public class CmdPromptOnOff : ParamBasedCommand
+	public abstract class _OnOffCommand:ParamBasedCommand
 	{
-		public CmdPromptOnOff() : base(new[] { Param.ParamTypes.Bool })
-		{
-		}
+		protected _OnOffCommand() : base(new[] { Param.ParamTypes.Bool })
+		{ }
+
+		public override ICommandEditor GetEditor() => new OnOffEditor();
+
+	}
+
+	public class CmdPromptOnOff : _OnOffCommand
+	{
 
 		public override void Execute(ExecutionContext context)
 		{
 			context.View.ConfigToEdit.Write(Config.SAW_Prompts, GetParamAsBool(0));
 		}
 
-		public override ICommandEditor GetEditor()
+	}
+
+	public class CmdHideTitleOnOff : _OnOffCommand
+	{
+
+		public override void Execute(ExecutionContext context)
 		{
-			return new OnOffEditor();
+			context.View.ConfigToEdit.Write(Config.Hide_Title, GetParamAsBool(0));
+			(context.View.FindForm() as frmRun)?.SetHiddenTitle(); // required to make the setting take effect
 		}
 
 	}
 
-	public class CmdClickSoundOnOff : ParamBasedCommand
+	public class CmdClickSoundOnOff : _OnOffCommand
 	{ // command is "set click" here, but was "click" in saw
-
-		public CmdClickSoundOnOff() : base(new[] { Param.ParamTypes.Bool })
-		{
-		}
 
 		public override void Execute(ExecutionContext context)
 		{
 			context.View.ConfigToEdit.Write(Config.Sound_Click, GetParamAsBool(0));
 		}
 
-		public override ICommandEditor GetEditor()
-		{
-			return new OnOffEditor();
-		}
-
-		public override string GetScriptWithParams(bool forSAW6)
-		{ // script was different in SAW6
-			return "click " + m_ParamList[0].ValueAsString();
-		}
-
+		public override string GetScriptWithParams(bool forSAW6) => "click " + m_ParamList[0].ValueAsString();  // script was different in SAW6
 	}
 	#endregion
 
@@ -211,15 +201,9 @@ namespace SAW.Commands
 
 		#region Meta
 
-		public override string GetCommandName()
-		{
-			return Strings.Item("Script_CommandPart_" + StepCode) + " " + Strings.Item("Script_CommandPart_" + m_Code);
-		}
+		public override string GetCommandName() => Strings.Item("Script_CommandPart_" + StepCode) + " " + Strings.Item("Script_CommandPart_" + m_Code);
 
-		public override string GetDescription()
-		{
-			return Strings.Item("Script_Desc_" + StepCode.ToUpper() + "_" + m_Code.ToUpper());
-		}
+		public override string GetDescription() => Strings.Item("Script_Desc_" + StepCode.ToUpper() + "_" + m_Code.ToUpper());
 
 		internal override void CompleteCommandListEntry(CommandList.Entry entry)
 		{
@@ -290,15 +274,13 @@ namespace SAW.Commands
 	public class CmdAdjustScanTime : _AdjustScan
 	{
 		public CmdAdjustScanTime() : base("ScanTime", Switches.Engine.Timings.ScanTime)
-		{
-		}
+		{ }
 	}
 
 	public class CmdAdjustRestart : _AdjustScan
 	{
 		public CmdAdjustRestart() : base("RestartTime", Switches.Engine.Timings.CriticalReverse)
-		{
-		}
+		{ }
 	}
 
 	public class CmdAdjustInputAcc : _AdjustScan

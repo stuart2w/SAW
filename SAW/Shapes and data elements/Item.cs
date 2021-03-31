@@ -1140,8 +1140,7 @@ namespace SAW
 		}
 
 		/// <summary>Returns child items which can be used to display word list entries</summary>
-		private IEnumerable<Item> WordListEntryChildren
-		{ get { return from s in Contents.OfType<Scriptable>() where s.Element is Item && !(s.Element as Item).WordlistDoesntFill select (Item)s.Element; } }
+		internal IEnumerable<Item> WordListEntryChildren => from s in Contents.OfType<Scriptable>() where s.Element is Item item && !item.WordlistDoesntFill select (Item)s.Element;
 
 		private void MaximiseFontSize()
 		{

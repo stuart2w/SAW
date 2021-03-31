@@ -40,6 +40,7 @@ namespace SAW
 			Equilateral = 12,
 			Polygon = 13,
 			IrregularPolygon = 14,
+			Arc = 15,
 			Circle = 16,
 			Ellipse = 17,
 			Semicircle = 18,
@@ -87,7 +88,6 @@ namespace SAW
 
 			// not used in SAW, but included so that various code compiles:
 			Pie = 38,
-			Arc = 15,
 		}
 
 		// shapes visible to the user (omits anything which cannot be added to the toolbar)
@@ -96,7 +96,7 @@ namespace SAW
 			Shapes.Line, Shapes.Orthogonal, Shapes.Arrow, Shapes.PolyLine, Shapes.Connector,
 			Shapes.Square, Shapes.Rectangle, Shapes.OrthogonalRectangle, Shapes.Parallelogram, Shapes.Rhombus,
 			Shapes.Triangle, Shapes.Isosceles, Shapes.Equilateral, Shapes.Polygon, Shapes.IrregularPolygon,
-			Shapes.Circle, Shapes.Ellipse, Shapes.Semicircle, Shapes.Curve, Shapes.ClosedCurve, Shapes.Pencil, Shapes.GenericPath,
+			Shapes.Circle, Shapes.Ellipse, Shapes.Semicircle, Shapes.Arc, Shapes.Curve, Shapes.ClosedCurve, Shapes.Pencil, Shapes.GenericPath,
 			Shapes.FreeText, Shapes.TextLine, Shapes.FloatingLabel,Shapes.UserSocket,Shapes.Button,
 			Shapes.Container, Shapes.Flow};
 		// In no particular order (and see also GetClass)
@@ -141,6 +141,7 @@ namespace SAW
 				case Shapes.Circle: return new Circle();
 				case Shapes.Ellipse: return new Ellipse();
 				case Shapes.Semicircle: return new Semicircle();
+				case Shapes.Arc: return new Arc();
 				case Shapes.Arrow: return new Arrow();
 				case Shapes.SelectionBox: return new SelectionBox();
 				case Shapes.Image: return new ImportedImage();
@@ -195,7 +196,6 @@ namespace SAW
 					return Classes.Real;
 			}
 		}
-
 
 		/// <summary>Only applicable to UserShapes.  Returns true if the option to include the shape should not generally be shown in configuration</summary>
 		internal static bool HideShapeType(Shapes shape)
@@ -2577,8 +2577,7 @@ namespace SAW
 
 		/// <summary>Returns how the shape can use labels, or not. 
 		/// NOTE: can be called before the shape is constructed, show should not rely on state</summary>
-		public virtual LabelModes LabelMode
-		{ get { return LabelModes.Allowed; } }
+		public virtual LabelModes LabelMode => LabelModes.Allowed;
 
 		public bool HasText(bool labelOnly)
 		{
@@ -4122,10 +4121,7 @@ namespace SAW
 		}
 
 		/// <summary>Returns true if it is possible to DoDoubleClick with the given set of items selected.  This is called on first item.  Default is to only return true if 1 item (this) is selected</summary>
-		internal virtual bool CanDoubleClickWith(IEnumerable<Shape> selection)
-		{
-			return selection.Count() == 1;
-		}
+		internal virtual bool CanDoubleClickWith(IEnumerable<Shape> selection) => selection.Count() == 1;
 
 		#endregion
 

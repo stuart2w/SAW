@@ -1534,4 +1534,485 @@ namespace SAW
 
 	#endregion
 
+	#region Arc - shape in own right and also base for Pie
+	public class Arc : PartCircle
+	{
+		// draws just part of a circle.  Initially the user draws from the centre to the edge
+		// stores 3 points -(0) = centre; (1) = first point on radius; (2) = second point on radius
+
+		protected bool m_First = true; // true if this is the first one created.  This is not stored in the data; it is only used when initially creating the shape
+									   // in the arc, only the first can have the radius adjusted; in the Pie only the first cannot be completed to make a circle
+
+		#region Basic information
+		public override Shapes ShapeCode => Shapes.Arc;
+		public override PointF Centre => Vertices[0];
+		public override bool IsFilled => false;
+		protected override int FixedVerticesLength() => 3;
+
+		public override SnapModes SnapNext(SnapModes requested)
+		{
+			if (m_DefinedVertices >= 2 && requested == SnapModes.Grid)
+				return SnapModes.Off; // don't try and snap to grid points while moving around the radius!
+			if (m_DefinedVertices == 1 && g_RadiusLocked && requested != SnapModes.Angle)
+				return SnapModes.Off; // subsequent arcs also locked to radius
+			return base.SnapNext(requested);
+		}
+
+		protected override void SetInformation()
+		{
+			m_Radius = Centre.VectorTo(Vertices[1]).Length();
+			if (m_DefinedVertices < 2)
+			{
+				// still placing the baseline
+				m_StartAngle = 0;
+				m_EndAngle = 0;
+			}
+			else
+			{
+				m_StartAngle = Centre.VectorTo(Vertices[1]).VectorAngle();
+				m_EndAngle = Centre.VectorTo(Vertices[2]).VectorAngle();
+			}
+		}
+
+		internal override List<Prompt> GetPrompts()
+		{
+			List<Prompt> list = new List<Prompt>();
+			if (m_DefinedVertices == 1)
+			{
+				if (!g_RadiusLocked)
+					list.Add(new Prompt(ShapeVerbs.Complete, "Arc_Choose1", "Arc_Choose1"));
+				else
+				{
+					if (m_First)
+						list.Add(new Prompt(ShapeVerbs.Complete, "Arc_Choose1Locked", "Arc_Choose1"));
+					else
+						list.Add(new Prompt(ShapeVerbs.Complete, "Arc_Choose1NotFirst", "Arc_Choose1"));
+					list.Add(new Prompt(ShapeVerbs.Increment | ShapeVerbs.Decrement, "Arc_IncDec", "Arc_IncDec"));
+				}
+				list.Add(new Prompt(ShapeVerbs.Cancel, "CancelAll", "CancelAll"));
+			}
+			else
+			{
+				list.Add(new Prompt(ShapeVerbs.Choose, "Arc_Choose2", "Arc_Choose2"));
+				list.Add(new Prompt(ShapeVerbs.Complete, "Arc_Finish", "Arc_Finish"));
+				list.Add(new Prompt(ShapeVerbs.Increment | ShapeVerbs.Decrement, "Arc_IncDec", "Arc_IncDec"));
+				if (m_First)
+				{
+					if (!g_RadiusLocked)
+						list.Add(new Prompt(ShapeVerbs.Info, "Prompts_Arc_ManuallyLock", "TOOLIMG_48_ARC"));
+					list.Add(new Prompt(ShapeVerbs.Cancel, "Arc_Cancel1", "Arc_Cancel1"));
+				}
+				else
+					list.Add(new Prompt(ShapeVerbs.Cancel, "CancelAll", "CancelAll"));
+			}
+			return list;
+		}
+
+		public override PointF Middle()
+		{
+			//Return MidArcPoint()
+			// can't use the above, because this is mainly used for the movement GrabSpot, and we already have a radius GrabSpot at MidArcPoint
+			return Geometry.MidPoint(m_DefinedVertices < 2 ? Vertices[0] : Vertices[2], Vertices[1]);
+			// when doing first line mid point is mid of line
+		}
+
+		public override AllowedActions Allows => (base.Allows | AllowedActions.Arrowheads) & ~AllowedActions.Tidy;
+
+		protected internal override bool Closed() => false;
+
+		/// <summary>the number of degrees away from the start that is required to generate Direction + -1</summary>
+		/// <remarks>The angular label increases this somewhat (it is unlikely to want very large angles so often)</remarks>
+		protected virtual float ZeroDirectionTolerance => 3;
+
+		#endregion
+
+		#region Radius lock
+
+		protected static bool g_RadiusLocked = false; //all arcs except first get same radius until tool button is pressed again
+		public static float FixedRadius = 10;
+		protected static bool m_RadiusWasLocked = false; // remembers radius locked in case of cancellation
+		public static event NullEventHandler RadiusLockedChanged;
+
+		public static bool RadiusLocked
+		{
+			get { return g_RadiusLocked; }
+			set
+			{
+				if (value == g_RadiusLocked)
+					return;
+				g_RadiusLocked = value;
+				RadiusLockedChanged?.Invoke();
+			}
+		}
+
+		public override VerbResult OtherVerb(EditableView.ClickPosition position, Functions.Codes code)
+		{
+			switch (code)
+			{
+				case Functions.Codes.Increment:
+				case Functions.Codes.Decrement:
+					if (!RadiusLocked && m_DefinedVertices < 2)
+						return VerbResult.Rejected;
+					// must set base angle before calling fn below...
+					m_StartAngle = Geometry.VectorAngle(Vertices[0], Vertices[1]);
+					return base.OtherVerb(position, code);
+				default:
+					return VerbResult.Rejected;
+			}
+		}
+
+		///// <summary>Called if the user selects the arc tool again while drawing it.  If and only if this was at the end of setting the radius, it fixes the radius and cancels</summary>
+		///// <returns>Returns true if this fixed the radius</returns>
+		//public bool TryMeasure()
+		//{
+		//	if (g_RadiusLocked)
+		//		return false;
+		//	if (m_DefinedVertices != 2)
+		//		return false;
+		//	RadiusLocked = true;
+		//	return true;
+		//}
+		#endregion
+
+		#region Verbs
+		public override VerbResult Start(EditableView.ClickPosition position)
+		{
+			if (g_RadiusLocked)
+				m_Radius = FixedRadius;
+			return base.Start(position);
+		}
+
+		public override VerbResult Cancel(EditableView.ClickPosition position)
+		{
+			if (m_DefinedVertices == 1)
+				return VerbResult.Destroyed;
+			// was placing the baseline, the only fixed point was the start point
+			// otherwise must have been placing the arc: revert to placing the end of the baseline
+			// ... except if this is not the first slice, then we do not want to revert back to modifying the radius line
+			//If Not m_bolFirst Then Return VerbResult.Destroyed
+			// actually we do, because the start point can be set even if the radius itself is not adjusted, so this is moved to Pie
+			DiscardVertex();
+			m_Direction = 0;
+			RadiusLocked = m_RadiusWasLocked;
+			return VerbResult.Continuing;
+		}
+
+		public override VerbResult Choose(EditableView.ClickPosition position)
+		{
+			Float(position);
+			switch (m_DefinedVertices)
+			{
+				case 1:
+					// have just placed in the initial line
+					if (position.Snapped.ApproxEqual(Vertices[0]))
+						return VerbResult.Rejected;
+					FixVertex(); // adds another floating vertex for the end of the arc
+					m_Bounds = RectangleF.Empty;
+					return VerbResult.Continuing;
+				case 2:
+					EnsureBounds();
+					m_DefinedVertices += 1;
+					m_RadiusWasLocked = g_RadiusLocked;
+					RadiusLocked = ShapeCode == Shapes.Arc; // cos Pie calls down to this and DOESN'T lock
+					FixedRadius = m_Radius;
+					if (Math.Abs(m_EndAngle - m_StartAngle) < Geometry.NEGLIGIBLE)
+						return VerbResult.Substitute; // returns a circle instead
+					if (m_Direction == 0) // must be after angle condition for Pie, which changes result, and this shape continues
+						return VerbResult.Rejected;
+					return VerbResult.Spawn;
+				default:
+					return VerbResult.Unexpected;
+			}
+		}
+
+		public override VerbResult Complete(EditableView.ClickPosition position)
+		{
+			if (m_DefinedVertices != 2)
+				return Choose(position);
+			Choose(position);
+			// can't use CompleteRetrospective as that assumes that Spawn has already been dealt with
+			m_DefinedVertices = 3;
+			FixedRadius = m_Radius;
+			return VerbResult.Completed;
+		}
+
+		public override VerbResult CompleteRetrospective()
+		{
+			if (!m_First)
+				return VerbResult.Destroyed; // this does not complete the circle (like the pie), but it does terminate creating within the circle
+											 // i.e. the arc created by the Choose triggered by the first mouse down will be allowed to stand, and this spawned shape is destroyed
+			if (m_DefinedVertices != 2 || m_Direction == 0)
+				return VerbResult.Rejected;
+			m_DefinedVertices = 3;
+			FixedRadius = m_Radius;
+			return VerbResult.Completed;
+		}
+
+		public override VerbResult Float(EditableView.ClickPosition position)
+		{
+			PointF pt = position.Snapped;
+			DecacheArrowheads();
+			DiscardPath();
+			if (m_DefinedVertices < 2)
+			{
+				// placing first radial point
+				if (m_First && !g_RadiusLocked)
+					return base.Float(position); // the base class can cope with placing the FIRST radius
+				else
+				{
+					// except in subsequent arcs we must maintain the radius
+					SizeF vector = Centre.VectorTo(pt);
+					if (vector.Length() < Geometry.NEGLIGIBLE)
+						return VerbResult.Continuing; // ignore attempts to move over the centre spot
+													  // this will result in an indeterminate angle
+					float angle = vector.VectorAngle();
+					Vertices[1] = PointF.Add(Centre, Geometry.ScalarToVector(m_Radius, angle));
+					m_Bounds = CalculateBounds();
+					return VerbResult.Continuing;
+				}
+			}
+			else
+			{
+				EnsureBounds(); // for the radius and angle
+				Debug.Assert(m_Path == null); // And EndArrowhead Is Nothing)
+				SizeF vector = Centre.VectorTo(pt);
+				if (vector.Length() < Geometry.NEGLIGIBLE)
+					return VerbResult.Continuing; // ignore attempts to move over the centre spot
+				float angle = vector.VectorAngle();
+				if (Geometry.AbsoluteAngularDifference(angle, m_StartAngle) < Geometry.Radians(ZeroDirectionTolerance))
+				{
+					// we are very close to the start line - either close it if very long, or set the direction to nil
+					m_EndAngle = angle; // needed to get MidArcPoint to use current float point (cos start and end will be identical the second time this runs)
+					if (m_Direction == 0 || Geometry.DistanceBetween(MidArcPoint(), Vertices[0]) < m_Radius) // second condition checks arc is currently short
+						m_Direction = 0;
+					else                        // we have gone near 360 - make it 360
+						m_EndAngle = m_StartAngle;
+					Vertices[2] = Vertices[1];
+				}
+				else
+				{
+					// we are far enough away from the start line to determine which way we are going if we were previously hovering over the start line
+					if (m_Direction == 0)
+						m_Direction = Geometry.DirectionFromSimilarAngles(m_StartAngle, angle);
+					Vertices[2] = PointF.Add(Centre, Geometry.ScalarToVector(m_Radius, angle));
+				}
+				m_Bounds = CalculateBounds();
+				return VerbResult.Continuing;
+			}
+		}
+
+		public override bool AllowVerbWhenComplete(Functions.Codes code)
+		{
+			switch (code)
+			{
+				case Functions.Codes.Increment:
+				case Functions.Codes.Decrement:
+					return true;
+			}
+			return base.AllowVerbWhenComplete(code);
+		}
+		#endregion
+
+		#region Coords - HitTest, Sockets, Targets, GrabSpots
+
+		public override RectangleF RefreshBounds(bool withShadow = false)
+		{
+			// path version certainly doesn't work properly when placing the last point
+			return base.RefreshBoundsFromBounds(withShadow);
+		}
+
+		protected override void CreatePath()
+		{
+			m_Path = new System.Drawing.Drawing2D.GraphicsPath();
+			m_Path.StartFigure();
+			if (m_DefinedVertices < 2)
+				m_Path.AddLine(Vertices[0], Vertices[1]);
+			else
+			{
+				if (m_Direction == 1)
+					m_Path.AddArc(CircleRectangle(), Geometry.DotNetAngle(m_StartAngle), Geometry.Degrees(Geometry.AngleBetween(m_StartAngle, m_EndAngle)));
+				else
+					m_Path.AddArc(CircleRectangle(), Geometry.DotNetAngle(m_EndAngle), Geometry.Degrees(Geometry.AngleBetween(m_EndAngle, m_StartAngle)));
+			}
+		}
+
+		protected override void SetPointsFromAngles()
+		{
+			// this version can be triggered when adjusting radius and drawing baseline, in which case just V(1) is adjusted
+			Vertices[1] = PointF.Add(Centre, Geometry.ScalarToVector(m_Radius, m_StartAngle));
+			if (m_DefinedVertices > 1)
+				Vertices[2] = PointF.Add(Centre, Geometry.ScalarToVector(m_Radius, m_EndAngle));
+			m_Bounds = RectangleF.Empty;
+			DiscardPath();
+		}
+
+		internal override List<Target> GenerateTargets(UserSocket floating)
+		{
+			List<Target> colTargets = base.GenerateTargets(floating);
+			colTargets.Add(new Target(this, Vertices[0], Target.Types.Centre, floating, Target.Priorities.Low));
+			colTargets.Add(new Target(this, Vertices[1], Target.Types.Vertex, floating, Target.Priorities.Vertex));
+			colTargets.Add(new Target(this, Vertices[2], Target.Types.Vertex, floating, Target.Priorities.Vertex));
+			return colTargets;
+		}
+
+		internal override List<Socket> GetSockets()
+		{
+			List<Socket> list = new List<Socket>();
+			list.Add(new Socket(this, 1, Vertices[1]));
+			list.Add(new Socket(this, 2, Vertices[2]));
+			if (Geometry.AngleBetween(m_StartAngle, m_EndAngle) > Geometry.ANGLE90 / 3)               // we only add the midpoint of the arc if it is not too small an angle
+				list.Add(new Socket(this, 3, MidArcPoint()));
+			return list;
+		}
+
+		//These functions support more socket positions than are reported above, because these also work with the Pie object
+		internal override PointF SocketPosition(int index)
+		{
+			switch (index)
+			{
+				case -1:
+					return Centre; // not actually used, but shapes are supposed to support this
+				case 0:
+				case 1:
+				case 2:
+					return Vertices[index];
+				case 3:
+					return MidArcPoint();
+				case 4:
+				case 5:
+					return Geometry.MidPoint(Centre, Vertices[index - 3]);
+				default:
+					throw new InvalidOperationException();
+			}
+		}
+
+		internal override SizeF SocketExitVector(int index)
+		{
+			switch (index)
+			{
+				case 0:
+					return Geometry.ScalarToVector(1, (m_StartAngle + m_EndAngle) / 2 + Geometry.ANGLE180);
+				case 1:
+					return Geometry.ScalarToVector(1, m_StartAngle + Geometry.ANGLE45 * -m_Direction);
+				case 2:
+					return Geometry.ScalarToVector(1, m_EndAngle + Geometry.ANGLE45 * m_Direction);
+				case 3:
+					return Geometry.ScalarToVector(1, (m_StartAngle + m_EndAngle) / 2);
+				case 4:
+					return Vertices[0].VectorTo(Vertices[1]).Perpendicular(-m_Direction);
+				case 5:
+					return Vertices[0].VectorTo(Vertices[2]).Perpendicular(m_Direction);
+				default:
+					throw new ArgumentException("SocketExitVector: index");
+			}
+		}
+
+		public override PointF DoSnapAngle(PointF newPoint)
+		{
+			// different from base class - BOTH points use centre origin
+			return Geometry.AngleSnapPoint(newPoint, Centre);
+		}
+
+		#endregion
+
+		#region Drawing, arrowheads
+
+		protected override void PrepareDraw(DrawResources resources)
+		{
+			DefaultPrepareDrawForText(resources);
+			DefaultPrepareLineDraw(resources, LineStyle); // we don't really want the Filled version because that will create a brush
+			if (m_DefinedVertices == 2)
+			{
+				// placing the second arc point.  In this case we draw both the radial lines faintly
+				resources.CustomPen = resources.Graphics.CreateStroke(Color.FromArgb(LineStyle.Colour.A / 5, LineStyle.Colour), Geometry.THINLINE);
+			}
+		}
+
+		protected override void InternalDraw(Canvas gr, DrawResources resources)
+		{
+			if (resources.MainPen == null)
+				return;
+			if (m_DefinedVertices < 2 || m_Direction == 0)                // while placing the initial radius just draw that...
+				gr.DrawLine(Vertices[0], Vertices[1], resources.MainPen);
+			else
+			{
+				// we must provide a bounding box for the arc.  This is not the bounding box of the shape (which is just the arc itself)
+				// but the bounding box of the imaginary circle of which the arc is part
+				EnsureBounds(); // to check that radius and angles are set
+				RectangleF bounds = new RectangleF(Centre.X - m_Radius, Centre.Y - m_Radius, m_Radius * 2, m_Radius * 2);
+				if (m_Direction == 1)
+					gr.DrawArc(bounds, Geometry.DotNetAngle(m_StartAngle), Geometry.Degrees(Geometry.AngleBetween(m_StartAngle, m_EndAngle, true)), resources.MainPen);
+				else
+					gr.DrawArc(bounds, Geometry.DotNetAngle(m_EndAngle), Geometry.Degrees(Geometry.AngleBetween(m_EndAngle, m_StartAngle, true)), resources.MainPen);
+				if (resources.CustomPen != null)
+				{
+					// we also draw the radial lines to help when creating the arc
+					gr.DrawLine(Vertices[0], Vertices[1], resources.CustomPen);
+					gr.DrawLine(Vertices[0], Vertices[2], resources.CustomPen);
+				}
+				if ((Allows & AllowedActions.Arrowheads) > 0)
+					base.DrawArrowheads(resources); // not all derived classes allow them
+			}
+		}
+
+		protected override PointF[] ArrowheadVector(bool isEnd)
+		{
+			if (Vertices.Count < 3)
+				return null; // arc not present yet - no arrowheads
+			PointF endPoint = Vertices[isEnd ? 2 : 1]; // the position of the arrow head itself
+			float direction;
+			if (isEnd)
+				direction = m_EndAngle - m_Direction * Geometry.ANGLE90;
+			else
+				direction = m_StartAngle + m_Direction * Geometry.ANGLE90;
+			// The important thing is the direction, but the length will cause the arrowhead to shrink if small
+			// by using the radius it should ensure a reason the small arrowhead if it is a tight circle
+			// can't use m_sngRadius as it is only defined by CalculateBounds - which will request the arrowhead vectors, giving an infinite loop
+			float length = Vertices[0].VectorTo(Vertices[1]).Length();
+			length = Math.Min(length / 2, Geometry.DistanceBetween(Vertices[1], Vertices[2]) / 2);
+			PointF other = endPoint + Geometry.ScalarToVector(length, direction);
+			return new[] { other, endPoint };
+		}
+		#endregion
+
+		#region Spawning
+		// also implemented by Pie, but rather differently.  The Pie immediately start drawing out the arc once it has spawned
+		public override Shape Spawn()
+		{
+			if (Math.Abs(m_EndAngle - m_StartAngle) < Geometry.NEGLIGIBLE)
+			{
+				// returning a circle in place of this rather than new arc
+				Circle create = Circle.Create(Vertices[0], m_Radius);
+				create.FillStyle.Colour = Color.Empty;
+				create.LineStyle.CopyFrom(this.LineStyle);
+				return create;
+			}
+			else
+			{
+				Arc create = new Arc();
+				create.CopyFrom(this, CopyDepth.Duplicate, Mapping.Ignore);
+				create.Vertices.RemoveAt(2); // ' only the centre point is fixed, and Vertices(1) is floating
+				create.m_Radius = FixedRadius;
+				create.m_DefinedVertices = 1; // the first point on the radius is incomplete, although the radius will be maintained
+				create.m_First = false;
+				return create;
+			}
+		}
+
+		#endregion
+
+		public override void Load(DataReader reader)
+		{
+			base.Load(reader);
+			if (Vertices.Count != 3)
+			{
+				this.Status = StatusValues.Deleted; // corrupt - won't be added to page
+				Utilities.LogSubError("Omitting arc " + this.ID + " on load, since it is corrupt");
+			}
+		}
+
+		// Load/Save/CopyFrom in base class are sufficient
+	}
+	#endregion
+
 }

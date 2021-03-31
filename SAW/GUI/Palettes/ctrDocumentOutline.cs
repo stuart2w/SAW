@@ -208,11 +208,11 @@ namespace SAW
 
 		private void AddTreeNode(Shape shape, TreeNodeCollection nodes)
 		{
-			var node = nodes.Add(shape.Description);
+			TreeNode node = nodes.Add(shape.Description);
 			node.Tag = shape;
 			StyleNode(node, shape);
 			NodeList.Add(shape, node);
-			if (shape is IShapeContainer container) // && !(shape is Scriptable))
+			if (shape is IShapeContainer container)
 				FillTreeNode(container, node.Nodes);
 		}
 
@@ -240,6 +240,7 @@ namespace SAW
 				node.ImageIndex = 0; // misc shape
 			node.SelectedImageIndex = node.ImageIndex;
 		}
+
 		#endregion
 
 		private void tvOutline_AfterSelect(object sender, TreeViewEventArgs e)

@@ -270,6 +270,8 @@ namespace SAW
 
 		public override string ToString() => $"Buttonshape (Action={Action})";
 
+		internal override string Description => $"{Strings.Item("Shape_Button")} ({Action.DescriptionWithAccelerator()})";
+
 		#endregion
 
 		#region Verbs

@@ -137,6 +137,7 @@ namespace SAW
 			Add("AdjustRepeatDelay", typeof(CmdAdjustRepeatDelay), "Settings/Scan");
 			Add("AdjustRepeatTime", typeof(CmdAdjustRepeatTime), "Settings/Scan");
 			Add("PromptOnOff", typeof(CmdPromptOnOff), "Settings");
+			Add("HideTitle", typeof(CmdHideTitleOnOff), "Settings").SAW6 = false;
 			Add("ClickSoundOnOff", typeof(CmdClickSoundOnOff), "Settings");
 			Add("WordlistSet", typeof(CmdWordListSet), "Prediction");
 			Add("WordlistSelect", typeof(CmdWordListSelect), "Prediction");

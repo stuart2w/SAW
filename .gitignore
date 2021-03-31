@@ -7,6 +7,9 @@ Test data/
 Webserver/
 graphics/
 PrecompiledWeb/
+Installer/*.exe
+Installer/*.bat
+
 
 xx.*
 *.gxml

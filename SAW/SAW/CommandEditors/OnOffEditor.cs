@@ -45,10 +45,8 @@ namespace SAW.CommandEditors
 			}
 		}
 
-		public string GetValidationError()
-		{
-			return null;
-		}
+		public string GetValidationError() => null;
+
 		#endregion
 
 		#region Events

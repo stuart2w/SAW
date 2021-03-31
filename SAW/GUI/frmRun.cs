@@ -23,7 +23,7 @@ namespace SAW
 			Globals.Root.CurrentPageChanged += CurrentPageChanged;
 		}
 
-		private void SetHiddenTitle()
+		internal void SetHiddenTitle()
 		{
 			FormBorderStyle = Globals.Root.CurrentConfig.ReadBoolean(Config.Hide_Title) ? FormBorderStyle.None : FormBorderStyle.Sizable;
 		}

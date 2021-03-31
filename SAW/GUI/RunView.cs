@@ -528,10 +528,7 @@ namespace SAW
 
 		#region Mouse
 
-		public int MouseStep
-		{
-			get { return CurrentConfig.MouseStep(MouseStepType); }
-		}
+		public int MouseStep => CurrentConfig.MouseStep(MouseStepType);
 
 		public AppliedConfig.MouseSteps MouseStepType = AppliedConfig.MouseSteps.Medium;
 
@@ -609,19 +606,20 @@ namespace SAW
 			}
 			return false;
 		}
+
 		#endregion
 
 		#region Word prediction
 		/// <summary>Each of these is a SAW item containing the buttons to display word predictions.
 		/// Usually only one will be used, but it is possible to specify multiple ones, in which case they all show the same contents (used if they are in different pop ups) </summary>
-		private List<Item> m_WordPredictionContainers = new List<Item>();
+		private readonly List<Item> m_WordPredictionContainers = new List<Item>();
 
 		private Blade.Engine m_Blade;
 
 		/// <summary>Called by SetWordList to define the (/an) output area.  Does not update settings</summary>
 		public void SetWordList(int itemID)
 		{
-			Item item = (m_Page.FindScriptableByID(itemID)?.Element as Item); // must be a SAW item, since it must have contents
+			Item item = m_Page.FindScriptableByID(itemID)?.Element as Item; // must be a SAW item, since it must have contents
 			if (item == null)
 			{
 				OnError(Strings.Item("Script_Fail_MissingWordListItem", itemID.ToString()));
@@ -629,8 +627,8 @@ namespace SAW
 			}
 			m_WordPredictionContainers.Add(item);
 			EnsureBlade();
+			m_Blade.NumberPredictions = Math.Max(8, (from C in m_WordPredictionContainers select C.WordListEntryChildren.Count()).Max()); // min of 8 just for sanity
 			m_Blade.Case = Cases.Normal;
-			// UpdateWordPredictions(); // not needed as the script will also call BladeSettings
 		}
 
 		private void EnsureBlade()
@@ -665,7 +663,7 @@ namespace SAW
 			if (m_Blade == null || !m_WordPredictionContainers.Any())
 				return;
 			List<string> predictions = m_Blade.Predict(m_Blade.TrackedMessage);
-			foreach (var container in m_WordPredictionContainers)
+			foreach (Item container in m_WordPredictionContainers)
 				container.ShowPredictions(predictions);
 		}
 
@@ -683,21 +681,12 @@ namespace SAW
 			//UpdateWordPredictions();
 		}
 
-		//public Blade.Engine Blade
-		//{
-		//	get
-		//	{
-		//		EnsureBlade();
-		//		return m_Blade;
-		//	}
-		//}
-
 		#region Various callbacks and their helpers
 
 		private bool CharacterCaptureAttached;
+		/// <summary>all CHARACTERS typed sent here by keyswitch, except a few undetectable sent by KeySend to KeySend_ExtraKeyForPredictions</summary>
 		private void KeySwitch_CharacterTyped(object sender, SingleFieldEventClass<char> e)
-		{ // all CHARACTERS typed sent here by keyswitch, except a few undetectable sent by KeySend to KeySend_ExtraKeyForPredictions
-		  //Debug.WriteLine("Track char: " + e.Value);
+		{
 			if (m_Blade == null)
 				return;
 			m_Blade.TrackCharacterTyped(e, 0);
