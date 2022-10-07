@@ -1,7 +1,7 @@
 
 namespace SAW
 {
-	public partial class frmUpdate : System.Windows.Forms.Form
+	internal partial class frmUpdate : System.Windows.Forms.Form
 	{
 		
 		//Form overrides dispose to clean up the component list.

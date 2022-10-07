@@ -20,7 +20,7 @@ namespace SAW.Functions
 
 	class SelectNone : SelectionVerb
 	{
-		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
+		public override void Trigger(ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
 		{
 			Globals.Root.CurrentPage.DeselectAll();
 		}
@@ -30,7 +30,7 @@ namespace SAW.Functions
 
 	class SelectAll : SelectionVerb
 	{
-		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
+		public override void Trigger(ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
 		{
 			Globals.Root.CurrentPage.SelectAll();
 		}
@@ -40,7 +40,7 @@ namespace SAW.Functions
 
 	class SelectNext : SelectionVerb
 	{
-		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
+		public override void Trigger(ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
 		{
 			pnlView.IterateSelectionTo(Globals.Root.CurrentPage.NextSelection(1));
 		}
@@ -51,7 +51,7 @@ namespace SAW.Functions
 
 	class SelectPrevious : SelectionVerb
 	{
-		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
+		public override void Trigger(ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
 		{
 			pnlView.IterateSelectionTo(Globals.Root.CurrentPage.NextSelection(-1));
 		}

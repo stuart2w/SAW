@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace SAW
 {
-	public partial class frmErrorReport
+	internal partial class frmErrorReport
 	{
 		public frmErrorReport()
 		{

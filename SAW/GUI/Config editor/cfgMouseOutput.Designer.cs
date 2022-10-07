@@ -1,6 +1,6 @@
 ﻿namespace SAW
 {
-	partial class cfgMouseOutput
+	internal partial class cfgMouseOutput
 	{
 		/// <summary> 
 		/// Required designer variable.

@@ -10,7 +10,7 @@ using Newtonsoft.Json.Linq;
 
 namespace SAW
 {
-	public partial class frmOpenSymbol : Form
+	internal partial class frmOpenSymbol : Form
 	{
 		/// <summary>Any text to show in output instead of result images</summary>
 		private string m_Message;

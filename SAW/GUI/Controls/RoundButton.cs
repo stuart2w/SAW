@@ -4,10 +4,11 @@ using System.Diagnostics;
 using System.Windows.Forms;
 using SAW.Functions;
 using Action = SAW.Functions.Action;
+using SAW.Shapes;
 
 namespace SAW
 {
-	public class RoundButton : SharedButton // usually used within palettes; where there are several which can be selected as alternatives
+	internal class RoundButton : SharedButton // usually used within palettes; where there are several which can be selected as alternatives
 	{
 
 		// Usually the state is reflected through the GUIParameter attached to this.
@@ -256,7 +257,8 @@ namespace SAW
 	}
 
 	#region Arrowhead
-	public class ArrowheadButton : RoundButton
+
+	internal class ArrowheadButton : RoundButton
 	{
 
 		// Like RoundButton.  Not sure at the moment was I want this to also match the other parameter

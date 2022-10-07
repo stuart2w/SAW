@@ -4,15 +4,14 @@ using System.Drawing;
 using System.Diagnostics;
 using System.IO;
 
-namespace SAW
+namespace SAW.Shapes
 {
-
+	/// <summary>An external image which has been imported into the document</summary>
 	public class ImportedImage : AbstractRectangle
 	{
 		// an image which has been imported into the document
 		// the "Start" verb just places at an arbitrary position; Choose makes the final placement
 		// because .net keeps the file open all the time, we copy the entire data into a memory buffer and open a memory stream to get the actual image
-		// in v1 was BoundsDefines
 
 		protected SharedReference<SharedImage> m_Data;
 
@@ -33,7 +32,7 @@ namespace SAW
 			// should only be used when loading an existing one from file
 		}
 
-		public ImportedImage(string file, Document document, Transaction transaction)
+		public ImportedImage(string file, Document document, Transaction transaction = null)
 		{
 			// should be used when creating a new one; i.e. importing from disk
 			m_Data = (SharedImage)document.AddSharedResourceFromFile(file, transaction);
@@ -43,11 +42,18 @@ namespace SAW
 			m_OriginalName = Path.GetFileName(file);
 		}
 
+		public ImportedImage(SharedImage image)
+		{
+			m_Data =image;
+			m_ImageSize = m_Data.Content.GetSize();
+			SetDefaultSize();
+		}
+
 		/// <summary>Does not support SVG</summary>
 		public ImportedImage(Stream strm, Document document, Transaction transaction)
 		{
 			// should be used when creating a new one; i.e. importing from disk
-			m_Data = (SharedImage)document.AddSharedResourceFromStream(strm, transaction);
+			m_Data = (SharedImage)document.AddSharedResourceFromStream(strm, transaction = null);
 			document.AddSharedResource(m_Data.Content);
 			//m_Image = m_Data.Content.GetImage();
 			m_ImageSize = m_Data.Content.GetSize();
@@ -82,7 +88,7 @@ namespace SAW
 
 		public override Shapes ShapeCode => Shapes.Image;
 
-		public override SnapModes SnapNext(SnapModes requested)
+		protected internal override SnapModes SnapNext(SnapModes requested)
 		{
 			if (!m_PositionFixed)
 				return SnapModes.Off;
@@ -91,10 +97,9 @@ namespace SAW
 			return requested; // do not try and snap the size of the image
 		}
 
-		public override AllowedActions Allows
-		{ get { return (base.Allows | AllowedActions.TransformRotate  | AllowedActions.MirrorFlipOnly) & ~(AllowedActions.TransformMirror | AllowedActions.Merge); } }
+		public override AllowedActions Allows => (base.Allows | AllowedActions.TransformRotate | AllowedActions.MirrorFlipOnly) & ~(AllowedActions.TransformMirror | AllowedActions.Merge);
 
-		public override void Diagnostic(System.Text.StringBuilder output)
+		protected internal override void Diagnostic(System.Text.StringBuilder output)
 		{
 			base.Diagnostic(output);
 			output.AppendLine("Shared image ID: " + (m_Data?.ID ?? Guid.Empty));
@@ -116,7 +121,7 @@ namespace SAW
 		private const float ALWAYSALLOWEDSIZE = 20; // 2 cm
 		private const float MINIMUMRATIO = 0.1f; // otherwise we impose a limit of 10% scale
 
-		public override VerbResult Start(EditableView.ClickPosition position)
+		public override VerbResult Start(ClickPosition position)
 		{
 			//Debug.Assert(m_Image != null);
 			float height = m_ImageSize.Height / NOMINALPIXELSPERMILLIMETRE;
@@ -129,7 +134,7 @@ namespace SAW
 			return VerbResult.Continuing;
 		}
 
-		public override VerbResult Cancel(EditableView.ClickPosition position)
+		public override VerbResult Cancel(ClickPosition position)
 		{
 			if (!m_PositionFixed)
 				return VerbResult.Destroyed;
@@ -138,7 +143,7 @@ namespace SAW
 			return VerbResult.Continuing;
 		}
 
-		public override VerbResult Choose(EditableView.ClickPosition position)
+		public override VerbResult Choose(ClickPosition position)
 		{
 			if (SingleClickPlacement)
 			{
@@ -154,7 +159,7 @@ namespace SAW
 			return VerbResult.Continuing;
 		}
 
-		public override VerbResult Complete(EditableView.ClickPosition position)
+		public override VerbResult Complete(ClickPosition position)
 		{
 			Float(position);
 			return CompleteRetrospective();
@@ -169,7 +174,7 @@ namespace SAW
 			return VerbResult.Completed;
 		}
 
-		public override VerbResult Float(EditableView.ClickPosition position)
+		public override VerbResult Float(ClickPosition position)
 		{
 			PointF pt = position.Snapped;
 			if (!m_PositionFixed)
@@ -244,7 +249,7 @@ namespace SAW
 			m_ImageSize = imported.m_ImageSize;
 		}
 
-		public override void Load(DataReader reader)
+		protected internal override void Load(DataReader reader)
 		{
 			base.Load(reader);
 			m_Data = new SharedReference<SharedImage> { ID = reader.ReadGuid() };
@@ -252,7 +257,7 @@ namespace SAW
 			m_Flip = reader.ReadSize();
 		}
 
-		public override void Save(DataWriter writer)
+		protected internal override void Save(DataWriter writer)
 		{
 			base.Save(writer);
 			writer.Write(m_Data?.ID ?? Guid.Empty);
@@ -260,14 +265,14 @@ namespace SAW
 			writer.Write(m_Flip);
 		}
 
-		public override void AddRequiredReferences(Action<Datum> fnAdd, Mapping mapID)
+		protected internal override void AddRequiredReferences(Action<Datum> fnAdd, Mapping mapID)
 		{
 			base.AddRequiredReferences(fnAdd, mapID);
 			if (m_Data?.Content != null)
 				fnAdd.Invoke(m_Data.Content);
 		}
 
-		public override void UpdateReferencesObjectsCreated(Document document, DataReader reader)
+		protected internal override void UpdateReferencesObjectsCreated(Document document, DataReader reader)
 		{
 			base.UpdateReferencesObjectsCreated(document, reader);
 			if (m_Data != null)
@@ -277,7 +282,7 @@ namespace SAW
 			}
 		}
 
-		public override void UpdateReferencesIDsChanged(Mapping mapID, Document document)
+		protected internal override void UpdateReferencesIDsChanged(Mapping mapID, Document document)
 		{
 			base.UpdateReferencesIDsChanged(mapID, document);
 			m_Data?.UpdateIDsReferencesChanged();
@@ -291,7 +296,7 @@ namespace SAW
 		{
 			if (resources.Highlight)
 			{
-				using (var highlight = resources.Graphics.CreateStroke(CurrentHighlightColour, resources.HIGHLIGHTEXTRAWIDTH))
+				using (Stroke highlight = resources.Graphics.CreateStroke(CurrentHighlightColour, resources.HIGHLIGHTEXTRAWIDTH))
 				{
 					gr.DrawLines(Vertices, highlight);
 					gr.DrawLine(Vertices[3], Vertices[0], highlight);
@@ -339,14 +344,6 @@ namespace SAW
 		{
 			// note this only used on support menu - so not critical
 			return m_Data?.Content?.MemoryImage;
-		}
-
-		public string GetEstimatedFileExtention()
-		{
-			// note this only used on support menu - so not critical
-			if (!string.IsNullOrEmpty(m_OriginalName))
-				return Path.GetExtension(m_OriginalName);
-			return ".png";
 		}
 
 		#endregion

@@ -1,9 +1,9 @@
 using System;
-
+using SAW.Shapes;
 
 namespace SAW
 {
-	public partial class frmUserButtonStyle
+	internal partial class frmUserButtonStyle
 	{
 		public frmUserButtonStyle()
 		{
@@ -37,7 +37,7 @@ namespace SAW
 						typeName = Strings.Item("Config_ButtonStyle_Selection");
 						break;
 					default:
-						SAW.Item.ItemDisplayTypes displayType = (SAW.Item.ItemDisplayTypes)(index - 2);
+						Item.ItemDisplayTypes displayType = (Item.ItemDisplayTypes)(index - 2);
 						typeName = Strings.Item("SAW_Style_" + displayType.ToString().Replace("IDT_", ""));
 						break;
 				}

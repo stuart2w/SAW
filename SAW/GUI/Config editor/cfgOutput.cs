@@ -2,7 +2,7 @@
 
 namespace SAW
 {
-	public partial class cfgOutput : ConfigPage
+	internal partial class cfgOutput : ConfigPage
 	{
 		public cfgOutput()
 		{

@@ -7,7 +7,7 @@ namespace SAW
 	/// <summary>
 	/// we always have one of these classes, which can be accessed via Globals.Root.Speech
 		/// it is done this way rather than having shared members, so that we can control the moment it is constructed during the start up</summary>
-	public class Speech
+	internal class Speech
 	{
 		private bool m_Failed; // must be true if there are no voices
 		/// <summary>list of all the available voice names </summary>
@@ -37,7 +37,7 @@ namespace SAW
 
 		/// <summary>Notification that settings have changed and this may need to update the engine</summary>
 		/// <param name="appliedConfig">Supplied so that frmEditConfig can use what is displayed (which may not be current user/teacher)</param>
-		public void SettingsChanged(AppliedConfig appliedConfig)
+		internal void SettingsChanged(AppliedConfig appliedConfig)
 		{
 			if (m_Failed)
 				return;

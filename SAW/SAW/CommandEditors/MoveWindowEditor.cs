@@ -27,7 +27,7 @@ namespace SAW.CommandEditors
 			m_Filling = true;
 			try
 			{
-				txtApplication.Text = m_Command.m_ParamList[0].ValueAsString();
+				txtApplication.Text = m_Command.ParamList[0].ValueAsString();
 				chkUseOutput.Checked = (txtApplication.Text == CmdOpenApp.USEOUTPUT);
 				if (chkUseOutput.Checked)
 					txtApplication.Text = "";
@@ -68,9 +68,9 @@ namespace SAW.CommandEditors
 			if (m_Filling)
 				return;
 			if (chkUseOutput.Checked)
-				m_Command.m_ParamList[0] = new StringParam(CmdOpenApp.USEOUTPUT);
+				m_Command.ParamList[0] = new StringParam(CmdOpenApp.USEOUTPUT);
 			else
-				m_Command.m_ParamList[0] = new StringParam(txtApplication.Text);
+				m_Command.ParamList[0] = new StringParam(txtApplication.Text);
 			UserChanged?.Invoke(this, EventArgs.Empty);
 		}
 
@@ -78,7 +78,7 @@ namespace SAW.CommandEditors
 		{
 			if (m_Filling)
 				return;
-			m_Command.m_ParamList[0] = new StringParam(txtApplication.Text);
+			m_Command.ParamList[0] = new StringParam(txtApplication.Text);
 			UserChanged?.Invoke(this, EventArgs.Empty);
 		}
 
@@ -102,7 +102,7 @@ namespace SAW.CommandEditors
 				return;
 			if (txtX.IsValid)
 			{
-				m_Command.m_ParamList[1] = new IntegerParam(txtX.Value);
+				m_Command.ParamList[1] = new IntegerParam(txtX.Value);
 				UserChanged?.Invoke(this, EventArgs.Empty);
 			}
 		}
@@ -113,7 +113,7 @@ namespace SAW.CommandEditors
 				return;
 			if (txtY.IsValid)
 			{
-				m_Command.m_ParamList[2] = new IntegerParam(txtY.Value);
+				m_Command.ParamList[2] = new IntegerParam(txtY.Value);
 				UserChanged?.Invoke(this, EventArgs.Empty);
 			}
 		}

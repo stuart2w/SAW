@@ -1,7 +1,7 @@
 
 namespace SAW
 {
-	public partial class ctrArrowheadsPalette : PalettePanel
+	internal partial class ctrArrowheadsPalette : PalettePanel
 	{
 		
 		//UserControl overrides dispose to clean up the component list.

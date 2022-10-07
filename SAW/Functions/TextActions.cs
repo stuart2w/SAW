@@ -20,7 +20,7 @@ namespace SAW.Functions
 		{
 		}
 
-		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
+		public override void Trigger(ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
 		{
 			// sends them as separate chars - this allows equation editor to do funky stuff like on "("
 			foreach (var c in Strings.Translate(Text))
@@ -53,7 +53,7 @@ namespace SAW.Functions
 			Key = key;
 		}
 
-		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
+		public override void Trigger(ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
 		{
 			Editor.SimulateKey(Key);
 		}
@@ -100,7 +100,7 @@ namespace SAW.Functions
 		}
 		#endregion
 
-		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
+		public override void Trigger(ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
 		{
 			Editor.SimulateKey(Character);
 		}

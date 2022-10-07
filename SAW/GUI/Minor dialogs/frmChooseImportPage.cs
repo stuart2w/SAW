@@ -5,7 +5,7 @@ using System.Windows.Forms;
 
 namespace SAW
 {
-	public partial class frmChooseImportPage
+	internal partial class frmChooseImportPage
 	{
 		public frmChooseImportPage()
 		{

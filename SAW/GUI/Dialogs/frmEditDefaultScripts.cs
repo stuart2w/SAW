@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Windows.Forms;
 using SAW.Functions;
+using SAW.Shapes;
 
 namespace SAW
 {
-	public partial class frmEditDefaultScripts : Form
+	internal partial class frmEditDefaultScripts : Form
 	{
 		public frmEditDefaultScripts()
 		{

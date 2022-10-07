@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
+using SAW.Shapes;
 
 namespace SAW.Functions
 {
@@ -31,7 +32,6 @@ namespace SAW.Functions
 			Verb.Register(Codes.TidyGrid, new Tidy() { Mode = Shape.SnapModes.Grid });
 			Verb.Register(Codes.DoubleClick, new DoubleClick());
 			Verb.Register(Codes.QuickAddButtons, (source, pnlView, tx) => { frmAddButtons.Display(Globals.Root.CurrentPage); }, true, view => Globals.Root.CurrentDocument.ActivityID.Equals(Activities.PaletteID));
-			Verb.Register(Codes.FreeTextToTextLine, new FreeTextToLine());
 			Verb.Register(Codes.SmallestHeight, new Alignment());
 			Verb.Register(Codes.SmallestWidth, new Alignment());
 			Verb.Register(Codes.LargestHeight, new Alignment());
@@ -51,9 +51,9 @@ namespace SAW.Functions
 	/// <summary>Represents shape-specific functionality invoked by double clicking (also on menus, with shape-specific text)</summary>
 	internal class DoubleClick : Verb
 	{
-		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
+		public override void Trigger(ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
 		{
-			Globals.Root.CurrentPage.SelectedShapes[0].DoDoubleClick(pnlView, EditableView.ClickPosition.Sources.VerbButton);
+			Globals.Root.CurrentPage.SelectedShapes[0].DoDoubleClick(pnlView, ClickPosition.Sources.VerbButton);
 		}
 
 		public override bool AbandonsCurrent => false;// must not abandon, otherwise control+enter does not edit existing text
@@ -72,7 +72,7 @@ namespace SAW.Functions
 	internal class ChangeZ : Verb
 	{
 
-		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
+		public override void Trigger(ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
 		{
 			switch (Code)
 			{
@@ -104,7 +104,7 @@ namespace SAW.Functions
 	internal class MakeChild : Verb
 	{
 
-		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
+		public override void Trigger(ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
 		{
 			Shape moving = CurrentPage.SelectedShapes.First();
 			IShapeContainer oldContainer = moving.Container;
@@ -156,7 +156,7 @@ namespace SAW.Functions
 	internal class MoveOutOfContainer : Verb
 	{
 
-		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
+		public override void Trigger(ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
 		{
 			Shape moving = CurrentPage.SelectedShapes.First();
 			IShapeContainer oldContainer = moving.Container;
@@ -187,7 +187,7 @@ namespace SAW.Functions
 
 	internal class SelectTexture : Verb
 	{
-		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
+		public override void Trigger(ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
 		{
 			SharedImage texture = frmTexture.PickTexture(CurrentDocument);
 			if (texture == null) return;
@@ -213,7 +213,7 @@ namespace SAW.Functions
 	/// <summary>The QuickTransform verb, but the DoTransform function is useful as a way of applying a transform with refresh etc.</summary>
 	internal class QuickTransform : Verb
 	{
-		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
+		public override void Trigger(ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
 		{
 			if (CurrentPage == null || CurrentPage.SelectedCount < 1)
 				return;
@@ -313,7 +313,7 @@ namespace SAW.Functions
 	{
 		public int X;
 		public int Y;
-		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
+		public override void Trigger(ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
 		{
 			if (CurrentPage == null || CurrentPage.SelectedCount < 1)
 				return;
@@ -334,7 +334,7 @@ namespace SAW.Functions
 	internal class ChangeTextSize : Verb
 	{
 		public int Delta;
-		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
+		public override void Trigger(ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
 		{
 			float newValue = frmFont.AdjustSize(Editor.ParameterValue(Parameters.FontSize) / 100f, Delta);
 			Editor.SetParameterValue((int)(newValue * 100), Parameters.FontSize);
@@ -350,7 +350,7 @@ namespace SAW.Functions
 	{
 		public Shape.SnapModes Mode;
 
-		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
+		public override void Trigger(ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
 		{
 			bool changed = false;
 			foreach (Shape shape in CurrentPage.SelectedShapes)
@@ -384,36 +384,10 @@ namespace SAW.Functions
 
 	}
 
-	internal class FreeTextToLine : Verb
-	{
-		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
-		{
-			List<FreeText> shapes = CurrentPage.SelectedShapes.OfType<FreeText>().ToList(); // new copy so we don't have problems editing while iterating
-			if (shapes.Count == 0)
-				return;
-			CurrentPage.DeleteSelected(transaction);
-			List<Shape> newList = new List<Shape>();
-			foreach (FreeText shp in shapes)
-			{
-				TextLine textLine = TextLine.FromFreeText(shp);
-				transaction.Create(textLine);
-				newList.Add(textLine);
-				CurrentPage.AddNew(textLine, transaction);
-			}
-			CurrentPage.SelectOnly(newList);
-		}
-
-		public override bool AutoRefreshAfterTrigger => true;
-
-		public override bool IsApplicable(EditableView pnlView)
-			=> CurrentPage.SelectedCount > 0 && CurrentPage.SelectedShapes.All(shp => shp.ShapeCode == Shape.Shapes.FreeText);
-
-		public override bool IncludeOnContextMenu => false;
-	}
 
 	internal class Alignment : Verb
 	{
-		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
+		public override void Trigger(ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
 		{
 			if (CurrentPage == null || CurrentPage.SelectedCount < 2)
 				return;
@@ -556,7 +530,7 @@ namespace SAW.Functions
 	#region Font style changes
 	internal abstract class ChangeTextStyleVerb : Verb
 	{
-		public override sealed void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
+		public override sealed void Trigger(ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
 		{
 			foreach (Shape shape in CurrentPage.SelectedShapes)
 			{

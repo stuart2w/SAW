@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Drawing;
 using System.Windows.Forms;
+using SAW.Shapes;
 
 namespace SAW.Functions
 {
@@ -77,7 +78,7 @@ namespace SAW.Functions
 
 		#endregion
 
-		public abstract void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction);
+		public abstract void Trigger(ClickPosition.Sources source, EditableView pnlView, Transaction transaction);
 
 		#region Values and object stuff
 		public abstract string PersistValueText { get; }
@@ -165,7 +166,7 @@ namespace SAW.Functions
 		#region Protected properties giving compatibility to frmMain
 
 		protected static Document CurrentDocument => Globals.Root.CurrentDocument;
-		protected static frmMain Editor => Globals.Root.Editor;
+		private protected static frmMain Editor => Globals.Root.Editor;
 		protected static int CurrentPageIndex => Globals.Root.CurrentPageIndex;
 		protected static Page CurrentPage => Globals.Root.CurrentPage;
 
@@ -191,7 +192,7 @@ namespace SAW.Functions
 
 		public override string PersistValueText => "";
 
-		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
+		public override void Trigger(ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
 		{// not an error condition?
 		}
 
@@ -218,7 +219,7 @@ namespace SAW.Functions
 
 		#endregion
 
-		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
+		public override void Trigger(ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
 		{
 			Editor.ChangeTool(Tool);
 		}
@@ -261,7 +262,7 @@ namespace SAW.Functions
 
 		#endregion
 
-		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
+		public override void Trigger(ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
 		{
 			Editor.UserChangeSnapMode(Mode);
 		}
@@ -311,7 +312,7 @@ namespace SAW.Functions
 
 		public override int ValueAsInteger => Value;
 
-		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
+		public override void Trigger(ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
 		{
 			Editor.ChangeGridVisible(Value == 1, true); // nominally value 1 is on, 0 off, although function will actually ignore the value
 		}
@@ -332,7 +333,7 @@ namespace SAW.Functions
 
 	}
 
-	public class PaletteAction : Action
+	internal class PaletteAction : Action
 	{
 
 		#region Values construct and persist
@@ -356,7 +357,7 @@ namespace SAW.Functions
 
 		#endregion
 
-		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
+		public override void Trigger(ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
 		{
 			Editor.TriggerPalette(Purpose, true);
 		}
@@ -367,7 +368,7 @@ namespace SAW.Functions
 	}
 
 	/// <summary>Toggles the display of the given palette </summary>
-	public class ShowPaletteAction : Action
+	internal class ShowPaletteAction : Action
 	{
 
 		#region Values construct and persist
@@ -391,7 +392,7 @@ namespace SAW.Functions
 
 		#endregion
 
-		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
+		public override void Trigger(ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
 		{
 			string key = Config.ShowPaletteKey(Purpose);
 			Config.UserCurrent.Write(key, !Config.UserCurrent.ReadBooleanEx(key));
@@ -420,7 +421,7 @@ namespace SAW.Functions
 
 		#endregion
 
-		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
+		public override void Trigger(ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
 		{
 			// passed to the current colour panel if any
 			Control ctrFocused = GUIUtilities.GetFocusControl();

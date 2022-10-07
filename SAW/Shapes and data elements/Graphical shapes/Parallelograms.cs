@@ -2,13 +2,30 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Diagnostics;
+using System.Linq;
 
 // this file includes the three versions: square, rectangle, parallelogram
 
-namespace SAW
+namespace SAW.Shapes
 {
 	public class Parallelogram : Sequential
 	{
+
+		public Parallelogram()
+		{ }
+
+		/// <summary>Constructs from the first 3 points.  The 4th point is filled in automatically.  The 3 points must not form a line.</summary>
+		public Parallelogram(PointF A, PointF B, PointF C)
+		{
+			if (Geometry.DistancePointToLine(A, B, C) < Geometry.NEGLIGIBLE)
+				throw new ArgumentException("Points cannot be co-linear");
+			Start(new ClickPosition(A));
+			Choose(new ClickPosition(B));
+			Choose(new ClickPosition(C));
+			LineStyle.SetDefaults(); // otherwise error reports cannot be loaded
+			FillStyle.SetDefaults();
+			FillStyle.Colour = Color.Transparent;
+		}
 
 		#region Information
 
@@ -19,7 +36,7 @@ namespace SAW
 
 		#endregion
 
-		public override VerbResult Float(EditableView.ClickPosition position)
+		public override VerbResult Float(ClickPosition position)
 		{
 			// let the base class take care of positioning the first line
 			if (m_DefinedVertices < 2)
@@ -46,7 +63,7 @@ namespace SAW
 			return list;
 		}
 
-		protected  internal override void DoGrabMove(GrabMovement move)
+		protected internal override void DoGrabMove(GrabMovement move)
 		{
 			// although any point can be moved, we cannot use the base class which assumes they are completely independent
 			if (move.GrabType == GrabTypes.SingleVertex)
@@ -68,7 +85,7 @@ namespace SAW
 				base.DoGrabMove(move);
 		}
 
-		public override string StatusInformation(bool ongoing)
+		protected internal override string StatusInformation(bool ongoing)
 		{
 			if (ongoing)
 				return base.StatusInformation(true);
@@ -90,12 +107,12 @@ namespace SAW
 	{
 
 		#region Constructors
+
 		public RectangleShape()
 		{ }
 
 		public RectangleShape(RectangleF rct)
 		{
-			// used by the splatter to create a rectangle bordering the page
 			Vertices.Add(new PointF(rct.X, rct.Y));
 			Vertices.Add(new PointF(rct.Right, rct.Y));
 			Vertices.Add(new PointF(rct.Right, rct.Bottom));
@@ -104,16 +121,29 @@ namespace SAW
 			LineStyle.SetDefaults(); // otherwise error reports cannot be loaded
 			FillStyle.SetDefaults();
 			FillStyle.Colour = Color.Transparent;
-			base.Status = StatusValues.Complete;
+			Status = StatusValues.Complete;
 		}
+
+		/// <summary>Constructs from 3 sequential points on the rectangle.  3rd point will be modified to ensure the 90 degree angle</summary>
+		public RectangleShape(PointF A, PointF B, PointF C)
+		{
+			Start(new ClickPosition(A));
+			Choose(new ClickPosition(B));
+			Choose(new ClickPosition(C));
+			LineStyle.SetDefaults(); // otherwise error reports cannot be loaded
+			FillStyle.SetDefaults();
+			FillStyle.Colour = Color.Transparent;
+		}
+
 		#endregion
 
 		#region Information
+
 		public override Shapes ShapeCode => Shapes.Rectangle;
 
 		internal override List<Prompt> GetPrompts() => base.GetBaseLinePrompts("Rectangle", false);
 
-		public override SnapModes SnapNext(SnapModes requested)
+		protected internal override SnapModes SnapNext(SnapModes requested)
 		{
 			if (m_DefinedVertices >= 2)
 			{
@@ -129,7 +159,7 @@ namespace SAW
 
 		#endregion
 
-		public override VerbResult Float(EditableView.ClickPosition position)
+		public override VerbResult Float(ClickPosition position)
 		{
 			// let the base class take care of positioning the first line
 			if (m_DefinedVertices < 2)
@@ -137,12 +167,13 @@ namespace SAW
 			// need to calculate the coordinates of the fourth point.  We can add the 1>2 vector onto point 0
 			Debug.Assert(Vertices.Count == 4);
 			PointF newPoint = Geometry.PerpendicularPoint(Vertices[0], Vertices[1], position.Snapped);
-			if (newPoint.Equals(Vertices[2]))
+			if (newPoint.Equals(Vertices[2]) && !Vertices[3].IsEmpty)
 				return VerbResult.Unchanged;
 			if (newPoint.ApproxEqual(Vertices[1]))
 				return VerbResult.Rejected;
 			Vertices[2] = newPoint;
 			SizeF vector = Vertices[1].VectorTo(Vertices[2]);
+			Debug.WriteLine($"Vector={vector}");
 			Vertices[3] = PointF.Add(Vertices[0], vector);
 			m_Bounds = CalculateBounds();
 			m_Acceptable = !VerticesFormLine(0);
@@ -166,7 +197,7 @@ namespace SAW
 			return list;
 		}
 
-		protected  internal override void DoGrabMove(GrabMovement move)
+		protected internal override void DoGrabMove(GrabMovement move)
 		{
 			switch (move.GrabType)
 			{
@@ -239,6 +270,7 @@ namespace SAW
 			DiscardPath();
 			return changed;
 		}
+
 		#endregion
 
 		// Load/Save/CopyFrom in base class are sufficient
@@ -248,9 +280,12 @@ namespace SAW
 	{
 		// stored in data as a normal Rectangle (and pretends to be such).  Difference is in the way it is drawn out
 
+		public OrthogonalRectangle() { }
+		public OrthogonalRectangle(RectangleF rct) : base(rct) { }
+
 		private PointF m_Start;
 
-		public override VerbResult Start(EditableView.ClickPosition position)
+		public override VerbResult Start(ClickPosition position)
 		{
 			m_Start = position.Snapped;
 			base.Start(position);
@@ -260,7 +295,7 @@ namespace SAW
 			return VerbResult.Continuing;
 		}
 
-		public override VerbResult Choose(EditableView.ClickPosition position)
+		public override VerbResult Choose(ClickPosition position)
 		{
 			Float(position);
 			if (m_Bounds.Width < 1 || m_Bounds.Height < 1)
@@ -269,7 +304,7 @@ namespace SAW
 			return VerbResult.Completed;
 		}
 
-		public override VerbResult Float(EditableView.ClickPosition position)
+		public override VerbResult Float(ClickPosition position)
 		{
 			DiscardPath();
 			m_Bounds = Geometry.RectangleFromPoints(m_Start, position.Snapped);
@@ -286,7 +321,7 @@ namespace SAW
 			return VerbResult.Rejected;
 		}
 
-		public override VerbResult Complete(EditableView.ClickPosition position) => Choose(position);
+		public override VerbResult Complete(ClickPosition position) => Choose(position);
 
 		public override VerbResult CompleteRetrospective()
 		{
@@ -295,18 +330,18 @@ namespace SAW
 			return VerbResult.Rejected;
 		}
 
-		public override VerbResult Cancel(EditableView.ClickPosition position) => VerbResult.Destroyed;
+		public override VerbResult Cancel(ClickPosition position) => VerbResult.Destroyed;
 
 		internal override List<Prompt> GetPrompts()
 		{
 			return new List<Prompt>
 			{
-				new Prompt(ShapeVerbs.Complete, "OrthogonalRectangle_Finish", "OrthogonalRectangle_Finish"), 
+				new Prompt(ShapeVerbs.Complete, "OrthogonalRectangle_Finish", "OrthogonalRectangle_Finish"),
 				new Prompt(ShapeVerbs.Choose | ShapeVerbs.Complete, "CancelAll", "CancelAll")
 			};
 		}
 
-		public override SnapModes SnapNext(SnapModes requested)
+		protected internal override SnapModes SnapNext(SnapModes requested)
 		{
 			switch (requested)
 			{
@@ -317,25 +352,43 @@ namespace SAW
 					return SnapModes.Off; // Angle snap doesn't make much sense here
 			}
 		}
+
 	}
 
 
 	public class Square : RectangleShape
 	{
 
+		public Square()
+		{ }
+
+		/// <summary>Constructs from the first 3 points.  3rd point will be modified to make it a valid square - effectively it only matters which side of initial line that point falls.
+		/// It will fail if the 3rd point is co-linear with the first 2</summary>
+		public Square(PointF A, PointF B, PointF C)
+		{
+			if (Geometry.DistancePointToLine(A, B, C) < Geometry.NEGLIGIBLE)
+				throw new ArgumentException("Points cannot be co-linear");
+			Start(new ClickPosition(A));
+			Choose(new ClickPosition(B));
+			Choose(new ClickPosition(C));
+			LineStyle.SetDefaults(); // otherwise error reports cannot be loaded
+			FillStyle.SetDefaults();
+			FillStyle.Colour = Color.Transparent;
+		}
+
 		#region Information
 		public override Shapes ShapeCode => Shapes.Square;
 		public override AllowedActions Allows => base.Allows & ~AllowedActions.TransformLinearStretch;
 		internal override List<Prompt> GetPrompts() => base.GetBaseLinePrompts("Square", true);
 
-		public override string StatusInformation(bool ongoing)
+		protected internal override string StatusInformation(bool ongoing)
 		{
 			if (ongoing)
 				return base.StatusInformation(true);
 			return Strings.Item("Info_Edge") + ": " + Measure.FormatLength(Geometry.DistanceBetween(Vertices[0], Vertices[1]));
 		}
 
-		public override SnapModes SnapNext(SnapModes requested)
+		protected internal override SnapModes SnapNext(SnapModes requested)
 		{
 			if (m_DefinedVertices >= 2)
 				return SnapModes.Off;
@@ -345,7 +398,7 @@ namespace SAW
 
 		#endregion
 
-		public override VerbResult Float(EditableView.ClickPosition position)
+		public override VerbResult Float(ClickPosition position)
 		{
 			// let the base class take care of positioning the first line
 			if (m_DefinedVertices < 2)
@@ -394,7 +447,7 @@ namespace SAW
 			return list;
 		}
 
-		protected  internal override void DoGrabMove(GrabMovement move)
+		protected internal override void DoGrabMove(GrabMovement move)
 		{
 			if (move.GrabType == GrabTypes.SingleVertex || move.GrabType == GrabTypes.Radius) // not sure how I want to display them graphically yet, but the functionality will be the same
 			{
@@ -438,8 +491,24 @@ namespace SAW
 		// Load/Save/CopyFrom in base class are sufficient
 	}
 
-		public class Rhombus : Sequential
+	public class Rhombus : Sequential
 	{
+
+		public Rhombus()
+		{ }
+
+		/// <summary>Constructs from the first 3 points.  3rd point will be modified to make it a valid rhombus</summary>
+		public Rhombus(PointF A, PointF B, PointF C)
+		{
+			if (Geometry.DistancePointToLine(A, B, C) < Geometry.NEGLIGIBLE)
+				throw new ArgumentException("Points cannot be co-linear");
+			Start(new ClickPosition(A));
+			Choose(new ClickPosition(B));
+			Choose(new ClickPosition(C));
+			LineStyle.SetDefaults(); // otherwise error reports cannot be loaded
+			FillStyle.SetDefaults();
+			FillStyle.Colour = Color.Transparent;
+		}
 
 		#region Info
 		public override Shapes ShapeCode => Shapes.Rhombus;
@@ -453,7 +522,7 @@ namespace SAW
 		// let the base class take care of positioning the first line
 		// however after choosing the end of that line becomes point 2 and point 1 is then moved (and point 3 is automatic)
 
-		public override VerbResult Choose(EditableView.ClickPosition position)
+		public override VerbResult Choose(ClickPosition position)
 		{
 			PointF pt = position.Snapped;
 			if (pt.ApproxEqual(LastDefined))
@@ -478,7 +547,7 @@ namespace SAW
 			}
 		}
 
-		public override VerbResult Float(EditableView.ClickPosition position)
+		public override VerbResult Float(ClickPosition position)
 		{
 			if (m_DefinedVertices < 2)
 				return base.Float(position);
@@ -513,7 +582,7 @@ namespace SAW
 			return list;
 		}
 
-		protected  internal override void DoGrabMove(GrabMovement move)
+		protected internal override void DoGrabMove(GrabMovement move)
 		{
 			// although any point can be moved, we cannot use the base class which assumes they are completely independent
 			if (move.GrabType == GrabTypes.SingleVertex)

@@ -288,7 +288,7 @@ namespace SAW
 		/// <summary>
 		/// Contains all of the p/invoke declarations for the Win32 APIs used in this sample
 		/// </summary>
-		public class NativeMethods
+		internal class NativeMethods
 		{
 
 			[DllImport("User32.dll", CharSet = CharSet.Unicode)]
@@ -324,7 +324,8 @@ namespace SAW
 		#endregion
 
 		#region Extensible dialog
-		public class OpenFileDialog : IDisposable
+
+		internal class OpenFileDialog : IDisposable
 		{
 			// The maximum number of characters permitted in a path
 			private const int _MAX_PATH = 260;
@@ -392,7 +393,7 @@ namespace SAW
 				_ofn.lpstrDefExt = Marshal.StringToCoTaskMemUni(defaultExtension);
 				_ofn.lpstrFileTitle = _fileTitleBuffer;
 				_ofn.nMaxFileTitle = _MAX_PATH;
-				_ofn.lpstrFilter = Marshal.StringToCoTaskMemUni(filter);
+				_ofn.lpstrFilter = Marshal.StringToCoTaskMemUni(filter.Replace("|","\0"));
 				_ofn.Flags = OpenFileNameFlags.EnableHook | OpenFileNameFlags.EnableTemplateHandle | OpenFileNameFlags.EnableSizing | OpenFileNameFlags.Explorer;
 				_ofn.hInstance = _ipTemplate;
 				_ofn.lpfnHook = new OfnHookProc(MyHookProc);

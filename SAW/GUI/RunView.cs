@@ -3,18 +3,17 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Diagnostics;
 using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
 using System.Windows.Forms;
 using Blade;
 using SAW.Commands;
 using Switches.Engines;
 using Switches.Switching;
+using SAW.Shapes;
 
 namespace SAW
 {
 	/// <summary>The document view used to run the selection set for the user.  EditView does the editing version (both inherit from StaticView)</summary>
-	public class RunView : StaticView
+	internal class RunView : StaticView
 	{
 		private Switches.Engine m_Engine;
 		public string PreviousSelectionSet = "";
@@ -530,7 +529,7 @@ namespace SAW
 
 		public int MouseStep => CurrentConfig.MouseStep(MouseStepType);
 
-		public AppliedConfig.MouseSteps MouseStepType = AppliedConfig.MouseSteps.Medium;
+		internal AppliedConfig.MouseSteps MouseStepType = AppliedConfig.MouseSteps.Medium;
 
 		#endregion
 

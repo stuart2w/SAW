@@ -4,11 +4,13 @@ using System.Windows.Forms;
 using System.Linq;
 using SAW.Functions;
 using Action = SAW.Functions.Action;
-
+using SAW.Shapes;
 
 namespace SAW
 {
-	public partial class ctrActionSelect : UserControl
+	// used only within the palette editor - not generally used by users
+
+	internal class ctrActionSelect : UserControl
 	{
 		private TreeNode m_KeyNode; // the node, if any, representing keypress
 		private TreeNode m_CharacterNode;

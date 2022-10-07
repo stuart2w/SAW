@@ -5,19 +5,22 @@ using SAW.CommandEditors;
 
 namespace SAW.Commands
 {
-	/// <summary>Grid scan command moves the mouse over current screen in a grid, using the switch output</summary>
+	/// <summary>Grid scan command moves the mouse over current screen in a grid, using the switch output.  Parameters are (columns, rows)</summary>
 	public class CmdGridScan : ParamBasedCommand, IContinuousCommand
 	{
+		public CmdGridScan(int columns, int rows) : this()
+		{
+			ParamList.Add(columns);
+			ParamList.Add(rows);
+		}
+
 		public CmdGridScan() : base(new[] { Param.ParamTypes.Integer, Param.ParamTypes.Integer })
 		{
 		}
 
-		public override ICommandEditor GetEditor()
-		{
-			return new GridScanEditor();
-		}
+		internal override ICommandEditor GetEditor() => new GridScanEditor();
 
-		public override void Execute(ExecutionContext context)
+		internal override void Execute(ExecutionContext context)
 		{
 			int rows = Math.Max((int)GetParamAsInt(1), 1);
 			m_NumberColumns = Math.Max((int)GetParamAsInt(0), 1);
@@ -80,7 +83,8 @@ namespace SAW.Commands
 		}
 
 		#region IContinuousCommand
-		public void Iterate()
+
+		void IContinuousCommand.Iterate()
 		{
 			m_Overlay?.Invalidate();
 			if (m_ScanInRow)
@@ -94,7 +98,7 @@ namespace SAW.Commands
 			Cursor.Position = CurrentRect.Centre();
 		}
 
-		public bool Trigger(bool isRepeat)
+		bool IContinuousCommand.Trigger(bool isRepeat)
 		{
 			if (m_ScanInRow)
 				return false;
@@ -105,7 +109,7 @@ namespace SAW.Commands
 			return true;
 		}
 
-		public void Stop()
+		void IContinuousCommand.Stop()
 		{
 			m_View = null;
 			m_Overlay?.Dispose();

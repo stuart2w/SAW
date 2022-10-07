@@ -1,6 +1,6 @@
 ﻿namespace SAW
 {
-	partial class ctrScale
+	internal partial class ctrScale
 	{
 		/// <summary> 
 		/// Required designer variable.

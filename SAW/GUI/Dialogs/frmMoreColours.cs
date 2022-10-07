@@ -7,7 +7,7 @@ using System.Windows.Forms;
 
 namespace SAW
 {
-	public partial class frmMoreColours : KeyForm
+	internal partial class frmMoreColours : KeyForm
 	{
 		public frmMoreColours()
 		{

@@ -2,11 +2,11 @@ using System;
 using System.Drawing;
 using System.Diagnostics;
 using System.Windows.Forms;
-
+using SAW.Shapes;
 
 namespace SAW
 {
-	public partial class ctrButtonStyleEdit : IParameterConsumer
+	internal partial class ctrButtonStyleEdit : IParameterConsumer
 	{
 		// the part of the button editor which deals with the content of a style - can also be used to edit
 		// document styles directly, not via a button

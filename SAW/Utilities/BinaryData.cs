@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Diagnostics;
 using System.Collections;
 using System.Linq;
+using SAW.Shapes;
 // ReSharper disable UnusedVariable
 
 namespace SAW
@@ -14,7 +15,7 @@ namespace SAW
 		// Note that the file itself has one marker indicating what the file is.  Each object also has a type marker.  So a file containing a single object has two
 		MaximumShape = 149, // any code less than this is a shape
 		ButtonStyle = 228,
-		Splash = 229, // just a random Byte
+		SAW = 229, // just a random Byte
 		Page = 230,
 		Paper = 231,
 		GraphPaper = 233,

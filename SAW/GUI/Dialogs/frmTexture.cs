@@ -2,10 +2,11 @@ using System;
 using System.Drawing;
 using System.Diagnostics;
 using System.Windows.Forms;
+using SAW.Shapes;
 
 namespace SAW
 {
-	public partial class frmTexture
+	internal partial class frmTexture
 	{
 
 		private SharedImage m_Chosen;

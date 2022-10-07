@@ -4,7 +4,7 @@ using System.Windows.Forms;
 namespace SAW
 {
 	[System.ComponentModel.ToolboxItem(false)]
-	public class ConfigPage : UserControl
+	internal class ConfigPage : UserControl
 	{
 
 		internal frmEditConfig Form;

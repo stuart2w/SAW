@@ -13,7 +13,7 @@ using Action = SAW.Functions.Action;
 namespace SAW
 {
 	/// <summary>persistable data storing position of a palette </summary>
-	public class PalettePosition
+	internal class PalettePosition
 	{
 		/// <summary>only None,Left and Right supported at the moment</summary>
 		public DockStyle Dock = DockStyle.Right;
@@ -107,7 +107,7 @@ namespace SAW
 	}
 
 	/// <summary>Container gathering all information about one possible palette.  Defined whether shown or not.  Data here is not editable.</summary>
-	public class Palette
+	internal class Palette
 	{
 		/// <summary>the actual control implementing this.  Must implement IPalette</summary>
 		public readonly Control Control;

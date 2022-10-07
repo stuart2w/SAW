@@ -3,7 +3,7 @@ using System.Windows.Forms;
 
 namespace SAW
 {
-	public partial class cfgListValues : ConfigPage
+	internal partial class cfgListValues : ConfigPage
 	{
 		
 		//UserControl overrides dispose to clean up the component list.

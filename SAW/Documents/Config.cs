@@ -4,7 +4,7 @@ using System.Drawing;
 using System.Diagnostics;
 using System.Windows.Forms;
 using System.Linq;
-
+using SAW.Shapes;
 
 namespace SAW
 {
@@ -26,12 +26,12 @@ namespace SAW
 		internal Dictionary<string, string> Values = new Dictionary<string, string>();
 		/// <summary>the document containing this configuration
 		/// for system, user and activity settings a document with no pages is always generated (v2: 1 page added for page size etc to activities</summary>
-		public Document Document;
+		internal Document Document;
 		/// <summary>only in User</summary>
 		public MemoryImage Picture;
 		/// <summary>likewise only in User (but includes teacher).
 		/// V2 was array[2].  Changed to extensible list in V3 to support SAW</summary>
-		public List<ButtonStyle> ButtonStyle; // = new List<ButtonStyle>();
+		internal List<ButtonStyle> ButtonStyle; // = new List<ButtonStyle>();
 		public const int BUTTONSTYLES = 10; //leaves 0-1 unused as Splash;  2-9 are Item.StyleTypes.  5 (2+3) won't actually be used as that is the code for custom
 											/// <summary>is flagged to true if AM.LoadConfig created this because it couldn't load the file
 											/// this is not stored in data; but will prevent an activity being saved (otherwise the system will think it has the activity later, whereas the file would actually be junk )</summary>
@@ -211,15 +211,9 @@ namespace SAW
 #if DEBUG
 		internal string SourceFile; // where it was loaded from (if created by FromFile)
 #endif
-		public override byte TypeByte
-		{
-			get
-			{
-				return (byte)FileMarkers.Config;
-			}
-		}
+		protected internal override byte TypeByte => (byte)FileMarkers.Config;
 
-		public override void Load(DataReader reader)
+		protected internal override void Load(DataReader reader)
 		{
 			base.Load(reader);
 			// the values are written as pairs of strings, with an empty string to terminate
@@ -300,7 +294,7 @@ namespace SAW
 			ShapeSequence = reader.ReadBoolean() ? reader.ReadListString().ToArray() : null;
 		}
 
-		public override void Save(DataWriter writer)
+		protected internal override void Save(DataWriter writer)
 		{
 			base.Save(writer);
 			foreach (string key in Values.Keys)
@@ -402,7 +396,7 @@ namespace SAW
 			}
 		}
 
-		public override void UpdateReferencesObjectsCreated(Document document, DataReader reader)
+		protected internal override void UpdateReferencesObjectsCreated(Document document, DataReader reader)
 		{
 		}
 
@@ -687,7 +681,7 @@ namespace SAW
 			return (Keys)Convert.ToInt32(key.Substring(4), 16);
 		}
 
-		public static string PaletteKeyFragment(Palette.Purpose purpose)
+		internal static string PaletteKeyFragment(Palette.Purpose purpose)
 		{
 			if (purpose.IsParameter)
 			{
@@ -708,7 +702,7 @@ namespace SAW
 			return purpose.Special.ToString();
 		}
 
-		public static string ShowPaletteKey(Palette palette)
+		internal static string ShowPaletteKey(Palette palette)
 		{
 			string fragment;
 			if (palette.PalettePurpose.Special == Palette.Purpose.Specials.Custom)
@@ -721,15 +715,15 @@ namespace SAW
 		}
 
 		/// <summary>Note that there is an implicit conversion from Parameters or a custom Guid to purpose, so either can also be supplied here</summary>
-		public static string ShowPaletteKey(Palette.Purpose purpose)
+		internal static string ShowPaletteKey(Palette.Purpose purpose)
 		{
 			// Generally the version with a Palette parameter is better, but this is useful in the wizard to control the standard palettes
 			return "Show_Palette_" + PaletteKeyFragment(purpose);
 		}
 
-		public static string ShowPaletteKey(Guid customID) => "Show_Palette_" + customID;
+		internal static string ShowPaletteKey(Guid customID) => "Show_Palette_" + customID;
 
-		public static string SelectPaletteKey(Palette.Purpose purpose)
+		internal static string SelectPaletteKey(Palette.Purpose purpose)
 		{
 			// Which palette should be used for the given purpose; stored as the string palette ID
 			if (purpose.IsCustom)
@@ -740,7 +734,7 @@ namespace SAW
 			return "Select_Palette_" + fragment;
 		}
 
-		public static string ToolbarIncludeKey(Functions.Codes code)
+		internal static string ToolbarIncludeKey(Functions.Codes code)
 		{
 			return "TBShow_" + code;
 		}
@@ -770,12 +764,12 @@ namespace SAW
 				ButtonStyle = new List<ButtonStyle>();
 			while (ButtonStyle.Count < BUTTONSTYLES)
 				ButtonStyle.Add(null);
-			SAW.ButtonStyle.EnsureConfigUserDefaultsSet(this);
+			SAW.Shapes.ButtonStyle.EnsureConfigUserDefaultsSet(this);
 			for (int i = 2; i < BUTTONSTYLES; i++)
 			{ // all SAW ones
 				if (ButtonStyle[i] == null)
 				{
-					ButtonStyle[i] = new ButtonStyle() { ImageType = SAW.ButtonStyle.ImageTypes.None };
+					ButtonStyle[i] = new ButtonStyle() { ImageType = SAW.Shapes.ButtonStyle.ImageTypes.None };
 					ButtonStyle[i].Initialise();
 					ButtonStyle[i].LineStyle[0] = new Shape.LineStyleC() { Colour = Color.Black, Width = 1 };
 					ButtonStyle[i].LineStyle[1] = new Shape.LineStyleC() { Colour = Color.Red, Width = 1 };
@@ -1078,7 +1072,7 @@ namespace SAW
 
 		#region Palettes and positions
 
-		public Dictionary<string, PalettePosition> PalettePositions; // only created as needed.  Only in user configs.  Key is the palette ID
+		internal Dictionary<string, PalettePosition> PalettePositions; // only created as needed.  Only in user configs.  Key is the palette ID
 
 		public void StorePalettePositions()
 		{

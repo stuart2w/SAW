@@ -1,6 +1,6 @@
 ﻿namespace SAW
 {
-	partial class frmRun
+	internal partial class frmRun
 	{
 		/// <summary>
 		/// Required designer variable.

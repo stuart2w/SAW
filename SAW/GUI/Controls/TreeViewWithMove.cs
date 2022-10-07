@@ -7,7 +7,7 @@ namespace SAW
 {
 	/// <summary>Derivative of Treeview which implements moving a node within its siblings (only)</summary>
 	[ToolboxItem(false)]
-	public class TreeViewWithMove : TreeView
+	internal class TreeViewWithMove : TreeView
 	{
 		public class MoveEventArgs : EventArgs
 		{

@@ -2,11 +2,12 @@ using System;
 using System.Drawing;
 using System.Diagnostics;
 using System.Windows.Forms;
+using SAW.Shapes;
 
 
 namespace SAW
 {
-	public partial class frmFlow
+	internal partial class frmFlow
 	{
 
 		private Flow m_Flow;

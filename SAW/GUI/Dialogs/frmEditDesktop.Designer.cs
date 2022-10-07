@@ -1,6 +1,6 @@
 ﻿namespace SAW
 {
-	partial class frmEditDesktop
+	internal partial class frmEditDesktop
 	{
 		/// <summary>
 		/// Required designer variable.

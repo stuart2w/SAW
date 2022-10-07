@@ -3,11 +3,11 @@ using System;
 using System.Drawing;
 using System.Windows.Forms;
 using System.Linq;
-
+using SAW.Shapes;
 
 namespace SAW
 {
-	public partial class cfgCustomPalettes
+	internal partial class cfgCustomPalettes
 	{
 
 		// This is the custom palettes section; see Features for the section which shows and hides palettes

@@ -4,7 +4,7 @@ using System.Diagnostics;
 
 namespace SAW
 {
-	public partial class cfgSpeech
+	internal partial class cfgSpeech
 	{
 		public cfgSpeech()
 		{

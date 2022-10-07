@@ -8,7 +8,7 @@ namespace SAW
 	/// <summary>Extends a FlowLayoutPanel to support selecting one of the contents by clicking on it
 		/// the click handler will only work correctly for single controls, not controls containing other controls</summary>
 	[System.ComponentModel.DefaultEvent("UserSelected")]
-	public sealed class SelectionPanel : Panel
+	internal sealed class SelectionPanel : Panel
 	{
 
 		#region Properties and Fields

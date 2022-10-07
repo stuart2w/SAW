@@ -1,11 +1,12 @@
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 
-namespace SAW
+namespace SAW.Shapes
 {
-		/// <summary>Base class for any type where the bounding rectangle defines the coordinates</summary>
+	/// <summary>Base class for any type where the bounding rectangle defines the coordinates</summary>
 	public abstract class BoundsDefines : Shape
 	{
 
@@ -16,10 +17,8 @@ namespace SAW
 			ClearTextCache(); // base class does a slightly more efficient version, but in practice this is probably only used for buttons which have quite simple text
 		}
 
-		public override bool HitTestDetailed(PointF clickPoint, float scale, bool treatAsFilled)
-		{
-			return true; // clicking anywhere within the bounds counts as a hit
-		}
+		protected internal override bool HitTestDetailed(PointF clickPoint, float scale, bool treatAsFilled) => true; // clicking anywhere within the bounds counts as a hit
+
 
 		protected override RectangleF CalculateBounds()
 		{
@@ -65,13 +64,13 @@ namespace SAW
 			Lined.DrawLineTargetGivenPoints(gr, pn, activePhase, target.Position, start, end);
 		}
 
-		public override void Load(DataReader reader)
+		protected internal override void Load(DataReader reader)
 		{
 			base.Load(reader);
 			m_Bounds = reader.ReadRectangleF();
 		}
 
-		public override void Save(DataWriter writer)
+		protected internal override void Save(DataWriter writer)
 		{
 			base.Save(writer);
 			writer.Write(m_Bounds);
@@ -105,6 +104,7 @@ namespace SAW
 		}
 
 		public override GeneralFlags Flags => base.Flags | GeneralFlags.ProtectBounds;
+
 	}
 
 
@@ -115,16 +115,16 @@ namespace SAW
 		/// <summary>defined around rectangle from top left: TL, TR, BR, BL</summary>
 		protected PointF[] Vertices = new PointF[4];
 
-		public override AllowedActions Allows
-		{ get { return base.Allows | AllowedActions.Tidy; } }
+		public override AllowedActions Allows => base.Allows | AllowedActions.Tidy;
 
 		#region Data
-		public override void Load(DataReader reader)
+
+		protected internal override void Load(DataReader reader)
 		{
 			base.Load(reader);
 			if (reader.Version < 90)
 			{
-				var rct = reader.ReadRectangleF();
+				RectangleF rct = reader.ReadRectangleF();
 				Vertices[0] = rct.Location;
 				Vertices[1] = rct.TopRight();
 				Vertices[2] = rct.BottomRight();
@@ -134,7 +134,7 @@ namespace SAW
 				Vertices = reader.ReadListPoints().ToArray();
 		}
 
-		public override void Save(DataWriter writer)
+		protected internal override void Save(DataWriter writer)
 		{
 			base.Save(writer);
 			if (writer.Version < 90)
@@ -142,7 +142,6 @@ namespace SAW
 			else
 				writer.Write(Vertices);
 		}
-
 
 		public override void CopyFrom(Datum other, CopyDepth depth, Mapping mapID)
 		{
@@ -168,7 +167,7 @@ namespace SAW
 			transformation.TransformPoints(Vertices);
 		}
 
-		public override bool HitTestDetailed(PointF clickPoint, float scale, bool treatAsFilled)
+		protected internal override bool HitTestDetailed(PointF clickPoint, float scale, bool treatAsFilled)
 		{
 			// The requirement is that the vector to the point must be to the right of the vector from any vertex to the next.  If all four satisfy this the point must be inside the box
 			for (int index = 0; index <= 3; index++)
@@ -183,6 +182,16 @@ namespace SAW
 		protected void SetRectangle(RectangleF rct)
 		{
 			Vertices = rct.GetPoints();
+			m_Bounds = RectangleF.Empty;
+		}
+
+		/// <summary>Defines location from the 4 corners, which should form a rectangle (not checked in here) </summary>
+
+		public void SetVertices(PointF[] corners)
+		{
+			if (corners.Length != 4)
+				throw new ArgumentException(nameof(corners));
+			Vertices = corners;
 			m_Bounds = RectangleF.Empty;
 		}
 

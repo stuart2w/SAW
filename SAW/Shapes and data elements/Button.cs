@@ -7,13 +7,30 @@ using System.Linq;
 using SAW.Functions;
 using Action = SAW.Functions.Action;
 
-namespace SAW
+namespace SAW.Shapes
 {
+	/// <summary>Position of image relative to text within a button</summary>
+	[Flags]
+	public enum ButtonLayouts
+	{
+		/// <summary>Image below text</summary>
+		Below = 0,
+		/// <summary>Image above text</summary>
+		Above,
+		/// <summary>Image to right of text</summary>
+		Right,
+		/// <summary>Image to left of text</summary>
+		Left,
+		/// <summary>Both items are centred within button, superimposed</summary>
+		CentreBoth,
+		/// <summary>Add this to any of Below/Above/Right/Left to make the image fill the button, and the text is overlaid, positioned according</summary>
+		Superimpose = 128 
+	}
+
 	/// <summary>Note, this is not the regular SAW item which is "Item".  This is a button on a palette or in the toolbox.  It may also be usable in the document in future if
 	/// Scriptable is extended to be able to contain anything. </summary>
-	public class ButtonShape : BoundsDefines
+	internal class ButtonShape : BoundsDefines
 	{
-		// for buttons in palettes
 		// uses TextStyle defined in base class.  LineStyle and FillStyle not used - See Styling section
 
 		public enum States
@@ -125,18 +142,7 @@ namespace SAW
 
 		private Guid m_StyleID; // defined whether stored internally or in document
 		private float m_TextRatio = -1; // means use auto
-		[Flags]
-		public enum Layouts
-		{
-			// location of image relative to text.  frmButton assumes these numbered 0-128
-			Below = 0,
-			Above,
-			Right,
-			Left,
-			CentreBoth, // both fill button
-			Superimpose = 128 // add this to make image fill, and text just gets its share within.  Text position unaffected
-		}
-		private Layouts m_Layout = Layouts.Above;
+		private ButtonLayouts m_Layout = ButtonLayouts.Above;
 
 		private States DrawState
 		{
@@ -148,7 +154,7 @@ namespace SAW
 			}
 		}
 
-		public override StyleBase StyleObjectForParameter(Parameters parameter, bool applyingDefault = false)
+		internal override StyleBase StyleObjectForParameter(Parameters parameter, bool applyingDefault = false)
 		{
 			if (BackgroundStyleObject == null)
 				return null; // can happen when the main screen requests the current style for ongoing shape (and I think it might be a dummy ongoing shape) in order to update palettes
@@ -192,7 +198,7 @@ namespace SAW
 			}
 		}
 
-		internal Layouts Layout
+		internal ButtonLayouts Layout
 		{
 			get { return m_Layout; }
 			set
@@ -202,13 +208,13 @@ namespace SAW
 				TextStyle.Alignment = StringAlignment.Center;
 				// if text superimposed we want to move it right to the edge
 				// layout is IMAGE position
-				if (m_Layout == (Layouts.Below | Layouts.Superimpose))
+				if (m_Layout == (ButtonLayouts.Below | ButtonLayouts.Superimpose))
 					TextStyle.VerticalAlignment = StringAlignment.Near;
-				else if (m_Layout == (Layouts.Above | Layouts.Superimpose))
+				else if (m_Layout == (ButtonLayouts.Above | ButtonLayouts.Superimpose))
 					TextStyle.VerticalAlignment = StringAlignment.Far;
-				else if (m_Layout == (Layouts.Left | Layouts.Superimpose))
+				else if (m_Layout == (ButtonLayouts.Left | ButtonLayouts.Superimpose))
 					TextStyle.Alignment = StringAlignment.Near;
-				else if (m_Layout == (Layouts.Right | Layouts.Superimpose))
+				else if (m_Layout == (ButtonLayouts.Right | ButtonLayouts.Superimpose))
 					TextStyle.Alignment = StringAlignment.Far;
 				ClearTextCache();
 			}
@@ -219,15 +225,14 @@ namespace SAW
 		#endregion
 
 		#region Info
+
 		public override Shapes ShapeCode => Shapes.Button;
 
-		public override GeneralFlags Flags
-		{ get { return base.Flags | GeneralFlags.NoEmptyLabelMessage | GeneralFlags.NoColourOnTransformCopy | GeneralFlags.DoubleClickAfterCreation; } }
+		public override GeneralFlags Flags => base.Flags | GeneralFlags.NoEmptyLabelMessage | GeneralFlags.NoColourOnTransformCopy | GeneralFlags.DoubleClickAfterCreation;
 
-		public override AllowedActions Allows
-		{get{return (base.Allows | AllowedActions.Tidy) & ~(AllowedActions.TransformRotate  | AllowedActions.TransformMirror | AllowedActions.Merge | AllowedActions.Arrowheads);}}
+		public override AllowedActions Allows => (base.Allows | AllowedActions.Tidy) & ~(AllowedActions.TransformRotate  | AllowedActions.TransformMirror | AllowedActions.Merge | AllowedActions.Arrowheads);
 
-		public override LabelModes LabelMode => LabelModes.Always;
+		internal override LabelModes LabelMode => LabelModes.Always;
 
 		protected override LabelPositions LabelPosition => LabelPositions.RotatedRectangle;
 		// not actually rotated, but easier to just use this than create a new CustomRect value
@@ -261,7 +266,7 @@ namespace SAW
 			return objList;
 		}
 
-		public override SnapModes SnapNext(SnapModes requested)
+		protected internal override SnapModes SnapNext(SnapModes requested)
 		{
 			if (requested == SnapModes.Angle) // not implemented, but is implicit anyway
 				return SnapModes.Off;
@@ -277,7 +282,7 @@ namespace SAW
 		#region Verbs
 		private static PointF g_ptStart; // in order to allow drawing out any corner first
 		private const float MINSIZE = 2;
-		public override VerbResult Start(EditableView.ClickPosition position)
+		public override VerbResult Start(ClickPosition position)
 		{
 			// Style for button is most common one on this page, or last one selected
 			BackgroundStyleObject = frmButton.GetStyleForNewButton(position.Page);
@@ -299,7 +304,7 @@ namespace SAW
 			TextStyle.SetDefaults();
 		}
 
-		public override VerbResult Float(EditableView.ClickPosition position)
+		public override VerbResult Float(ClickPosition position)
 		{
 			RectangleF rct = Geometry.RectangleFromPoints(g_ptStart, position.Snapped);
 			if (rct.Width < MINSIZE || rct.Height < MINSIZE)
@@ -308,11 +313,11 @@ namespace SAW
 			return VerbResult.Continuing;
 		}
 
-		public override VerbResult Cancel(EditableView.ClickPosition position) => VerbResult.Destroyed;
+		public override VerbResult Cancel(ClickPosition position) => VerbResult.Destroyed;
 
-		public override VerbResult Choose(EditableView.ClickPosition position) => Complete(position);
+		public override VerbResult Choose(ClickPosition position) => Complete(position);
 
-		public override VerbResult Complete(EditableView.ClickPosition position)
+		public override VerbResult Complete(ClickPosition position)
 		{
 			VerbResult eResult = Float(position);
 			if (eResult == VerbResult.Rejected)
@@ -335,7 +340,7 @@ namespace SAW
 			return Strings.Item("Button_Edit");
 		}
 
-		internal override void DoDoubleClick(EditableView view, EditableView.ClickPosition.Sources source)
+		internal override void DoDoubleClick(EditableView view, ClickPosition.Sources source)
 		{
 			if (Globals.Root.User == Users.User)
 				return;
@@ -487,12 +492,12 @@ namespace SAW
 			}
 		}
 
-		public override void Load(DataReader reader)
+		protected internal override void Load(DataReader reader)
 		{
 			base.Load(reader);
 			// State not saved
 			m_State = States.Normal;
-			m_Layout = (Layouts)reader.ReadInt32();
+			m_Layout = (ButtonLayouts)reader.ReadInt32();
 			m_TextRatio = reader.ReadSingle();
 			m_Image = SharedReference<SharedImage>.FromGUID(reader.ReadGuid());
 			m_StyleID = reader.ReadGuid();
@@ -508,7 +513,7 @@ namespace SAW
 			}
 		}
 
-		public override void Save(DataWriter writer)
+		protected internal override void Save(DataWriter writer)
 		{
 			base.Save(writer);
 			writer.Write((int)m_Layout);
@@ -532,7 +537,7 @@ namespace SAW
 			}
 		}
 
-		public override void AddRequiredReferences(Action<Datum> fnAdd, Mapping mapID)
+		protected internal override void AddRequiredReferences(Action<Datum> fnAdd, Mapping mapID)
 		{
 			base.AddRequiredReferences(fnAdd, mapID);
 			if (BackgroundStyleObject != null && BackgroundStyleObject.IsShared && !BackgroundStyleObject.IsUserDefault)
@@ -554,14 +559,14 @@ namespace SAW
 		}
 
 		// The image and style are not contained, it is only a shared reference - unless style is not shared
-		public override void Iterate(DatumFunction fn)
+		internal override void Iterate(DatumFunction fn)
 		{
 			base.Iterate(fn);
 			if (BackgroundStyleObject != null && !BackgroundStyleObject.IsShared)
 				BackgroundStyleObject.Iterate(fn);
 		}
 
-		public override void UpdateReferencesObjectsCreated(Document document, DataReader reader)
+		protected internal override void UpdateReferencesObjectsCreated(Document document, DataReader reader)
 		{
 			base.UpdateReferencesObjectsCreated(document, reader);
 			m_Image?.DereferenceOnLoad(document);
@@ -588,7 +593,7 @@ namespace SAW
 			}
 		}
 
-		public override void UpdateReferencesIDsChanged(Mapping mapID, Document document)
+		protected internal override void UpdateReferencesIDsChanged(Mapping mapID, Document document)
 		{
 			base.UpdateReferencesIDsChanged(mapID, document);
 			if (mapID.ContainsKey(m_StyleID))
@@ -645,17 +650,17 @@ namespace SAW
 			return GetTextArea(m_Bounds, m_TextRatio, m_Image, m_Layout);
 		}
 
-		internal static RectangleF GetTextArea(RectangleF bounds, float textRatio, SharedReference<SharedImage> image, Layouts layout)
+		internal static RectangleF GetTextArea(RectangleF bounds, float textRatio, SharedReference<SharedImage> image, ButtonLayouts layout)
 		{
 			// superimpose flag extends the image under the text - has no effect on text area, which is still limited
 			if (image == null)
 				return bounds;
 			if (textRatio < 0.01)
 			{
-				switch (layout & ~Layouts.Superimpose)
+				switch (layout & ~ButtonLayouts.Superimpose)
 				{
-					case Layouts.Above:
-					case Layouts.Below:
+					case ButtonLayouts.Above:
+					case ButtonLayouts.Below:
 						return bounds; // text drawn in entire space - to allow auto-sizing - image will try and draw beside
 					default: // image made square or 50% whichever is smaller
 						float imageRatio = Math.Min(0.5F, bounds.Height / bounds.Width);
@@ -666,23 +671,23 @@ namespace SAW
 			textRatio = Math.Min(textRatio, 0.9F);
 			RectangleF temp = bounds;
 			//Debug.WriteLine("GetTextArea with layout=" + layout);
-			switch (layout & ~Layouts.Superimpose)
+			switch (layout & ~ButtonLayouts.Superimpose)
 			{
-				case Layouts.CentreBoth:
+				case ButtonLayouts.CentreBoth:
 					break;
 				// note Layout name refers to IMAGE
-				case Layouts.Above:
+				case ButtonLayouts.Above:
 					temp.Y += bounds.Height * (1.0f - textRatio);
 					temp.Height = bounds.Height * textRatio;
 					break;
-				case Layouts.Below:
+				case ButtonLayouts.Below:
 					temp.Height = bounds.Height * textRatio;
 					break;
-				case Layouts.Left:
+				case ButtonLayouts.Left:
 					temp.X += bounds.Width * (1.0f - textRatio);
 					temp.Width = bounds.Width * textRatio;
 					break;
-				case Layouts.Right:
+				case ButtonLayouts.Right:
 					temp.Width = bounds.Width * textRatio;
 					break;
 				default:
@@ -699,13 +704,13 @@ namespace SAW
 			return GetImageArea(m_Bounds, m_TextRatio, m_Image, m_Layout, LabelText, m_Fragments);
 		}
 
-		internal static RectangleF GetImageArea(RectangleF bounds, float defaultTextRatio, SharedReference<SharedImage> image, Layouts layout, string LabelText, List<Fragment> fragments)
+		internal static RectangleF GetImageArea(RectangleF bounds, float defaultTextRatio, SharedReference<SharedImage> image, ButtonLayouts layout, string LabelText, List<Fragment> fragments)
 		{
 			Debug.Assert(image != null);
 			RectangleF basis = bounds;
 			basis.Inflate(-0.6F, -0.6F); // roughly 2 pixels; stops this overlapping the border so badly
 
-			if ((layout & Layouts.Superimpose) > 0 || layout == Layouts.CentreBoth || string.IsNullOrEmpty(LabelText)) //OrElse m_strLabel = "" Then
+			if ((layout & ButtonLayouts.Superimpose) > 0 || layout == ButtonLayouts.CentreBoth || string.IsNullOrEmpty(LabelText)) //OrElse m_strLabel = "" Then
 			{
 				basis.Inflate(-0.8F, -0.8F); // if the image covers most of the button, we to leave more margin, otherwise it can be impossible to see the background colour (which gives selection state)
 				return basis;
@@ -715,8 +720,8 @@ namespace SAW
 			{
 				switch (layout) // superimpose flag filtered out above
 				{
-					case Layouts.Above: // check size of text - image gets remainder, or 25% whichever is larger
-					case Layouts.Below:
+					case ButtonLayouts.Above: // check size of text - image gets remainder, or 25% whichever is larger
+					case ButtonLayouts.Below:
 						float text = 0;
 						if (fragments != null && fragments.Count > 0)
 							text = fragments[fragments.Count - 1].Bounds.Bottom - fragments[0].Bounds.Top;
@@ -733,17 +738,17 @@ namespace SAW
 			RectangleF temp = basis;
 			switch (layout)
 			{
-				case Layouts.Above:
+				case ButtonLayouts.Above:
 					temp.Height = temp.Height * (1.0f - textRatio);
 					break;
-				case Layouts.Below:
+				case ButtonLayouts.Below:
 					temp.Y = temp.Y + temp.Height * textRatio;
 					temp.Height = temp.Height * (1.0f - textRatio);
 					break;
-				case Layouts.Left:
+				case ButtonLayouts.Left:
 					temp.Width = temp.Width * (1.0f - textRatio);
 					break;
-				case Layouts.Right:
+				case ButtonLayouts.Right:
 					temp.X = temp.X + temp.Width * textRatio;
 					temp.Width = temp.Width * (1.0f - textRatio);
 					break;
@@ -760,7 +765,7 @@ namespace SAW
 				// Near is top aligned - which happens automatically.  for all others need to adjust the Y positions
 				float height = m_Fragments[m_Fragments.Count - 1].Bounds.Bottom - m_Fragments[0].Bounds.Top;
 				float Y; // where the first must be
-				if ((m_Layout & ~Layouts.Superimpose) == Layouts.Above) // remember Layout is IMAGE position
+				if ((m_Layout & ~ButtonLayouts.Superimpose) == ButtonLayouts.Above) // remember Layout is IMAGE position
 					Y = Bounds.Height - height;
 				else
 					Y = 0; // text top
@@ -785,9 +790,9 @@ namespace SAW
 		{
 			get // returns true if text is pushed to edge
 			{
-				if (m_Layout == Layouts.Above || m_Layout == Layouts.Below)
+				if (m_Layout == ButtonLayouts.Above || m_Layout == ButtonLayouts.Below)
 					return m_TextRatio <= 0;
-				else if (m_Layout == (Layouts.Above | Layouts.Superimpose) || m_Layout == (Layouts.Below | Layouts.Superimpose))
+				else if (m_Layout == (ButtonLayouts.Above | ButtonLayouts.Superimpose) || m_Layout == (ButtonLayouts.Below | ButtonLayouts.Superimpose))
 					return true;
 				else
 					return false;
@@ -809,7 +814,7 @@ namespace SAW
 
 	}
 
-	public class ButtonStyle : Datum, IComparable<ButtonStyle>
+	internal class ButtonStyle : Datum, IComparable<ButtonStyle>
 	{
 
 		// can be shared between buttons - because we may want a lot of buttons all looking the same, and it's quite
@@ -854,8 +859,7 @@ namespace SAW
 			FillStyle[2].Colour = Color.FromArgb(0, 255, 255);
 		}
 
-		public override byte TypeByte
-		{ get { return (byte)FileMarkers.ButtonStyle; } }
+		protected internal override byte TypeByte => (byte)FileMarkers.ButtonStyle;
 
 		#region Data
 		public override void CopyFrom(Datum other, CopyDepth depth, Mapping mapID)
@@ -902,7 +906,7 @@ namespace SAW
 			}
 		}
 
-		public override void Load(DataReader reader)
+		protected internal override void Load(DataReader reader)
 		{
 			base.Load(reader);
 			ImageType = (ImageTypes)reader.ReadByte();
@@ -922,7 +926,7 @@ namespace SAW
 			Name = reader.ReadString();
 		}
 
-		public override void Save(DataWriter writer)
+		protected internal override void Save(DataWriter writer)
 		{
 			base.Save(writer);
 			writer.WriteByte((byte)ImageType); // must be before loop so that we know whether to load images or not
@@ -945,7 +949,7 @@ namespace SAW
 		}
 
 		// note FillStyles can have references - so need to process these - but IDs never change for textures(?) so that one not needed
-		public override void AddRequiredReferences(Action<Datum> fnAdd, Mapping mapID)
+		protected internal override void AddRequiredReferences(Action<Datum> fnAdd, Mapping mapID)
 		{
 			base.AddRequiredReferences(fnAdd, mapID);
 			foreach (Shape.FillStyleC objStyle in FillStyle)
@@ -954,7 +958,7 @@ namespace SAW
 			}
 		}
 
-		public override void UpdateReferencesObjectsCreated(Document document, DataReader reader)
+		protected internal override void UpdateReferencesObjectsCreated(Document document, DataReader reader)
 		{
 			foreach (Shape.FillStyleC objStyle in FillStyle)
 			{
@@ -1187,7 +1191,7 @@ namespace SAW
 
 	}
 
-	public class ScalableImage
+	internal class ScalableImage
 	{
 		// for button(style).  Records one or more images which can be drawn at different sizes
 		// if multiple, then the nearest to the required size is drawn

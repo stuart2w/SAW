@@ -3,7 +3,7 @@
 namespace SAW
 {
 	/// <summary>Modified text box to intercept all keys so that they are reported to the normal key events on the control </summary>
-	public class TextBoxAllKeys : TextBox, IKeyControl
+	internal class TextBoxAllKeys : TextBox, IKeyControl
 	{
 		protected override bool IsInputChar(char charCode) => true;
 

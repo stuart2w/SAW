@@ -5,6 +5,7 @@ using System.Text;
 using SAW.CommandEditors;
 using SAW.Commands;
 using System.Linq;
+using SAW.Shapes;
 
 namespace SAW
 {
@@ -33,14 +34,14 @@ namespace SAW
 			return CommandListEntry.PossibleCommandsLower[0];
 		}
 
-		/// <summary>Returns the text version of the script in local language, excluding the comment</summary>
+		/// <summary>Returns the text version of the script in local language, excluding the comment, but including parameters</summary>
 		public virtual string GetScriptWithParams(bool forSAW6)
 		{
 			string name = GetCommandName();
-			if (m_ParamList.Count == 0)
+			if (ParamList.Count == 0)
 				return name;
 			StringBuilder output = new StringBuilder(name);
-			foreach (var p in m_ParamList)
+			foreach (var p in ParamList)
 			{
 				output.Append(' ');
 				if ((p as StringParam)?.Quoted ?? false)
@@ -137,7 +138,7 @@ namespace SAW
 
 		/// <summary>Called by FromScript when this is being constructed from the text script to do any customisation based on the actual command (the bit that identified the script).  InitialiseFromParams will ALSO be called.</summary>
 		/// <param name="commandUsed">The first part of the line which was used to identify the command (for command objects which support multiple items)</param>
-		public virtual void InitialiseFromCommandUsed(string commandUsed)
+		internal virtual void InitialiseFromCommandUsed(string commandUsed)
 		{
 		}
 
@@ -151,15 +152,14 @@ namespace SAW
 		}
 
 		/// <summary>Used when a new script is added to fill in any default params</summary>
-		public virtual void InitialiseDefaultsForCreation()
+		internal virtual void InitialiseDefaultsForCreation()
 		{ }
 
 		#endregion
 
 		#region Editing Info
 		/// <summary>The CommandList meta-data for this</summary>
-		public CommandList.Entry CommandListEntry
-		{ get { return CommandList.Entries[Code]; } }
+		public CommandList.Entry CommandListEntry => CommandList.Entries[Code];
 
 		/// <summary>This is called once when CommandList is being populated.  The object must fill in PossibleCommands, and can also use CustomData if desired</summary>
 		internal virtual void CompleteCommandListEntry(CommandList.Entry entry)
@@ -168,32 +168,26 @@ namespace SAW
 		}
 
 		/// <summary>Returns the description of this command when adding it</summary>
-		public virtual string GetDescription()
-		{
-			return Strings.Item("Script_Desc_" + Code.ToUpper());
-		}
+		public virtual string GetDescription() => Strings.Item("Script_Desc_" + Code.ToUpper());
 
 		/// <summary>Returns the control which edits custom properties of this command, if any.  Returns null if none is needed (typically because there are no parameters)</summary>
-		public virtual ICommandEditor GetEditor()
-		{
-			return null;
-		}
+		internal virtual ICommandEditor GetEditor() => null;
 
 		#endregion
 
 		#region Parameters
 
 		/// <summary>List of CParam objects.  However some classes write other values individually</summary>
-		public List<Param> m_ParamList { get; private set; } = new List<Param>();
+		public List<Param> ParamList { get; private set; } = new List<Param>();
 
 		/// <summary>Reads the param, optionally creating it if missing</summary>
 		public short GetParamAsInt(int index, bool create = false)
 		{
 			if (create)
 				EnsureParams(index + 1);
-			else if (m_ParamList.Count < index + 1)
+			else if (ParamList.Count < index + 1)
 				throw new UserException(Strings.Item("Script_Error_TooFewParameters"));
-			return m_ParamList[index].ValueAsInt();
+			return ParamList[index].ValueAsInt();
 		}
 
 		/// <summary>Reads the param, optionally creating it if missing</summary>
@@ -201,9 +195,9 @@ namespace SAW
 		{
 			if (create)
 				EnsureParams(index + 1);
-			else if (m_ParamList.Count < index + 1)
+			else if (ParamList.Count < index + 1)
 				throw new UserException(Strings.Item("Script_Error_TooFewParameters"));
-			return m_ParamList[index].ValueAsBool();
+			return ParamList[index].ValueAsBool();
 		}
 
 		/// <summary>Reads the param, optionally creating it if missing</summary>
@@ -211,9 +205,9 @@ namespace SAW
 		{
 			if (create)
 				EnsureParams(index + 1);
-			else if (m_ParamList.Count < index + 1)
+			else if (ParamList.Count < index + 1)
 				throw new UserException(Strings.Item("Script_Error_TooFewParameters"));
-			return m_ParamList[index].ValueAsFloat();
+			return ParamList[index].ValueAsFloat();
 		}
 
 		/// <summary>Reads the param, optionally creating it if missing</summary>
@@ -221,23 +215,23 @@ namespace SAW
 		{
 			if (create)
 				EnsureParams(index + 1);
-			else if (m_ParamList.Count < index + 1)
+			else if (ParamList.Count < index + 1)
 				throw new UserException(Strings.Item("Script_Error_TooFewParameters"));
-			return m_ParamList[index].ValueAsString();
+			return ParamList[index].ValueAsString();
 		}
 
 		/// <summary>Ensure there are at least this many params in the list</summary>
-		public virtual void EnsureParams(int count)
+		internal virtual void EnsureParams(int count)
 		{
-			while (m_ParamList.Count < count)
-				m_ParamList.Add(new IntegerParam());
+			while (ParamList.Count < count)
+				ParamList.Add(new IntegerParam());
 		}
 
 		#endregion
 
 		#region Execution
 		/// <summary>Information passed to the Execute methods </summary>
-		public class ExecutionContext
+		internal class ExecutionContext
 		{
 			public readonly Scriptable TargetItem;
 			public readonly RunView View;
@@ -260,8 +254,7 @@ namespace SAW
 
 		}
 
-		public abstract void Execute(ExecutionContext context);
-
+		internal abstract void Execute(ExecutionContext context);
 
 		// TODO: all visit commands should be MouseUp (but not sure what these commands are?!)
 
@@ -274,18 +267,18 @@ namespace SAW
 		}
 
 		/// <summary>These were implemented by separate command lists in SAW5, but there's no need for that</summary>
-		public virtual ExecutionTimes ExecutionTime
-		{ get { return ExecutionTimes.Immediate; } }
+		internal virtual ExecutionTimes ExecutionTime => ExecutionTimes.Immediate;
+
 		#endregion
 
 		#region Data
 		public virtual void Read(ArchiveReader ar)
 		{
-			m_ParamList = ar.ReadList<Param>();
+			ParamList = ar.ReadList<Param>();
 		}
 		public virtual void Write(ArchiveWriter ar)
 		{
-			ar.WriteList(m_ParamList);
+			ar.WriteList(ParamList);
 		}
 
 		/// <summary>Returns a deep copy of the command.  The base class implements copying the standard parameter list; derived classes storing custom data must override</summary>
@@ -293,13 +286,13 @@ namespace SAW
 		{
 			Command clone = CommandListEntry.CreateInstance();
 			clone.Comment = Comment;
-			foreach (var p in m_ParamList)
-				clone.m_ParamList.Add(p.Clone());
+			foreach (var p in ParamList)
+				clone.ParamList.Add(p.Clone());
 			return clone;
 		}
 
 		/// <summary>Reads a command from the Splash data format reader</summary>
-		public static Command FromReader(DataReader reader)
+		internal static Command FromReader(DataReader reader)
 		{
 			string code = reader.ReadString();
 			if (!CommandList.Entries.ContainsKey(code))
@@ -316,7 +309,7 @@ namespace SAW
 			int numberParams = reader.ReadByte();
 			for (int i = 0; i < numberParams; i++)
 			{
-				m_ParamList.Add(Param.FromReader(reader));
+				ParamList.Add(Param.FromReader(reader));
 			}
 		}
 
@@ -325,8 +318,8 @@ namespace SAW
 		{
 			writer.Write(Code);
 			writer.WriteOptionalString(Comment);// note that we must distinguish null and "", which is done by this method
-			writer.WriteByte(m_ParamList.Count);
-			foreach (Param p in m_ParamList)
+			writer.WriteByte(ParamList.Count);
+			foreach (Param p in ParamList)
 				p.Write(writer);
 		}
 
@@ -334,10 +327,10 @@ namespace SAW
 		{
 			if (Code != other.Code || Comment != other.Comment)
 				return false;
-			if (m_ParamList.Count != other.m_ParamList.Count)
+			if (ParamList.Count != other.ParamList.Count)
 				return false;
-			for (int i = 0; i < m_ParamList.Count; i++)
-				if (!m_ParamList[i].Equals(other.m_ParamList[i]))
+			for (int i = 0; i < ParamList.Count; i++)
+				if (!ParamList[i].Equals(other.ParamList[i]))
 					return false;
 			return true;
 		}
@@ -363,7 +356,7 @@ namespace SAW
 
 	}
 
-	/// <summary>Implements a command object where there are several script commands visible to the user, distinguished internally by another integer (or enum)
+	/// <summary>Implements a command object where there are several script commands visible to the user which use the same object, distinguished internally by another integer (or enum)
 	/// In some cases it's actually 2 values, which can be packed into a 32-bit value to make this work.</summary>
 	public abstract class CommandWithIntID : Command
 	{// Derived class must implement GetPossibleIntIDs, GetDescription, GetCommand
@@ -377,6 +370,7 @@ namespace SAW
 		/// <summary>Derived class must return all the possible integer IDs used for the different commands visible to the user</summary>
 		protected abstract int[] GetPossibleIntIDs();
 
+		/// <summary>The ID which distinguishes between the user commands sharing one object</summary>
 		public abstract int SingleParam { get; set; }
 
 		internal override void CompleteCommandListEntry(CommandList.Entry entry)
@@ -395,7 +389,7 @@ namespace SAW
 			SingleParam = actualParam;
 		}
 
-		public override void InitialiseFromCommandUsed(string commandUsed)
+		internal override void InitialiseFromCommandUsed(string commandUsed)
 		{
 			int[] parms = (int[])CommandListEntry.CustomData;
 			int index = Array.IndexOf(CommandListEntry.PossibleCommandsLower, commandUsed);
@@ -468,10 +462,11 @@ namespace SAW
 
 	}
 
-	/// <summary>Base class for commands which use params.  They are NOT required to inherit from this and some don't.</summary>
+	/// <summary>Base class for commands which use params.  They are not REQUIRED to inherit from this and some don't.
+	/// This maintains the list of expected parameter types and auto-creates default of the correct type as needed</summary>
 	public abstract class ParamBasedCommand : Command
 	{
-		// it's slightly inefficient to store this in each instance, but it's really not going to make any different
+		// it's slightly inefficient to store this in each instance, but it's really not going to make any difference
 		protected readonly Param.ParamTypes[] ExpectedParams;
 		/// <summary>Only relevant if this has a single string parameter; if true then what appear to be multiple parameters are accepted and concatenated into the one string</summary>
 		protected bool TreatParametersAsSingleString;
@@ -500,17 +495,17 @@ namespace SAW
 				switch (ExpectedParams[i])
 				{
 					case Param.ParamTypes.Bool:
-						m_ParamList.Add(new BoolParam(possibleParams[i]));
+						ParamList.Add(new BoolParam(possibleParams[i]));
 						break;
 					case Param.ParamTypes.Float:
-						m_ParamList.Add(new FloatParam(possibleParams[i]));
+						ParamList.Add(new FloatParam(possibleParams[i]));
 						break;
 					case Param.ParamTypes.Integer:
-						m_ParamList.Add(new IntegerParam(possibleParams[i]));
+						ParamList.Add(new IntegerParam(possibleParams[i]));
 						break;
 					case Param.ParamTypes.String:
 					case Param.ParamTypes.UnquotedString:
-						m_ParamList.Add(new StringParam(possibleParams[i], ExpectedParams[i] != Param.ParamTypes.UnquotedString));
+						ParamList.Add(new StringParam(possibleParams[i], ExpectedParams[i] != Param.ParamTypes.UnquotedString));
 						break;
 					default:
 						throw new InvalidOperationException("Unexpected param type: " + ExpectedParams[i]);
@@ -518,33 +513,31 @@ namespace SAW
 			}
 		}
 
-		public override sealed void InitialiseDefaultsForCreation()
+		internal sealed override void InitialiseDefaultsForCreation()
 		{
 			EnsureParams(ExpectedParams.Length);
 		}
 
-		public static Param CreateParamOfType(Param.ParamTypes type)
+		/// <summary>Creates a param object of the given type with its default value (false/0/"") </summary>
+		internal static Param CreateParamOfType(Param.ParamTypes type)
 		{
 			switch (type)
 			{
-				case Param.ParamTypes.Bool:
-					return new BoolParam(false);
-				case Param.ParamTypes.Float:
-					return new FloatParam(0);
-				case Param.ParamTypes.Integer:
-					return new IntegerParam(0);
-				case Param.ParamTypes.String:
-					return new StringParam("");
+				case Param.ParamTypes.Bool: return new BoolParam(false);
+				case Param.ParamTypes.Float: return new FloatParam(0);
+				case Param.ParamTypes.Integer: return new IntegerParam(0);
+				case Param.ParamTypes.String: return new StringParam("");
+				case Param.ParamTypes.UnquotedString: throw new InvalidOperationException("Cannot created UnquotedString");
 				default:
 					throw new InvalidOperationException("Unexpected param type: " + type);
 			}
 		}
 
-		public override void EnsureParams(int count)
+		internal override void EnsureParams(int count)
 		{ // overrides base class to create params of correct type
-			while (m_ParamList.Count < count)
+			while (ParamList.Count < count)
 			{
-				m_ParamList.Add(CreateParamOfType(ExpectedParams[m_ParamList.Count]));
+				ParamList.Add(CreateParamOfType(ExpectedParams[ParamList.Count]));
 			}
 		}
 
@@ -552,22 +545,20 @@ namespace SAW
 
 	#region Null command - placeholder for comments
 	/// <summary>This is just used as a place holder for any line containing only a comment</summary>
-	public class NullCommand : Command
+	internal class NullCommand : Command
 	{
 		internal override void CompleteCommandListEntry(CommandList.Entry entry)
 		{
 			entry.PossibleCommandsLower = new[] { "null" };
 		}
 
-		public override string GetCommandName()
-		{
-			return ""; // comment is not included in this command and will be added
-		}
+		public override string GetCommandName() => "";  // comment is not included in this command and will be added
 
-		public override void Execute(ExecutionContext context)
-		{
-		}
+		internal override void Execute(ExecutionContext context)
+		{}
+
 	}
+
 	#endregion
 
 }

@@ -4,7 +4,7 @@ using SAW.Repo2;
 
 namespace SAW
 {
-	public partial class frmUpdate
+	internal partial class frmUpdate
 	{
 		public frmUpdate()
 		{

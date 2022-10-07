@@ -6,13 +6,30 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace SAW
+namespace SAW.Shapes
 {
-	public class FloatingLabel : TextLine
+	public sealed class FloatingLabel : TextLine
 	{
 
 		/// <summary>Distance from linked shape centre to Vertex 0</summary>
 		private SizeF m_Offset;
+
+		public FloatingLabel()
+		{ }
+
+
+		/// <summary>Creates a label linked to a shape.  Note caller must still add this shape once constructed to the container</summary>
+		/// <param name="linkedTo">The other shape which should already be in the same container that this will be added to</param>
+		/// <param name="page">The page that the shapes are on.  Note that this must be the page even if the shapes are embedded within some other container</param>
+		/// <param name="text">The text in the label</param>
+		public FloatingLabel(Shape linkedTo, Page page, string text)
+		{
+			if (string.IsNullOrWhiteSpace(text))
+				throw new ArgumentException("text cannot be empty");
+			DoStart(page, linkedTo);
+			m_Label = text;
+			CompleteRetrospective();
+		}
 
 		#region Info
 
@@ -28,8 +45,9 @@ namespace SAW
 		private const float MINSPACE = 100;
 
 		/// <summary>Not stored in data; only used when first being created</summary>
-		bool m_AddingRight ;
-		public override VerbResult Start(EditableView.ClickPosition position)
+		bool m_AddingRight;
+
+		public override VerbResult Start(ClickPosition position)
 		{
 			Shape hit = position.Page.HitTest(position.Exact, 1, Page.HitTestMode.StartSelectionFilled);
 			if (hit == null)
@@ -37,13 +55,20 @@ namespace SAW
 				MessageBox.Show(Strings.Item("FloatingLabel_NoShapeClicked"));
 				return VerbResult.Rejected;
 			}
+			DoStart(position.Page, hit);
+			CaretGain();
+			return VerbResult.Continuing;
+		}
 
+		// used by Start and also one of the constructors
+		private void DoStart(Page page, Shape hit)
+		{
 			RectangleF hitBounds = hit.Bounds;
-			RectangleF pageBounds = position.Page.Bounds;
+			RectangleF pageBounds = page.Bounds;
 			float spaceRight = pageBounds.Right - hitBounds.Right;
 			float spaceLeft = hitBounds.Left - pageBounds.Left;
 
-			m_AddingRight=true;
+			m_AddingRight = true;
 			float space = spaceRight;
 			if (spaceRight < PREFERSPACE && spaceLeft > spaceRight)
 			{
@@ -68,30 +93,21 @@ namespace SAW
 			TextStyle.Alignment = StringAlignment.Near;
 			m_Label = "";
 			FormatText();
-			CaretGain();
-
-			return VerbResult.Continuing;
 		}
 
-		public override VerbResult Float(EditableView.ClickPosition position) => VerbResult.Continuing;
+		public override VerbResult Float(ClickPosition position) => VerbResult.Continuing;
 
 		// there's not actually much difference between cancelling and choosing
-		public override VerbResult Cancel(EditableView.ClickPosition position)
+		public override VerbResult Cancel(ClickPosition position)
 		{
 			if (!string.IsNullOrEmpty(m_Label))
 				return Complete(position);
 			return VerbResult.Destroyed;
 		}
 
-		public override VerbResult Choose(EditableView.ClickPosition position) => CompleteRetrospective();
-		//{
-		//	if (string.IsNullOrEmpty(m_Label))
-		//		return VerbResult.Rejected;
-		//	CaretLose();
-		//	return VerbResult.Completed;
-		//}
+		public override VerbResult Choose(ClickPosition position) => CompleteRetrospective();
 
-		public override VerbResult Complete(EditableView.ClickPosition position) => CompleteRetrospective();
+		public override VerbResult Complete(ClickPosition position) => CompleteRetrospective();
 
 		public override VerbResult CompleteRetrospective()
 		{
@@ -102,7 +118,7 @@ namespace SAW
 			{ // want to move it to crudely right align
 				var widthUsed = CalculateTextBounds().Width;
 				Vertices[0] = new PointF(Vertices[1].X - widthUsed - 1, Vertices[1].Y);
-				m_Bounds =RectangleF.Empty;
+				m_Bounds = RectangleF.Empty;
 				ClearTextCache();
 			}
 			return VerbResult.Completed;
@@ -112,13 +128,13 @@ namespace SAW
 
 		#region Datum
 
-		public override void Save(DataWriter writer)
+		protected internal override void Save(DataWriter writer)
 		{
 			base.Save(writer);
 			writer.Write(m_Offset);
 		}
 
-		public override void Load(DataReader reader)
+		protected internal override void Load(DataReader reader)
 		{
 			base.Load(reader);
 			m_Offset = reader.ReadSizeF();
@@ -186,7 +202,6 @@ namespace SAW
 		}
 
 		#endregion
-
 
 	}
 }

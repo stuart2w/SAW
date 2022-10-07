@@ -6,10 +6,11 @@ using System.Collections;
 using System.Windows.Forms;
 using System.Drawing.Drawing2D;
 using System.Linq;
+using SAW.Shapes;
 
 namespace SAW
 {
-	public class ButtonPanel : ContainerControl, IPalette, IKeyControl, IEnumerable<RoundButton>
+	internal class ButtonPanel : ContainerControl, IPalette, IKeyControl, IEnumerable<RoundButton>
 	{
 
 		// if control itself has TabStop, then it will intercept tab and make it SELECT the next button
@@ -43,7 +44,7 @@ namespace SAW
 			return create;
 		}
 
-		public ArrowheadButton AddArrowheadButton()
+		internal ArrowheadButton AddArrowheadButton()
 		{
 			ArrowheadButton create = new ArrowheadButton();
 			AddExisting(create);
@@ -460,7 +461,7 @@ namespace SAW
 		{
 			// width is specified in data coordinates
 			RoundButton button = AddButton();
-			button.SampleLine = new Pen(Color.Black, width / 100f / Geometry.POINTUNIT) { DashStyle = pattern };
+			button.SampleLine = new Pen(Color.Black, width / 100f) { DashStyle = pattern };
 
 			if (parameter == Parameters.LineWidth)
 				button.AttachParameter(parameter, width);

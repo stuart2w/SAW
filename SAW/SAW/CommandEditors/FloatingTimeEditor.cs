@@ -61,8 +61,8 @@ namespace SAW.CommandEditors
 		{
 			if (m_Filling)
 				return;
-			m_Command.m_ParamList.Clear();
-			m_Command.m_ParamList.Add(new FloatParam((float) nudTime.Value));
+			m_Command.ParamList.Clear();
+			m_Command.ParamList.Add(new FloatParam((float) nudTime.Value));
 			UserChanged?.Invoke(this, EventArgs.Empty);
 		}
 	}

@@ -64,7 +64,7 @@ namespace SAW.Commands
 
 		#endregion
 
-		public override void Execute(ExecutionContext context)
+		internal override void Execute(ExecutionContext context)
 		{
 			Form window = context.View.FindForm();
 			Screen screen = Screen.FromRectangle(window.Bounds);
@@ -133,7 +133,7 @@ namespace SAW.Commands
 
 		#endregion
 
-		public override void Execute(ExecutionContext context)
+		internal override void Execute(ExecutionContext context)
 		{
 			Debug.WriteLine("Execute ShowWindow/" + m_WindowsCommand + " on SAW window due to script");
 			Windows.ShowWindow(context.View.FindForm().Handle, m_WindowsCommand);
@@ -181,7 +181,7 @@ namespace SAW.Commands
 
 		#endregion
 
-		public override void Execute(ExecutionContext context)
+		internal override void Execute(ExecutionContext context)
 		{
 			int step = context.View.MouseStep;
 			Form window = context.View.FindForm();
@@ -230,7 +230,7 @@ namespace SAW.Commands
 
 		#endregion
 
-		public override void Execute(ExecutionContext context)
+		internal override void Execute(ExecutionContext context)
 		{
 			int step = context.View.MouseStep / 2; // this changes half as much as others
 			Form window = context.View.FindForm();
@@ -245,19 +245,19 @@ namespace SAW.Commands
 		public CmdWait() : base(new[] { Param.ParamTypes.Float })
 		{ }
 
-		public override void Execute(ExecutionContext context)
+		internal override void Execute(ExecutionContext context)
 		{
 			int mult = Globals.Root.CurrentConfig.ReadInteger(Config.Wait_Multipler, Config.Wait_Multipler_Default);
 			float seconds = GetParamAsFloat(0) / 100 * mult; // time in seconds
 			Thread.Sleep((int)(seconds * 1000));
 		}
 
-		public override ICommandEditor GetEditor() => new FloatingTimeEditor();
+		internal override ICommandEditor GetEditor() => new FloatingTimeEditor();
 	}
 
 	public class CmdCloseSAW : Command
 	{
-		public override void Execute(ExecutionContext context)
+		internal override void Execute(ExecutionContext context)
 		{
 			Globals.Root.CloseApplication();
 		}
@@ -272,10 +272,10 @@ namespace SAW.Commands
 		{
 		}
 
-		public override void Execute(ExecutionContext context)
+		internal override void Execute(ExecutionContext context)
 		{
 				context.View.PreviousSelectionSet = Globals.Root.CurrentDocument.Filename; // doesn't matter if not defined - PreviousSelectionSet null or empty just means that previous cannot work
-				string target = m_ParamList[0].ValueAsString();
+				string target = ParamList[0].ValueAsString();
 				CmdOpenApp.ProcessOutputDirective(ref target, context);
 				TidyFilename(ref target, new[] {Document.StandardExtension, Document.SAW6Extension});
 				if (!System.IO.File.Exists(target))
@@ -311,11 +311,11 @@ namespace SAW.Commands
 		public override void Read(ArchiveReader ar)
 		{ // warn if the old "user selection set" is used.  Noone knows how it worked anyway
 			base.Read(ar);
-			if (m_ParamList.Count > 0 && m_ParamList[0].ValueAsString().Contains("##"))
+			if (ParamList.Count > 0 && ParamList[0].ValueAsString().Contains("##"))
 				Globals.NonFatalOperationalError("[SAW_FILE_HASHSET]");
 		}
 
-		public override ICommandEditor GetEditor()
+		internal override ICommandEditor GetEditor()
 		{
 			return new AppCommandEditor();
 		}
@@ -324,7 +324,7 @@ namespace SAW.Commands
 
 	public class CmdPreviousSelectionSet : Command
 	{
-		public override void Execute(ExecutionContext context)
+		internal override void Execute(ExecutionContext context)
 		{
 			if (string.IsNullOrEmpty(context.View.PreviousSelectionSet))
 				context.View.OnFail("No previous selection set");
@@ -338,7 +338,7 @@ namespace SAW.Commands
 
 	public class CmdOpenItemTemplateSet : Command
 	{
-		public override void Execute(ExecutionContext context)
+		internal override void Execute(ExecutionContext context)
 		{
 			throw new NotImplementedException();
 		}

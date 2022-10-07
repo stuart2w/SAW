@@ -4,7 +4,7 @@ using System.Windows.Forms;
 
 namespace SAW
 {
-	public partial class cfgMouseOutput : ConfigPage
+	internal partial class cfgMouseOutput : ConfigPage
 	{
 		public cfgMouseOutput()
 		{

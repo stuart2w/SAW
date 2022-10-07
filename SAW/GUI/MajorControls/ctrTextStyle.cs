@@ -3,10 +3,11 @@ using System;
 using System.Drawing;
 using System.Windows.Forms;
 using SAW.Functions;
+using SAW.Shapes;
 
 namespace SAW
 {
-	public partial class ctrTextStyle : IPalette
+	internal partial class ctrTextStyle : IPalette
 	{
 
 		// Unfortunately the .net font chooser dialogue does not work because it allows selection of non-true type fonts

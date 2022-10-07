@@ -7,10 +7,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using SAW.Shapes;
 
 namespace SAW
 {
-	public partial class ctrRotation : PalettePanel
+	internal partial class ctrRotation : PalettePanel
 	{
 		private bool m_Filling;
 		/// <summary>True when this invokes the global event (so we can ignore our own invocation) </summary>

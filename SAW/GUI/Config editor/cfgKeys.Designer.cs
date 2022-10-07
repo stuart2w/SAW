@@ -2,7 +2,7 @@ using System;
 
 namespace SAW
 {
-	public partial class cfgKeys : ConfigPage
+	internal partial class cfgKeys : ConfigPage
 	{
 		
 		//UserControl overrides dispose to clean up the component list.

@@ -13,7 +13,7 @@ namespace SAW.Commands
 		public CmdLoadSettings() : base(new[] { Param.ParamTypes.String })
 		{ }
 
-		public override void Execute(ExecutionContext context)
+		internal override void Execute(ExecutionContext context)
 		{
 			string file = base.GetParamAsString(0);
 			Globals.Root.ManualSettingsFile = file;
@@ -32,7 +32,7 @@ namespace SAW.Commands
 			Globals.OnSettingsChanged();
 		}
 
-		public override ICommandEditor GetEditor()
+		internal override ICommandEditor GetEditor()
 		{
 			return new LoadSettingsEditor();
 		}
@@ -41,7 +41,7 @@ namespace SAW.Commands
 
 	public class CmdSaveSettings : Command
 	{
-		public override void Execute(ExecutionContext context)
+		internal override void Execute(ExecutionContext context)
 		{
 			if (string.IsNullOrEmpty(Globals.Root.ManualSettingsFile))
 				context.View.OnFail("Cannot save settings: settings have not been loaded from an external file");
@@ -101,19 +101,19 @@ namespace SAW.Commands
 
 		#region Other meta stuff
 
-		public override ICommandEditor GetEditor() => new OnOffEditor();
+		internal override ICommandEditor GetEditor() => new OnOffEditor();
 
-		public override void InitialiseDefaultsForCreation()
+		internal override void InitialiseDefaultsForCreation()
 		{
 			base.InitialiseDefaultsForCreation();
-			m_ParamList.Add(new BoolParam(true));
+			ParamList.Add(new BoolParam(true));
 		}
 
 		protected override void InitialiseFromParams(List<string> possibleParams, string commandUsed)
 		{
 			if (possibleParams.Count < 0)
 				throw new UserException(Strings.Item("Script_Error_TooFewParameters", commandUsed));
-			m_ParamList.Add(new BoolParam(possibleParams[0]));
+			ParamList.Add(new BoolParam(possibleParams[0]));
 		}
 
 		#endregion
@@ -132,7 +132,7 @@ namespace SAW.Commands
 			}
 		}
 
-		public override void Execute(ExecutionContext context)
+		internal override void Execute(ExecutionContext context)
 		{
 			context.View.ConfigToEdit.Write(SettingsField, GetParamAsBool(0));
 		}
@@ -144,14 +144,13 @@ namespace SAW.Commands
 		protected _OnOffCommand() : base(new[] { Param.ParamTypes.Bool })
 		{ }
 
-		public override ICommandEditor GetEditor() => new OnOffEditor();
+		internal override ICommandEditor GetEditor() => new OnOffEditor();
 
 	}
 
 	public class CmdPromptOnOff : _OnOffCommand
 	{
-
-		public override void Execute(ExecutionContext context)
+		internal override void Execute(ExecutionContext context)
 		{
 			context.View.ConfigToEdit.Write(Config.SAW_Prompts, GetParamAsBool(0));
 		}
@@ -160,8 +159,7 @@ namespace SAW.Commands
 
 	public class CmdHideTitleOnOff : _OnOffCommand
 	{
-
-		public override void Execute(ExecutionContext context)
+		internal override void Execute(ExecutionContext context)
 		{
 			context.View.ConfigToEdit.Write(Config.Hide_Title, GetParamAsBool(0));
 			(context.View.FindForm() as frmRun)?.SetHiddenTitle(); // required to make the setting take effect
@@ -172,12 +170,12 @@ namespace SAW.Commands
 	public class CmdClickSoundOnOff : _OnOffCommand
 	{ // command is "set click" here, but was "click" in saw
 
-		public override void Execute(ExecutionContext context)
+		internal override void Execute(ExecutionContext context)
 		{
 			context.View.ConfigToEdit.Write(Config.Sound_Click, GetParamAsBool(0));
 		}
 
-		public override string GetScriptWithParams(bool forSAW6) => "click " + m_ParamList[0].ValueAsString();  // script was different in SAW6
+		public override string GetScriptWithParams(bool forSAW6) => "click " + ParamList[0].ValueAsString();  // script was different in SAW6
 	}
 	#endregion
 
@@ -196,8 +194,7 @@ namespace SAW.Commands
 			m_Timing = timing;
 		}
 
-		protected string StepCode
-		{ get { return m_Step < 0 ? "Dec" : "Inc"; } }
+		protected string StepCode => m_Step < 0 ? "Dec" : "Inc";
 
 		#region Meta
 
@@ -214,7 +211,7 @@ namespace SAW.Commands
 			entry.CustomData = new[] { -1, +1 };
 		}
 
-		public override void InitialiseFromCommandUsed(string commandUsed)
+		internal override void InitialiseFromCommandUsed(string commandUsed)
 		{
 			int[] parms = (int[])CommandListEntry.CustomData;
 			int index = Array.IndexOf(CommandListEntry.PossibleCommandsLower, commandUsed);
@@ -260,7 +257,7 @@ namespace SAW.Commands
 
 		#endregion
 
-		public override void Execute(ExecutionContext context)
+		internal override void Execute(ExecutionContext context)
 		{
 			string field = Switches.Engine.TimingConfigField(m_Timing);
 			int value = Globals.Root.CurrentConfig.ReadInteger(field, context.ScanEngine.DefaultTiming(m_Timing));

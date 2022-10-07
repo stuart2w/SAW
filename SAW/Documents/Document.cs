@@ -5,54 +5,56 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using SAW.Commands;
+using SAW.Shapes;
 
 namespace SAW
 {
-	public partial class Document : Datum, IDisposable
+	public class Document : Datum, IDisposable
 	{
 
 		// A single Splash document, containing one or more pages.  This is what is stored in a data file
 
 		#region Fields which are stored
 		private List<Page> m_Pages = new List<Page>();
-		public Shape.SnapModes SnapMode = Shape.SnapModes.Off;
+		internal Shape.SnapModes SnapMode = Shape.SnapModes.Off;
 		public Config UserSettings; // settings which apply only in user mode
 		public Config BothSettings;
 		// settings which apply in BOTH user and editor mode
-		// Settings are not automatically created with documents, because we do have a number of documents which don't really represent actual documents
-
 
 		// these only stored if explicitly set by the user...
-		public Shape.LineStyleC InitialLineStyle;
-		public Shape.FillStyleC InitialFillStyle;
-		public Shape.TextStyleC InitialTextStyle;
-		//public Shape.MarkerStyleC InitialMarkerStyle;
-		/// <summary>Units in which coordinates stored in the document; must be pixels or millimetres at the moment</summary>
-		public GraphicsUnit Units = GraphicsUnit.Millimeter;
-		/// <summary>If true the first item listed is rendered topmost (used in SAW)</summary>
-		public bool ReverseRenderOrder;
+		internal Shape.LineStyleC InitialLineStyle;
+		internal Shape.FillStyleC InitialFillStyle;
+		internal Shape.TextStyleC InitialTextStyle;
 
-		/// <summary>the hash of the password to get into edit mode (unused in SAW)</summary>
-		public string Password = "";
+		/// <summary>Units in which coordinates stored in the document; must be pixels or millimetres at the moment</summary>
+		public GraphicsUnit Units = GraphicsUnit.Pixel;
+
+		/// <summary>If true the first item listed is rendered topmost (used in SAW)</summary>
+		internal bool ReverseRenderOrder;
+
 		/// <summary>(Was ActivityName) Intended for storage in the activity itself; NO LONGER copied to the derived document</summary>
 		/// <remarks>Both Name and DisplayName are also used for palettes in PaletteTitle and PaletteDescription properties</remarks>
-		public string Name = "";
+		internal string Name = "";
 		/// <summary>Alternate version of Name which is used when displaying in run mode to the end user (not editor).
 		/// E.g. Name might be "Infant Numbers" whereas the display version would be just "Numbers"</summary>
 		/// <remarks>Both Name and DisplayName are also used for palettes in PaletteTitle and PaletteDescription properties</remarks>
-		public string DisplayName = "";
+		internal string DisplayName = "";
 
 		/// <summary>Used with palettes.</summary>
-		public string SubTitle = "";
+		internal string SubTitle = "";
 
 		#region SAW
-		// all null except in SAW
+		/// <summary>The default script for all normal items.  If an item has its own script that has an option determining whether this is run first </summary>
 		public Scriptable DefaultItemScripts;
+		/// <summary>The default script for all items marked as escape items.  If an item has its own script that has an option determining whether this is run first </summary>
 		public Scriptable DefaultEscapeScripts;
+		/// <summary>The default script for all group items - ie those containing sub-items.  If an item has its own script that has an option determining whether this is run first </summary>
 		public Scriptable DefaultGroupScripts;
+		/// <summary>Script run when the set is loaded/started in run mode</summary>
 		public Script StartupScript;
 		/// <summary>Optional and might not exist</summary>
 		public SAW.Header SAWHeader;
+
 		#endregion
 
 		#endregion
@@ -63,16 +65,17 @@ namespace SAW
 		private bool m_Changed;
 		/// <summary>remembers where this was loaded from if anywhere</summary>
 		public string Filename = "";
+
 		/// <summary>not currently stored in the data, only used with multiple documents
 		/// use AM.CurrentPageIndex for the current page in the GUI </summary>
 		public int CurrentPage = 0; // 
-		public int UntitledIndex; // number to use for this document if calling it "Untitled N"
-		public static int NextUntitledIndex = 1; // above # for next new document created
-		public List<Transaction> UndoTransactions = new List<Transaction>(); // edits which have been made in the order that they occurred (last one is undone first)
-		public List<Transaction> RedoTransactions = new List<Transaction>();
+		internal int UntitledIndex; // number to use for this document if calling it "Untitled N"
+		internal static int NextUntitledIndex = 1; // above # for next new document created
+		internal List<Transaction> UndoTransactions = new List<Transaction>(); // edits which have been made in the order that they occurred (last one is undone first)
+		internal List<Transaction> RedoTransactions = new List<Transaction>();
 		private bool m_ReferencesUpdated; // true once UpdateReferences has been called.  Only used for debugging
 #if DEBUG
-		public int FileVersion; // binary version of file from which this was loaded
+		internal int FileVersion; // binary version of file from which this was loaded
 #endif
 
 		public bool Changed
@@ -84,12 +87,14 @@ namespace SAW
 				StateChanged?.Invoke(this, EventArgs.Empty);
 			}
 		}
+
 		/// <summary>Note this is invoked when Changed is assigned, even if it isn't a change.  This is deliberate as thelistener may need to refresh due to a name change</summary>
 		public event EventHandler<EventArgs> StateChanged;
 
 		#endregion
 
 		#region Constructors, including shared functions
+
 		public Document(bool empty)
 		{
 			if (!empty)
@@ -116,7 +121,7 @@ namespace SAW
 		}
 
 		/// <summary>Loads the document.  noErrorUI param is SAW only and suppresses any warning for an sss file load (this is used when it is loaded at run time</summary>
-		internal static Document FromFile(string file, bool remember, bool noErrorUI = false)
+		public static Document FromFile(string file, bool remember, bool noErrorUI = false)
 		{
 			ConfigLevelHint = Config.Levels.DocumentUser;
 			Document loaded;
@@ -126,7 +131,7 @@ namespace SAW
 				{
 					using (var reader = new ArchiveReader(file))
 					{
-						var oldDocument = new SAW6Doc();
+						SAW6Doc oldDocument = new SAW6Doc();
 						oldDocument.Read(reader);
 						loaded = reader.IntoDocument;
 						loaded.InitialiseForSAW();
@@ -137,7 +142,7 @@ namespace SAW
 			}
 			else
 			{
-				DataReader reader = new DataReader(file, FileMarkers.Splash); // will throw an exception if the file is too new
+				DataReader reader = new DataReader(file, FileMarkers.SAW); // will throw an exception if the file is too new
 				loaded = (Document)reader.ReadData(FileMarkers.Document);
 				if (reader.Version < 85 && !loaded.ActivityID.IsEmpty() && !loaded.IsPaletteWithin)
 				{
@@ -153,7 +158,8 @@ namespace SAW
 			return loaded;
 		}
 
-		/// <summary>Configures document for use in SAW, setting things in the Splash engine which are fixed/default differently in SAW</summary>
+		/// <summary>Configures document for use in SAW, setting things in the Splash engine which are fixed/default differently in SAW.
+		/// Called by SetDefaultGridAndSnapFromActivity</summary>
 		public void InitialiseForSAW()
 		{
 			m_Pages[0].Paper = Paper.CreateNew(Paper.Papers.Square, m_Pages[0].Paper);
@@ -166,8 +172,8 @@ namespace SAW
 				SAWHeader = new Header() { Version = 6006 };
 		}
 
-		/// <summary>does initial settings for NEW (ie not loaded) document</summary>
-		public void SetDefaultGridAndSnapFromActivity()
+		/// <summary>does initial settings for NEW (ie not loaded) document.  Also creates scripts</summary>
+		public void SetDefaultsForNewDocument()
 		{
 			InitialiseForSAW();
 
@@ -241,7 +247,6 @@ namespace SAW
 				}
 				else
 					BothSettings = document.BothSettings;
-				Password = document.Password;
 				ActivityIcon = document.ActivityIcon;
 				ActivityID = document.ActivityID;
 				Name = document.Name;
@@ -283,7 +288,7 @@ namespace SAW
 		}
 
 		// Load/Save are not shared since much of it is historical and not needed in SAW
-		public override void Load(DataReader reader)
+		protected internal override void Load(DataReader reader)
 		{
 			base.Load(reader);
 #if DEBUG
@@ -310,7 +315,7 @@ namespace SAW
 			}
 
 			reader.ReadInt32(); // protection
-			Password = reader.ReadString();
+			reader.ReadString(); // password
 			Info.Load(reader);
 			ActivityID = reader.ReadGuid();
 			Name = reader.ReadString();
@@ -365,10 +370,10 @@ namespace SAW
 			}
 		}
 
-		public override void Save(DataWriter writer)
+		protected internal override void Save(DataWriter writer)
 		{
 			Debug.Assert(m_ReferencesUpdated,
-				"Document.Save: m_bolReferencesUpdated = false: it does not appear that UpdateReferencesObjectsCreated was called when the document was loaded" + "\r\n" +
+				"Document.Save: m_ReferencesUpdated = false: it does not appear that UpdateReferencesObjectsCreated was called when the document was loaded" + "\r\n" +
 				"IGNORE this when creating activity from document");
 			TidySharedResources();
 			base.Save(writer);
@@ -380,7 +385,7 @@ namespace SAW
 			writer.Write(UserSettings); // can be nothing
 			writer.Write(BothSettings);
 			writer.Write(0); // protection mode
-			writer.Write(Password);
+			writer.Write(""); // password
 			Info.Save(writer);
 			writer.Write(ActivityID);
 			writer.Write(Name);
@@ -420,10 +425,10 @@ namespace SAW
 			}
 		}
 
-		public override byte TypeByte
+		protected internal override byte TypeByte
 		{ get { return (byte)FileMarkers.Document; } }
 
-		public override void UpdateReferencesObjectsCreated(Document document, DataReader reader)
+		protected internal override void UpdateReferencesObjectsCreated(Document document, DataReader reader)
 		{
 			foreach (SharedBase image in m_SharedResources.Values)
 			{
@@ -445,7 +450,7 @@ namespace SAW
 			m_ReferencesUpdated = true;
 		}
 
-		public override void UpdateReferencesIDsChanged(Mapping mapID, Document document)
+		protected internal override void UpdateReferencesIDsChanged(Mapping mapID, Document document)
 		{
 			foreach (SharedImage image in m_SharedResources.Values)
 			{
@@ -467,12 +472,12 @@ namespace SAW
 			m_ReferencesUpdated = true;
 		}
 
-		public override void Iterate(DatumFunction fn)
+		internal override void Iterate(DatumFunction fn)
 		{
 			IterateEx(fn, true, true);
 		}
 
-		public void IterateEx(DatumFunction fn, bool includeSharedBitmaps, bool includeSharedButtonStyles)
+		protected internal void IterateEx(DatumFunction fn, bool includeSharedBitmaps, bool includeSharedButtonStyles)
 		{
 			// for the document we need a version where we can omit the shared images, because when tidying bitmaps we use this function,
 			// but only want to detect the images actually referenced elsewhere!
@@ -516,8 +521,6 @@ namespace SAW
 				return false;
 			if (!Info.Equals(document.Info))
 				return false;
-			if (Password != document.Password)
-				return false;
 			if (DisplayName != document.DisplayName)
 				return false;
 			if (Name != document.Name)
@@ -550,18 +553,13 @@ namespace SAW
 
 		#region List of pages
 
-		public int Count
-		{ get { return m_Pages.Count; } }
+		/// <summary>The number of pages in the document</summary>
+		public int Count => m_Pages.Count;
 
-		public Page Page(int index)
-		{
-			return m_Pages[index];
-		}
+		/// <summary>Returns one of the pages.  Note: first page is numbered 0 </summary>
+		public Page Page(int index) => m_Pages[index];
 
-		public int IndexOf(Page page)
-		{
-			return m_Pages.IndexOf(page);
-		}
+		public int IndexOf(Page page) => m_Pages.IndexOf(page);
 
 		/// <summary>source is the page to copy grid settings etc from (i.e. the currently displayed page).  If duplicate all content is also duplicated
 		/// interactive should be true if this is UI triggered and can produce UI (question about background images)</summary>
@@ -600,7 +598,7 @@ namespace SAW
 			return create;
 		}
 
-		public void MovePage(int pageIndex, int before, Transaction transaction)
+		internal void MovePage(int pageIndex, int before, Transaction transaction)
 		{
 			// to move to the end of intBefore = Count (i.e. before a non-existent page)
 			if (pageIndex == before)
@@ -618,14 +616,14 @@ namespace SAW
 		{
 			if (index < 0 || index >= m_Pages.Count)
 				return;
-			transaction.Edit(this);
-			transaction.Delete(m_Pages[index]);
+			transaction?.Edit(this);
+			transaction?.Delete(m_Pages[index]);
 			// I don't think it is necessary to put the contents of the page into the transaction, because the shapes will still be referenced by the page object in the transaction
 			m_Pages.RemoveAt(index);
 		}
 
-		public IEnumerable<Page> Pages
-		{ get { return m_Pages; } }
+		/// <summary>All the contained pages for use in foreach() </summary>
+		public IEnumerable<Page> Pages => m_Pages.AsReadOnly();
 
 		#endregion
 
@@ -633,26 +631,43 @@ namespace SAW
 
 		private DatumList m_SharedResources = new DatumList();
 
-		public SharedBase AddSharedResourceFromFile(string file, Transaction transaction, bool isImage = true)
+		/// <summary>Loads an image into the document for use in buttons within the document.
+		/// Media is all stored centrally the document.  If the same item is loaded more than once only one copy is kept.</summary>
+		/// <remarks>Calling this again for an image that is already loaded will return the existing copy</remarks>
+		public SharedImage AddImageFromFile(string file) => (SharedImage)AddSharedResourceFromFile(file);
+
+		/// <summary>Loads a sound file into the document for use in buttons within the document.
+		/// Media is all stored centrally the document.  If the same item is loaded more than once only one copy is kept.</summary>
+		/// <remarks>Calling this again for a sound that is already loaded will return the existing copy</remarks>
+		public SharedResource AddSoundFromFile(string file) => (SharedResource)AddSharedResourceFromFile(file, null, false);
+
+		/// <summary>Loads an image or sound into the document for use in buttons within the document.
+		/// Media is all stored centrally the document.  If the same item is loaded more than once only one copy is kept.</summary>
+		/// <param name="file">The filename containing the image or sound</param>
+		/// <param name="transaction">Optional.  Only required if it is necessary to be able to undo these changes</param>
+		/// <param name="isImage">Defaults to true.  Parameter must be included and false if loading any other resource</param>
+		/// <returns>Returns a SharedImage or SharedResource</returns>
+		internal SharedBase AddSharedResourceFromFile(string file, Transaction transaction = null, bool isImage = true)
 		{
-			if (string.IsNullOrEmpty(file)) return null;
+			if (string.IsNullOrEmpty(file))
+				return null;
 			int CRC = CRCCalc.Calc(file);
 			SharedBase existing = FindSharedResourceByCRC<SharedBase>(CRC);
 			if (existing != null)
 				return existing;
-			transaction.Edit(this);
+			transaction?.Edit(this);
 			SharedBase create;
 			if (isImage)
 				create = SharedImage.CreateFromFile(file, CRC);
 			else
 				create = SharedResource.CreateFromFile(file, CRC);
 			m_SharedResources.Add(create);
-			transaction.Create(create);
+			transaction?.Create(create);
 			return create;
 		}
 
 		/// <summary>Extension must be provided IF AND ONLY IF it is not an image.</summary>
-		public SharedBase AddSharedResourceFromStream(System.IO.Stream stream, Transaction transaction, string fileExtensionIfNotImage = "", bool imageIsSVG = false)
+		internal SharedBase AddSharedResourceFromStream(System.IO.Stream stream, Transaction transaction, string fileExtensionIfNotImage = "", bool imageIsSVG = false)
 		{
 			int CRC = CRCCalc.Calc(stream);
 			SharedBase existing = FindSharedResourceByCRC<SharedBase>(CRC);
@@ -669,21 +684,21 @@ namespace SAW
 			return create;
 		}
 
-		public T FindSharedResourceByCRC<T>(int CRC) where T : SharedBase
+		internal T FindSharedResourceByCRC<T>(int CRC) where T : SharedBase
 		{
 			return m_SharedResources.Values.OfType<T>().FirstOrDefault(x => x.CRC == CRC);
 		}
 
 		/// <summary>Return type will also be ISharedResource, but defining as Datum makes the ID accessible</summary>
-		public T FindExistingSharedResource<T>(Guid id) where T : Datum
+		internal T FindExistingSharedResource<T>(Guid id) where T : Datum
 		{
 			if (m_SharedResources.ContainsKey(id))
 				return (T)m_SharedResources[id];
 			return null;
 		}
 
-		/// <summary>Returns the shared instance to use for the given memory data.  Can cope with objTransaction = Nothing, but in this case do wouldn't remove the image again</summary>
-		public SharedImage AddSharedBitmapFromMemoryImage(MemoryImage image, Transaction transaction)
+		/// <summary>Returns the shared instance to use for the given memory data.  Can cope with transaction = null, but in this case undo wouldn't remove the image again</summary>
+		internal SharedImage AddSharedBitmapFromMemoryImage(MemoryImage image, Transaction transaction)
 		{
 			int CRC = image.CalcCRC();
 			SharedImage existing = FindSharedResourceByCRC<SharedImage>(CRC);
@@ -696,28 +711,28 @@ namespace SAW
 			return create;
 		}
 
-		public SharedImage AddSharedBitmapForResource(string ID, Transaction transaction)
+		internal SharedImage AddSharedBitmapForResource(string id, Transaction transaction)
 		{
-			int CRC = CRCCalc.Calc(Encoding.Unicode.GetBytes(ID));
+			int CRC = CRCCalc.Calc(Encoding.Unicode.GetBytes(id));
 			SharedImage existing = FindSharedResourceByCRC<SharedImage>(CRC);
 			if (existing != null)
 				return existing;
 			transaction.Edit(this);
-			SharedImage create = SharedImage.CreateForResource(ID);
+			SharedImage create = SharedImage.CreateForResource(id);
 			m_SharedResources.Add(create);
 			transaction.Create(create);
 			return create;
 		}
 
 		/// <summary>Adds the object if not already in the shared resources, returning the copy to use (the param if not in resources, or the canonical object of that ID from the shared resources if the ID existed)</summary>
-		public T AddSharedResource<T>(T resource) where T : SharedBase
+		internal T AddSharedResource<T>(T resource) where T : SharedBase
 		{
 			if (!m_SharedResources.Contains(resource))
 				m_SharedResources.Add(resource);
 			return resource;
 		}
 
-		public void TidySharedResources()
+		internal void TidySharedResources()
 		{
 			// doesn't count as a transactional change, because this is in theory just tidying up missing links which should already have been included
 			// now called by Save, to ensure we do all places where documents are saved (e.g. configuration documents)
@@ -747,7 +762,7 @@ namespace SAW
 			}
 		}
 
-		public DatumList TexturesUsed()
+		internal DatumList TexturesUsed()
 		{
 			// returns all textures used by shapes in doc
 			DatumList list = new DatumList();
@@ -772,7 +787,7 @@ namespace SAW
 
 		private readonly DatumList m_SharedButtonStyles = new DatumList();
 
-		public ButtonStyle GetButtonStyle(Guid id)
+		internal ButtonStyle GetButtonStyle(Guid id)
 		{
 			if (ButtonStyle.UserDefaultByID(id) != null)
 				return ButtonStyle.UserDefaultByID(id);
@@ -781,12 +796,12 @@ namespace SAW
 			return null;
 		}
 
-		public IEnumerable<Datum> SharedButtonStyles()
+		internal IEnumerable<Datum> SharedButtonStyles()
 		{
 			return m_SharedButtonStyles.Values;
 		}
 
-		public void AddButtonStyle(ButtonStyle style)
+		internal void AddButtonStyle(ButtonStyle style)
 		{
 			Debug.Assert(style.IsShared);
 			if (m_SharedButtonStyles.Contains(style))
@@ -795,7 +810,7 @@ namespace SAW
 				m_SharedButtonStyles.Add(style);
 		}
 
-		public void RemoveButtonStyle(ButtonStyle style)
+		internal void RemoveButtonStyle(ButtonStyle style)
 		{
 			Debug.Assert(!style.ID.IsEmpty(), "Trying to remove user default style from document!");
 			if (m_SharedButtonStyles.Contains(style))
@@ -803,7 +818,7 @@ namespace SAW
 			style.IsShared = false;
 		}
 
-		public ButtonStyle FindSharedButtonStyleByName(string name)
+		internal ButtonStyle FindSharedButtonStyleByName(string name)
 		{
 			foreach (ButtonStyle style in m_SharedButtonStyles.Values)
 			{
@@ -849,13 +864,14 @@ namespace SAW
 		// IDs now in Activities class
 
 		/// <summary>This is always a bitmap and never a WMF or SVG </summary>
-		public MemoryImage ActivityIcon;
+		internal MemoryImage ActivityIcon;
 
-		public Guid ActivityID { get; set; } = Guid.Empty;
+		internal Guid ActivityID { get; set; } = Guid.Empty;
 
 		#endregion
 
 		#region Settings
+
 		public Config GetCreateUserSettings(Transaction transaction = null)
 		{
 			if (UserSettings == null)
@@ -914,7 +930,7 @@ namespace SAW
 			}
 		}
 
-		/// <summary>Applies the necessary scaling to convert from document unstå its to output pixels.  DPI is needed to determine actual size of output pixel</summary>
+		/// <summary>Applies the necessary scaling to convert from document units to output pixels.  DPI is needed to determine actual size of output pixel</summary>
 		public void ApplyUnitScale(ref SizeF sz, float dpiX, float dpiY)
 		{
 			switch (Units)
@@ -947,8 +963,20 @@ namespace SAW
 			}
 		}
 
+		#region Saving, filenames and information
 
-		#region Filenames and information
+		public void Save(string file = null)
+		{
+			if (!string.IsNullOrEmpty(file))
+				Filename = file;
+			if (string.IsNullOrEmpty(Filename))
+				throw new ArgumentException("file must be provided to Save() if document does not already have filename set");
+			Bitmap thumbnail = Page(0).GenerateThumbnail2(SAW.Page.FILEDOCUMENTTHUMBNAILSIZE, ApproxUnitScale, 96);
+			using (DataWriter writer = new DataWriter(Filename, FileMarkers.SAW, thumbnail: thumbnail))
+			{
+				writer.Write(this);
+			}
+		}
 
 		internal const string WorksheetExtension = ".saw7";
 		internal const string StandardExtension = ".saw7";
@@ -970,7 +998,7 @@ namespace SAW
 		internal static string LoadFilter()
 		{
 			// they value which can be given to OpenDialog
-			return "SAW file (" + LoadPattern() + ")|" + LoadPattern();
+			return "SAW file (" + LoadPattern() + ")|" + LoadPattern() + "|SVG(*.svg)|*.svg";
 		}
 
 		public string FilenameWithExtension(string extension)
@@ -997,14 +1025,12 @@ namespace SAW
 		{
 			if (!string.IsNullOrEmpty(DisplayName))
 				return DisplayName; // will be original worksheet name if set;  or palette name
-			else if (!string.IsNullOrEmpty(Filename))
+			 if (!string.IsNullOrEmpty(Filename))
 				return System.IO.Path.GetFileNameWithoutExtension(Filename);
-			else
-				return Strings.Item("New_Document").Replace("%0", UntitledIndex.ToString());
+			 return Strings.Item("New_Document").Replace("%0", UntitledIndex.ToString());
 		}
 
 		#endregion
-
 
 		/// <summary>True if contains no content.  NOT VALID FOR NON-STANDARD DOCS (eg configs)</summary>
 		public bool IsEmpty
@@ -1018,7 +1044,7 @@ namespace SAW
 		}
 
 		/// <summary>extracts the preview from the file on disk</summary>
-		public static Image GetFilePreview(string file)
+		internal static Image GetFilePreview(string file)
 		{
 			try
 			{
@@ -1044,7 +1070,7 @@ namespace SAW
 			}
 		}
 
-		public void WriteExportText(IndentStringBuilder output)
+		internal void WriteExportText(IndentStringBuilder output)
 		{
 			output.AppendLine("Header for SAW");
 			output.Indent += 1;
@@ -1069,17 +1095,19 @@ namespace SAW
 			}
 		}
 
+		/// <summary>Returns the next unused SAWID within the document (equal to highest used so far plus 1)</summary>
+		public int NextUniqueID => (from p in Pages select p.FindHighestUsedID()).Max() + 1;
 
 		#region Palettes
 
 		/// <summary>if this is loaded as a palette within a config this is a reference to the config </summary>
-		public Config PaletteWithin = null;
-		public SizeF PaletteDesignSize;
+		internal Config PaletteWithin = null;
+		internal SizeF PaletteDesignSize;
 		// only defined in v81 data.  Not really defined whether this includes margin or not, as the margin is always set to 0 for palettes
 
 		/// <summary>Text displayed in the title of the palette at runtime.</summary>
 		/// <remarks>Stored in Name</remarks>
-		public string PaletteTitle
+		internal string PaletteTitle
 		{
 			get
 			{
@@ -1091,7 +1119,7 @@ namespace SAW
 
 		/// <summary>Main part of description in the editing screen.  Can be translatable</summary>
 		/// <remarks>SubTitle is appended in brackets if it is not empty</remarks>
-		public string PaletteDescription
+		internal string PaletteDescription
 		{
 			get
 			{
@@ -1107,7 +1135,7 @@ namespace SAW
 
 		/// <summary>Complete description display in the editing screen, including both PaletteDescription and SubTitle</summary>
 		/// <remarks>Return value is already translated</remarks>
-		public string PaletteEditingFullDescription
+		internal string PaletteEditingFullDescription
 		{
 			get
 			{
@@ -1118,7 +1146,7 @@ namespace SAW
 		}
 
 		/// <summary>If purpose was custom this correctly returns the a purpose with the document ID</summary>
-		public Palette.Purpose PalettePurpose
+		internal Palette.Purpose PalettePurpose
 		{
 			get
 			{
@@ -1132,10 +1160,10 @@ namespace SAW
 		}
 
 		/// <summary>True if this is a palette within a config file</summary>
-		public bool IsPaletteWithin => PaletteWithin != null;
+		internal bool IsPaletteWithin => PaletteWithin != null;
 
 		/// <summary>Called (only for palettes) when the document is opened for editing; not when switching between tabs</summary>
-		public void StartEditingPalette()
+		internal void StartEditingPalette()
 		{
 			if (m_Pages[0].IsSingleAutoSize && PaletteDesignSize.Width > 0 && PaletteDesignSize.Height > 0)
 			{
@@ -1144,16 +1172,18 @@ namespace SAW
 			}
 		}
 
-		public class PaletteNameSort : IComparer<Document>
+		internal class PaletteNameSort : IComparer<Document>
 		{
 
 			public int Compare(Document x, Document y) => Strings.Translate(x.Name).CompareTo(Strings.Translate(y.Name));
+
 		}
 
 		#endregion
 
 		#region Document Info
-		public struct DocumentInfo
+		// in SAW this is only used for Palettes to identify them
+		internal struct DocumentInfo
 		{
 			public Palette.Purpose Purpose;
 			public string Author;

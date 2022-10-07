@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace SAW
 {
-	public class FileDialog
+	internal class FileDialog
 	{
 		// Handles global support for the standard Windows save and open dialogs
 		// the main reason for this class is to support storing different current folders for documents and images (and various other things)

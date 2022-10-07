@@ -1,7 +1,7 @@
 ﻿namespace SAW
 {
 	/// <summary>Stub for compatibility with Splash</summary>
-	public class Server
+	internal class Server
 	{
 		internal static string Language2 = System.Globalization.CultureInfo.CurrentUICulture.Name.Substring(0, 2);
 
@@ -19,28 +19,6 @@
 		}
 
 	}
-
-	#region Partial classes for services, allowing 'using'
-	// all from: http://omaralzabir.com/do-not-use-using-in-wcf-client/
-
-
-	//namespace Repo2
-	//{
-	//	public partial class Repo2SoapClient : IDisposable
-	//	{
-
-	//		public void Dispose()
-	//		{
-	//			if (State == CommunicationState.Faulted)
-	//				Abort();
-	//			else if (State != CommunicationState.Closed)
-	//				Close();
-	//		}
-
-	//	}
-	//}
-
-	#endregion
 
 }
 

@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
+using SAW.Shapes;
 
 namespace SAW
 {
-	public partial class ctrDocumentOutline : PalettePanel
+	internal partial class ctrDocumentOutline : PalettePanel
 	{
 		/// <summary>A list of all the nodes in the tree, for convenience.  We can look up a node using the data object as index.
 		/// Or iterate all of them using .Values</summary>
@@ -172,7 +173,7 @@ namespace SAW
 			List<Shape> selected = Globals.Root.CurrentPage.SelectedShapes;
 			if (selected.Count != 1)
 				return;
-			Globals.PerformAction(Functions.Verb.Find(Functions.Codes.EditItemBounds), EditableView.ClickPosition.Sources.Irrelevant);
+			Globals.PerformAction(Functions.Verb.Find(Functions.Codes.EditItemBounds), ClickPosition.Sources.Irrelevant);
 		}
 
 		#region Filling tree

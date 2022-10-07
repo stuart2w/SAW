@@ -4,7 +4,7 @@ using System.Drawing;
 using System.Diagnostics;
 
 
-namespace SAW
+namespace SAW.Shapes
 {
 	public abstract class Circular : Filled
 	{
@@ -43,6 +43,7 @@ namespace SAW
 			}
 
 		}
+
 		#endregion
 
 		internal override float[] GetRelevantAngles()
@@ -60,13 +61,10 @@ namespace SAW
 			return new RectangleF(pt.X - r, pt.Y - r, r * 2, r * 2);
 		}
 
-		public override string StatusInformation(bool ongoing) => Strings.Item("Info_Radius") + ": " + Measure.FormatLength(Radius);
+		protected internal override string StatusInformation(bool ongoing) => Strings.Item("Info_Radius") + ": " + Measure.FormatLength(Radius);
 
-		protected PointF PointAtAngle(float angle)
-		{
-			// doesn't check this is within the used arc - is just a point on the circumference
-			return Centre + Geometry.ScalarToVector(Radius, angle);
-		}
+		// doesn't check this is within the used arc - is just a point on the circumference
+		protected PointF PointAtAngle(float angle) => Centre + Geometry.ScalarToVector(Radius, angle);
 
 	}
 
@@ -74,6 +72,18 @@ namespace SAW
 	public class Circle : Circular
 	{
 		// this inherits from Lined, so has an array of vertices in theory - we just use the first entry for the centre
+
+		public Circle()
+		{ }
+
+		public Circle(PointF centre, float radius)
+		{
+			m_DefinedVertices = 2;
+			m_Radius = radius;
+			Vertices.Add(centre);
+			LineStyle.SetDefaults();
+			FillStyle.SetDefaults();
+		}
 
 		#region Information and data
 		private float m_Radius;
@@ -92,22 +102,12 @@ namespace SAW
 			return list;
 		}
 
-		public static Circle Create(PointF centre, float radius)
-		{
-			Circle create = new Circle();
-			create.Vertices.Add(centre);
-			create.m_DefinedVertices = 2;
-			create.LineStyle.SetDefaults();
-			create.FillStyle.SetDefaults();
-			create.m_Radius = radius;
-			return create;
-		}
 		#endregion
 
 		#region Verbs
 		//All verbs need to be overridden
 
-		public override VerbResult Start(EditableView.ClickPosition position)
+		public override VerbResult Start(ClickPosition position)
 		{
 			// cannot use base class Start because that would create two points
 			Debug.Assert(LineStyle != null && FillStyle != null);
@@ -125,9 +125,9 @@ namespace SAW
 			return VerbResult.Continuing;
 		}
 
-		public override VerbResult Cancel(EditableView.ClickPosition position) => VerbResult.Destroyed;
+		public override VerbResult Cancel(ClickPosition position) => VerbResult.Destroyed;
 
-		public override VerbResult Choose(EditableView.ClickPosition position)
+		public override VerbResult Choose(ClickPosition position)
 		{
 			Float(position);
 			if (m_Radius < MINIMUMRADIUS)
@@ -135,7 +135,7 @@ namespace SAW
 			return VerbResult.Completed;
 		}
 
-		public override VerbResult Complete(EditableView.ClickPosition position) => Choose(position);
+		public override VerbResult Complete(ClickPosition position) => Choose(position);
 
 		public override VerbResult CompleteRetrospective()
 		{
@@ -145,7 +145,7 @@ namespace SAW
 			return VerbResult.Completed;
 		}
 
-		public override VerbResult Float(EditableView.ClickPosition position)
+		public override VerbResult Float(ClickPosition position)
 		{
 			m_Radius = Geometry.DistanceBetween(Centre, position.Snapped);
 			float step = position.ScalarSnapStep(0);
@@ -161,7 +161,7 @@ namespace SAW
 			return VerbResult.Continuing;
 		}
 
-		public override VerbResult OtherVerb(EditableView.ClickPosition position, Functions.Codes code)
+		protected internal override VerbResult OtherVerb(ClickPosition position, Functions.Codes code)
 		{
 			switch (code)
 			{
@@ -186,17 +186,11 @@ namespace SAW
 
 		#region Coordinates
 
-		protected override RectangleF CalculateBounds()
-		{
-			return new RectangleF(Vertices[0].X - m_Radius, Vertices[0].Y - m_Radius, m_Radius * 2, m_Radius * 2);
-		}
+		protected override RectangleF CalculateBounds() => new RectangleF(Vertices[0].X - m_Radius, Vertices[0].Y - m_Radius, m_Radius * 2, m_Radius * 2);
 
-		public override RectangleF RefreshBounds(bool withShadow = false)
-		{
-			return base.RefreshBoundsFromBounds(true);
-		}
+		public override RectangleF RefreshBounds(bool withShadow = false) => base.RefreshBoundsFromBounds(true);
 
-		public override SnapModes SnapNext(SnapModes requested)
+		protected internal override SnapModes SnapNext(SnapModes requested)
 		{
 			if (requested == SnapModes.Angle)
 				return SnapModes.Off;
@@ -209,7 +203,7 @@ namespace SAW
 			transformation.TransformScalar(ref m_Radius);
 		}
 
-		public override bool HitTestDetailed(PointF clickPoint, float scale, bool treatAsFilled)
+		protected internal override bool HitTestDetailed(PointF clickPoint, float scale, bool treatAsFilled)
 		{
 			float distance = Geometry.DistanceBetween(Centre, clickPoint);
 			if (IsFilled || treatAsFilled)
@@ -270,13 +264,13 @@ namespace SAW
 		}
 
 		#region BinaryData and Copy
-		public override void Load(DataReader reader)
+		protected internal override void Load(DataReader reader)
 		{
 			base.Load(reader);
 			m_Radius = reader.ReadSingle();
 		}
 
-		public override void Save(DataWriter writer)
+		protected internal override void Save(DataWriter writer)
 		{
 			base.Save(writer);
 			writer.Write(m_Radius);
@@ -346,18 +340,12 @@ namespace SAW
 		{
 			switch (index)
 			{
-				case -1:
-					return Middle();
-				case 0:
-					return new PointF(Centre.X, Centre.Y + m_Radius);
-				case 1:
-					return new PointF(Centre.X + m_Radius, Centre.Y);
-				case 2:
-					return new PointF(Centre.X, Centre.Y - m_Radius);
-				case 3:
-					return new PointF(Centre.X - m_Radius, Centre.Y);
-				default:
-					return PointF.Empty;
+				case -1: return Middle();
+				case 0: return new PointF(Centre.X, Centre.Y + m_Radius);
+				case 1: return new PointF(Centre.X + m_Radius, Centre.Y);
+				case 2: return new PointF(Centre.X, Centre.Y - m_Radius);
+				case 3: return new PointF(Centre.X - m_Radius, Centre.Y);
+				default: return PointF.Empty;
 			}
 		}
 
@@ -371,10 +359,10 @@ namespace SAW
 
 		protected override PointF[] GetPathForArc()
 		{
-			using (System.Drawing.Drawing2D.GraphicsPath objPath = new System.Drawing.Drawing2D.GraphicsPath())
+			using (System.Drawing.Drawing2D.GraphicsPath path = new System.Drawing.Drawing2D.GraphicsPath())
 			{
-				objPath.AddEllipse(CircleRectangle());
-				return objPath.PathPoints;
+				path.AddEllipse(CircleRectangle());
+				return path.PathPoints;
 			}
 		}
 
@@ -393,11 +381,12 @@ namespace SAW
 		// if m_Bounds is RectangleF.empty then the values in these are undefined (they are not actually cleared)
 		protected const float MINIMUMRADIUS = 2;
 
-		protected int m_Direction = 0; // this IS stored in the data, however
-									   // for the arc,the arc can be drawn in either direction.  It is possible to draw nearly an entire 360°
-									   // so once the user moves off in one direction it maintains that direction way around.  The direction is reset to 0 if the user is approximately over the start line
-									   // likewise the semicircle can go either way.  This could have been achieved by simply flipping the points over, but that would make some strange results
-									   // if the user then cancelled.  Should be set back to 0 if the user cancels so that the baseline is being moved
+		protected int m_Direction = 0;
+		// this IS stored in the data, however
+		// for the arc,the arc can be drawn in either direction.  It is possible to draw nearly an entire 360°
+		// so once the user moves off in one direction it maintains that direction way around.  The direction is reset to 0 if the user is approximately over the start line
+		// likewise the semicircle can go either way.  This could have been achieved by simply flipping the points over, but that would make some strange results
+		// if the user then cancelled.  Should be set back to 0 if the user cancels so that the baseline is being moved
 
 		#region Circular implementation
 		// this is needed by some of the functions in Geometry
@@ -515,10 +504,13 @@ namespace SAW
 		public override void ApplyTransformation(Transformation transformation)
 		{
 			base.ApplyTransformation(transformation);
-			transformation.TransformAngle(ref m_StartAngle);
-			transformation.TransformAngle(ref m_EndAngle);
-			transformation.TransformScalar(ref m_Radius);
-			transformation.TransformDirection(ref m_Direction);
+			if (!(transformation is TransformAffine))
+			{
+				transformation.TransformAngle(ref m_StartAngle);
+				transformation.TransformAngle(ref m_EndAngle);
+				transformation.TransformDirection(ref m_Direction);
+				transformation.TransformScalar(ref m_Radius);
+			}
 		}
 
 		public override PointF Middle()
@@ -544,6 +536,7 @@ namespace SAW
 			return Vertices[0] + Geometry.ScalarToVector(m_Radius, midAngle);
 			// is this sufficient: ??
 		}
+
 		#endregion
 
 		#region Targets, GrabSpots
@@ -596,7 +589,7 @@ namespace SAW
 		// should be implemented to set Vertices (0..n) based upon Centre, radius, m_StartAngle
 		// in practice Centre will not have changed (because this is derived from the points anyway).  This is called rather when the radius or angle is adjusted
 
-		public override VerbResult OtherVerb(EditableView.ClickPosition position, Functions.Codes code)
+		protected internal override VerbResult OtherVerb(ClickPosition position, Functions.Codes code)
 		{
 			switch (code)
 			{
@@ -625,7 +618,7 @@ namespace SAW
 			}
 		}
 
-		public override void Diagnostic(System.Text.StringBuilder output)
+		protected internal override void Diagnostic(System.Text.StringBuilder output)
 		{
 			base.Diagnostic(output);
 			output.AppendLine("Start angle = " + m_StartAngle.ToString("0.###"));
@@ -634,7 +627,7 @@ namespace SAW
 			output.AppendLine("Winding direction = " + m_Direction);
 		}
 
-		public override string StatusInformation(bool ongoing)
+		protected internal override string StatusInformation(bool ongoing)
 		{
 			string strStatus = base.StatusInformation(ongoing); // just radius
 			switch (m_Direction)
@@ -652,7 +645,7 @@ namespace SAW
 		}
 
 		#region BinaryData and Copy
-		public override void Load(DataReader reader)
+		protected internal override void Load(DataReader reader)
 		{
 			base.Load(reader);
 			m_Direction = reader.ReadInt32();
@@ -660,7 +653,7 @@ namespace SAW
 										 // it is essential for these objects to clear the bounds because this indicates that the various angles are invalid
 		}
 
-		public override void Save(DataWriter writer)
+		protected internal override void Save(DataWriter writer)
 		{
 			base.Save(writer);
 			writer.Write(m_Direction);
@@ -703,7 +696,7 @@ namespace SAW
 
 		#region Verbs
 		// the Start in Lined is OK
-		public override VerbResult Cancel(EditableView.ClickPosition position)
+		public override VerbResult Cancel(ClickPosition position)
 		{
 			if (m_DefinedVertices == 1)
 				return VerbResult.Destroyed; // was placing the baseline, the only fixed point was the start point
@@ -712,7 +705,7 @@ namespace SAW
 			return VerbResult.Continuing;
 		}
 
-		public override VerbResult Choose(EditableView.ClickPosition position)
+		public override VerbResult Choose(ClickPosition position)
 		{
 			Float(position);
 			if (m_DefinedVertices < 2)
@@ -733,7 +726,7 @@ namespace SAW
 			}
 		}
 
-		public override VerbResult Complete(EditableView.ClickPosition position)
+		public override VerbResult Complete(ClickPosition position)
 		{
 			if (m_DefinedVertices < 2)
 				return Choose(position);
@@ -750,7 +743,7 @@ namespace SAW
 			return VerbResult.Completed;
 		}
 
-		public override VerbResult Float(EditableView.ClickPosition position)
+		public override VerbResult Float(ClickPosition position)
 		{
 			if (m_DefinedVertices == 1)
 			{
@@ -918,6 +911,25 @@ namespace SAW
 													// m_Path from Lined is the path of these points. Also set by CalculateDynamicVertices
 													// m_Path = nothing is used to test if m_ptBezier is defined.  This is sufficient to cope with deserialise I think - path will be null and both recalculated
 
+		public Ellipse()
+		{ }
+
+		/// <summary>Creates the ellipse given 3 nominal points: the 2 ends of the major axis, and either of the points at the end of the minor axis.
+		/// In practice the first 2 points can be the minor axis and it will work.  And the 3rd point is adjusted if not valid: the distance from the line to this point determines the half-width of the ellipse. </summary>
+		public Ellipse(PointF majorAxisA, PointF majorAxisB, PointF minorAxis)
+		{
+			Start(new ClickPosition(majorAxisA));
+			Choose(new ClickPosition(majorAxisB));
+			Complete(new ClickPosition(minorAxis));
+			LineStyle.SetDefaults();
+			FillStyle.SetDefaults();
+			FillStyle.Colour = Color.Transparent;
+		}
+
+		/// <summary>Creates an orthogonal ellipse which fits within the given rectangle</summary>
+		public Ellipse(RectangleF rect) : this(new PointF(rect.X, rect.Y + rect.Height / 2), new PointF(rect.Right, rect.Y + rect.Height / 2), new PointF(rect.X + rect.Width / 2, rect.Top))
+		{ }
+
 		#region Coordinate calculations
 		private bool Orthogonal
 		{ get { return Geometry.LineApproxPerpendicular(Vertices[0], Vertices[1]); } }
@@ -1046,12 +1058,13 @@ namespace SAW
 		#endregion
 
 		#region Basic information
+
 		public override Shapes ShapeCode
 		{
 			get { return Shapes.Ellipse; }
 		}
 
-		public override SnapModes SnapNext(SnapModes requested)
+		protected internal override SnapModes SnapNext(SnapModes requested)
 		{
 			if (m_DefinedVertices < 2)
 				return requested;
@@ -1082,7 +1095,7 @@ namespace SAW
 			return list;
 		}
 
-		public override string StatusInformation(bool ongoing)
+		protected internal override string StatusInformation(bool ongoing)
 		{
 			string status = Strings.Item("Info_MajorAxis") + ": ";
 			float major = Geometry.DistanceBetween(Vertices[0], Vertices[1]);
@@ -1110,7 +1123,7 @@ namespace SAW
 		#region Verbs
 		// the base class Start is OK - it places 2 initial vertices at the start point
 
-		public override VerbResult Cancel(EditableView.ClickPosition position)
+		public override VerbResult Cancel(ClickPosition position)
 		{
 			if (m_DefinedVertices < 2)
 			{
@@ -1127,7 +1140,7 @@ namespace SAW
 			}
 		}
 
-		public override VerbResult Choose(EditableView.ClickPosition position)
+		public override VerbResult Choose(ClickPosition position)
 		{
 			PointF pt = position.Snapped;
 			if (m_DefinedVertices < 2)
@@ -1151,7 +1164,7 @@ namespace SAW
 			}
 		}
 
-		public override VerbResult Complete(EditableView.ClickPosition position)
+		public override VerbResult Complete(ClickPosition position)
 		{
 			if (m_DefinedVertices < 2)
 				return Choose(position);
@@ -1166,7 +1179,7 @@ namespace SAW
 			return VerbResult.Completed;
 		}
 
-		public override VerbResult Float(EditableView.ClickPosition position)
+		public override VerbResult Float(ClickPosition position)
 		{
 			if (m_DefinedVertices < 2)
 				// still placing the baseline
@@ -1418,7 +1431,8 @@ namespace SAW
 		#endregion
 
 		#region Miscellaneous coordinates
-		public override bool HitTestDetailed(PointF clickPoint, float scale, bool treatAsFilled)
+
+		protected internal override bool HitTestDetailed(PointF clickPoint, float scale, bool treatAsFilled)
 		{
 			Debug.Assert(m_DefinedVertices == 3);
 			SizeF vector = Centre.VectorTo(clickPoint);
@@ -1444,10 +1458,7 @@ namespace SAW
 			return aPoints;
 		}
 
-		internal override float[] GetRelevantAngles()
-		{
-			return new float[] { Geometry.VectorAngle(Vertices[0], Vertices[1]), m_MinorAxis.VectorAngle() };
-		}
+		internal override float[] GetRelevantAngles() => new[] { Geometry.VectorAngle(Vertices[0], Vertices[1]), m_MinorAxis.VectorAngle() };
 
 		public override bool Tidy(SnapModes mode, Page page)
 		{
@@ -1501,7 +1512,7 @@ namespace SAW
 		}
 
 		#region Load/Save
-		public override void Load(DataReader reader)
+		protected internal override void Load(DataReader reader)
 		{
 			base.Load(reader);
 			m_MinorAxis = reader.ReadSizeF();
@@ -1509,7 +1520,7 @@ namespace SAW
 			CalculateDynamicVertices();
 		}
 
-		public override void Save(DataWriter writer)
+		protected internal override void Save(DataWriter writer)
 		{
 			base.Save(writer);
 			writer.Write(m_MinorAxis);
@@ -1543,13 +1554,38 @@ namespace SAW
 		protected bool m_First = true; // true if this is the first one created.  This is not stored in the data; it is only used when initially creating the shape
 									   // in the arc, only the first can have the radius adjusted; in the Pie only the first cannot be completed to make a circle
 
+		public Arc()
+		{ }
+
+		/// <summary>Creates an arc.  startAngle, endAngle are expressed IN RADIANS, from vertically up.  In addition direction indicates which of the 2 possible arcs between these angles is used.
+		/// +1 indicates clockwise from start to end, -1 widdershins.</summary>
+		/// <remarks>The angles can be positive or negative.  Use Geometry.Radians(angleInDegress) to convert from degrees</remarks>
+		public Arc(PointF centre, float radius, float startAngle, float endAngle, int direction)
+		{
+			m_DefinedVertices = 3;
+			Status = StatusValues.Complete;
+			m_Radius = radius;
+			m_StartAngle = Geometry.NormaliseAngle(startAngle);
+			m_EndAngle = Geometry.NormaliseAngle(endAngle);
+			Vertices.Add(centre);
+			Vertices.Add(PointF.Empty);
+			Vertices.Add(PointF.Empty);
+			SetPointsFromAngles(); // defines the second two points
+			if (direction != 1 && direction != -1)
+				throw new ArgumentException("Direction must be -1 or 1");
+			m_Direction = direction;
+			LineStyle.SetDefaults();
+			FillStyle.SetDefaults();
+			FillStyle.Colour = Color.Transparent; // not actually used anyway IIRC, but this would make more sense
+		}
+
 		#region Basic information
 		public override Shapes ShapeCode => Shapes.Arc;
 		public override PointF Centre => Vertices[0];
 		public override bool IsFilled => false;
 		protected override int FixedVerticesLength() => 3;
 
-		public override SnapModes SnapNext(SnapModes requested)
+		protected internal override SnapModes SnapNext(SnapModes requested)
 		{
 			if (m_DefinedVertices >= 2 && requested == SnapModes.Grid)
 				return SnapModes.Off; // don't try and snap to grid points while moving around the radius!
@@ -1629,9 +1665,10 @@ namespace SAW
 		#region Radius lock
 
 		protected static bool g_RadiusLocked = false; //all arcs except first get same radius until tool button is pressed again
-		public static float FixedRadius = 10;
+		/// <summary>The radius used when radius locked</summary>
+		internal static float FixedRadius = 10;
 		protected static bool m_RadiusWasLocked = false; // remembers radius locked in case of cancellation
-		public static event NullEventHandler RadiusLockedChanged;
+		internal static event NullEventHandler RadiusLockedChanged;
 
 		public static bool RadiusLocked
 		{
@@ -1645,7 +1682,7 @@ namespace SAW
 			}
 		}
 
-		public override VerbResult OtherVerb(EditableView.ClickPosition position, Functions.Codes code)
+		protected internal override VerbResult OtherVerb(ClickPosition position, Functions.Codes code)
 		{
 			switch (code)
 			{
@@ -1661,28 +1698,18 @@ namespace SAW
 			}
 		}
 
-		///// <summary>Called if the user selects the arc tool again while drawing it.  If and only if this was at the end of setting the radius, it fixes the radius and cancels</summary>
-		///// <returns>Returns true if this fixed the radius</returns>
-		//public bool TryMeasure()
-		//{
-		//	if (g_RadiusLocked)
-		//		return false;
-		//	if (m_DefinedVertices != 2)
-		//		return false;
-		//	RadiusLocked = true;
-		//	return true;
-		//}
 		#endregion
 
 		#region Verbs
-		public override VerbResult Start(EditableView.ClickPosition position)
+
+		public override VerbResult Start(ClickPosition position)
 		{
 			if (g_RadiusLocked)
 				m_Radius = FixedRadius;
 			return base.Start(position);
 		}
 
-		public override VerbResult Cancel(EditableView.ClickPosition position)
+		public override VerbResult Cancel(ClickPosition position)
 		{
 			if (m_DefinedVertices == 1)
 				return VerbResult.Destroyed;
@@ -1697,7 +1724,7 @@ namespace SAW
 			return VerbResult.Continuing;
 		}
 
-		public override VerbResult Choose(EditableView.ClickPosition position)
+		public override VerbResult Choose(ClickPosition position)
 		{
 			Float(position);
 			switch (m_DefinedVertices)
@@ -1725,7 +1752,7 @@ namespace SAW
 			}
 		}
 
-		public override VerbResult Complete(EditableView.ClickPosition position)
+		public override VerbResult Complete(ClickPosition position)
 		{
 			if (m_DefinedVertices != 2)
 				return Choose(position);
@@ -1748,7 +1775,7 @@ namespace SAW
 			return VerbResult.Completed;
 		}
 
-		public override VerbResult Float(EditableView.ClickPosition position)
+		public override VerbResult Float(ClickPosition position)
 		{
 			PointF pt = position.Snapped;
 			DecacheArrowheads();
@@ -1774,7 +1801,7 @@ namespace SAW
 			else
 			{
 				EnsureBounds(); // for the radius and angle
-				Debug.Assert(m_Path == null); // And EndArrowhead Is Nothing)
+				Debug.Assert(m_Path == null); 
 				SizeF vector = Centre.VectorTo(pt);
 				if (vector.Length() < Geometry.NEGLIGIBLE)
 					return VerbResult.Continuing; // ignore attempts to move over the centre spot
@@ -1801,7 +1828,7 @@ namespace SAW
 			}
 		}
 
-		public override bool AllowVerbWhenComplete(Functions.Codes code)
+		protected internal override bool AllowVerbWhenComplete(Functions.Codes code)
 		{
 			switch (code)
 			{
@@ -1811,6 +1838,7 @@ namespace SAW
 			}
 			return base.AllowVerbWhenComplete(code);
 		}
+
 		#endregion
 
 		#region Coords - HitTest, Sockets, Targets, GrabSpots
@@ -1848,11 +1876,11 @@ namespace SAW
 
 		internal override List<Target> GenerateTargets(UserSocket floating)
 		{
-			List<Target> colTargets = base.GenerateTargets(floating);
-			colTargets.Add(new Target(this, Vertices[0], Target.Types.Centre, floating, Target.Priorities.Low));
-			colTargets.Add(new Target(this, Vertices[1], Target.Types.Vertex, floating, Target.Priorities.Vertex));
-			colTargets.Add(new Target(this, Vertices[2], Target.Types.Vertex, floating, Target.Priorities.Vertex));
-			return colTargets;
+			List<Target> targets = base.GenerateTargets(floating);
+			targets.Add(new Target(this, Vertices[0], Target.Types.Centre, floating, Target.Priorities.Low));
+			targets.Add(new Target(this, Vertices[1], Target.Types.Vertex, floating, Target.Priorities.Vertex));
+			targets.Add(new Target(this, Vertices[2], Target.Types.Vertex, floating, Target.Priorities.Vertex));
+			return targets;
 		}
 
 		internal override List<Socket> GetSockets()
@@ -1907,7 +1935,7 @@ namespace SAW
 			}
 		}
 
-		public override PointF DoSnapAngle(PointF newPoint)
+		protected internal override PointF DoSnapAngle(PointF newPoint)
 		{
 			// different from base class - BOTH points use centre origin
 			return Geometry.AngleSnapPoint(newPoint, Centre);
@@ -1973,16 +2001,17 @@ namespace SAW
 			PointF other = endPoint + Geometry.ScalarToVector(length, direction);
 			return new[] { other, endPoint };
 		}
+
 		#endregion
 
 		#region Spawning
 		// also implemented by Pie, but rather differently.  The Pie immediately start drawing out the arc once it has spawned
-		public override Shape Spawn()
+		protected internal override Shape Spawn()
 		{
 			if (Math.Abs(m_EndAngle - m_StartAngle) < Geometry.NEGLIGIBLE)
 			{
 				// returning a circle in place of this rather than new arc
-				Circle create = Circle.Create(Vertices[0], m_Radius);
+				Circle create = new Circle(Vertices[0], m_Radius);
 				create.FillStyle.Colour = Color.Empty;
 				create.LineStyle.CopyFrom(this.LineStyle);
 				return create;
@@ -2001,7 +2030,7 @@ namespace SAW
 
 		#endregion
 
-		public override void Load(DataReader reader)
+		protected internal override void Load(DataReader reader)
 		{
 			base.Load(reader);
 			if (Vertices.Count != 3)

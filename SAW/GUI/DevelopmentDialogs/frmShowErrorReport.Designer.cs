@@ -2,7 +2,7 @@ using System.Windows.Forms;
 
 namespace SAW
 {
-	public partial class frmShowErrorReport : System.Windows.Forms.Form
+	internal partial class frmShowErrorReport : System.Windows.Forms.Form
 	{
 		
 		//Form overrides dispose to clean up the component list.

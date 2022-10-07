@@ -2,11 +2,11 @@ using System;
 using System.Drawing;
 using System.Diagnostics;
 using System.Windows.Forms;
-
+using SAW.Shapes;
 
 namespace SAW
 {
-	public partial class frmNewPageBackground
+	internal partial class frmNewPageBackground
 	{
 		/// <summary>this is used when clicking a new page where the original has a large background image.  The user can choose whether to use the same image or not </summary>
 		public frmNewPageBackground()

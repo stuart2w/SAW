@@ -6,7 +6,7 @@ using System.Linq;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
 
-namespace SAW
+namespace SAW.Shapes
 {
 	/// <summary>Abstract base class for shapes representing a GraphicsPath</summary>
 	public abstract class PolyPath : Filled
@@ -19,7 +19,7 @@ namespace SAW
 
 		protected override int FixedVerticesLength() => 0;
 
-		public override void Diagnostic(System.Text.StringBuilder output)
+		protected internal override void Diagnostic(System.Text.StringBuilder output)
 		{
 			base.Diagnostic(output);
 			if (m_Path == null)
@@ -57,11 +57,11 @@ namespace SAW
 
 		#region Verbs
 
-		public override VerbResult Float(EditableView.ClickPosition pt) => VerbResult.Rejected;
-		public override VerbResult Start(EditableView.ClickPosition position) => VerbResult.Rejected;
-		public override VerbResult Cancel(EditableView.ClickPosition position) => VerbResult.Rejected;
-		public override VerbResult Choose(EditableView.ClickPosition position) => VerbResult.Rejected;
-		public override VerbResult Complete(EditableView.ClickPosition position) => VerbResult.Rejected;
+		public override VerbResult Float(ClickPosition pt) => VerbResult.Rejected;
+		public override VerbResult Start(ClickPosition position) => VerbResult.Rejected;
+		public override VerbResult Cancel(ClickPosition position) => VerbResult.Rejected;
+		public override VerbResult Choose(ClickPosition position) => VerbResult.Rejected;
+		public override VerbResult Complete(ClickPosition position) => VerbResult.Rejected;
 		public override VerbResult CompleteRetrospective() => VerbResult.Rejected;
 
 		#endregion
@@ -75,7 +75,7 @@ namespace SAW
 			m_Path = (GraphicsPath)polyPath.m_Path.Clone();
 		}
 
-		public override void Load(DataReader reader)
+		protected internal override void Load(DataReader reader)
 		{
 			base.Load(reader);
 			PointF[] points = reader.ReadListPoints().ToArray();
@@ -84,7 +84,7 @@ namespace SAW
 			m_Path = new GraphicsPath(points, types, FillMode.Winding);
 		}
 
-		public override void Save(DataWriter writer)
+		protected internal override void Save(DataWriter writer)
 		{
 			base.Save(writer);
 			writer.Write(m_Path.PathPoints);
@@ -407,7 +407,7 @@ namespace SAW
 
 		#region Verbs
 
-		public override VerbResult Start(EditableView.ClickPosition position)
+		public override VerbResult Start(ClickPosition position)
 		{
 			PointF pt = position.Snapped;
 			Debug.Assert(LineStyle != null);
@@ -424,7 +424,7 @@ namespace SAW
 			return VerbResult.Continuing;
 		}
 
-		public override VerbResult Float(EditableView.ClickPosition pt)
+		public override VerbResult Float(ClickPosition pt)
 		{
 			PointF[] points = m_Path.PathPoints;
 			byte[] types = m_Path.PathTypes;
@@ -437,7 +437,7 @@ namespace SAW
 		}
 
 		/// <summary>Does the main logic of float.  Extracted so that it can be used within Choose etc without creating a new path more than once</summary>
-		private void DoFloat(ref byte[] types, ref PointF[] points, EditableView.ClickPosition pt)
+		private void DoFloat(ref byte[] types, ref PointF[] points, ClickPosition pt)
 		{
 			bool wantBezier = Control.ModifierKeys != Keys.Shift;// note requires exactly shift, and not control or alt
 			if (wantBezier)
@@ -456,7 +456,7 @@ namespace SAW
 			DecacheArrowhead(true);
 		}
 
-		public override VerbResult Cancel(EditableView.ClickPosition position)
+		public override VerbResult Cancel(ClickPosition position)
 		{
 			PointF[] points = m_Path.PathPoints;
 			byte[] types = m_Path.PathTypes;
@@ -471,7 +471,7 @@ namespace SAW
 			return VerbResult.Continuing;
 		}
 
-		public override VerbResult Choose(EditableView.ClickPosition position)
+		public override VerbResult Choose(ClickPosition position)
 		{
 			PointF[] points = m_Path.PathPoints;
 			byte[] types = m_Path.PathTypes;
@@ -496,7 +496,7 @@ namespace SAW
 			return VerbResult.Continuing;
 		}
 
-		public override VerbResult Complete(EditableView.ClickPosition position)
+		public override VerbResult Complete(ClickPosition position)
 		{
 			Choose(position);
 			return CompleteRetrospective();
@@ -801,7 +801,7 @@ namespace SAW
 			}
 		}
 
-		public override bool VertexVerbApplicable(Functions.Codes code, Target target)
+		protected internal override bool VertexVerbApplicable(Functions.Codes code, Target target)
 		{
 			if (!Globals.Root.CurrentConfig.ReadBoolean(Config.Advanced_Graphics))
 				return false; // Even Add and Remove disabled for this shape, although allow other shapes
@@ -870,7 +870,7 @@ namespace SAW
 			}
 		}
 
-		public override VerbResult OtherVerb(EditableView.ClickPosition position, Functions.Codes code)
+		protected internal  override VerbResult OtherVerb(ClickPosition position, Functions.Codes code)
 		{
 			Target target = position.Page.SelectedPath;
 			switch (code)
@@ -1177,7 +1177,7 @@ namespace SAW
 			m_Bounds = RectangleF.Empty;
 		}
 
-		public override (GrabSpot[], string[]) GetEditableCoords(Target selectedElement)
+		internal override (GrabSpot[], string[]) GetEditableCoords(Target selectedElement)
 		{
 			if (selectedElement == null || selectedElement.Type != Target.Types.Line && selectedElement.Type != Target.Types.Vertex)
 				return base.GetEditableCoords(selectedElement);

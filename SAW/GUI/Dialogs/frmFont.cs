@@ -7,7 +7,7 @@ using System.Windows.Forms;
 
 namespace SAW
 {
-	public partial class frmFont
+	internal partial class frmFont
 	{
 		public frmFont()
 		{

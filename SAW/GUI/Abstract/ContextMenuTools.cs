@@ -5,10 +5,11 @@ using System.Linq;
 using System.Windows.Forms;
 using SAW.Functions;
 using Action = SAW.Functions.Action;
+using SAW.Shapes;
 
 namespace SAW
 {
-	public static class ContextMenuTools
+	internal static class ContextMenuTools
 	{
 
 		#region creating and initialising for first time
@@ -197,7 +198,6 @@ namespace SAW
 						mnu.Text = text;
 						mnu.Visible = !string.IsNullOrEmpty(text);
 						break;
-					case Codes.FreeTextToTextLine:
 					case Codes.ConvertToPath:
 					case Codes.CCFUpdate:
 						// these are rare enough to hide unless allowed (actually only appears on the main edit menu)
@@ -243,7 +243,7 @@ namespace SAW
 			Action tag = (Action)((ToolStripItem)sender).Tag;
 			if (tag.IsEmpty)
 				return;
-			Globals.PerformAction(tag, EditableView.ClickPosition.Sources.Mouse);
+			Globals.PerformAction(tag, ClickPosition.Sources.Mouse);
 		}
 
 

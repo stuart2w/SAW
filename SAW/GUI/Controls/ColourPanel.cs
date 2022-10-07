@@ -11,7 +11,7 @@ using Action = SAW.Functions.Action;
 namespace SAW
 {
 	[System.ComponentModel.DefaultEvent("UserSelectedColour")]
-	public sealed class ColourPanel : Control, ILinearAnimated, IAnimationNotifyComplete, IPalette, IInvokeable, IKeyControl
+	internal sealed class ColourPanel : Control, ILinearAnimated, IAnimationNotifyComplete, IPalette, IInvokeable, IKeyControl
 	{
 		// The main part of the panel is a grid of colours.  Then there is a vertical dividing line and up to 3 special buttons down the right-hand side
 

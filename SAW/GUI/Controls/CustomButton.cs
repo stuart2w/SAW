@@ -5,7 +5,7 @@ using SAW.Functions;
 
 namespace SAW
 {
-	public class CustomButton : SharedButton
+	internal class CustomButton : SharedButton
 	{
 		// Not using button to stop it auto-focusing the form (?)
 		private SAW.Functions.Codes m_eVerb = Codes.None;

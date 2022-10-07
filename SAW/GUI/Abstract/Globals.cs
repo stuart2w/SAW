@@ -9,6 +9,7 @@ using System.Text;
 using Microsoft.Win32;
 using SAW.Functions;
 using Action = SAW.Functions.Action;
+using SAW.Shapes;
 
 namespace SAW
 {
@@ -16,11 +17,16 @@ namespace SAW
 	/// Many of the more common events on here are delayed on a timer</summary>
 	public static class Globals
 	{
-		/// <summary>MUST be nothing in Design mode (some controls within controls check for this since DesignMode doesn't work for them)</summary>
-		internal static RootApplication Root;
+		/// <summary>The root application object.  Responsible for list of documents etc.
+		/// MUST be nothing in Design mode (some controls within controls check for this since DesignMode doesn't work for them)</summary>
+		public static RootApplication Root { get; internal set; }
 
 		private static readonly Timer m_tmr;
 		private static frmMain Editor; // defined by menu when it is created
+
+		/// <summary>True if this is not running as its own application, but InitialiseExternal has been called </summary>
+		internal static bool IsEmbedded;
+
 		static Globals()
 		{
 			m_tmr = new Timer { Interval = 100, Enabled = false };
@@ -111,24 +117,24 @@ namespace SAW
 		#region Misc functions
 
 		/// <summary>Set to the targeted control when using right click to speak.  We should attempt to ignore any Click from this control</summary>
-		public static Control DiscardClickFrom;
+		internal static Control DiscardClickFrom;
 
 		/// <summary>Checks of this control should have any clicks discarded, returning true if Click should be ignored, and either way clears DiscardClickFrom</summary>
 		/// <remarks>The intention is that this can be called on the click event.  It clears the Discard setting because if anything else is clicked it implies
 		/// we're not still receiving the matching Click from the attempt to speak</remarks>
-		public static bool CheckDiscardClick(Control control)
+		internal static bool CheckDiscardClick(Control control)
 		{
 			var old = DiscardClickFrom;
 			DiscardClickFrom = null;
 			return control == old;
 		}
 
-		public static void RestoreFocus()
+		internal static void RestoreFocus()
 		{
 			(Root.CurrentMainScreen() as frmMain)?.pnlView.Focus();
 		}
 
-		public static void SetFontAsDefault(Font font)
+		internal static void SetFontAsDefault(Font font)
 		{
 			(Root.CurrentMainScreen() as frmMain)?.SetFontAsDefault(font);
 		}
@@ -146,15 +152,15 @@ namespace SAW
 		}
 
 		[EditorBrowsable(EditorBrowsableState.Never)]
-		public static void SetEditor(frmMain frm)
+		internal static void SetEditor(frmMain frm)
 		{
 			Editor = frm;
 			UseParameterScreen(Editor);
 		}
 
 		/// <summary>There is a problem using the Windows button renderer within palettes under classic theme (probably because we are not using pixel scale)</summary>
-		public static bool ClassicTheme = false;
-		public static void CheckThemeOnStartup()
+		internal static bool ClassicTheme = false;
+		internal static void CheckThemeOnStartup()
 		{
 			try
 			{
@@ -307,14 +313,14 @@ namespace SAW
 			m_tmr.Enabled = true;
 		}
 
-		public static void UseParameterScreen(IParameterConsumer screen)
+		internal static void UseParameterScreen(IParameterConsumer screen)
 		{
 			if (m_ParameterScreen != null)
 				m_StackParameterScreens.Push(m_ParameterScreen);
 			m_ParameterScreen = screen;
 		}
 
-		public static void RemoveParameterScreen(IParameterConsumer screen)
+		internal static void RemoveParameterScreen(IParameterConsumer screen)
 		{
 			if (screen != m_ParameterScreen)
 				throw new ArgumentException();
@@ -470,7 +476,7 @@ namespace SAW
 			return Editor?.VerbApplicable(code) ?? false;
 		}
 
-		public static void PerformAction(Action action, EditableView.ClickPosition.Sources source)
+		public static void PerformAction(Action action, ClickPosition.Sources source)
 		{
 			Editor?.PerformAction(action, source);
 		}
@@ -480,18 +486,18 @@ namespace SAW
 		#region Error handling and reporting
 		private static bool m_InvalidState;
 		private static bool m_InvalidDocument;
-		public static event NullEventHandler InvalidCurrentState;
-		public static event NullEventHandler InvalidCurrentDocument;
+		internal static event NullEventHandler InvalidCurrentState;
+		internal static event NullEventHandler InvalidCurrentDocument;
 
 		/// <summary>Tells the GUI to abort current operations - something is wrong</summary>
-		public static void NotifyInvalidCurrentState()
+		internal static void NotifyInvalidCurrentState()
 		{
 			Root.Log.WriteLine("Globals.InvalidCurrentState");
 			m_InvalidState = true;
 			m_tmr.Enabled = true;
 		}
 
-		public static void NotifyInvalidDocument()
+		internal static void NotifyInvalidDocument()
 		{
 			Root.Log.WriteLine("Globals.NotifyInvalidDocument");
 			m_InvalidDocument = true;
@@ -511,7 +517,7 @@ namespace SAW
 			}
 		}
 
-		public static void StoreEvent(string text)
+		internal static void StoreEvent(string text)
 		{
 			g_Events.Enqueue(new DiagnosticEvent(text));
 			//Debug.WriteLine(strText);
@@ -521,7 +527,7 @@ namespace SAW
 			}
 		}
 
-		public static void WriteDiagnosticEvents(DataWriter writer)
+		internal static void WriteDiagnosticEvents(DataWriter writer)
 		{
 			writer.Write(1); // Can be used for future expansion without changing the main data file versions
 			writer.Write(g_Events.Count);
@@ -533,7 +539,7 @@ namespace SAW
 		}
 
 		/// <summary>Returns text summary of the events stored in an error report</summary>
-		public static string ReadDiagnosticEvents(DataReader reader)
+		internal static string ReadDiagnosticEvents(DataReader reader)
 		{
 			Debug.Assert(reader.ReadInt32() == 1);
 			var count = reader.ReadInt32();
@@ -547,13 +553,12 @@ namespace SAW
 			return output.ToString();
 		}
 
-
 		// support for reporting non-fatal errors in large operations.  Not implemented yet
 
 		/// <summary>Reports an error which may be non-fatal in some cases</summary>
 		/// <param name="text">Translatable text</param>
 		/// <param name="throwOutsideOperation">If true this throws an exception if not in a context where a group of non-fatal errors can be reported</param>
-		public static void NonFatalOperationalError(string text, bool throwOutsideOperation = true)
+		internal static void NonFatalOperationalError(string text, bool throwOutsideOperation = true)
 		{
 			text = Strings.Translate(text);
 			Root.Log.WriteLine("Op error: " + text);
@@ -572,7 +577,7 @@ namespace SAW
 		private static readonly Dictionary<string, int> OperationErrors = new Dictionary<string, int>();
 
 		/// <summary>Instantiate one of these to encapsulate a larger operation that can survive minor errors</summary>
-		public class Operation : IDisposable
+		internal class Operation : IDisposable
 		{
 			private readonly string Name;
 
@@ -607,7 +612,6 @@ namespace SAW
 		}
 
 		#endregion
-
 	}
 
 }

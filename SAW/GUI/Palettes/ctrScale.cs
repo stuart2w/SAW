@@ -7,11 +7,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using SAW.Shapes;
 
 namespace SAW
 {
 	/// <summary>Floating palette which allows the user to enter an amount to scale by</summary>
-	public partial class ctrScale : PalettePanel
+	internal partial class ctrScale : PalettePanel
 	{
 		private bool m_Percent = true;
 		private bool m_Filling;

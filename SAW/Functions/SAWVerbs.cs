@@ -6,6 +6,7 @@ using System.Linq;
 using System.Windows.Forms;
 using SAW.CCF;
 using SAW.GUI.Dialogs;
+using SAW.Shapes;
 
 namespace SAW.Functions
 {
@@ -46,7 +47,7 @@ namespace SAW.Functions
 	internal class ShowHidePopup : Verb
 	{
 		public bool Show;
-		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
+		public override void Trigger(ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
 		{
 			foreach (var s in CurrentPage.SelectedShapes.OfType<Scriptable>().Where(s => s.Popup && s.Shown != Show))
 			{
@@ -65,7 +66,7 @@ namespace SAW.Functions
 	{
 		public bool Show;
 
-		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
+		public override void Trigger(ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
 		{
 			CurrentPage.Iterate(s =>
 			{
@@ -86,7 +87,7 @@ namespace SAW.Functions
 
 	internal class SetPromptItem : Verb
 	{
-		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
+		public override void Trigger(ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
 		{
 			if (CurrentPage.SelectedCount != 1)
 				return;
@@ -109,7 +110,7 @@ namespace SAW.Functions
 	internal class ShowHideGraphicSelection : Verb
 	{
 		public bool Show;
-		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
+		public override void Trigger(ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
 		{
 			foreach (var item in (from Scriptable s in CurrentPage.SelectedShapes.OfType<Scriptable>() where s.Element is Item select (s.Element as Item)))
 			{
@@ -125,7 +126,7 @@ namespace SAW.Functions
 	internal class ShowHideTextSelection : Verb
 	{
 		public bool Show;
-		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
+		public override void Trigger(ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
 		{
 			foreach (var item in (from Scriptable s in CurrentPage.SelectedShapes.OfType<Scriptable>() where s.Element is Item select (s.Element as Item)))
 			{
@@ -143,7 +144,7 @@ namespace SAW.Functions
 
 	internal class ViewPredictionWords : Verb
 	{
-		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
+		public override void Trigger(ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
 		{
 			try
 			{ BladeWrapper.Blade.EditUserWordList(); }
@@ -160,7 +161,7 @@ namespace SAW.Functions
 
 	internal class GridWizard : Verb
 	{
-		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
+		public override void Trigger(ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
 		{
 			frmGridWizard.Display((CurrentPage.SelectedShapes.FirstOrDefault() as IShapeContainer) ?? CurrentPage, CurrentDocument);
 		}
@@ -179,7 +180,7 @@ namespace SAW.Functions
 	internal class EditItemBounds : Verb
 	{
 
-		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
+		public override void Trigger(ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
 		{
 			var selected = SelectedItem;
 			if (selected == null)
@@ -207,7 +208,7 @@ namespace SAW.Functions
 
 	internal class EditWindowBounds : Verb
 	{
-		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
+		public override void Trigger(ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
 		{
 			if (CurrentDocument.IsPaletteWithin)
 			{ // not appropriate for palettes - and will fail as EditWindowBounds tries to access the SAWHeader
@@ -226,7 +227,7 @@ namespace SAW.Functions
 	internal class CopyScripts : Verb
 	{
 
-		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
+		public override void Trigger(ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
 		{
 			Scriptable scriptable = pnlView.CurrentPage.SelectedShapes.First() as Scriptable;
 			if (scriptable == null)
@@ -306,7 +307,7 @@ namespace SAW.Functions
 
 	internal class CopyPresentation : Verb
 	{
-		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
+		public override void Trigger(ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
 		{
 			Item item = SelectedItem;
 			if (item == null)
@@ -398,7 +399,7 @@ namespace SAW.Functions
 	/// <summary>Update entire selection set using Concept Coding Framework</summary>
 	internal class CCFUpdate : Verb
 	{
-		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
+		public override void Trigger(ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
 		{
 			MultiUpdate update = new MultiUpdate();
 			if (!frmMultiUpdateOptions.Display(CurrentPage.SelectedShapes.OfType<Item>().Any(), update))
@@ -456,7 +457,7 @@ namespace SAW.Functions
 
 	public class SaveSettings : Verb
 	{
-		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
+		public override void Trigger(ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
 		{
 			string existing = "";
 			if (Globals.Root.ManualSettingsFile != null)
@@ -477,7 +478,7 @@ namespace SAW.Functions
 
 	public class LoadSettings : Verb
 	{
-		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
+		public override void Trigger(ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
 		{
 			string existing = "";
 			if (Globals.Root.ManualSettingsFile != null)
@@ -512,7 +513,7 @@ namespace SAW.Functions
 
 	internal class MakeActive : Verb
 	{
-		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
+		public override void Trigger(ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
 		{
 			IShapeContainer container = CurrentPage.SelectionContainer();
 			if (container == null)
@@ -556,7 +557,7 @@ namespace SAW.Functions
 
 	internal class MakeInactive : Verb
 	{
-		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
+		public override void Trigger(ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
 		{
 			IShapeContainer container = CurrentPage.SelectionContainer();
 			if (container == null)

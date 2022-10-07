@@ -1,6 +1,6 @@
 ﻿namespace SAW
 {
-	partial class frmUserReport
+	internal partial class frmUserReport
 	{
 		/// <summary>
 		/// Required designer variable.

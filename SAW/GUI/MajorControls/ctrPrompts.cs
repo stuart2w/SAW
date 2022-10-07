@@ -4,10 +4,11 @@ using System.Drawing;
 using System.Windows.Forms;
 using System.Linq;
 using SAW.Functions;
+using SAW.Shapes;
 
 namespace SAW
 {
-	public sealed class ctrPrompts : Control, IBlendableColourDisplay
+	internal sealed class ctrPrompts : Control, IBlendableColourDisplay
 	{
 		private List<Shape.Prompt> m_Prompts;
 
@@ -227,7 +228,7 @@ namespace SAW
 		{
 			if (e.Button == MouseButtons.Left && m_CloseHover)
 			{
-				Globals.Root.PerformAction(Verb.Find(Codes.TogglePrompts), EditableView.ClickPosition.Sources.Mouse);
+				Globals.Root.PerformAction(Verb.Find(Codes.TogglePrompts), ClickPosition.Sources.Mouse);
 				m_CloseHover = false;
 				if (!g_CloseMessageGiven)
 				{

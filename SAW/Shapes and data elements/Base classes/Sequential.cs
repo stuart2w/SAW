@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 
-namespace SAW
+namespace SAW.Shapes
 {
 	/// <summary>Base class for any shape which is drawn by joining up the vertices.  This basically extends the functionality in Lined for
 	/// shapes which are a series of lines (e.g. not circle)</summary>
@@ -28,7 +28,7 @@ namespace SAW
 		protected bool m_Acceptable = false; // if true Choose will let the shape be completed (only applicable when placing pt2)
 
 		#region Verbs
-		public override VerbResult Cancel(EditableView.ClickPosition position)
+		public override VerbResult Cancel(ClickPosition position)
 		{
 			// unless overridden in a subclass this will remove one DEFINED vertex
 			// and trim the vertex array to contain just the defined ones plus one floating
@@ -57,13 +57,13 @@ namespace SAW
 			return VerbResult.Rejected;
 		}
 
-		public override VerbResult Complete(EditableView.ClickPosition position)
+		public override VerbResult Complete(ClickPosition position)
 		{
 			Choose(position);
 			return CompleteRetrospective();
 		}
 
-		public override VerbResult Choose(EditableView.ClickPosition position)
+		public override VerbResult Choose(ClickPosition position)
 		{
 			PointF pt = position.Snapped;
 			if (pt.ApproxEqual(LastDefined))
@@ -88,29 +88,27 @@ namespace SAW
 			}
 
 			// presumably the shape is complete - however reject if trying to place pt2 on pt1
+			Float(position);
 			if (!m_Acceptable)
 				return VerbResult.Rejected;
-			Float(position);
 			m_DefinedVertices = FixedVerticesLength();
 			return VerbResult.Completed;
 		}
 
-		public override VerbResult Float(EditableView.ClickPosition pt)
+		public override VerbResult Float(ClickPosition pt)
 		{
 			DiscardPath();
 			return base.Float(pt);
 		}
+
 		#endregion
 
 		#region Information
 
-		protected virtual bool UseBaseline()
-		{
-			// should return true if the shape needs just an initial line to start generating a complete shape
-			return true;
-		}
+		/// <summary>should return true if the shape needs just an initial line to start generating a complete shape</summary>
+		protected virtual bool UseBaseline() => true;
 
-		public override string StatusInformation(bool ongoing)
+		protected internal override string StatusInformation(bool ongoing)
 		{
 			if (ongoing)
 			{
@@ -145,9 +143,11 @@ namespace SAW
 				return base.Allows | AllowedActions.Tidy;
 			}
 		}
+
 		#endregion
 
 		#region Miscellaneous coordinate, Drawing and path
+
 		protected override void InternalDraw(Canvas gr, DrawResources resources)
 		{
 			base.InternalDrawFromPath(gr, resources);
@@ -214,7 +214,7 @@ namespace SAW
 			return base.TidyVertices(modes, page, last);
 		}
 
-		public override void NotifyStyleChanged(Parameters parameter, int oldValue, int newValue)
+		internal override void NotifyStyleChanged(Parameters parameter, int oldValue, int newValue)
 		{
 			switch (parameter)
 			{

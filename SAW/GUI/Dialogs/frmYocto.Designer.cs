@@ -1,6 +1,6 @@
 ﻿namespace SAW.GUI.Dialogs
 {
-	partial class frmYocto
+	internal partial class frmYocto
 	{
 		/// <summary>
 		/// Required designer variable.

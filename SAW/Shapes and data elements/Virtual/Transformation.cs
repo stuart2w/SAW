@@ -7,7 +7,7 @@ using System.Linq;
 using System.Drawing.Drawing2D;
 
 // if adding, update Shape.TransformationType and related
-namespace SAW
+namespace SAW.Shapes
 {
 	// transformation are implemented as virtual shapes.  In Splash these can be used as tools which modify the existing content rather than being added to the page themselves.
 	// in SAW this functionality isn't used, but the remainder of the transformation logic is applicable
@@ -102,7 +102,7 @@ namespace SAW
 		#region Verbs
 		// these are often done in the subclasses.  Default implementations for some of the functions are here
 
-		public override VerbResult Start(EditableView.ClickPosition position)
+		public override VerbResult Start(ClickPosition position)
 		{
 			if (position.RequestedSnap == SnapModes.Grid)
 				m_Initial = position.Page.Paper.SnapPoint2(position.Exact);
@@ -145,15 +145,15 @@ namespace SAW
 			return VerbResult.Continuing;
 		}
 
-		public override VerbResult Cancel(EditableView.ClickPosition position) => VerbResult.Destroyed;
+		public override VerbResult Cancel(ClickPosition position) => VerbResult.Destroyed;
 
-		public override VerbResult Choose(EditableView.ClickPosition position)
+		public override VerbResult Choose(ClickPosition position)
 		{
 			Float(position);
 			return DoTransform(position, false);
 		}
 
-		public override VerbResult Complete(EditableView.ClickPosition position)
+		public override VerbResult Complete(ClickPosition position)
 		{
 			Float(position);
 			return DoTransform(position, true);
@@ -172,7 +172,7 @@ namespace SAW
 			shape.ApplyTransformation(this);
 		}
 
-		protected VerbResult DoTransform(EditableView.ClickPosition position, bool complete)
+		protected VerbResult DoTransform(ClickPosition position, bool complete)
 		{
 			// should be called once the transformation is finally applied to the data
 			// complete = true if one copy is made and the transaction is finished.  If false, then further copies can be made.  Has no effect if not copying
@@ -316,19 +316,19 @@ namespace SAW
 			Debug.Fail("Function not applicable to transformation");
 		}
 
-		public override void Load(DataReader reader)
+		protected internal override void Load(DataReader reader)
 		{
 			base.Load(reader);
 			Debug.Fail("Function not applicable to transformation");
 		}
 
-		public override void Save(DataWriter writer)
+		protected internal override void Save(DataWriter writer)
 		{
 			base.Save(writer);
 			Debug.Fail("Function not applicable to transformation");
 		}
 
-		public override bool HitTestDetailed(PointF clickPoint, float scale, bool treatAsFilled)
+		protected internal override bool HitTestDetailed(PointF clickPoint, float scale, bool treatAsFilled)
 		{
 			Debug.Fail("Function not applicable to transformation");
 			return true;
@@ -443,7 +443,7 @@ namespace SAW
 			return m_Initial.IsEmpty;
 		}
 
-		public override void Diagnostic(System.Text.StringBuilder output)
+		protected internal override void Diagnostic(System.Text.StringBuilder output)
 		{
 			base.Diagnostic(output);
 			output.Append("Initial = ");
@@ -489,28 +489,28 @@ namespace SAW
 			m_Initial = shape.Middle();
 		}
 
-		public override VerbResult Start(EditableView.ClickPosition position)
+		public override VerbResult Start(ClickPosition position)
 		{
 			if (position.RequestedSnap == SnapModes.Angle)
 				position.View.InvalidateAll(); // because of the green lines
 			return base.Start(position);
 		}
 
-		public override VerbResult Cancel(EditableView.ClickPosition position)
+		public override VerbResult Cancel(ClickPosition position)
 		{
 			if (position.RequestedSnap == SnapModes.Angle)
 				position.View.InvalidateAll(StaticView.InvalidationBuffer.Current); // because of the green lines
 			return base.Cancel(position);
 		}
 
-		public override VerbResult Complete(EditableView.ClickPosition position)
+		public override VerbResult Complete(ClickPosition position)
 		{
 			if (position.RequestedSnap == SnapModes.Angle)
 				position.View.InvalidateAll(StaticView.InvalidationBuffer.Current); // because of the green lines
 			return base.Complete(position);
 		}
 
-		public override VerbResult Choose(EditableView.ClickPosition position)
+		public override VerbResult Choose(ClickPosition position)
 		{
 			if (position.RequestedSnap == SnapModes.Angle)
 				position.View.InvalidateAll(StaticView.InvalidationBuffer.Current); // because of the green lines
@@ -551,7 +551,7 @@ namespace SAW
 
 		#region Positioning and SetGrabTransform
 
-		public override VerbResult Float(EditableView.ClickPosition position)
+		public override VerbResult Float(ClickPosition position)
 		{
 			// if using shape to shape snapping, then initially place using the exact coordinates, and then we'll snap the vertices from there to a nearby shapes
 			// otherwise use objPosition.Snapped as the target, which might be snapped to grid if appropriate
@@ -599,10 +599,10 @@ namespace SAW
 
 		#region Snapping
 
-		public override SnapModes SnapNext(SnapModes requested) => requested;
-		public override PointF DoSnapAngle(PointF newPoint) => Geometry.AngleSnapPoint(newPoint, m_Initial, Geometry.ANGLE90);
+		protected internal override SnapModes SnapNext(SnapModes requested) => requested;
+		protected internal override PointF DoSnapAngle(PointF newPoint) => Geometry.AngleSnapPoint(newPoint, m_Initial, Geometry.ANGLE90);
 
-		public bool Snap(List<UserSocket> vertices, float scale, Page page, Shape singleMovingShape, PointF originalCentre, PointF currentCentre)
+		internal bool Snap(List<UserSocket> vertices, float scale, Page page, Shape singleMovingShape, PointF originalCentre, PointF currentCentre)
 		{
 			// ptOriginalCentre should be the centre of the original shape(s) (this is only used if auto rotation is required)
 			// Other parameters as below
@@ -627,7 +627,7 @@ namespace SAW
 			return success;
 		}
 
-		public static bool Snap(List<UserSocket> vertices, float scale, Page page, Shape singleMovingShape, PointF currentCentre, bool autoRotate, ref SizeF vectorResult, ref float rotationResult)
+		internal static bool Snap(List<UserSocket> vertices, float scale, Page page, Shape singleMovingShape, PointF currentCentre, bool autoRotate, ref SizeF vectorResult, ref float rotationResult)
 		{
 			// this function extracts from EditableView the functionality to perform shape snap between the shape being moved and anything on the page
 			// Returns true if snapping should be performed, false if too far from any targets
@@ -871,7 +871,7 @@ namespace SAW
 		public override bool Active() => m_StartFixed;
 
 		#region Standard implementation of most verbs
-		public override VerbResult Start(EditableView.ClickPosition position)
+		public override VerbResult Start(ClickPosition position)
 		{
 			// nothing selected.
 			// all selected shapes are affected;
@@ -879,7 +879,7 @@ namespace SAW
 			return VerbResult.Continuing;
 		}
 
-		public override VerbResult Cancel(EditableView.ClickPosition position)
+		public override VerbResult Cancel(ClickPosition position)
 		{
 			if (m_StartFixed)
 			{
@@ -892,7 +892,7 @@ namespace SAW
 			return base.Cancel(position);
 		}
 
-		public override VerbResult Choose(EditableView.ClickPosition position)
+		public override VerbResult Choose(ClickPosition position)
 		{
 			Float(position);
 			if (!m_StartFixed)
@@ -913,7 +913,7 @@ namespace SAW
 			return DoTransform(position, false);
 		}
 
-		public override VerbResult Complete(EditableView.ClickPosition position)
+		public override VerbResult Complete(ClickPosition position)
 		{
 			if (!m_StartFixed)
 				return VerbResult.Rejected;
@@ -932,7 +932,7 @@ namespace SAW
 			return VerbResult.TransformationComplete;
 		}
 
-		public override VerbResult Float(EditableView.ClickPosition position)
+		public override VerbResult Float(ClickPosition position)
 		{
 			if (!m_StartFixed)
 			{
@@ -1014,7 +1014,7 @@ namespace SAW
 		#region Basic information
 		public override Shapes ShapeCode => Shapes.TransformRotate;
 
-		public override SnapModes SnapNext(SnapModes requested)
+		protected internal override SnapModes SnapNext(SnapModes requested)
 		{
 			// This now angle snaps if grid snapping is turned on (many users won't find angle snapping, but would probably be hoping for some sort of snapping if grid snapping is turned on)
 			if ((requested == SnapModes.Angle || requested == SnapModes.Grid) && m_StartFixed)
@@ -1022,7 +1022,7 @@ namespace SAW
 			return SnapModes.Off;
 		}
 
-		public override PointF DoSnapAngle(PointF newPoint) => Geometry.AngleSnapPointRelative(newPoint, m_Initial, m_Start);
+		protected internal override PointF DoSnapAngle(PointF newPoint) => Geometry.AngleSnapPointRelative(newPoint, m_Initial, m_Start);
 
 		public override AllowedActions RequiredAllowed => AllowedActions.TransformRotate;
 		protected override string RequiredAllowedMessage => Strings.Item("Cannot_Rotate");
@@ -1164,7 +1164,7 @@ namespace SAW
 		#region Basic information
 
 		public override Shapes ShapeCode => Shapes.TransformScale;
-		public override SnapModes SnapNext(SnapModes requested) => SnapModes.Off;
+		protected internal override SnapModes SnapNext(SnapModes requested) => SnapModes.Off;
 		public override AllowedActions RequiredAllowed => AllowedActions.TransformScale;
 		protected override string RequiredAllowedMessage => Strings.Item("Cannot_Resize");
 
@@ -1298,7 +1298,7 @@ namespace SAW
 		}
 
 		public override Shapes ShapeCode => Shapes.TransformLinearScale;
-		public override SnapModes SnapNext(SnapModes requested) => SnapModes.Off;
+		protected internal override SnapModes SnapNext(SnapModes requested) => SnapModes.Off;
 		public override AllowedActions RequiredAllowed => AllowedActions.TransformLinearStretch;
 		protected override string RequiredAllowedMessage => Strings.Item("Cannot_Resize");
 
@@ -1421,7 +1421,7 @@ namespace SAW
 		#region Basics
 
 		public override Shapes ShapeCode => Shapes.TransformMirror;
-		public override SnapModes SnapNext(SnapModes requested) => requested;
+		protected internal override SnapModes SnapNext(SnapModes requested) => requested;
 		public override AllowedActions RequiredAllowed => AllowedActions.TransformMirror;
 		public override bool Active() => !m_Second.IsEmpty;
 		protected override string RequiredAllowedMessage => Strings.Item("Cannot_Reflect");
@@ -1431,7 +1431,7 @@ namespace SAW
 		#region Verbs and Positioning
 
 		private const float SNAPANGLETOLERANCE = Geometry.PI / 36; // 5° each way
-		public override VerbResult Float(EditableView.ClickPosition position)
+		public override VerbResult Float(ClickPosition position)
 		{
 			// If Not m_InitialFixed Then Return VerbResult.Continuing
 			if (m_Second.IsEmpty)
@@ -1507,7 +1507,7 @@ namespace SAW
 
 		}
 
-		public override VerbResult Choose(EditableView.ClickPosition position)
+		public override VerbResult Choose(ClickPosition position)
 		{
 			Float(position);
 			if (m_Second.IsEmpty)
@@ -1532,10 +1532,10 @@ namespace SAW
 			}
 		}
 
-		public override VerbResult Complete(EditableView.ClickPosition position) => Choose(position);
+		public override VerbResult Complete(ClickPosition position) => Choose(position);
 		public override VerbResult CompleteRetrospective() => VerbResult.Rejected;
 
-		public override VerbResult Cancel(EditableView.ClickPosition position)
+		public override VerbResult Cancel(ClickPosition position)
 		{
 			if (!m_Second.IsEmpty)
 			{
@@ -1550,7 +1550,7 @@ namespace SAW
 			return base.Cancel(position);
 		}
 
-		public override PointF DoSnapAngle(PointF newPoint)
+		protected internal override PointF DoSnapAngle(PointF newPoint)
 		{
 			if (m_Second.IsEmpty)
 				return newPoint;
@@ -1631,7 +1631,7 @@ namespace SAW
 
 		#region Not applicable as this isn't a shape
 		public override Shapes ShapeCode => throw new InvalidOperationException();
-		public override VerbResult Float(EditableView.ClickPosition position) => throw new InvalidOperationException();
+		public override VerbResult Float(ClickPosition position) => throw new InvalidOperationException();
 		public override AllowedActions RequiredAllowed => AllowedActions.TransformLinearStretch | AllowedActions.TransformMove | AllowedActions.TransformScale;
 		protected override string RequiredAllowedMessage => throw new InvalidOperationException();
 		public override bool Active() => true; // but not actually applicable as this isn't a shape?

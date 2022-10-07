@@ -7,7 +7,7 @@ using System.Resources;
 
 namespace SAW
 {
-	public partial class frmResource
+	internal partial class frmResource
 	{
 		// This has an image list control just to set the size of the items; Images are not stored in the image list
 

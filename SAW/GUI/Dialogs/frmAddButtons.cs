@@ -4,12 +4,12 @@ using System.Drawing;
 using System.Windows.Forms;
 using System.Linq;
 using SAW.Functions;
-
+using SAW.Shapes;
 
 namespace SAW
 {
 	/// <summary>Adds one or more buttons to custom palette.  Contians an action selector and add button.  Adding does not close the form</summary>
-	public partial class frmAddButtons
+	internal partial class frmAddButtons
 	{
 
 		private readonly Page m_Page;
@@ -68,7 +68,7 @@ namespace SAW
 			}
 			ButtonShape create = new ButtonShape();
 			transaction.Create(create);
-			EditableView.ClickPosition dummyPosition = new EditableView.ClickPosition(pt, m_Page, 1, Shape.SnapModes.Off, Shape.SnapModes.Off, null, EditableView.ClickPosition.Sources.Irrelevant);
+			ClickPosition dummyPosition = new ClickPosition(pt, m_Page, 1, Shape.SnapModes.Off, Shape.SnapModes.Off, null, ClickPosition.Sources.Irrelevant);
 			create.Start(dummyPosition);
 			create.SetStyleObject(frmButton.GetStyleForNewButton(m_Page));
 			dummyPosition.Exact = dummyPosition.Exact + sz;

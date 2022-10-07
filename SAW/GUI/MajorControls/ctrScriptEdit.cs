@@ -3,10 +3,11 @@ using System.Drawing;
 using System.Diagnostics;
 using System.Linq;
 using System.Windows.Forms;
+using SAW.Shapes;
 
 namespace SAW
 {
-	public partial class ctrScriptEdit : UserControl
+	internal partial class ctrScriptEdit : UserControl
 	{
 		private Script m_Script;
 		private bool m_Filling;

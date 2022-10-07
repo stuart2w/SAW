@@ -53,12 +53,12 @@ namespace SAW.Functions
 
 	internal class Choose : Verb // not drawing verb - this one is always applicable
 	{
-		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
+		public override void Trigger(ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
 		{
 			if (Editor.MovingPalette != null)
 				Editor.CompletePaletteMove();
 			Control over = GUIUtilities.YoungestChildUnderMouse(Editor);
-			if (source == EditableView.ClickPosition.Sources.Pad)
+			if (source == ClickPosition.Sources.Pad)
 				over = pnlView; // if triggered by mouse in control pad, target must be drawing area, not living back to the control pad!
 			if (over == pnlView)
 				pnlView.TriggerVerb(Codes.Choose, source);
@@ -71,7 +71,7 @@ namespace SAW.Functions
 
 	internal class Cancel : DrawingVerb
 	{
-		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
+		public override void Trigger(ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
 		{
 			if (Editor.MovingPalette != null)
 				Editor.AbortPaletteMove();
@@ -83,7 +83,7 @@ namespace SAW.Functions
 	/// <summary>Just calls TriggerVerb on panel view - used for several verbs</summary>
 	internal class DrawingVerbDoneByPanel : DrawingVerb
 	{
-		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
+		public override void Trigger(ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
 		{
 			pnlView.TriggerVerb(Code, source);
 		}
@@ -97,7 +97,7 @@ namespace SAW.Functions
 		/// <summary>The current mouse step size in use</summary>
 		public static int CurrentStepSize = 1;
 
-		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
+		public override void Trigger(ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
 		{
 			// parameters are the amount to move always as a single unit.  Scale is applied inside this function
 			// this uses screen coordinates which are top downwards for Y
@@ -115,7 +115,7 @@ namespace SAW.Functions
 		/// <summary>The step which this verb object configures </summary>
 		public AppliedConfig.MouseSteps Step;
 
-		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
+		public override void Trigger(ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
 		{
 			SetMouseStep(Step);
 		}

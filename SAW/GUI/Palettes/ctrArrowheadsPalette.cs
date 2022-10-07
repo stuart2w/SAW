@@ -1,7 +1,7 @@
 
 namespace SAW
 {
-	public partial class ctrArrowheadsPalette : PalettePanel, IKeyControl
+	internal partial class ctrArrowheadsPalette : PalettePanel, IKeyControl
 	{
 		public ctrArrowheadsPalette()
 		{

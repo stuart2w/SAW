@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System;
 using System.Drawing;
 
-namespace SAW
+namespace SAW.Shapes
 {
 	public class Line : Lined
 	{
@@ -17,6 +17,7 @@ namespace SAW
 		{
 			Vertices.Add(start);
 			Vertices.Add(end);
+			LineStyle.SetDefaults();
 			m_DefinedVertices = 2;
 			m_Bounds = RectangleF.Empty;
 			Status = StatusValues.Complete;
@@ -28,10 +29,7 @@ namespace SAW
 		protected override LabelPositions LabelPosition => LabelPositions.Line;
 		protected override PointF[] LineLabelGetPoints() => Vertices.ToArray();
 
-		public override string StatusInformation(bool ongoing)
-		{
-			return Strings.Item("Info_Length") + ": " + Measure.FormatLength(Geometry.DistanceBetween(Vertices[0], Vertices[1]));
-		}
+		protected internal override string StatusInformation(bool ongoing) => Strings.Item("Info_Length") + ": " + Measure.FormatLength(Geometry.DistanceBetween(Vertices[0], Vertices[1]));
 
 		public override AllowedActions Allows => base.Allows | AllowedActions.Tidy;
 
@@ -41,12 +39,12 @@ namespace SAW
 
 		#region Verbs
 		// note that when the shape is started, the initial point is entered into the array twice to give the initial line that the user is moving
-		public override VerbResult Choose(EditableView.ClickPosition position)
+		public override VerbResult Choose(ClickPosition position)
 		{
 			return Complete(position);
 		}
 
-		public override VerbResult Complete(EditableView.ClickPosition position)
+		public override VerbResult Complete(ClickPosition position)
 		{
 			if (Vertices.Count != 2 || m_DefinedVertices != 1)
 				return VerbResult.Unexpected;
@@ -56,7 +54,7 @@ namespace SAW
 			return VerbResult.Completed;
 		}
 
-		public override VerbResult Cancel(EditableView.ClickPosition position)
+		public override VerbResult Cancel(ClickPosition position)
 		{
 			if (Vertices.Count != 2 || m_DefinedVertices != 1)
 				return VerbResult.Unexpected;
@@ -71,7 +69,7 @@ namespace SAW
 			return VerbResult.Completed;
 		}
 
-		public override VerbResult OtherVerb(EditableView.ClickPosition position, SAW.Functions.Codes code)
+		protected internal  override VerbResult OtherVerb(ClickPosition position, SAW.Functions.Codes code)
 		{
 			switch (code)
 			{
@@ -94,6 +92,7 @@ namespace SAW
 					return VerbResult.Rejected;
 			}
 		}
+
 		#endregion
 
 		#region sockets
@@ -130,7 +129,7 @@ namespace SAW
 
 		#region Coordinates
 		public const float LINEHITTOLERANCE = 2;
-		public override bool HitTestDetailed(PointF clickPoint, float scale, bool treatAsFilled)
+		protected internal override bool HitTestDetailed(PointF clickPoint, float scale, bool treatAsFilled)
 		{
 			float distance = Geometry.DistancePointToLine(Vertices[0], Vertices[1], clickPoint);
 			return distance < LineStyle.Width + LINEHITTOLERANCE / scale;
@@ -182,7 +181,7 @@ namespace SAW
 			return list;
 		}
 
-		public void InitialiseArrowheadGUISample()
+		internal void InitialiseArrowheadGUISample()
 		{
 			// Initialises this so that it can be used off the page
 			// used both in RoundButton and CreateParameterSampleImage
@@ -195,7 +194,7 @@ namespace SAW
 			m_DefinedVertices = 2;
 		}
 
-		public override (GrabSpot[], string[]) GetEditableCoords(Target selectedElement)
+		internal override (GrabSpot[], string[]) GetEditableCoords(Target selectedElement)
 		{
 			return (new[] { new GrabSpot(this, GrabTypes.SingleVertex, Vertices[0],0),
 				new GrabSpot(this, GrabTypes.SingleVertex, Vertices[1],1)}, new[] { "[SAW_Coord_From]", "[SAW_Coord_To]" });
@@ -219,7 +218,7 @@ namespace SAW
 			};
 		}
 
-		public override VerbResult Complete(EditableView.ClickPosition position)
+		public override VerbResult Complete(ClickPosition position)
 		{
 			if (Vertices.Count != 2 || m_DefinedVertices != 1)
 				return VerbResult.Unexpected;
@@ -230,16 +229,16 @@ namespace SAW
 			return VerbResult.Completed;
 		}
 
-		public override SnapModes SnapNext(SnapModes requested) => SnapModes.Off;
+		protected internal override SnapModes SnapNext(SnapModes requested) => SnapModes.Off;
 		// the snapping will be done internally because otherwise it would cause strange interactions with the snapping to the necessary direction
 
-		public override VerbResult Float(EditableView.ClickPosition position)
+		public override VerbResult Float(ClickPosition position)
 		{
 			AdjustPoint(1, position);
 			return base.Float(position);
 		}
 
-		private bool AdjustPoint(int index, EditableView.ClickPosition position)
+		private bool AdjustPoint(int index, ClickPosition position)
 		{
 			// Used by both Float and DoGrabMove.  Returns true if the point is valid
 			PointF pt = position.Snapped;
@@ -330,11 +329,12 @@ namespace SAW
 
 		#region Data
 
-		public override void Load(DataReader reader)
+		protected internal override void Load(DataReader reader)
 		{
 			base.Load(reader);
 			DefaultStylesApplied();
 		}
+
 		#endregion
 
 	}

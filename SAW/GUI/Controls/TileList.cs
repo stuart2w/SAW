@@ -7,7 +7,7 @@ using System.Windows.Forms;
 
 namespace SAW
 {
-	public sealed class TileList : ScrollableControl, IEnumerable<TileList.Tile>
+	internal sealed class TileList : ScrollableControl, IEnumerable<TileList.Tile>
 	{
 
 		public TileList()

@@ -4,7 +4,7 @@ using System.Drawing;
 using System.Diagnostics;
 using System.Drawing.Drawing2D;
 using System.Linq;
-
+using SAW.Shapes;
 
 // "Parameters" actually refers to style parameters
 namespace SAW
@@ -24,13 +24,13 @@ namespace SAW
 		None = 0,
 		Tool,
 		//ToolFolder,
-		FillColour=3,
+		FillColour = 3,
 		LineColour,
 		TextColour,
 		LinePattern,
 		LineWidth,
-		FillPattern=8,
-		TextAlignment=11,
+		FillPattern = 8,
+		TextAlignment = 11,
 		TextVerticalAlignment,
 		FontSize, // this is used to get the TextStyle object for the font name and style itself, which don't have parameters
 		ArrowheadEndType, // used to indicate ArrowHeads palette
@@ -67,7 +67,7 @@ namespace SAW
 		Action_ShowPalette = -16
 	}
 
-	public interface IParameterConsumer
+	internal interface IParameterConsumer
 	{
 		int ParameterValue(Parameters parameter);
 		void SetParameterValue(int value, Parameters parameter);
@@ -77,7 +77,7 @@ namespace SAW
 	internal class ParameterSupport
 	{
 		// the line widths offered to the user (*100 to make them integers)
-		internal static int[] StandardLineWidths = { 40, 70, 110, 140, 180 };
+		internal static int[] StandardLineWidths = { 100, 200, 300, 400, 500 }; // { 40, 70, 110, 140, 180 };
 		internal static int[] LineWidthsPlusVeryThin = { 24, 40, 70, 110, 140, 180 }; // Includes one thinner option for the button editor
 		internal static DashStyle[] StandardLinePatterns = { DashStyle.Solid, DashStyle.Dash, DashStyle.Dot, DashStyle.DashDot, DashStyle.DashDotDot };
 		internal static Shape.FillStyleC.Patterns[] StandardFillPatterns = { Shape.FillStyleC.Patterns.Solid, Shape.FillStyleC.Patterns.Empty, Shape.FillStyleC.Patterns.Vertical, Shape.FillStyleC.Patterns.Horizontal, Shape.FillStyleC.Patterns.ForwardDiagonal, Shape.FillStyleC.Patterns.BackwardDiagonal, Shape.FillStyleC.Patterns.Cross, Shape.FillStyleC.Patterns.DiagonalCross };
@@ -168,8 +168,7 @@ namespace SAW
 						return Strings.Item("Colour_" + index);
 					return Strings.Item("Custom_Colour");
 				case Parameters.LineWidth:
-					float points = value / 100f / Geometry.POINTUNIT;
-					return points.ToString("0.#") + " " + Strings.Item("pt");
+					return $"{value / 100:0.#}{Strings.Item("px")}";
 				case Parameters.LinePattern:
 					return Strings.Item("Line_" + (DashStyle)value);
 				case Parameters.FillPattern:

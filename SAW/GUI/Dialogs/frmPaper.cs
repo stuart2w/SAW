@@ -2,12 +2,12 @@ using System;
 using System.Drawing;
 using System.Diagnostics;
 using System.Windows.Forms;
-
+using SAW.Shapes;
 
 namespace SAW
 {
 	/// <summary>Edits page background and grid</summary>
-	public partial class frmPaper
+	internal partial class frmPaper
 	{
 
 		private readonly Page m_Page; // we need to remember the page in order to draw the sample, and for changing the colour

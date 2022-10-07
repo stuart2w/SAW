@@ -1,6 +1,6 @@
 ﻿namespace SAW
 {
-	partial class frmFocusWarning
+	internal partial class frmFocusWarning
 	{
 		/// <summary>
 		/// Required designer variable.

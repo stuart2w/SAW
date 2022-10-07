@@ -1,6 +1,6 @@
 ﻿namespace SAW
 {
-	partial class frmOpenSymbol
+	internal partial class frmOpenSymbol
 	{
 		/// <summary>
 		/// Required designer variable.

@@ -12,12 +12,12 @@ namespace SAW.Commands
 		{
 		}
 
-		public override ICommandEditor GetEditor()
+		internal override ICommandEditor GetEditor()
 		{
 			return new BladeEditor();
 		}
 
-		public override void Execute(ExecutionContext context)
+		internal override void Execute(ExecutionContext context)
 		{
 			int itemID = GetParamAsInt(1);
 			context.View.SetWordList(itemID);
@@ -41,12 +41,12 @@ namespace SAW.Commands
 		{
 		}
 
-		public override ICommandEditor GetEditor()
+		internal override ICommandEditor GetEditor()
 		{
 			return new BladeEditor();
 		}
 
-		public override void Execute(ExecutionContext context)
+		internal override void Execute(ExecutionContext context)
 		{
 			context.View.BladeSettings(GetParamAsString(0));
 		}
@@ -74,10 +74,12 @@ namespace SAW.Commands
 
 	public class CmdWordListSelect : Command
 	{
-		public override void Execute(ExecutionContext context)
+
+		internal override void Execute(ExecutionContext context)
 		{
 			context.View.SelectPrediction(context.TargetItem.Element.LabelText);
 		}
+
 	}
 
 	public class CmdWordListScroll : Command
@@ -128,7 +130,7 @@ namespace SAW.Commands
 			}
 		}
 
-		public override void Execute(ExecutionContext context)
+		internal override void Execute(ExecutionContext context)
 		{
 			context.View.ScrollWordList(Direction);
 		}
@@ -173,7 +175,7 @@ namespace SAW.Commands
 		}
 		#endregion
 
-		public override ICommandEditor GetEditor()
+		internal override ICommandEditor GetEditor()
 		{
 			return new WordListScrollEditor();
 		}
@@ -182,19 +184,21 @@ namespace SAW.Commands
 
 	public class CmdEditPredictionWords : Command
 	{
-		public override void Execute(ExecutionContext context)
+		internal override void Execute(ExecutionContext context)
 		{
 			Globals.Root.PerformAction(Verb.Find(Codes.ViewPredictionWords));
 		}
 	}
 
+	/// <summary>obsolete in SAW7;  CommandList entry marked SAW7=false</summary>
 	public class CmdDDEExe : ParamBasedCommand
-	{ // obsolete in SAW7;  CommandList entry marked SAW7=false
+	{ 
+
 		public CmdDDEExe() : base(new[] { Param.ParamTypes.String, Param.ParamTypes.String })
 		{
 		}
 
-		public override void Execute(ExecutionContext context)
+		internal override void Execute(ExecutionContext context)
 		{
 			Console.Beep();
 		}

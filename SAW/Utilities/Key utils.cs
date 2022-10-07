@@ -33,7 +33,7 @@ namespace SAW
 		public Keys Modifiers => m_Key & Keys.Modifiers;
 	}
 
-	public interface IKeyControl
+	internal interface IKeyControl
 	{
 		// no implementation of these functions should block - because this may cause Windows to handle the key itself, or let it flow further
 		// any implementer must set CurrentFocus on GotFocus/LostFocus (can't use GetFocus as that's Win/API and won't work on a Mac)

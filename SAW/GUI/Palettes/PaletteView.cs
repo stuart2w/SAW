@@ -6,12 +6,13 @@ using System.Windows.Forms;
 using System.Linq;
 using SAW.Functions;
 using Action = SAW.Functions.Action;
+using SAW.Shapes;
 
 namespace SAW
 {
 	/// <summary>The control representing any custom palette when in use; based upon the standard document view,
 	/// but implementing some extra bits needed by palettes</summary>
-	public sealed class PaletteView : StaticView, IPalette, IKeyControl
+	internal sealed class PaletteView : StaticView, IPalette, IKeyControl
 	{
 
 		private readonly Palette m_Palette;
@@ -110,7 +111,7 @@ namespace SAW
 					Globals.Root.PerformAction(Verb.Find(Codes.RestoreFocus));
 					break;
 			}
-			Globals.Root.PerformAction(buttonShape.Action, EditableView.ClickPosition.Sources.Pad);
+			Globals.Root.PerformAction(buttonShape.Action, ClickPosition.Sources.Pad);
 		}
 
 		protected override void m_Page_ShapeNotifiedIndirectChange(Shape shape, ChangeAffects affected, RectangleF area)

@@ -1,6 +1,6 @@
 namespace SAW
 {
-	public partial class cfgCustomPalettes : ConfigPage
+	internal partial class cfgCustomPalettes : ConfigPage
 	{
 		
 		//UserControl overrides dispose to clean up the component list.

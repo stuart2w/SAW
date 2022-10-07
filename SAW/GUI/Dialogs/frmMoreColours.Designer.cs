@@ -1,7 +1,7 @@
 
 namespace SAW
 {
-	public partial class frmMoreColours : KeyForm
+	internal partial class frmMoreColours : KeyForm
 	{
 		
 		//Form overrides dispose to clean up the component list.

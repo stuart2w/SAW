@@ -7,7 +7,7 @@ using Switches.Switching;
 
 namespace SAW
 {
-	public partial class cfgSwitching : ConfigPage
+	internal partial class cfgSwitching : ConfigPage
 	{
 		private readonly Label[] TimingLabels;
 		private readonly ctrEditTiming[] TimingControls;

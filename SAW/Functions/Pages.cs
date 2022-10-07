@@ -1,4 +1,5 @@
 ﻿using System.Windows.Forms;
+using SAW.Shapes;
 
 namespace SAW.Functions
 {
@@ -23,7 +24,7 @@ namespace SAW.Functions
 
 	internal class PageNext : Verb
 	{// adds another page if at the end
-		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
+		public override void Trigger(ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
 		{
 			if (CurrentPageIndex >= CurrentDocument.Count - 1)
 			{
@@ -39,7 +40,7 @@ namespace SAW.Functions
 
 	internal class PagePrevious : Verb
 	{
-		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
+		public override void Trigger(ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
 		{
 			if (CurrentPageIndex > 0)
 				Editor.DisplayPage(CurrentPageIndex - 1);
@@ -51,7 +52,7 @@ namespace SAW.Functions
 
 	internal class PageDelete : Verb
 	{
-		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
+		public override void Trigger(ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
 		{
 			if (CurrentDocument.Count < 2)
 				return;
@@ -75,7 +76,7 @@ namespace SAW.Functions
 
 	internal class PageClear : Verb
 	{
-		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
+		public override void Trigger(ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
 		{
 			pnlView.ConcludeOngoing();
 			if (MessageBox.Show(Strings.Item("Confirm_ClearPage"), RootApplication.AppName, MessageBoxButtons.OKCancel) == DialogResult.OK) CurrentPage.Clear(transaction);
@@ -91,7 +92,7 @@ namespace SAW.Functions
 		public int Offset = 1;
 		public bool Duplicate;
 
-		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
+		public override void Trigger(ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
 		{
 			if (CurrentDocument.AddPage(CurrentPage, transaction, true, CurrentPageIndex + Offset, Duplicate) != null)
 				Editor.DisplayPage(CurrentPageIndex + Offset);
@@ -102,7 +103,7 @@ namespace SAW.Functions
 
 	internal class PageMoveDown : Verb
 	{
-		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
+		public override void Trigger(ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
 		{
 			if (CurrentPageIndex >= CurrentDocument.Count - 1)
 				return;
@@ -115,7 +116,7 @@ namespace SAW.Functions
 
 	internal class PageMoveUp : Verb
 	{
-		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
+		public override void Trigger(ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
 		{
 			if (CurrentPageIndex == 0)
 				return;
@@ -128,7 +129,7 @@ namespace SAW.Functions
 
 	internal class EditPaper : Verb
 	{
-		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
+		public override void Trigger(ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
 		{
 			bool sizeChanged;
 			if (frmPaper.EditPaper(CurrentPage, transaction, Editor, out sizeChanged) == DialogResult.OK)
@@ -149,7 +150,7 @@ namespace SAW.Functions
 
 	internal class PageSize : Verb
 	{
-		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
+		public override void Trigger(ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
 		{
 			if (frmPageSize.Display(Globals.Root.CurrentDocument, transaction) != DialogResult.OK)
 				return;
@@ -160,9 +161,9 @@ namespace SAW.Functions
 
 	internal class SetOrigin : Verb
 	{
-		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
+		public override void Trigger(ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
 		{
-			pnlView.StartCustomShape(new SAW.SetOrigin());
+			pnlView.StartCustomShape(new SAW.Shapes.SetOrigin());
 		}
 
 		public override bool IsApplicable(EditableView pnlView)

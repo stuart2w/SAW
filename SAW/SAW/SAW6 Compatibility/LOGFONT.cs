@@ -1,7 +1,7 @@
 namespace SAW
 {
 	/// <summary>Support for Win32 font object, used in old data</summary>
-	public class LOGFONT : IArchivable
+	internal class LOGFONT : IArchivable
 	{
 		public string FontName;
 		public int lfHeight;

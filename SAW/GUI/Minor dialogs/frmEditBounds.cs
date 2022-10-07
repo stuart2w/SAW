@@ -4,10 +4,11 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
+using SAW.Shapes;
 
 namespace SAW
 {
-	public partial class frmEditBounds : Form
+	internal partial class frmEditBounds : Form
 	{
 
 		private Rectangle m_OriginalValue;

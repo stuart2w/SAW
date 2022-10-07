@@ -3,7 +3,7 @@ using System;
 
 namespace SAW
 {
-	public partial class frmAddButtons : System.Windows.Forms.Form
+	internal partial class frmAddButtons : System.Windows.Forms.Form
 	{
 		
 		//Form overrides dispose to clean up the component list.

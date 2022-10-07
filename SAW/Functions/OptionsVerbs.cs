@@ -1,4 +1,6 @@
-﻿namespace SAW.Functions
+﻿using SAW.Shapes;
+
+namespace SAW.Functions
 {
 	internal static class OptionsVerbs
 	{
@@ -27,7 +29,7 @@
 		/// <summary>If this is non-zero it is used, otherwise value is used </summary>
 		public float Multiplier = 0;
 		public float Value = 1;
-		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
+		public override void Trigger(ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
 		{
 			pnlView.ChangeZoom(Multiplier != 0 ? pnlView.Zoom * Multiplier : Value);
 			Globals.NotifyVerbApplicabilityChanged();
@@ -57,7 +59,7 @@
 
 	internal class TogglePrompts : Verb
 	{
-		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
+		public override void Trigger(ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
 		{
 			bool current = Globals.Root.CurrentConfig.ReadBoolean(Config.SAW_Prompts, true);
 			transaction.Edit(CurrentDocument.UserSettings);
@@ -69,7 +71,7 @@
 
 	internal class ToggleTextRotate : Verb
 	{
-		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
+		public override void Trigger(ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
 		{
 			TransformRotate.IncludeText = !TransformRotate.IncludeText;
 			ctrRotation palette = (ctrRotation)Palette.Item("Rotation").Control;
@@ -81,7 +83,7 @@
 	internal class ToggleFullScreen : Verb
 	{
 
-		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
+		public override void Trigger(ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
 		{
 			if (Editor.WindowState == System.Windows.Forms.FormWindowState.Maximized)
 				Editor.WindowState = System.Windows.Forms.FormWindowState.Normal;

@@ -3,11 +3,12 @@ using System;
 using System.Drawing;
 using System.Windows.Forms;
 using System.Linq;
+using SAW.Shapes;
 
 namespace SAW
 {
 	[System.ComponentModel.DefaultEvent("UserChecked")]
-	public sealed class IconRadio : Control, ILinearAnimated, IInvokeable
+	internal sealed class IconRadio : Control, ILinearAnimated, IInvokeable
 	{
 		public event EventHandler CheckedChanged;
 		public event EventHandler UserChecked; // called when user clicks control to select it (and when user deselect is if Toggle = true)

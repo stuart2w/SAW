@@ -11,11 +11,11 @@ using System.Text;
 using Resources;
 using SAW.Functions;
 using Action = SAW.Functions.Action;
-using SAW.GUI;
+using SAW.Shapes;
 
 namespace SAW
 {
-	public sealed partial class frmMain : KeyForm, IParameterConsumer, IKeyControl
+	internal sealed partial class frmMain : KeyForm, IParameterConsumer, IKeyControl
 	{
 
 		private bool m_Filling = false;
@@ -443,7 +443,7 @@ namespace SAW
 			}
 		}
 
-		public void BringPaletteWindowToFront(frmPalette frm)
+		internal void BringPaletteWindowToFront(frmPalette frm)
 		{
 			// calling Form.BringToFront gives a form the focus.  Can't use MDI because those forms go behind this form controls (and anyway they can't leave this
 			// form - which is the whole point of usign subforms)
@@ -1213,7 +1213,7 @@ namespace SAW
 
 		public void rdoSnapGrid_DoubleClick(object sender, EventArgs e)
 		{
-			TriggerVerb(Codes.EditPaper, EditableView.ClickPosition.Sources.Mouse);
+			TriggerVerb(Codes.EditPaper, ClickPosition.Sources.Mouse);
 		}
 
 		#region Hover prompts
@@ -1538,12 +1538,12 @@ namespace SAW
 
 		public void btnPagePrevious_Click(object sender, EventArgs e)
 		{
-			TriggerVerb(Codes.PagePrevious, EditableView.ClickPosition.Sources.Mouse);
+			TriggerVerb(Codes.PagePrevious, ClickPosition.Sources.Mouse);
 		}
 
 		public void btnPageNext_Click(object sender, EventArgs e)
 		{
-			TriggerVerb(Codes.PageNext, EditableView.ClickPosition.Sources.Mouse);
+			TriggerVerb(Codes.PageNext, ClickPosition.Sources.Mouse);
 		}
 
 		public void mnuPageHeading_DropDownOpening(object sender, EventArgs e)
@@ -1790,7 +1790,7 @@ namespace SAW
 
 		#region Verbs and actions
 
-		private void TriggerVerb(Codes code, EditableView.ClickPosition.Sources source)
+		private void TriggerVerb(Codes code, ClickPosition.Sources source)
 		{
 			Globals.StoreEvent("Trigger: " + code);
 			Verb implementation = Verb.Find(code);
@@ -1826,11 +1826,11 @@ namespace SAW
 			return implementation.IsApplicable(pnlView);
 		}
 
-		public void PerformAction(Action action, EditableView.ClickPosition.Sources source) //, Optional ByVal bolQueueIfDialog As Boolean = False)
+		public void PerformAction(Action action, ClickPosition.Sources source) //, Optional ByVal bolQueueIfDialog As Boolean = False)
 		{
 			// if from keyboard this must be delayed if it could open a dialog - otherwise the KeyPress event might fire (and do something) although this KeyDown
 			// will be marked handled - but it all ends up out of sequence if the dialog runs an event loop
-			if (source == EditableView.ClickPosition.Sources.Keyboard && action.MightOpenModalDialog)
+			if (source == ClickPosition.Sources.Keyboard && action.MightOpenModalDialog)
 			{
 				m_ActionQueue.Enqueue(action);
 				Globals.Root.RequestDelayedCall(DoQueuedActions);
@@ -1851,7 +1851,7 @@ namespace SAW
 		{
 			while (m_ActionQueue.Count > 0)
 			{
-				PerformAction(m_ActionQueue.Dequeue(), EditableView.ClickPosition.Sources.Deferred); // only queued if they came from the keyboard
+				PerformAction(m_ActionQueue.Dequeue(), ClickPosition.Sources.Deferred); // only queued if they came from the keyboard
 			}
 		}
 
@@ -1867,7 +1867,7 @@ namespace SAW
 			if (!VerbApplicable(code))
 				Utilities.LogSubError("Verb_Button_Click: verb is not applicable: " + code);
 			else
-				TriggerVerb(code, EditableView.ClickPosition.Sources.VerbButton);
+				TriggerVerb(code, ClickPosition.Sources.VerbButton);
 			Globals.RestoreFocus();
 		}
 
@@ -1961,7 +1961,7 @@ namespace SAW
 			switch (result)
 			{
 				case DialogResult.Yes:
-					TriggerVerb(Codes.Save, EditableView.ClickPosition.Sources.Irrelevant); // but we need to detect if the user cancels the save box, if this was a new document
+					TriggerVerb(Codes.Save, ClickPosition.Sources.Irrelevant); // but we need to detect if the user cancels the save box, if this was a new document
 					if (document.Changed)
 						return false; // if the document was saved it would be marked as not changed
 					return true; // continue now that we have saved
@@ -2087,7 +2087,7 @@ namespace SAW
 				//Debug.WriteLine(ParameterSupport.KeyDescription(e.KeyData) + " = " + objAction.ToString)
 				if (!objAction.IsEmpty)
 				{
-					PerformAction(objAction, EditableView.ClickPosition.Sources.Keyboard);
+					PerformAction(objAction, ClickPosition.Sources.Keyboard);
 					e.Handled = true;
 					return;
 				}
@@ -2187,7 +2187,7 @@ namespace SAW
 		public void mnuDoubleClick_Click(object sender, EventArgs e)
 		{
 			// Triggers the double-click activity on the currently selected object
-			//	TriggerVerb(Verbs.DoubleClick, EditableView.ClickPosition.Sources.Mouse)
+			//	TriggerVerb(Verbs.DoubleClick, ClickPosition.Sources.Mouse)
 		}
 
 		public void mnuRecent_DropDownOpening(object sender, EventArgs e)
@@ -2963,7 +2963,7 @@ namespace SAW
 			pnlInfo.Invalidate(); // this changes less often so invalidating the lot is no problem
 		}
 
-		private void pnlView_DisplayMousePosition(EditableView.ClickPosition position)
+		private void pnlView_DisplayMousePosition(ClickPosition position)
 		{
 			//"(" + ptTarget.Exact.X.ToString("0.00") + "," + ptTarget.Exact.Y.ToString("0.00") + ")"
 			string newText = "";

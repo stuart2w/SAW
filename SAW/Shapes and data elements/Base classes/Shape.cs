@@ -10,7 +10,7 @@ using SAW.Functions;
 // this file contains the abstract base classes for the various shapes
 #pragma warning disable CS0659 // Type overrides Object.Equals(object o) but does not override Object.GetHashCode()
 
-namespace SAW
+namespace SAW.Shapes
 {
 	public abstract partial class Shape : Datum, IDisposable
 	{
@@ -300,6 +300,7 @@ namespace SAW
 		// will be set to empty after every edit
 		protected abstract RectangleF CalculateBounds();
 
+		/// <summary>Actual bounding box of the shape.  Often calculated from vertices automatically, but for some shapes this is stored and defines the shape</summary>
 		public RectangleF Bounds
 		{
 			get
@@ -346,7 +347,7 @@ namespace SAW
 				m_Bounds = CalculateBounds();
 		}
 
-		public abstract bool HitTestDetailed(PointF clickPoint, float scale, bool treatAsFilled);
+		protected internal abstract bool HitTestDetailed(PointF clickPoint, float scale, bool treatAsFilled);
 		// should return true if this point hits this shape.  We actually do some quite accurate tests - the previous version of AccessMaths did so
 		// we can assume that the caller has already checked the bounding rectangle for speed, so this just has to do detailed checks
 		// and can just return true if hitting the bounding rectangle is sufficient
@@ -414,7 +415,7 @@ namespace SAW
 		/// <summary>Returns the possible edits given the selected part of the shape.  Base class only acts on Centre, regardless of the provided target.
 		/// The shape must support Grab movement for any grab spots that are returned - the usual grab dragging functions will be used to perform any data changes that the user makes </summary>
 		/// <remarks>For EdgeMoveH/V spots, the editor will use the Focus, if set, to do Width/Height logic.  Leave Focus=PointF.Empty to show X/Y values rather than W/H to user</remarks>
-		public virtual (GrabSpot[], string[]) GetEditableCoords(Target selectedElement)
+		internal virtual (GrabSpot[], string[]) GetEditableCoords(Target selectedElement)
 		{
 			if (selectedElement is Target.ForGrabSpot forGrabSpot)
 				switch (forGrabSpot.Grab.GrabType)
@@ -451,16 +452,16 @@ namespace SAW
 							// Spawn method is used to get the new shape.  The replacement shape can be a new one.  At the moment the new one is treated as complete rather than ongoing
 		}
 
-		public abstract VerbResult Choose(EditableView.ClickPosition position);
-		public abstract VerbResult Start(EditableView.ClickPosition position); // like Choose, but this is used for the first point - which can usually be plummeted a different place in the class hierarchy
-		public abstract VerbResult Complete(EditableView.ClickPosition position);
+		public abstract VerbResult Choose(ClickPosition position);
+		public abstract VerbResult Start(ClickPosition position); // like Choose, but this is used for the first point - which can usually be plummeted a different place in the class hierarchy
+		public abstract VerbResult Complete(ClickPosition position);
 
 		public abstract VerbResult CompleteRetrospective(); // previously provided point should be considered the last one
 
 		// note that CompletePerspective can be called even if the last Choose returned Completed (Pie chart requires this)
-		public abstract VerbResult Cancel(EditableView.ClickPosition position);
+		public abstract VerbResult Cancel(ClickPosition position);
 
-		public abstract VerbResult Float(EditableView.ClickPosition position); // mostly returns Continuing or Unchanged
+		public abstract VerbResult Float(ClickPosition position); // mostly returns Continuing or Unchanged
 																			   // bolSnapToShapes is true if shape snapping is on; in most cases the point will already have been snapped by the view
 
 		/// <summary>Used only for certain verbs which can be triggered both when the shape is ongoing (being created) and later</summary>
@@ -469,14 +470,14 @@ namespace SAW
 		/// <param name="code">Verbs are Increment, Decrement, CountUpOne, CountDownOne, and all vertex editing</param>
 		/// <returns>Return Rejected if this verb is not used by this shape</returns>
 		/// <remarks>AllowVerbWhenComplete may be required in order to receive verbs once completed</remarks>
-		public virtual VerbResult OtherVerb(EditableView.ClickPosition position, Functions.Codes code)
+		protected internal virtual VerbResult OtherVerb(ClickPosition position, Functions.Codes code)
 		{
 			Debug.Assert(code == Functions.Codes.Increment || code == Functions.Codes.Decrement ||
 						 code >= Functions.Codes.AddVertex && code <= Functions.Codes.CornerVertex);
 			return VerbResult.Rejected;
 		}
 
-		public virtual Shape Spawn()
+		protected internal virtual Shape Spawn()
 		{
 			// if the shape returned Spawn in response to the Choose/Complete/CompleteRetrospective verbs than the editor will call this afterwards to get the new shape
 			// that must be created
@@ -484,7 +485,7 @@ namespace SAW
 			return null;
 		}
 
-		public virtual VerbResult CombinedKey(Keys key, char ch, Page page, bool simulated, EditableView fromView)
+		protected internal virtual VerbResult CombinedKey(Keys key, char ch, Page page, bool simulated, EditableView fromView)
 		{
 			// the GUI combines the KeyDown and KeyPress events and sends one call to this. The focal shape gets this call before any other part of the GUI
 			// returning Unexpected from this just means the key has been ignored, it is not really an error condition like it is with the main verbs
@@ -553,7 +554,7 @@ namespace SAW
 		}
 
 		/// <summary>if the user clicks with the selector on an existing shape this is called.  Ignored by most shapes.  Selection is done by the view</summary>
-		public virtual VerbResult ClickExisting(EditableView.ClickPosition position)
+		protected internal virtual VerbResult ClickExisting(ClickPosition position)
 		{
 			if (HasText(false) && HasCaret)
 			{
@@ -565,14 +566,14 @@ namespace SAW
 		}
 
 		/// <summary>Return true if shape still wants to recieve this verb when completed.  Only main 5 allowed and ChooseExisting</summary>
-		public virtual bool AllowVerbWhenComplete(Functions.Codes code)
+		protected internal virtual bool AllowVerbWhenComplete(Functions.Codes code)
 		{
 			Debug.Assert(code >= Functions.Codes.Choose && code <= Functions.Codes.ChooseExisting);
 			return false;
 		}
 
 		/// <summary>Called after shape has been completed, and any animation complete, and added to page.  Will only rarely need to be overridden</summary>
-		public virtual void OnConclude(Transaction transaction)
+		protected internal virtual void OnConclude(Transaction transaction)
 		{
 		}
 
@@ -620,7 +621,7 @@ namespace SAW
 
 			/// <summary>If defined then preferably only this element should be drawn.  Only used with highlight.  If not supported whole shape should be drawn.
 			/// (Used with editing single vertices to show selection;  if single vertex editing doesn't make sense in a shape it works fine that the whole shape is shown as highlighted)</summary>
-			public Target SingleElement;
+			internal Target SingleElement;
 
 			public Stroke MainPen;
 			public Fill MainBrush;
@@ -629,9 +630,9 @@ namespace SAW
 			public Stroke CustomPen;
 			public Fill CustomBrush;
 			public Font Font; // the default in this class is to store the font permanently; if other shapes want to do so temporarily it can be placed here
-			public StaticView.InvalidationBuffer Buffer; // not really needed, but can be useful for diagnosing graphics problems to set breakpoints/assertions only for certain buffers
+			internal StaticView.InvalidationBuffer Buffer; // not really needed, but can be useful for diagnosing graphics problems to set breakpoints/assertions only for certain buffers
 
-			public DrawResources(float scale, int fillAlpha, int edgeAlpha, bool viewIsFocal, bool isTypingShape, Canvas gr, StaticView.InvalidationBuffer buffer, float coordScale)
+			internal DrawResources(float scale, int fillAlpha, int edgeAlpha, bool viewIsFocal, bool isTypingShape, Canvas gr, StaticView.InvalidationBuffer buffer, float coordScale)
 			{
 				FillAlpha = fillAlpha;
 				EdgeAlpha = edgeAlpha;
@@ -874,13 +875,13 @@ namespace SAW
 
 		/// <summary>Returns IShapeContainer for this item, if it supports it.  The interface might not be on this object (to support shapes which optionally accept contents).
 		/// Note that AsContainer returns (nominally) this object; Container returns the parent of this object</summary>
-		public virtual IShapeContainer AsContainer
+		protected internal virtual IShapeContainer AsContainer
 		{
 			get { return this as IShapeContainer; }
 		}
 
 		/// <summary>Returns the IShapeTarget interface for this shape if it supports it.  Interface might not be on this object (to support shapes which optionally accept content, or delegate it)</summary>
-		public virtual IShapeTarget AsTarget => this as IShapeTarget;
+		protected internal virtual IShapeTarget AsTarget => this as IShapeTarget;
 
 		/// <summary>Test if shape is within the parent, with any number 0+ of intervening levels</summary>
 		public bool IsWithin(IShapeParent parent)
@@ -911,6 +912,7 @@ namespace SAW
 			}
 		}
 
+		/// <summary>True if the shape has a solid background and non-trivial width (ie not a line) </summary>
 		public virtual bool IsFilled => false;
 
 		/// <summary>True if the shape is rendered.  may be false due to !Shown</summary>
@@ -920,7 +922,7 @@ namespace SAW
 		internal static string DiagnosticFormat = "0.#";
 
 		[Conditional("DEBUG")]
-		public virtual void Diagnostic(System.Text.StringBuilder output)
+		protected internal virtual void Diagnostic(System.Text.StringBuilder output)
 		{
 			// shape should write any/all diagnostic information into output
 			// start with call to mybase
@@ -1002,10 +1004,7 @@ namespace SAW
 		/// <summary>Returns string describing the shape which can be displayed in the status line.
 		///  ongoing = true if the shape is still being drawn; otherwise it is assumed to be static
 		/// shapes can return "" if there isn't much meaningful to describe</summary>
-		public virtual string StatusInformation(bool ongoing)
-		{
-			return "";
-		}
+		protected internal virtual string StatusInformation(bool ongoing) => "";
 
 		#endregion
 
@@ -1060,8 +1059,8 @@ namespace SAW
 			ProtectBounds = 0x800,
 			/// <summary>Set if this cannot be put inside containers (e.g. selection box)</summary>
 			NotWithinContainer = 0x1000,
-			/// <summary>Should be returned by Page.FindSingleActivity (currently only NumberLine)</summary>
-			Activity = 0x2000,
+			///// <summary>Should be returned by Page.FindSingleActivity (currently only NumberLine)</summary>
+			//Activity = 0x2000,
 			/// <summary>If this flag is included in the shape no intersection testing methods will be called on the shape, with this shape as a parameter.
 			/// (Equivalent to overriding all the methods and leaving them empty)</summary>
 			NoIntersections = 0x4000,
@@ -1073,7 +1072,7 @@ namespace SAW
 			/// <summary>Usually a new shape is added to the page if it is Degenerate.  This flag ignores that check</summary>
 			IgnoreDegenerateWhenCreating = 0x40000
 		}
-		public static bool LastDoubleClickResult; // true if OK, false if cancel; only used at the moment if DoubleClickAfterCreation
+		internal static bool LastDoubleClickResult; // true if OK, false if cancel; only used at the moment if DoubleClickAfterCreation
 
 		public virtual GeneralFlags Flags
 		{ get { return GeneralFlags.None; } }
@@ -1131,6 +1130,7 @@ namespace SAW
 				return AllowedActions.Standard;
 			}
 		}
+
 		#endregion
 
 		/// <summary>a shape should return true if it is empty and can be discarded
@@ -1149,7 +1149,7 @@ namespace SAW
 		}
 
 		/// <summary>Used for SAW export.  Writes the description of this to the output.  Only relevant to SAW items, emits nothing for simple graphical elements</summary>
-		public virtual void WriteExportText(IndentStringBuilder output)
+		protected internal virtual void WriteExportText(IndentStringBuilder output)
 		{ }
 
 		#endregion
@@ -1167,13 +1167,13 @@ namespace SAW
 
 		/// <summary>Should return the snapping mode to use for the current point.  Mode for Start controlled by EditableView.EffectiveSnap</summary>
 		/// <param name="requested">Should be neither Off nor Socket (the request is not made if Off)</param>
-		public virtual SnapModes SnapNext(SnapModes requested)
+		protected internal virtual SnapModes SnapNext(SnapModes requested)
 		{
 			Debug.Assert(requested == SnapModes.Off || requested == SnapModes.Grid || requested == SnapModes.Shape || requested == SnapModes.Angle, "Unexpected SnapMode in Shape.SnapNext - if adding modes must check all overrides of this function");
 			return requested;
 		}
 
-		public virtual PointF DoSnapAngle(PointF newPoint)
+		protected internal virtual PointF DoSnapAngle(PointF newPoint)
 		{
 			// only called in SnapMode = Angle (and shouldn't be called if this rejects that mode under SnapNext)
 			// must return the modified ptNew
@@ -1241,10 +1241,10 @@ namespace SAW
 		#region Datum - mostly must be overridden
 		// the Load and Save functions will be overridden at intermediate classes - the final classes should call MyBase.Load etc
 
-		public override byte TypeByte => (byte)ShapeCode;
+		protected internal override byte TypeByte => (byte)ShapeCode;
 
 		private protected List<Guid> m_IDsForLinks; // only used when loading. Ids which need to be attached to objects later
-		public override void Load(DataReader reader)
+		protected internal override void Load(DataReader reader)
 		{
 			// reads label info.  Overridden functions must all call Mybase.Load...
 			base.Load(reader);
@@ -1278,7 +1278,7 @@ namespace SAW
 			Status = StatusValues.Complete;
 		}
 
-		public override void Save(DataWriter writer)
+		protected internal override void Save(DataWriter writer)
 		{
 			base.Save(writer);
 			if (HasText(false)) // this will always be true for text types
@@ -1339,7 +1339,7 @@ namespace SAW
 		}
 
 		/// <summary>Updates reference to other, NON-CONTAINED objects</summary>
-		public override void UpdateReferencesObjectsCreated(Document document, DataReader reader)
+		protected internal override void UpdateReferencesObjectsCreated(Document document, DataReader reader)
 		{
 			if (m_IDsForLinks == null)
 				return;
@@ -1373,7 +1373,7 @@ namespace SAW
 		}
 
 		/// <summary>Updates reference to other, NON-CONTAINED objects</summary>
-		public override void UpdateReferencesIDsChanged(Mapping mapID, Document document)
+		protected internal override void UpdateReferencesIDsChanged(Mapping mapID, Document document)
 		{
 			base.UpdateReferencesIDsChanged(mapID, document);
 			if (m_Links == null) return;
@@ -1426,6 +1426,7 @@ namespace SAW
 		#endregion
 
 		#region Targets
+
 		/// <summary>can return nothing if no points are available
 		/// The source position is expressed as a socket to allow angle/gender/class constraints.  Most shapes ignore this and just use .Centre</summary>
 		internal virtual List<Target> GenerateTargets(UserSocket floating)
@@ -1455,10 +1456,11 @@ namespace SAW
 		public virtual GraphicsPath ConvertToPath() => null;
 
 		#region Vertex editing
+
 		/// <summary>Returns whether the particular verb can be applied to this shape, given the target for where the user clicked.
 		/// If true the verb will be sent to OtherVerb.  The caller will already have checked that objTarget is of the right basic type.
 		/// This needs to report true if the shape supports the functionality, and if the segment is appropriate in other ways (e.g. not ConvertToBezier if it is already a Bezier)</summary>
-		public virtual bool VertexVerbApplicable(Functions.Codes code, Target target)
+		protected internal virtual bool VertexVerbApplicable(Functions.Codes code, Target target)
 		{
 			Debug.Assert(target.Shape == this);
 			Debug.Assert(target.Type == Target.Types.Line || target.Type == Target.Types.Vertex
@@ -1483,7 +1485,6 @@ namespace SAW
 		}
 
 		#endregion
-
 
 		#region IDisposable Support
 		// cannot rely on this being called.  This is only used in the entire document is disposed (otherwise even deleted shapes will exist in the undo buffer)
@@ -1515,23 +1516,25 @@ namespace SAW
 		// the styles can be updated using the same parameter system that the GUI uses (see IParameterGUI)
 		public abstract class StyleBase
 		{
-			public abstract int ParameterValue(Parameters parameter);
-			public abstract void SetParameterValue(int value, Parameters parameter);
+			internal abstract int ParameterValue(Parameters parameter);
+			internal abstract void SetParameterValue(int value, Parameters parameter);
 
 			public abstract void CopyFrom(StyleBase other);
-			public virtual void AddReferences(Action<Datum> fnAdd, Mapping mapID)
+
+			internal virtual void AddReferences(Action<Datum> fnAdd, Mapping mapID)
 			{
 			}
 
-			public virtual void UpdateReferencesObjectsCreated(Document document, DataReader reader)
+			internal virtual void UpdateReferencesObjectsCreated(Document document, DataReader reader)
 			{
 			}
 
 			/// <summary>Must return the parameters which are used by this object.  Individual shapes can still
 			/// not return this object for those parameters, but this object must accept ParameterValue on these parameters</summary>
-			public abstract Parameters[] ApplicableParameters();
+			internal abstract Parameters[] ApplicableParameters();
 
 			public abstract bool IdenticalTo(StyleBase other);
+
 		}
 		// *** if adding new parameters, remember to update StyleObjectForParameter in the derived classes
 
@@ -1566,7 +1569,7 @@ namespace SAW
 				writer.Write(Convert.ToInt32(Style));
 			}
 
-			public static TextStyleC Read(DataReader reader)
+			internal static TextStyleC Read(DataReader reader)
 			{
 				TextStyleC style = new TextStyleC();
 				style.Size = reader.ReadSingle();
@@ -1590,7 +1593,7 @@ namespace SAW
 			}
 
 			// will respond to LineColour - specialist text shapes allow this to also control text colour
-			public override int ParameterValue(Parameters parameter)
+			internal override int ParameterValue(Parameters parameter)
 			{
 				switch (parameter)
 				{
@@ -1612,7 +1615,8 @@ namespace SAW
 						return 0;
 				}
 			}
-			public override void SetParameterValue(int value, Parameters parameter)
+
+			internal override void SetParameterValue(int value, Parameters parameter)
 			{
 				switch (parameter)
 				{
@@ -1660,7 +1664,8 @@ namespace SAW
 			}
 
 			private static Parameters[] Applicable = { Parameters.TextColour, Parameters.TextAlignment, Parameters.TextVerticalAlignment, Parameters.FontSize, Parameters.FontStyle, Parameters.FontFace };
-			public override Parameters[] ApplicableParameters()
+
+			internal override Parameters[] ApplicableParameters()
 			{
 				return Applicable;
 			}
@@ -1709,7 +1714,7 @@ namespace SAW
 		/// logic working on mm.  We need to reduce the requested size by this factor
 		/// Explicitly specify sizeAdjust = 1 to get a size in points.  omitted gives default correction factor determined by looking at current document (ideally page really)
 		/// Specifying parameter may be faster, and is provided as rendering functions are given it</param>
-		public void EnsureFont(float coordScale = -1)
+		internal void EnsureFont(float coordScale = -1)
 		{
 			if (coordScale < 0)
 				coordScale = Globals.Root.CurrentDocument.ApproxUnitScale;// Geometry.MILLIMETRE * GUIUtilities.SystemDPI / Geometry.INCH;
@@ -1733,7 +1738,7 @@ namespace SAW
 		public class LineStyleC : StyleBase
 		{
 			public Color Colour;
-			/// <summary>Actual graphical width.  Not *100</summary>
+			/// <summary>Actual graphical width. Usually 1-5, although can be set to any value.  Editor screen will round back to an integer</summary>
 			public float Width;
 			// although we use the .net patterns (which seem to match the Windows API ones) we only use these for drawing if the line is reasonably wide
 			// if the line is only one pixel wide (after scaling?) the spacing is so small as to make the line look almost continuous
@@ -1743,7 +1748,7 @@ namespace SAW
 			public void SetDefaults()
 			{
 				Colour = Color.Black;
-				Width = Convert.ToSingle(ParameterSupport.StandardLineWidths[2] / 100); // Geometry.SINGLELINE
+				Width = ParameterSupport.StandardLineWidths[2] / 100f;
 				Pattern = DashStyle.Solid;
 			}
 
@@ -1757,7 +1762,7 @@ namespace SAW
 				writer.Write((int)Pattern);
 			}
 
-			public static LineStyleC Read(DataReader reader)
+			internal static LineStyleC Read(DataReader reader)
 			{
 				LineStyleC newStyle = new LineStyleC();
 				newStyle.Colour = reader.ReadColour();
@@ -1808,7 +1813,7 @@ namespace SAW
 				return list;
 			}
 
-			public override int ParameterValue(Parameters parameter)
+			internal override int ParameterValue(Parameters parameter)
 			{
 				switch (parameter)
 				{
@@ -1820,7 +1825,8 @@ namespace SAW
 						return 0;
 				}
 			}
-			public override void SetParameterValue(int value, Parameters parameter)
+
+			internal override void SetParameterValue(int value, Parameters parameter)
 			{
 				switch (parameter)
 				{
@@ -1854,7 +1860,7 @@ namespace SAW
 			}
 
 			private static readonly Parameters[] Applicable = { Parameters.LineColour, Parameters.LinePattern, Parameters.LineWidth };
-			public override Parameters[] ApplicableParameters() => Applicable;
+			internal override Parameters[] ApplicableParameters() => Applicable;
 
 			public override bool IdenticalTo(StyleBase other)
 			{
@@ -1901,7 +1907,7 @@ namespace SAW
 				Pattern = Patterns.Solid;
 			}
 
-			public void Write(DataWriter writer)
+			internal void Write(DataWriter writer)
 			{
 				writer.Write(Colour);
 				writer.Write((int)Pattern);
@@ -1910,7 +1916,7 @@ namespace SAW
 				Debug.Assert(Pattern >= (Patterns)(-2) && Pattern <= Patterns.Last);
 			}
 
-			public static FillStyleC Read(DataReader reader)
+			internal static FillStyleC Read(DataReader reader)
 			{
 				FillStyleC create = new FillStyleC();
 				create.Colour = reader.ReadColour();
@@ -1931,7 +1937,7 @@ namespace SAW
 				m_idTexture = fillStyle.m_idTexture;
 			}
 
-			public override int ParameterValue(Parameters parameter)
+			internal override int ParameterValue(Parameters parameter)
 			{
 				switch (parameter)
 				{
@@ -1945,7 +1951,7 @@ namespace SAW
 				}
 			}
 
-			public override void SetParameterValue(int value, Parameters parameter)
+			internal override void SetParameterValue(int value, Parameters parameter)
 			{
 				switch (parameter)
 				{
@@ -1968,7 +1974,7 @@ namespace SAW
 				}
 			}
 
-			public override void UpdateReferencesObjectsCreated(Document document, DataReader reader)
+			internal override void UpdateReferencesObjectsCreated(Document document, DataReader reader)
 			{
 				if (Pattern == Patterns.Texture)
 				{
@@ -1978,7 +1984,7 @@ namespace SAW
 				}
 			}
 
-			public override void AddReferences(Action<Datum> fnAdd, Mapping mapID)
+			internal override void AddReferences(Action<Datum> fnAdd, Mapping mapID)
 			{
 				if (m_Texture != null)
 				{
@@ -2022,7 +2028,8 @@ namespace SAW
 			}
 
 			private static Parameters[] Applicable = new Parameters[] { Parameters.FillColour, Parameters.FillPattern };
-			public override Parameters[] ApplicableParameters()
+
+			internal override Parameters[] ApplicableParameters()
 			{
 				return Applicable;
 			}
@@ -2038,10 +2045,11 @@ namespace SAW
 					return false;
 				return true;
 			}
+
 		}
 		#endregion
 
-		public virtual StyleBase StyleObjectForParameter(Parameters parameter, bool applyingDefault = false)
+		internal virtual StyleBase StyleObjectForParameter(Parameters parameter, bool applyingDefault = false)
 		{
 			// Returns nothing if this styling information does not apply to this shape
 			// Second parameter is true if this call to apply the default styles (shapes, in particular button, can lie and return Nothing if they don't want certain default styles to be applied)
@@ -2065,7 +2073,7 @@ namespace SAW
 			return null;
 		}
 
-		public virtual void NotifyStyleChanged(Parameters parameter, int oldValue, int newValue)
+		internal virtual void NotifyStyleChanged(Parameters parameter, int oldValue, int newValue)
 		{
 			// the GUI calls this after modifying the style (NOT when applying the initial style at about the same time as the Start verb)
 			if (parameter == Parameters.FontSize) // also used if font itself is changed
@@ -2229,7 +2237,7 @@ namespace SAW
 			/// <summary>whether the points used when generating the transformations should be snapped (Current.Snapped is the snapped point)</summary>
 			public SnapModes SnapMode;
 			/// <summary>the current location both snapped and unsnapped.  View willnot be defined</summary>
-			public EditableView.ClickPosition Current;
+			public ClickPosition Current;
 			/// <summary>True if the control key was pressed when the GrabSpots were created</summary>
 			/// <remarks>This can change their behaviour for some shapes, and it is important to use the value from when they were created otherwise there may be errors due to the inconsistency.</remarks>
 			public bool ControlKey;
@@ -2245,7 +2253,7 @@ namespace SAW
 			{
 				ShapeParameter = grabSpot.ShapeParameter;
 				// the entire Current object is replaced when the mouse moves, so we can just fill in dummy values for the the zoom etc
-				Current = new EditableView.ClickPosition(grabSpot.Position, page ?? grabSpot.Shape.FindPage(), 1, snapMode, snapMode, null, EditableView.ClickPosition.Sources.Irrelevant);
+				Current = new ClickPosition(grabSpot.Position, page ?? grabSpot.Shape.FindPage(), 1, snapMode, snapMode, null, ClickPosition.Sources.Irrelevant);
 				ShapeIndex = grabSpot.ShapeIndex;
 				Focus = grabSpot.Focus;
 				SnapMode = snapMode;
@@ -2530,7 +2538,7 @@ namespace SAW
 		/// <summary>Can optionally start a custom GrabMovement when the mouse is used directly, rather than the usual one</summary>
 		/// <returns>Usually Nothing, otherwise the GrabMovement to use instead of the default</returns>
 		/// <remarks>Used for text selection dragging</remarks>
-		internal virtual GrabMovement GetCustomGrabMove(EditableView.ClickPosition current, EditableView.ClickPosition click, Transaction transaction)
+		internal virtual GrabMovement GetCustomGrabMove(ClickPosition current, ClickPosition click, Transaction transaction)
 		{
 			if (HasText(true) && HasCaret && click != null) // Last condition should not be needed; just for safety
 			{
@@ -2577,7 +2585,7 @@ namespace SAW
 
 		/// <summary>Returns how the shape can use labels, or not. 
 		/// NOTE: can be called before the shape is constructed, show should not rely on state</summary>
-		public virtual LabelModes LabelMode => LabelModes.Allowed;
+		internal virtual LabelModes LabelMode => LabelModes.Allowed;
 
 		public bool HasText(bool labelOnly)
 		{
@@ -2626,7 +2634,7 @@ namespace SAW
 
 		/// <summary>Returns true if the shape supports typing an arbitrary text label.  I.e. accepts typing in the general sense.
 		/// Some other controls may accept "typing" in the sense of processing certain keys, such as NumberGrid</summary>
-		public bool SupportsTextLabel
+		internal bool SupportsTextLabel
 		{
 			get
 			{
@@ -2640,6 +2648,7 @@ namespace SAW
 				}
 			}
 		}
+
 		#endregion
 
 		protected virtual void DrawLabel(Canvas gr, DrawResources resources)
@@ -2685,7 +2694,7 @@ namespace SAW
 			}
 		}
 
-		public virtual void CreateLabel(TextStyleC currentTextStyle)
+		internal virtual void CreateLabel(TextStyleC currentTextStyle)
 		{
 			if (!SupportsTextLabel)
 			{
@@ -2816,7 +2825,7 @@ namespace SAW
 		protected List<Fragment> m_Fragments; // = nothing by default (most shapes have no text)
 
 		/// <summary>stores one 'line' of text </summary>
-		internal protected class Fragment
+		protected internal class Fragment
 		{
 			/// <summary>will exclude trailing Whitespace</summary>
 			public string Text;
@@ -2979,6 +2988,7 @@ namespace SAW
 			// this is a stub used by Equation.  Returns the font used in a particular fragment
 			return m_Font;
 		}
+
 		#endregion
 
 		#region Measurement and layout
@@ -3847,6 +3857,7 @@ namespace SAW
 			return VerbResult.Continuing;
 		}
 
+		/// <summary>Types the given text into the shape - implies that the shape has the caret</summary>
 		public virtual VerbResult TextType(string text)
 		{
 			// inserts the given text for typing
@@ -4063,11 +4074,11 @@ namespace SAW
 
 		/// <summary>Defaults true.  Mainly intended for function keys, and especially for palettes that work by sending keys - so that buttons can be greyed out at times.</summary>
 		/// <remarks>Always safe to return true, although maybe not perfect</remarks>
-		public virtual bool IsKeyApplicable(char ch) => true;
+		internal protected virtual bool IsKeyApplicable(char ch) => true;
 
 		/// <summary>Defaults true.  Mainly intended for function keys, and especially for palettes that work by sending keys - so that buttons can be greyed out at times.</summary>
 		/// <remarks>Always safe to return true, although maybe not perfect</remarks>
-		public virtual bool IsKeyApplicable(Keys eKey) => true;
+		internal protected virtual bool IsKeyApplicable(Keys eKey) => true;
 
 		#endregion
 
@@ -4094,7 +4105,7 @@ namespace SAW
 			return ""; // no need to have it on menu - there is an existing entry for it Strings.Item("Verb_MakeActive");
 		}
 
-		internal virtual void DoDoubleClick(EditableView view, EditableView.ClickPosition.Sources source)
+		internal virtual void DoDoubleClick(EditableView view, ClickPosition.Sources source)
 		{// in SAW this converts any dumb element into active content (with a Scriptable around it)
 			Verb verb = Verb.Find(Codes.MakeActive);
 			if (!verb.IsApplicable(view))

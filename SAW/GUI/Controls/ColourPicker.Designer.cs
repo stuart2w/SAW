@@ -1,6 +1,6 @@
 namespace SAW
 {
-	public partial class ColourPicker : System.Windows.Forms.Control
+	internal partial class ColourPicker : System.Windows.Forms.Control
 	{
 		
 		//Control overrides dispose to clean up the component list.

@@ -55,7 +55,7 @@ namespace SAW.CommandEditors
 			if (m_Filling)
 				return;
 			if (!rdoOn.Checked) return;
-			m_Command.m_ParamList[0] = new BoolParam(true);
+			m_Command.ParamList[0] = new BoolParam(true);
 			UserChanged?.Invoke(this, EventArgs.Empty);
 		}
 
@@ -64,7 +64,7 @@ namespace SAW.CommandEditors
 			if (m_Filling)
 				return;
 			if (!rdoOff.Checked) return;
-			m_Command.m_ParamList[0] = new BoolParam(true);
+			m_Command.ParamList[0] = new BoolParam(true);
 			UserChanged?.Invoke(this, EventArgs.Empty);
 		}
 

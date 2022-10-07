@@ -3,7 +3,7 @@ using System;
 using System.Drawing;
 using System.Diagnostics;
 
-namespace SAW
+namespace SAW.Shapes
 {
 	public class Group : Shape, IShapeParent
 	{
@@ -17,9 +17,9 @@ namespace SAW
 			// used when loading
 		}
 
-		public Group(List<Shape> colShapes)
+		public Group(IEnumerable<Shape> shapes)
 		{
-			Contents.AddRange(colShapes);
+			Contents.AddRange(shapes);
 			m_Bounds = RectangleF.Empty;
 			foreach (Shape shape in Contents)
 			{
@@ -47,7 +47,7 @@ namespace SAW
 		}
 
 		public List<Shape> Contents { get; private set; } = new List<Shape>();
-		public override LabelModes LabelMode => LabelModes.NotSupported;
+		internal override LabelModes LabelMode => LabelModes.NotSupported;
 		public override GeneralFlags Flags => base.Flags | GeneralFlags.NoColourOnTransformCopy;
 
 		#endregion
@@ -55,16 +55,17 @@ namespace SAW
 		#region Verbs - disallowed
 		// none of the usual verbs are applicable to groups.  The group is created in a single step from a collection of selected shapes
 
-		public override VerbResult Cancel(EditableView.ClickPosition position) => VerbResult.Unexpected;
-		public override VerbResult Choose(EditableView.ClickPosition position) => VerbResult.Unexpected;
-		public override VerbResult Complete(EditableView.ClickPosition position) => VerbResult.Unexpected;
+		public override VerbResult Cancel(ClickPosition position) => VerbResult.Unexpected;
+		public override VerbResult Choose(ClickPosition position) => VerbResult.Unexpected;
+		public override VerbResult Complete(ClickPosition position) => VerbResult.Unexpected;
 		public override VerbResult CompleteRetrospective() => VerbResult.Unexpected;
-		public override VerbResult Float(EditableView.ClickPosition position) => VerbResult.Unexpected;
-		public override VerbResult Start(EditableView.ClickPosition position) => VerbResult.Unexpected;
+		public override VerbResult Float(ClickPosition position) => VerbResult.Unexpected;
+		public override VerbResult Start(ClickPosition position) => VerbResult.Unexpected;
 
 		#endregion
 
 		#region Load/Save/copy from
+
 		public override void CopyFrom(Datum other, CopyDepth depth, Mapping mapID)
 		{
 			base.CopyFrom(other, depth, mapID);
@@ -94,7 +95,7 @@ namespace SAW
 			m_Bounds = RectangleF.Empty;
 		}
 
-		public override void Load(DataReader reader)
+		protected internal override void Load(DataReader reader)
 		{
 			base.Load(reader);
 			Contents = reader.ReadShapeList();
@@ -105,13 +106,13 @@ namespace SAW
 			ResetZ();
 		}
 
-		public override void Save(DataWriter writer)
+		protected internal override void Save(DataWriter writer)
 		{
 			base.Save(writer);
 			writer.WriteDatumList(Contents);
 		}
 
-		public override void UpdateReferencesObjectsCreated(Document document, DataReader reader)
+		protected internal override void UpdateReferencesObjectsCreated(Document document, DataReader reader)
 		{
 			base.UpdateReferencesObjectsCreated(document, reader);
 			foreach (Shape shape in Contents)
@@ -120,7 +121,7 @@ namespace SAW
 			}
 		}
 
-		public override void UpdateReferencesIDsChanged(Mapping mapID, Document document)
+		protected internal override void UpdateReferencesIDsChanged(Mapping mapID, Document document)
 		{
 			base.UpdateReferencesIDsChanged(mapID, document);
 			foreach (Shape shape in Contents)
@@ -129,7 +130,7 @@ namespace SAW
 			}
 		}
 
-		public override void Iterate(DatumFunction fn)
+		internal override void Iterate(DatumFunction fn)
 		{
 			base.Iterate(fn);
 			foreach (Shape shape in Contents)
@@ -154,7 +155,8 @@ namespace SAW
 
 		#endregion
 
-		#region Coords, Grabspots, Targets, cut
+		#region Coords, Grabspots, Targets
+
 		protected override RectangleF CalculateBounds()
 		{
 			RectangleF bounds = RectangleF.Empty;
@@ -165,7 +167,7 @@ namespace SAW
 			return bounds;
 		}
 
-		public override bool HitTestDetailed(PointF clickPoint, float scale, bool treatAsFilled) => true;  // clicking anywhere within the bounds is sufficient
+		protected internal override bool HitTestDetailed(PointF clickPoint, float scale, bool treatAsFilled) => true;  // clicking anywhere within the bounds is sufficient
 
 		public override void ApplyTransformation(Transformation transformation)
 		{
@@ -189,7 +191,7 @@ namespace SAW
 			return list;
 		}
 
-		public const float MAXIMUMSNAPROTATION = Geometry.ANGLE45 / 2; // most to autorotate a moving shape
+		internal const float MAXIMUMSNAPROTATION = Geometry.ANGLE45 / 2; // most to autorotate a moving shape
 
 		internal override List<Target> GenerateTargets(UserSocket floating)
 		{
@@ -332,16 +334,11 @@ namespace SAW
 		protected override void Dispose(bool disposing)
 		{
 			base.Dispose(disposing);
-			if (disposing)
-			{
-				if (Contents != null)
+			if (disposing && Contents != null)
+				foreach (Shape shp in Contents)
 				{
-					foreach (Shape shp in Contents)
-					{
-						shp.Dispose();
-					}
+					shp.Dispose();
 				}
-			}
 		}
 
 		#region IShapeParent and similar
@@ -359,7 +356,7 @@ namespace SAW
 		public void NotifyIndirectChange(Shape shape, ChangeAffects affected)
 		{
 			// just passes along the notification to its container
-			affected = affected & ~( ChangeAffects.GrabSpots);
+			affected = affected & ~(ChangeAffects.GrabSpots);
 			if (affected == 0 || Parent == null)
 				return; // Parent can be null - if this is floating to be placed
 			Parent.NotifyIndirectChange(shape, affected);

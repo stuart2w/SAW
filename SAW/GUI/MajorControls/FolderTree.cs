@@ -9,7 +9,7 @@ using System.IO;
 namespace SAW
 {
 	[ToolboxBitmap(typeof(FolderTree), "tree.gif"), System.ComponentModel.DefaultEvent("PathChanged")]
-	public class FolderTree : UserControl
+	internal class FolderTree : UserControl
 	{
 		public event EventHandler PathChanged;
 

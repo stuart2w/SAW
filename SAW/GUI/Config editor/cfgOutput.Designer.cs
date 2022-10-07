@@ -1,6 +1,6 @@
 ﻿namespace SAW
 {
-	partial class cfgOutput
+	internal partial class cfgOutput
 	{
 		/// <summary> 
 		/// Required designer variable.

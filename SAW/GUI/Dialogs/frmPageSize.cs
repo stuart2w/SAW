@@ -2,11 +2,11 @@ using System;
 using System.Drawing;
 using System.Windows.Forms;
 using System.Linq;
-
+using SAW.Shapes;
 
 namespace SAW
 {
-	public partial class frmPageSize
+	internal partial class frmPageSize
 	{
 		// Note that this is not necessarily act on the current document any longer
 		private bool m_Filling;

@@ -3,7 +3,7 @@ using System;
 using System.Drawing;
 using System.Diagnostics;
 
-namespace SAW
+namespace SAW.Shapes
 {
 	public class Triangle : Sequential
 	{
@@ -16,7 +16,22 @@ namespace SAW
 
 		#endregion
 
-		public override VerbResult Float(EditableView.ClickPosition position)
+		public Triangle()
+		{ }
+
+		public Triangle(PointF A, PointF B, PointF C)
+		{
+			Vertices.Add(A);
+			Vertices.Add(B);
+			Vertices.Add(C);
+			m_DefinedVertices = 3;
+			Status = StatusValues.Complete;
+			LineStyle.SetDefaults(); // otherwise error reports cannot be loaded
+			FillStyle.SetDefaults();
+			FillStyle.Colour = Color.Transparent;
+		}
+
+		public override VerbResult Float(ClickPosition position)
 		{
 			// I think that the base class Float is sufficient, except that it does not  set m_bolAcceptable
 			var eResult = base.Float(position);
@@ -34,7 +49,7 @@ namespace SAW
 			return list;
 		}
 
-		public override PointF DoSnapAngle(PointF newPoint)
+		protected internal override PointF DoSnapAngle(PointF newPoint)
 		{
 			if (m_DefinedVertices == 2)
 				return Geometry.AngleSnapFromTwoPoints(newPoint, Vertices[1], Vertices[0], false);
@@ -65,7 +80,7 @@ namespace SAW
 		// Load/Save/CopyFrom in base class are sufficient
 	}
 
-	public class Isosceles : Triangle
+	internal class Isosceles : Triangle
 	{
 
 		#region Information
@@ -73,7 +88,7 @@ namespace SAW
 		public override AllowedActions Allows => base.Allows & ~AllowedActions.TransformLinearStretch;
 		internal override List<Prompt> GetPrompts() => base.GetBaseLinePrompts("Isosceles", false);
 
-		public override SnapModes SnapNext(SnapModes requested)
+		protected internal override SnapModes SnapNext(SnapModes requested)
 		{
 			if (m_DefinedVertices >= 2)
 			{
@@ -85,7 +100,7 @@ namespace SAW
 			return base.SnapNext(requested);
 		}
 
-		public override string StatusInformation(bool ongoing)
+		protected internal override string StatusInformation(bool ongoing)
 		{
 			if (ongoing)
 				return base.StatusInformation(true); // display length of current edge
@@ -93,7 +108,7 @@ namespace SAW
 		}
 		#endregion
 
-		public override VerbResult Float(EditableView.ClickPosition position)
+		public override VerbResult Float(ClickPosition position)
 		{
 			// let the base class take care of positioning the first line
 			if (m_DefinedVertices < 2)
@@ -192,18 +207,18 @@ namespace SAW
 		// Load/Save/CopyFrom in base class are sufficient
 	}
 
-	public class Equilateral : Triangle
+	internal class Equilateral : Triangle
 	{
 
 		#region Information
 		public override Shapes ShapeCode => Shapes.Equilateral;
 		public override AllowedActions Allows => base.Allows & ~AllowedActions.TransformLinearStretch;
 		internal override List<Prompt> GetPrompts() => base.GetBaseLinePrompts("Equilateral", true);
-		public override string StatusInformation(bool ongoing) => Strings.Item("Info_Edge") + ": " + Measure.FormatLength(Geometry.DistanceBetween(Vertices[0], Vertices[1]));
+		protected internal override string StatusInformation(bool ongoing) => Strings.Item("Info_Edge") + ": " + Measure.FormatLength(Geometry.DistanceBetween(Vertices[0], Vertices[1]));
 
 		#endregion
 
-		public override VerbResult Float(EditableView.ClickPosition position)
+		public override VerbResult Float(ClickPosition position)
 		{
 			// let the base class take care of positioning the first line
 			if (m_DefinedVertices < 2)
@@ -265,7 +280,7 @@ namespace SAW
 				base.DoGrabAngleSnap(move);
 		}
 
-		public override PointF DoSnapAngle(PointF newPoint)
+		protected internal override PointF DoSnapAngle(PointF newPoint)
 		{
 			if (m_DefinedVertices == 2)
 				return newPoint;

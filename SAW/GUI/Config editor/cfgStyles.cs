@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Drawing;
 using System.Windows.Forms;
+using SAW.Shapes;
 
 namespace SAW
 {
-	public partial class cfgStyles : ConfigPage
+	internal partial class cfgStyles : ConfigPage
 	{
 		private Panel[] m_Previews;
 		private Button[] m_EditButtons;
@@ -14,16 +15,16 @@ namespace SAW
 			InitializeComponent();
 			Strings.Translate(this);
 
-			pnlOutputNormal.Tag = new Preview(SAW.Item.ItemDisplayTypes.IDT_Output, ButtonShape.States.Normal);
-			pnlOutputHigh.Tag = new Preview(SAW.Item.ItemDisplayTypes.IDT_Output, ButtonShape.States.Highlight);
-			pnlGroupNormal.Tag = new Preview(SAW.Item.ItemDisplayTypes.IDT_Group, ButtonShape.States.Normal);
-			pnlGroupHigh.Tag = new Preview(SAW.Item.ItemDisplayTypes.IDT_Group, ButtonShape.States.Highlight);
-			pnlEscapeNormal.Tag = new Preview(SAW.Item.ItemDisplayTypes.IDT_Escape, ButtonShape.States.Normal);
-			pnlEscapeHighlight.Tag = new Preview(SAW.Item.ItemDisplayTypes.IDT_Escape, ButtonShape.States.Highlight);
-			pnlHelpNormal.Tag = new Preview(SAW.Item.ItemDisplayTypes.IDT_Help, ButtonShape.States.Normal);
-			pnlHelpHighlight.Tag = new Preview(SAW.Item.ItemDisplayTypes.IDT_Help, ButtonShape.States.Highlight);
-			pnlNotScannedNormal.Tag = new Preview(SAW.Item.ItemDisplayTypes.IDT_NotScanned, ButtonShape.States.Normal);
-			pnlNotScannedHighlight.Tag = new Preview(SAW.Item.ItemDisplayTypes.IDT_NotScanned, ButtonShape.States.Highlight);
+			pnlOutputNormal.Tag = new Preview(Item.ItemDisplayTypes.IDT_Output, ButtonShape.States.Normal);
+			pnlOutputHigh.Tag = new Preview(Item.ItemDisplayTypes.IDT_Output, ButtonShape.States.Highlight);
+			pnlGroupNormal.Tag = new Preview(Item.ItemDisplayTypes.IDT_Group, ButtonShape.States.Normal);
+			pnlGroupHigh.Tag = new Preview(Item.ItemDisplayTypes.IDT_Group, ButtonShape.States.Highlight);
+			pnlEscapeNormal.Tag = new Preview(Item.ItemDisplayTypes.IDT_Escape, ButtonShape.States.Normal);
+			pnlEscapeHighlight.Tag = new Preview(Item.ItemDisplayTypes.IDT_Escape, ButtonShape.States.Highlight);
+			pnlHelpNormal.Tag = new Preview(Item.ItemDisplayTypes.IDT_Help, ButtonShape.States.Normal);
+			pnlHelpHighlight.Tag = new Preview(Item.ItemDisplayTypes.IDT_Help, ButtonShape.States.Highlight);
+			pnlNotScannedNormal.Tag = new Preview(Item.ItemDisplayTypes.IDT_NotScanned, ButtonShape.States.Normal);
+			pnlNotScannedHighlight.Tag = new Preview(Item.ItemDisplayTypes.IDT_NotScanned, ButtonShape.States.Highlight);
 
 			m_Previews = new[] { pnlOutputNormal, pnlOutputHigh, pnlGroupNormal, pnlGroupHigh, pnlEscapeNormal, pnlEscapeHighlight, pnlHelpNormal, pnlHelpHighlight, pnlNotScannedNormal, pnlNotScannedHighlight };
 			foreach (Panel p in m_Previews)
@@ -44,10 +45,10 @@ namespace SAW
 
 		private class Preview
 		{
-			public readonly SAW.Item.ItemDisplayTypes Style;
+			public readonly Item.ItemDisplayTypes Style;
 			public readonly ButtonShape.States State;
 
-			public Preview(SAW.Item.ItemDisplayTypes style, ButtonShape.States state)
+			public Preview(Item.ItemDisplayTypes style, ButtonShape.States state)
 			{
 				Style = style;
 				State = state;

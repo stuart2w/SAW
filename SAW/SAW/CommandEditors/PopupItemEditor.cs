@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Windows.Forms;
 using SAW.Commands;
+using SAW.Shapes;
 
 namespace SAW.CommandEditors
 {
@@ -75,8 +76,8 @@ namespace SAW.CommandEditors
 		{
 			if (m_Filling)
 				return;
-			m_Command.m_ParamList.Clear();
-			m_Command.m_ParamList.Add(new IntegerParam((int)cmbPopups.SelectedValue));
+			m_Command.ParamList.Clear();
+			m_Command.ParamList.Add(new IntegerParam((int)cmbPopups.SelectedValue));
 			UserChanged?.Invoke(this, EventArgs.Empty);
 		}
 

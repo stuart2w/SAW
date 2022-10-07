@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using SAW.Shapes;
 
 namespace SAW.Functions
 {
@@ -15,8 +16,7 @@ namespace SAW.Functions
 		Open,
 		Save,
 		SaveAs,
-		SaveAsWorksheet,
-		Print,
+		Print=5,
 		PrintDirectly,
 		PrintPreview,
 		ExportEMF,
@@ -48,7 +48,7 @@ namespace SAW.Functions
 		BringFrontOneStep,
 		SendBackOneStep,
 		QuickAddButtons,
-		FreeTextToTextLine,
+		//FreeTextToTextLine,
 		ConvertToPath = 124,
 		//MoveToPixels,
 		//TypeDegree,
@@ -306,7 +306,7 @@ namespace SAW.Functions
 	class NullVerb : Verb
 	{// it's OK to construct these - they are added as SAW/Splash stubs in places.  But they shouldn't be triggered
 
-		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
+		public override void Trigger(ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
 		{
 			Utilities.LogSubError("Triggering null verb");
 		}
@@ -315,7 +315,7 @@ namespace SAW.Functions
 	/// <summary>Wrapper that lets a verb be constructed just with an inline function.  Verb is always available. </summary>
 	public class LambdaVerb : Verb
 	{
-		public delegate void TriggerFunction(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction);
+		public delegate void TriggerFunction(ClickPosition.Sources source, EditableView pnlView, Transaction transaction);
 
 		private TriggerFunction m_Function;
 		private Predicate<EditableView> m_ApplicableFunction;
@@ -328,7 +328,7 @@ namespace SAW.Functions
 			m_ApplicableFunction = applicableFunction;
 		}
 
-		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
+		public override void Trigger(ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
 		{
 			m_Function.Invoke(source, pnlView, transaction);
 		}

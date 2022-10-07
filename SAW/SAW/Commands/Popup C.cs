@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using SAW.CommandEditors;
+using SAW.Shapes;
 
 namespace SAW.Commands
 {
@@ -11,10 +12,8 @@ namespace SAW.Commands
 		// the item ID is specified in an OPTIONAL param.  If no param is present, then this acts upon self or an ancestor (whichever is a popup)
 
 		#region Meta
-		protected override int[] GetPossibleIntIDs()
-		{
-			return new[] { 0, 1 };
-		}
+
+		protected override int[] GetPossibleIntIDs() => new[] { 0, 1 };
 
 		public override int SingleParam
 		{
@@ -32,7 +31,7 @@ namespace SAW.Commands
 			return Strings.Item(m_Show ? "Script_Desc_POPUPSHOW" : "Script_Desc_POPUPHIDE");
 		}
 
-		public override ICommandEditor GetEditor()
+		internal override ICommandEditor GetEditor()
 		{
 			return new PopupShowEditor();
 		}
@@ -42,7 +41,7 @@ namespace SAW.Commands
 			if (possibleParams.Count > 1)
 				throw new UserException(Strings.Item("Script_Error_TooManyParameters", commandUsed));
 			if (possibleParams.Count == 1)
-				m_ParamList.Add(new IntegerParam(possibleParams[0]));
+				ParamList.Add(new IntegerParam(possibleParams[0]));
 		}
 
 		#endregion
@@ -63,10 +62,10 @@ namespace SAW.Commands
 		}
 		#endregion
 
-		public override void Execute(ExecutionContext context)
+		internal override void Execute(ExecutionContext context)
 		{
 			Scriptable popup;
-			if (m_ParamList.Any())
+			if (ParamList.Any())
 			{
 				int ID = GetParamAsInt(0);
 				popup = context.Page.FindScriptableByID(ID);
@@ -81,7 +80,7 @@ namespace SAW.Commands
 				popup = search as Scriptable;
 			}
 			if (popup == null)
-				context.View.OnError(Strings.Item("Script_Fail_CannotFindPopup").Replace("%0", m_ParamList.Any() ? m_ParamList[0].ValueAsString() : "this"));
+				context.View.OnError(Strings.Item("Script_Fail_CannotFindPopup").Replace("%0", ParamList.Any() ? ParamList[0].ValueAsString() : "this"));
 			else
 			{
 				popup.Shown = m_Show;
@@ -95,10 +94,9 @@ namespace SAW.Commands
 
 	public class CmdPopupItem : Command
 	{
+		internal override ICommandEditor GetEditor() => new PopupItemEditor();
 
-		public override ICommandEditor GetEditor() => new PopupItemEditor();
-
-		public override void Execute(ExecutionContext context)
+		internal override void Execute(ExecutionContext context)
 		{
 			int ID = GetParamAsInt(0);
 			Scriptable item = context.Page.FindScriptableByID(ID);
@@ -115,7 +113,7 @@ namespace SAW.Commands
 			if (possibleParams.Count > 1)
 				throw new UserException(Strings.Item("Script_Error_TooManyParameters", commandUsed));
 			if (possibleParams.Count == 1)
-				m_ParamList.Add(new IntegerParam(possibleParams[0]));
+				ParamList.Add(new IntegerParam(possibleParams[0]));
 		}
 
 	}
@@ -123,7 +121,7 @@ namespace SAW.Commands
 	/// <summary>Runs select script of last item popped up</summary>
 	public class CmdPopupLast : Command
 	{
-		public override void Execute(ExecutionContext context)
+		internal override void Execute(ExecutionContext context)
 		{
 			if (context.View.LastPopupShown == null || context.View.LastPopupShown.FindPage() != context.Page)
 				return;
@@ -133,7 +131,7 @@ namespace SAW.Commands
 
 	public class CmdPopupSave : Command
 	{
-		public override void Execute(ExecutionContext context)
+		internal override void Execute(ExecutionContext context)
 		{
 			context.View.SavedPopup = context.View.LastPopupShown;
 		}
@@ -141,9 +139,9 @@ namespace SAW.Commands
 
 	public class CmdPopupRestore : Command
 	{
-		public override void Execute(ExecutionContext context)
+		internal override void Execute(ExecutionContext context)
 		{
-			var saved = context.View.SavedPopup;
+			Scriptable saved = context.View.SavedPopup;
 			if (saved == null)
 				return;
 			context.View.InvokeScript(saved, Scriptable.ScriptTypes.Select);
@@ -158,22 +156,22 @@ namespace SAW.Commands
 
 		public CmdGotoPage(int page) : this()
 		{
-			m_ParamList.Add(new IntegerParam(page));
+			ParamList.Add(new IntegerParam(page));
 		}
 
-		public override void Execute(ExecutionContext context)
+		internal override void Execute(ExecutionContext context)
 		{
 			int page = base.GetParamAsInt(0);
 			Globals.Root.CurrentPageIndex = page - 1; // data is 1-based
 		}
 
-		public override void EnsureParams(int count)
+		internal override void EnsureParams(int count)
 		{// overrides base because the param can't have the default value (0)
-			if (m_ParamList.Count < 1)
-				m_ParamList.Add(new IntegerParam(1));
+			if (ParamList.Count < 1)
+				ParamList.Add(new IntegerParam(1));
 		}
 
-		public override ICommandEditor GetEditor() => new GotoPageEditor();
+		internal override ICommandEditor GetEditor() => new GotoPageEditor();
 
 	}
 }

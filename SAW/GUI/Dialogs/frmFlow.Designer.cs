@@ -2,7 +2,7 @@
 
 namespace SAW
 {
-	public partial class frmFlow : System.Windows.Forms.Form
+	internal partial class frmFlow : System.Windows.Forms.Form
 	{
 		
 		//Form overrides dispose to clean up the component list.

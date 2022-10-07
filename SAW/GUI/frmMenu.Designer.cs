@@ -1,6 +1,6 @@
 ﻿namespace SAW
 {
-	partial class frmMenu
+	internal partial class frmMenu
 	{
 		/// <summary>
 		/// Required designer variable.

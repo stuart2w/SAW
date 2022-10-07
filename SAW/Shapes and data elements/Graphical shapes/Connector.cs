@@ -4,9 +4,9 @@ using System.Drawing;
 using System.Diagnostics;
 
 
-namespace SAW
+namespace SAW.Shapes
 {
-	public class Connector : Lined
+	internal class Connector : Lined
 	{
 
 		// this class always has exactly 2 Links which gives the locations where the ends are linked to
@@ -16,7 +16,7 @@ namespace SAW
 
 		#region Information
 		public override Shapes ShapeCode => Shapes.Connector;
-		public override SnapModes SnapNext(SnapModes requested) => SnapModes.Socket;
+		protected internal override SnapModes SnapNext(SnapModes requested) => SnapModes.Socket;
 		public override AllowedActions Allows => AllowedActions.Arrowheads ;
 		protected internal override bool Closed() => false;
 		public override GeneralFlags Flags => base.Flags | GeneralFlags.NumberLinksFixed;
@@ -89,7 +89,7 @@ namespace SAW
 
 		#region Verbs
 		private bool m_Acceptable = false;
-		public override VerbResult Start(EditableView.ClickPosition position)
+		public override VerbResult Start(ClickPosition position)
 		{
 			base.AddLink(null, 0);
 			base.AddLink(null, 0);
@@ -100,18 +100,18 @@ namespace SAW
 			return result;
 		}
 
-		private void UpdateLink(int index, EditableView.ClickPosition position)
+		private void UpdateLink(int index, ClickPosition position)
 		{
 			Socket socket = position.Page.NearestSocket(position.Exact);
 			m_Links[index] = new Link(socket); // works even if  objSocket.IsEmpty
 		}
 
-		public override VerbResult Cancel(EditableView.ClickPosition position)
+		public override VerbResult Cancel(ClickPosition position)
 		{
 			return VerbResult.Destroyed;
 		}
 
-		public override VerbResult Float(EditableView.ClickPosition pt)
+		public override VerbResult Float(ClickPosition pt)
 		{
 			Vertices[Vertices.Count - 1] = pt.Snapped;
 			UpdateLink(1, pt);
@@ -121,13 +121,13 @@ namespace SAW
 			return VerbResult.Continuing;
 		}
 
-		public override VerbResult Choose(EditableView.ClickPosition position)
+		public override VerbResult Choose(ClickPosition position)
 		{
 			Float(position);
 			return CompleteRetrospective();
 		}
 
-		public override VerbResult Complete(EditableView.ClickPosition position)
+		public override VerbResult Complete(ClickPosition position)
 		{
 			Float(position);
 			return CompleteRetrospective();
@@ -602,7 +602,7 @@ namespace SAW
 			base.DrawArrowheads(resources);
 		}
 
-		public override void UpdateReferencesObjectsCreated(Document document, DataReader reader)
+		protected internal override void UpdateReferencesObjectsCreated(Document document, DataReader reader)
 		{
 			base.UpdateReferencesObjectsCreated(document, reader);
 			// before 2.1.9 entries in m_Links could be deleted if they referenced deleted objects, which broke this - code assumes 2 entries

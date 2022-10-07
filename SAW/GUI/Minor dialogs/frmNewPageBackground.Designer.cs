@@ -1,7 +1,7 @@
 
 namespace SAW
 {
-	public partial class frmNewPageBackground : System.Windows.Forms.Form
+	internal partial class frmNewPageBackground : System.Windows.Forms.Form
 	{
 		
 		//Form overrides dispose to clean up the component list.

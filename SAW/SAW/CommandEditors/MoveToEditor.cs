@@ -81,7 +81,7 @@ namespace SAW.CommandEditors
 				return;
 			if (txtX.IsValid)
 			{
-				m_Command.m_ParamList[0] = new IntegerParam(txtX.Value);
+				m_Command.ParamList[0] = new IntegerParam(txtX.Value);
 				UserChanged?.Invoke(this, EventArgs.Empty);
 			}
 		}
@@ -93,7 +93,7 @@ namespace SAW.CommandEditors
 				return;
 			if (txtY.IsValid)
 			{
-				m_Command.m_ParamList[1] = new IntegerParam(txtY.Value);
+				m_Command.ParamList[1] = new IntegerParam(txtY.Value);
 				UserChanged?.Invoke(this, EventArgs.Empty);
 			}
 		}
@@ -109,8 +109,8 @@ namespace SAW.CommandEditors
 			{
 				m_Filling = true;
 				Point pt = this.PointToScreen(e.Location);
-				m_Command.m_ParamList[0] = new IntegerParam(pt.X);
-				m_Command.m_ParamList[1] = new IntegerParam(pt.Y);
+				m_Command.ParamList[0] = new IntegerParam(pt.X);
+				m_Command.ParamList[1] = new IntegerParam(pt.Y);
 				m_Filling = false;
 				FillUI();
 				UserChanged?.Invoke(this, EventArgs.Empty);

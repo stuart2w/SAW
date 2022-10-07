@@ -1,6 +1,6 @@
 ﻿namespace SAW
 {
-	partial class frmAddCommand
+	internal partial class frmAddCommand
 	{
 		/// <summary>
 		/// Required designer variable.

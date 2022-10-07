@@ -10,25 +10,26 @@ using System.Windows.Forms;
 namespace SAW
 {
 	#region Interfaces implemented by objects which are animated
-	public interface IBlendableColourDisplay
+
+	internal interface IBlendableColourDisplay
 	{
 		// the colour might be either the foreground or the background - the control can decide which it uses
 		Color VariableColour { get; set; }
 		// the Set method should call Invalidate within a control.  When implementing this remove it from DesignerSerialisationVisibility
 	}
 
-	public interface ILinearAnimated
+	internal interface ILinearAnimated
 	{
 		int VariableValue { get; set; }
 	}
 
-	public interface IToggleAnimated
+	internal interface IToggleAnimated
 	{
 		bool ToggleState { get; set; }
 		// "off" should be the resting state, if this needs to finish in a particular state after a particular number of iterations
 	}
 
-	public interface IAnimationNotifyComplete
+	internal interface IAnimationNotifyComplete
 	{
 		void Complete();
 	}

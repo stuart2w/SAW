@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using SAW.Commands;
+using SAW.Shapes;
 
 namespace SAW.Functions
 {
@@ -15,7 +16,7 @@ namespace SAW.Functions
 	{
 		public const string Filter = "*.irm|*.irm";
 
-		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
+		public override void Trigger(ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
 		{
 			if (!Globals.Root.CurrentConfig.ReadBoolean(Config.Multiple_Documents) && !Editor.CheckDiscardCurrent(false))
 				return;
@@ -111,7 +112,7 @@ namespace SAW.Functions
 		private Document GenerateDocument()
 		{
 			Document document = new Document(false);
-			document.SetDefaultGridAndSnapFromActivity();
+			document.SetDefaultsForNewDocument();
 			int currentPanel = 0; // which panel is being read, or -1 for the global bit at the top, or -2 for none (have encountered END)
 			Page page = document.Page(0);
 			m_NextElement = 0;
@@ -154,9 +155,7 @@ namespace SAW.Functions
 							lowestSepSeen = Math.Max((int)p1.Y, lowestSepSeen);
 							p1.Y += m_TopSize.Height - page.Size.Height;
 							p2.Y += m_TopSize.Height - page.Size.Height;
-							Line line = new Line(p1, p2);
-							line.LineStyle.Colour = Color.Black;
-							line.LineStyle.Width = 1;
+							Line line = new Line(p1, p2) {LineStyle = {Colour = Color.Black, Width = 1}};
 							page.AddNew(line, null);
 						}
 						break;
@@ -307,7 +306,7 @@ namespace SAW.Functions
 	internal class ExportIRM : Verb
 	{
 		private static bool g_WarningDone;
-		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
+		public override void Trigger(ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
 		{
 			if (!g_WarningDone)
 				MessageBox.Show(Strings.Item("SAW_IRM_SaveNote"));

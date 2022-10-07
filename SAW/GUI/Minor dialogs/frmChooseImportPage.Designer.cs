@@ -1,6 +1,6 @@
 namespace SAW
 {
-	public partial class frmChooseImportPage : System.Windows.Forms.Form
+	internal partial class frmChooseImportPage : System.Windows.Forms.Form
 	{
 		
 		//Form overrides dispose to clean up the component list.

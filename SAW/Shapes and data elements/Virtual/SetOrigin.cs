@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using System.Drawing;
 
-namespace SAW
+namespace SAW.Shapes
 {
-	public class SetOrigin : Shape
+	internal class SetOrigin : Shape
 	{
 		// dummy shape used when the user is setting the origin for reported coordinates
 
@@ -26,31 +26,31 @@ namespace SAW
 
 		public override GeneralFlags Flags => base.Flags | GeneralFlags.NotWithinContainer | GeneralFlags.AlwaysResetToolAfterCreation;
 
-		public override SnapModes SnapNext(SnapModes requested) => requested == SnapModes.Angle ? SnapModes.Off : base.SnapNext(requested);
+		protected internal override SnapModes SnapNext(SnapModes requested) => requested == SnapModes.Angle ? SnapModes.Off : base.SnapNext(requested);
 
 		#endregion
 
 		#region Verbs
 		// this is automatically started by the verb, therefore floating does most of the work
 
-		public override VerbResult Start(EditableView.ClickPosition position)
+		public override VerbResult Start(ClickPosition position)
 		{
 			m_Origin = position.Snapped;
 			return VerbResult.Continuing;
 		}
 
-		public override VerbResult Cancel(EditableView.ClickPosition position) => VerbResult.Destroyed;
+		public override VerbResult Cancel(ClickPosition position) => VerbResult.Destroyed;
 
-		public override VerbResult Float(EditableView.ClickPosition position)
+		public override VerbResult Float(ClickPosition position)
 		{
 			m_Origin = position.Snapped;
 			m_Bounds = RectangleF.Empty;
 			return VerbResult.Continuing;
 		}
 
-		public override VerbResult Choose(EditableView.ClickPosition position) => Complete(position);
+		public override VerbResult Choose(ClickPosition position) => Complete(position);
 
-		public override VerbResult Complete(EditableView.ClickPosition position)
+		public override VerbResult Complete(ClickPosition position)
 		{
 			m_Origin = position.Snapped;
 			m_Bounds = RectangleF.Empty;
@@ -63,7 +63,7 @@ namespace SAW
 
 		protected override RectangleF CalculateBounds() => Geometry.RectangleFromPoint(m_Origin, DRAWSIZE);
 
-		public override bool HitTestDetailed(PointF clickPoint, float scale, bool treatAsFilled) => false;
+		protected internal override bool HitTestDetailed(PointF clickPoint, float scale, bool treatAsFilled) => false;
 
 		private const float DRAWSIZE = 4;
 

@@ -1,6 +1,6 @@
 ﻿namespace SAW
 {
-	partial class frmEditBounds
+	internal partial class frmEditBounds
 	{
 		/// <summary>
 		/// Required designer variable.

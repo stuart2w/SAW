@@ -6,7 +6,7 @@ using System.Windows.Forms;
 
 namespace SAW
 {
-	public sealed class ctrPages : ScrollableControl
+	internal sealed class ctrPages : ScrollableControl
 	{
 
 		// DisplayedIndex should be assigned whenever the list of pages in the document changes, even if the same page index is still displayed

@@ -6,10 +6,11 @@ using System.Windows.Forms;
 using System.Linq;
 using SAW.Functions;
 using Action = SAW.Functions.Action;
+using SAW.Shapes;
 
 namespace SAW
 {
-	public partial class frmButton
+	internal partial class frmButton
 	{
 
 		private ButtonStyle m_Style;
@@ -55,8 +56,8 @@ namespace SAW
 			}
 			pnlImagePreview.NoImageString = Strings.Item("Button_NoImage");
 			PrepareLayout();
-			pnlLayout.SelectedIndex = Math.Min((int)m_Button.Layout & ((int)ButtonShape.Layouts.Superimpose - 1), pnlLayout.Controls.Count - 1);
-			chkSuperimpose.Checked = (m_Button.Layout & ButtonShape.Layouts.Superimpose) > 0;
+			pnlLayout.SelectedIndex = Math.Min((int)m_Button.Layout & ((int)ButtonLayouts.Superimpose - 1), pnlLayout.Controls.Count - 1);
+			chkSuperimpose.Checked = (m_Button.Layout & ButtonLayouts.Superimpose) > 0;
 			ShowRatioAndLayout();
 
 			// We need the configuration which will (probably) be in effect when the palette is used.  We assume user mode
@@ -141,9 +142,9 @@ namespace SAW
 			m_Button.LabelText = txtText.Text;
 			if (m_ImageChanged)
 				m_Button.SetImage(m_NewImage);
-			ButtonShape.Layouts layout = (ButtonShape.Layouts)pnlLayout.SelectedIndex;
+			ButtonLayouts layout = (ButtonLayouts)pnlLayout.SelectedIndex;
 			if (chkSuperimpose.Checked)
-				layout = layout | ButtonShape.Layouts.Superimpose;
+				layout = layout | ButtonLayouts.Superimpose;
 			m_Button.Layout = layout;
 
 			// Style:
@@ -323,10 +324,10 @@ namespace SAW
 		private void DrawLayoutPanel(object sender, PaintEventArgs e)
 		{
 			Panel pnl = (Panel)sender;
-			ButtonShape.Layouts layout = (ButtonShape.Layouts)Convert.ToInt32(pnl.Tag);
+			ButtonLayouts layout = (ButtonLayouts)Convert.ToInt32(pnl.Tag);
 			//If eLayout = pnlLayout.SelectedIndex Then e.Graphics.Clear(Color.Orange)
 			if (chkSuperimpose.Checked)
-				layout = layout | ButtonShape.Layouts.Superimpose;
+				layout = layout | ButtonLayouts.Superimpose;
 			m_LayoutButton.Layout = layout;
 			//e.Graphics.PageUnit = GraphicsUnit.Millimeter
 			float X = pnl.Width - 1; // / e.Graphics.DpiX) * INCH  ' pnl size in mm

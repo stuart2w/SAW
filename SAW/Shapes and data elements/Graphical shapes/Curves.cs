@@ -3,10 +3,11 @@ using System;
 using System.Drawing;
 using System.Diagnostics;
 using System.Drawing.Drawing2D;
+using System.Linq;
 using System.Text;
 
 
-namespace SAW
+namespace SAW.Shapes
 {
 	public class Curve : Sequential
 	{
@@ -26,17 +27,33 @@ namespace SAW
 			}
 		}
 
+		/// <summary>Constructor which creates the curve through a given list of points.  If closed an extra, STRAIGHT, line back to the start point is automatically added
+		/// There is no need to repeat the start point at the end of the list, but the end point should be close to the start if a visible straight join is not wanted</summary>
+		public Curve(IEnumerable<PointF> points, bool closed)
+		{
+			m_DefinedVertices = points.Count();
+			if (m_DefinedVertices < 2)
+				throw new ArgumentException("At least 2 points are required");
+			m_Closed = closed;
+			Vertices = points.ToList();
+			SetLength(m_DefinedVertices); // will update the control point list
+			SetControlPoints(0);
+			LineStyle.SetDefaults();
+			FillStyle.SetDefaults();
+			FillStyle.Colour = Color.Transparent;
+		}
+
 		#region Basic info
 		public override PointF Centre => base.CalculateCentreFromPoints();
 		public override Shapes ShapeCode => !m_Closed ? Shapes.Curve : Shapes.ClosedCurve;
 		protected override bool UseBaseline() => false;
-		protected  internal  override bool Closed() => m_Closed;
-		public override string StatusInformation(bool ongoing) => "";
-		public override LabelModes LabelMode => LabelModes.NotSupported;
+		protected internal override bool Closed() => m_Closed;
+		protected internal override string StatusInformation(bool ongoing) => "";
+		internal override LabelModes LabelMode => LabelModes.NotSupported;
 		public override AllowedActions Allows => base.Allows & ~(AllowedActions.Tidy | AllowedActions.PermittedArea);
 		protected override LineLogics LineLogic => LineLogics.UsePath;
 
-		public override StyleBase StyleObjectForParameter(Parameters parameter, bool applyingDefault = false)
+		internal override StyleBase StyleObjectForParameter(Parameters parameter, bool applyingDefault = false)
 		{
 			switch (parameter)
 			{
@@ -59,7 +76,7 @@ namespace SAW
 			}
 		}
 
-		public override void Diagnostic(StringBuilder output)
+		protected internal override void Diagnostic(StringBuilder output)
 		{
 			base.Diagnostic(output);
 			output.Append("Closed = ").AppendLine(m_Closed.ToString());
@@ -76,7 +93,7 @@ namespace SAW
 
 		#region Verbs
 
-		public override VerbResult Start(EditableView.ClickPosition position)
+		public override VerbResult Start(ClickPosition position)
 		{
 			if (base.Start(position) == VerbResult.Continuing)
 			{
@@ -96,7 +113,7 @@ namespace SAW
 			return VerbResult.Destroyed;
 		}
 
-		public override VerbResult Float(EditableView.ClickPosition pt)
+		public override VerbResult Float(ClickPosition pt)
 		{
 			if (m_DefinedVertices >= Vertices.Count)
 			{
@@ -119,7 +136,7 @@ namespace SAW
 			return VerbResult.Continuing;
 		}
 
-		public override VerbResult Choose(EditableView.ClickPosition position)
+		public override VerbResult Choose(ClickPosition position)
 		{
 			if (position.Snapped.ApproxEqual(LastDefined))
 				return VerbResult.Rejected;
@@ -151,7 +168,7 @@ namespace SAW
 			return VerbResult.Completed;
 		}
 
-		public override VerbResult Cancel(EditableView.ClickPosition position)
+		public override VerbResult Cancel(ClickPosition position)
 		{
 			if (m_DefinedVertices <= 1)
 				return VerbResult.Destroyed;
@@ -162,17 +179,17 @@ namespace SAW
 			return VerbResult.Continuing;
 		}
 
-		public override bool VertexVerbApplicable(Functions.Codes code, Target target)
+		protected internal override bool VertexVerbApplicable(Functions.Codes code, Target target)
 		{
 			switch (code)
 			{
-				case Functions.Codes.AddVertex:return true;
-				case Functions.Codes.RemoveVertex:return m_DefinedVertices > 2;
+				case Functions.Codes.AddVertex: return true;
+				case Functions.Codes.RemoveVertex: return m_DefinedVertices > 2;
 			}
 			return base.VertexVerbApplicable(code, target);
 		}
 
-		public override VerbResult OtherVerb(EditableView.ClickPosition position, Functions.Codes code)
+		protected internal override VerbResult OtherVerb(ClickPosition position, Functions.Codes code)
 		{
 			switch (code)
 			{
@@ -195,6 +212,7 @@ namespace SAW
 		#endregion
 
 		#region List of control points
+
 		protected override void SetLength(int length)
 		{
 			if (m_Closed)
@@ -337,7 +355,7 @@ namespace SAW
 
 		protected override RectangleF CalculateBounds() => base.BoundsOfPathDetailed();
 
-		public override bool HitTestDetailed(PointF clickPoint, float scale, bool treatAsFilled)
+		protected internal override bool HitTestDetailed(PointF clickPoint, float scale, bool treatAsFilled)
 		{
 			// this is an exception to the usual system where shapes can be treated as if filled sometimes.  I think for this shape it is probably more confusing
 			return base.HitTestDetailed(clickPoint, scale, treatAsFilled && m_Closed);
@@ -440,7 +458,7 @@ namespace SAW
 				if (Geometry.DirtyDistance(floating.Centre, bounds) <= Target.MaximumInterestDistance)
 				{
 					float maximumError = MaximumTError(index) * 3; // doesn't need to be so precise, because the target point release be on the Bezier
-																		 // said the user probably can't tell if it is a little bit short or long
+																   // said the user probably can't tell if it is a little bit short or long
 					Target create = GenerateLineTargetOnOneBezier(floating, GetSingleCurve(index), targets, maximumError, index);
 					if (create != null)
 						targets.Add(create);
@@ -485,7 +503,7 @@ namespace SAW
 			return list;
 		}
 
-		protected  internal override void DoGrabMove(GrabMovement move)
+		protected internal override void DoGrabMove(GrabMovement move)
 		{
 			base.DoGrabMove(move);
 			if (move.GrabType == GrabTypes.SingleVertex && m_Closed && move.ShapeIndex == 0)
@@ -555,13 +573,13 @@ namespace SAW
 		#endregion
 
 		#region Data
-		public override void Save(DataWriter writer)
+		protected internal override void Save(DataWriter writer)
 		{
 			base.Save(writer);
 			writer.Write(m_ControlPoints);
 		}
 
-		public override void Load(DataReader reader)
+		protected internal override void Load(DataReader reader)
 		{
 			// closed is set due to shape type
 			base.Load(reader);

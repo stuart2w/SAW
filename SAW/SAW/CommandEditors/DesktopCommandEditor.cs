@@ -66,10 +66,10 @@ namespace SAW.CommandEditors
 			}
 			if (m_Filling)
 				return;
-			if (m_Command.m_ParamList.Any())
-				m_Command.m_ParamList[0] = new StringParam(txtFile.Text);
+			if (m_Command.ParamList.Any())
+				m_Command.ParamList[0] = new StringParam(txtFile.Text);
 			else
-				m_Command.m_ParamList.Add(new StringParam(txtFile.Text));
+				m_Command.ParamList.Add(new StringParam(txtFile.Text));
 			UserChanged?.Invoke(this, EventArgs.Empty);
 		}
 

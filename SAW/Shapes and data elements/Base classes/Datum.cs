@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System;
 using System.Diagnostics;
 using System.Linq;
+using SAW.Shapes;
 
 namespace SAW
 {
@@ -84,20 +85,19 @@ namespace SAW
 			}
 		}
 
-		public virtual void Load(DataReader reader)
+		protected internal virtual void Load(DataReader reader)
 		{
 			ID = reader.ReadGuid();
 		}
 
-		public virtual void Save(DataWriter writer)
+		protected internal virtual void Save(DataWriter writer)
 		{
 			writer.Write(ID);
 		}
 
-		public abstract byte TypeByte { get; }
+		protected internal abstract byte TypeByte { get; }
 
-		public FileMarkers TypeByteAsFileMarker
-		{ get { return (FileMarkers)TypeByte; } }
+		internal FileMarkers TypeByteAsFileMarker => (FileMarkers)TypeByte;
 
 		/// <summary>Creates deep copy of object with new ID, adding itself to the mapping list.  Does not update references (this should be used within CopyFrom)</summary>
 		public virtual Datum Clone(Mapping mapID)
@@ -139,7 +139,7 @@ namespace SAW
 		}
 
 		/// <summary>AddRequiredReferences for this and all contained objects</summary>
-		public void AddRequiredReferencesRecurseToContained(Action<Datum> fnAdd, Mapping mapID)
+		protected internal void AddRequiredReferencesRecurseToContained(Action<Datum> fnAdd, Mapping mapID)
 		{
 			this.Iterate(obj => obj.AddRequiredReferences(fnAdd, mapID));
 		}
@@ -147,7 +147,7 @@ namespace SAW
 		/// <summary>Non-recursively invokes function for all non-contained objects which REQUIRED by this one (may not include loosely linked objects).
 		/// Particularly includes shared bitmaps.  Object IDs must also appear in mapID</summary>
 		[System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
-		public virtual void AddRequiredReferences(Action<Datum> fnAdd, Mapping mapID)
+		protected internal virtual void AddRequiredReferences(Action<Datum> fnAdd, Mapping mapID)
 		{
 			// if this object references other objects, __which it does not contain__ they need to be added, if not already in the list
 			// if the target object is effectively invariant, i.e. duplicates of this object would all refer to the same target
@@ -166,21 +166,23 @@ namespace SAW
 
 		/// <summary>called after loading.  Allows any objects which reference external objects not contained within self to relink to those objects
 		/// each class must call this on sub classes</summary>
-		public abstract void UpdateReferencesObjectsCreated(Document document, DataReader reader);
+		protected internal abstract void UpdateReferencesObjectsCreated(Document document, DataReader reader);
 
 		/// <summary>Called after copying a group of objects, where the copies have new ID numbers
 		/// objects with links to external objects should update their IDs, or clear them if they don't appear in the dictionary
 		/// key is the old ID, value is the new OBJECT
 		/// Document is provided for objects which access shared resources, but may want to update to a new reference (if the entire document has been copied)</summary>
-		public virtual void UpdateReferencesIDsChanged(Mapping mapID, Document document)
+		protected internal virtual void UpdateReferencesIDsChanged(Mapping mapID, Document document)
 		{
 		}
 
 		public delegate void DatumFunction(Datum obj);
-		public virtual void Iterate(DatumFunction fn)
+
+		/// <summary>Calls fn on this and all items CONTAINED within it, to any depth</summary>
+		internal virtual void Iterate(DatumFunction fn)
 		{
 			// Should be overridden in any derived classes which CONTAIN other objects.
-			// Overriding objects should do Mybase.Iterate and then call Iterate on each contained object
+			// Overriding objects should do base.Iterate and then call Iterate on each contained object
 			// should only iterate to CONTAINED objects.  For linked objects, override AddRequiredReferences
 			fn(this);
 		}
@@ -199,6 +201,7 @@ namespace SAW
 	}
 
 	#region ID mapping
+	/// <summary>Stores mapping of object IDs to new object references when copying/cloning an object tree </summary>
 	public class Mapping
 	{
 

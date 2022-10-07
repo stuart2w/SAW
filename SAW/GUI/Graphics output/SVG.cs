@@ -5,7 +5,7 @@ using System.Diagnostics;
 using System.Drawing.Drawing2D;
 using System.Xml.Linq;
 using System.Text;
-
+using SAW.Shapes;
 
 namespace SAW
 {
@@ -536,8 +536,8 @@ namespace SAW
 			Graphics gr = NetCanvas.MeasurementInstance.Underlying;
 			List<string> lines = new List<string>();
 
-			var sizeConversion = font.Size / font.FontFamily.GetEmHeight(FontStyle.Regular); // this is the only way to determine the conversion from the font's internal units to reality
-			var Y = layoutRect.Top + font.FontFamily.GetCellAscent(FontStyle.Regular) * sizeConversion;
+			float sizeConversion = font.Size / font.FontFamily.GetEmHeight(FontStyle.Regular); // this is the only way to determine the conversion from the font's internal units to reality
+			float Y = layoutRect.Top + font.FontFamily.GetCellAscent(FontStyle.Regular) * sizeConversion;
 			do
 			{
 				int chars;
@@ -578,7 +578,7 @@ namespace SAW
 					X = layoutRect.Right;
 					break;
 				default:
-					throw new ArgumentException("objFormat.Alignment");
+					throw new ArgumentException("format.Alignment");
 			}
 			StringBuilder style = new StringBuilder();
 			style.Append("font-size: ").Append(font.Size.ToString()).Append("pt; text-anchor: ").Append(anchor).Append("; ");

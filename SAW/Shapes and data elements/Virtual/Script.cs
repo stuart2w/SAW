@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.Text;
 using System.Linq;
 
-namespace SAW
+namespace SAW.Shapes
 {
 	/// <summary>Represents one of the individual scripts on a scriptable item (can visit/select/next/...)
 	/// These do not derive from Datum and are just entirely cloned by the containing object when needed for transaction control</summary>
+	/// <remarks>The script is stored as a series of object in CommandList.  The text form of the script is not stored and is regenerated as needed.</remarks>
 	public class Script : IArchivable
 	{
+		/// <summary>A record of where the selection should move next - contains a type and an ID which is used if Type == Item</summary>
 		public struct VisitTarget : IArchivable // was called VisitScript in C++ code
 		{
 			public enum VisitTypes
@@ -17,20 +19,26 @@ namespace SAW
 			/// <summary>What to visit - usually target is assigned relative to the current item, but if VisitType=Item then a specific numbered item can be assigned</summary>
 			public VisitTypes VisitType;
 
-			/// <summary>Stores the ID of the item to visit if the visit type is V_Item otherwise undefined</summary>
+			/// <summary>Stores the ID of the item to visit if the visit type is Item otherwise undefined</summary>
 			public int ItemID;
 
-			public void Read(ArchiveReader ar)
+			internal void Read(ArchiveReader ar)
 			{
 				VisitType = (VisitTypes)ar.ReadInt32();
 				ItemID = ar.ReadInt32();
 			}
-			public void Write(ArchiveWriter ar)
+
+			void IArchivable.Read(ArchiveReader ar) => Read(ar);
+
+			internal void Write(ArchiveWriter ar)
 			{
 				ar.Write((int)VisitType);
 				ar.Write(ItemID);
 			}
 
+			void IArchivable.Write(ArchiveWriter ar) => Write(ar);
+
+			/// <summary>Copy constructor</summary>
 			public VisitTarget(VisitTarget other)
 			{
 				ItemID = other.ItemID;
@@ -49,9 +57,23 @@ namespace SAW
 
 		}
 
+		/// <summary>Creates empty script object.  Visit must be assigned, and CommandList begins empty. </summary>
 		public Script()
 		{ }
 
+		/// <summary>Creates from the given text script, raising an exception if there were errors parsing.
+		/// Multiple commands must be separated by new lines (\r\n)</summary>
+		public  Script(string script, VisitTarget.VisitTypes visit = VisitTarget.VisitTypes.None)
+		{
+			string error = ParseFromScript(script, false);
+			Visit = new VisitTarget() { VisitType = visit };
+			if (error != null)
+				throw new Exception(error);
+		}
+
+		public static implicit operator Script(string s) => new Script(s);
+
+		/// <summary>Creates the script from a list of command objects</summary>
 		public Script(IEnumerable<Command> commands, VisitTarget.VisitTypes visit = VisitTarget.VisitTypes.None)
 		{
 			Visit = new VisitTarget() { VisitType = visit };
@@ -60,6 +82,8 @@ namespace SAW
 
 		#region Properties
 		// Unlike C++ code this does not store the combined text.  It is generated when needed
+
+		/// <summary>Where the selection should move to when the script is activated</summary>
 		public VisitTarget Visit;
 		/// <summary>parsed CCommandObj's, one per script textline.
 		/// Deferred and DeviceUp are not separated in SAW7.  They are all in this list</summary>
@@ -67,25 +91,25 @@ namespace SAW
 
 		/// <summary>If true default script is run first.  Unlike SAW6 where they were only run if this script is empty</summary>
 		public bool RunDefault = true;
-		//public bool m_Deleteable; //! This is set to TRUE if scripts marked as not being deleteable should be deleted
-		//public ScriptTypes m_ScriptType = ScriptTypes.None;//! This is the type of script
+
 		#endregion
 
 		#region Data
-		public void Read(ArchiveReader ar)
+
+		internal void Read(ArchiveReader ar)
 		{
 			string script = ar.ReadStringL();
 			Visit.Read(ar);
 			ar.ReadList(CommandList);
 			ar.ReadList(CommandList);// deferred items in SAW 6 are in a separate list
 									 // then the script is read in order to preserve comments
-			var error = ParseFromScript(script, true);
+			string error = ParseFromScript(script, true);
 			if (error != null)
 				Globals.NonFatalOperationalError(Strings.Item("Script_Error_LoadSAW6") + error + " (" + script.Replace("\n", "\\n").Replace("\r", "\\r") + ")");
 			RunDefault = !CommandList.Any();
 		}
 
-		public void Write(ArchiveWriter ar)
+		internal void Write(ArchiveWriter ar)
 		{
 			ar.WriteStringL(GenerateScript(true), true);
 			Visit.Write(ar);
@@ -97,8 +121,11 @@ namespace SAW
 			ar.WriteFiltered(CommandList, x => x.ExecutionTime == Command.ExecutionTimes.Deferred && x.CommandListEntry.SAW6);  // not sure what happened to any device up???
 		}
 
+		void IArchivable.Read(ArchiveReader ar) => Read(ar);
+		void IArchivable.Write(ArchiveWriter ar) => Write(ar);
+
 		/// <summary>Reads from Splash format data file.  This object doesn't inherit from Datum, so it is necessary to call this directly</summary>
-		public void Read(DataReader reader)
+		internal void Read(DataReader reader)
 		{
 			Visit.VisitType = (VisitTarget.VisitTypes)reader.ReadByte();
 			Visit.ItemID = reader.ReadInt32();
@@ -110,7 +137,7 @@ namespace SAW
 		}
 
 		/// <summary>Writes to Splash format data file.  This object doesn't inherit from Datum, so it is necessary to call this directly</summary>
-		public void Write(DataWriter writer)
+		internal void Write(DataWriter writer)
 		{
 			writer.Write((byte)Visit.VisitType);
 			writer.Write(Visit.ItemID);
@@ -148,6 +175,8 @@ namespace SAW
 		#endregion
 
 		#region Conversion between command objects and text
+
+		/// <summary>Generates a text script from the stored command objects </summary>
 		public string GenerateScript(bool forSAW6 = false)
 		{
 			StringBuilder s = new StringBuilder();
@@ -160,6 +189,7 @@ namespace SAW
 		}
 
 		/// <summary>Parses the given script and stores in the command list if OK; if not it returns an error message (null on success)</summary>
+		/// <remarks>Multiple commands must be separated by new lines (\r\n)</remarks>
 		/// <returns>Error message or Null on success</returns>
 		public string ParseFromScript(string script, bool fromSAW6)
 		{
@@ -203,7 +233,7 @@ namespace SAW
 		public override string ToString() => GenerateScript(false);
 
 		/// <summary>Does the output for the "output as text" command.  This should be given the description which is prefixed on the beginning.  This allows an optional call to this which will be ignored if it is null </summary>
-		public void WriteExportText(IndentStringBuilder output, string description)
+		internal void WriteExportText(IndentStringBuilder output, string description)
 		{
 			if (Visit.VisitType == VisitTarget.VisitTypes.None && !CommandList.Any())
 				return;
@@ -216,7 +246,7 @@ namespace SAW
 			output.AppendLine();
 		}
 
-		/// <summary>True if the script contains nothing, but runs default scripts.  ie the user has not changed anything here</summary>
+		/// <summary>True if the script contains nothing, but DOES run default scripts.  ie the user has not changed anything here</summary>
 		public bool IsEmpty => RunDefault && !CommandList.Any() && Visit.VisitType == VisitTarget.VisitTypes.None;
 
 	}

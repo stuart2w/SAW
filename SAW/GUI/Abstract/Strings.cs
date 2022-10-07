@@ -13,7 +13,7 @@ namespace SAW
 		/// <summary>defined by Load (stored here for use in SaveFile)</summary>
 		private static string g_Folder;
 
-		public static void Load()
+		internal static void Load()
 		{
 			Load(false, false);
 			// And one or two items are added, which are derived from Windows
@@ -32,7 +32,7 @@ namespace SAW
 			string culture = System.Globalization.CultureInfo.CurrentUICulture.Name;
 			// folder bodges for my machines... ' 
 #if DEBUG
-			if (System.IO.Directory.Exists("d:\\data\\Siberix") && !g_Folder.ToLower().Contains("program"))
+			if (System.IO.Directory.Exists("d:\\data\\Siberix") && !g_Folder.ToLower().Contains("program") && !Globals.IsEmbedded)
 			{
 				g_Folder = System.Reflection.Assembly.GetExecutingAssembly().Location.Replace("\\x86", "").Replace("\\bin", ""); // will work if x86 present or not
 																																 // still need to remove filename and go up outside bin folder
@@ -47,7 +47,7 @@ namespace SAW
 			}
 			Server.Language2 = culture.Substring(0, 2);
 
-			List<string> suffixes = new List<string> {""};
+			List<string> suffixes = new List<string> { "" };
 
 			foreach (string suffix in suffixes)
 			{
@@ -123,7 +123,7 @@ namespace SAW
 		{
 			if (!System.IO.File.Exists(file))
 			{
-				Debug.WriteLine("Strings file does not exist: " + System.IO.Path.GetFileName(file));
+				Debug.WriteLine("Strings file does not exist: " + file); // System.IO.Path.GetFileName(file));
 				return;
 			}
 			Debug.WriteLine("Loading strings: " + System.IO.Path.GetFileName(file));
@@ -171,7 +171,6 @@ namespace SAW
 		{
 			return Item(ID).Replace("%0", replacement0);
 		}
-
 
 		public static bool Exists(string ID)
 		{
@@ -240,7 +239,7 @@ namespace SAW
 		}
 
 		/// <summary>Converts any text within a LinkLabel enclosed in (( )) into a link</summary>
-		public static void AutoLink(LinkLabel lnk)
+		internal static void AutoLink(LinkLabel lnk)
 		{
 			int start = lnk.Text.IndexOf("((");
 			int end = lnk.Text.IndexOf("))");
@@ -251,7 +250,7 @@ namespace SAW
 			}
 		}
 
-		public static void Translate(ToolStripItem item)
+		internal static void Translate(ToolStripItem item)
 		{
 			item.Text = Translate(item.Text);
 			if (!(item is ToolStripMenuItem)) return;
@@ -261,7 +260,7 @@ namespace SAW
 			}
 		}
 
-		public static void Translate(Menu item)
+		internal static void Translate(Menu item)
 		{
 			if (item is MenuItem)
 				((MenuItem)item).Text = Translate(((MenuItem)item).Text);
@@ -295,7 +294,7 @@ namespace SAW
 
 		#endregion
 
-		public static void SaveList(string file, bool onlyMissing)
+		internal static void SaveList(string file, bool onlyMissing)
 		{
 			// we will load the text again, omitting the English to give us in memory a list of what is in the translated files
 			// and then process the file again
@@ -348,13 +347,13 @@ namespace SAW
 		}
 
 		/// <summary>All the loaded codes from the translations file</summary>
-		public static Dictionary<string, string>.KeyCollection Keys
+		internal static Dictionary<string, string>.KeyCollection Keys
 		{ get { return g_Strings.Keys; } }
 
 		private static HashSet<string> m_Once = new HashSet<string>();
 		/// <summary>can be used to track messages which should only be displayed once.  This function returns if the message should be displayed
 		/// it will then return false in future for the same ID</summary>
-		public static bool OnceMessage(string ID)
+		internal static bool OnceMessage(string ID)
 		{
 			Debug.Assert(!ID.StartsWith("[") && !ID.Contains(" "), "Strings.OnceMessage: parameter should be ID not translatable message or message");
 			if (m_Once.Contains(ID))

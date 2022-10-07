@@ -8,9 +8,10 @@ using System.Linq;
 using System.Windows.Forms;
 using SAW.Functions;
 
-namespace SAW
+namespace SAW.Shapes
 {
-	/// <summary>Used to add scripting support to any existing element.  Always contains one and only one other shape</summary>
+	/// <summary>Used to add scripting support to any existing visual element.  Always contains one and only one other shape which provides the UI.
+	/// There is a property containing a Script object for each of the individual possible scripts - any or all of these can be null indicating no script in that location</summary>
 	public class Scriptable : Shape, IShapeContainer
 	{
 		/// <summary>The visual element for this - usually a SAW.Item, but can be anything</summary>
@@ -27,7 +28,7 @@ namespace SAW
 
 		#region Properties supporting active functionality
 
-		public ButtonShape.States State;
+		internal ButtonShape.States State;
 
 		/// <summary>Was stored as string in SAW6, but appears to always behave as int, and scripts referencing an ID could only accept integers</summary>
 		public int SAWID { get; set; }
@@ -38,6 +39,7 @@ namespace SAW
 		public bool Shown = true;
 		/// <summary>In milliseconds.  -1 indicates no repeat scripts. </summary>
 		public int RepeatTimeout = -1;
+		/// <summary>If true the normal iteration will skip over this element</summary>
 		public bool NotVisited;
 		/// <summary>The Auto Repeat of standard Select scripts;  not whether the repeat scripts are used;  this causes entire item to repeat</summary>
 		public bool AutoRepeat;
@@ -49,7 +51,7 @@ namespace SAW
 		public bool OutputAsDisplay;
 		public string SpeechText;
 		public bool SpeechAsDisplay;
-		public string PromptText;
+		internal string PromptText;
 
 		#endregion
 
@@ -66,8 +68,9 @@ namespace SAW
 			PostRepeat
 		}
 
-		public readonly Script[] Scripts = new Script[6];
+		internal readonly Script[] Scripts = new Script[6];
 
+		/// <summary>Script that is run when the item is highlighted;  typically highlights the item </summary>
 		public Script VisitScript
 		{
 			[DebuggerStepThrough]
@@ -75,6 +78,7 @@ namespace SAW
 			set { Scripts[0] = value; }
 		}
 
+		/// <summary>Script that is run when the user activates this item.  This is the main functional script for each item </summary>
 		public Script SelectScript
 		{
 			[DebuggerStepThrough]
@@ -82,6 +86,7 @@ namespace SAW
 			set { Scripts[1] = value; }
 		}
 
+		/// <summary>Script that is run when the highlight/selection should move on to the next item.  By default this will select the next item, but can be overridden to navigate elsewhere</summary>
 		public Script NextScript
 		{
 			[DebuggerStepThrough]
@@ -89,6 +94,7 @@ namespace SAW
 			set { Scripts[2] = value; }
 		}
 
+		/// <summary>Script that is run once before repeating if the user presses and holds the switch.  Only used if RepeatTimeout is set</summary>
 		public Script PreRepeatScript
 		{
 			[DebuggerStepThrough]
@@ -96,6 +102,7 @@ namespace SAW
 			set { Scripts[3] = value; }
 		}
 
+		/// <summary>Script that is run repeatedly if the user presses and holds the switch.  Only used if RepeatTimeout is set</summary>
 		public Script RepeatScript
 		{
 			[DebuggerStepThrough]
@@ -103,6 +110,7 @@ namespace SAW
 			set { Scripts[4] = value; }
 		}
 
+		/// <summary>Script that is run once at the end of repetition when the user releases a held switch.  Only used if RepeatTimeout is set</summary>
 		public Script PostRepeatScript
 		{
 			[DebuggerStepThrough]
@@ -110,11 +118,10 @@ namespace SAW
 			set { Scripts[5] = value; }
 		}
 
-		public Script GetScript(ScriptTypes which)
-		{
-			return Scripts[(int)which];
-		}
+		/// <summary>Gets one of the SelectScript/VisitScript etc properties...  Individual scripts should usually be accessed by the named property.</summary>
+		public Script GetScript(ScriptTypes which) => Scripts[(int)which];
 
+		/// <summary>Sets one of the SelectScript/VisitScript etc properties... Individual scripts should usually be accessed by the named property.</summary>
 		public void SetScript(ScriptTypes which, Script value)
 		{
 			Scripts[(int)which] = value;
@@ -131,8 +138,7 @@ namespace SAW
 		}
 
 		/// <summary>True if this uses the 3 custom repeating scripts.  (Even if false the basic SAW script can repeat if AutoRepeat=true</summary>
-		public bool HasRepeatingScript
-		{ get { return RepeatTimeout >= 0; } }
+		public bool HasRepeatingScript => RepeatTimeout >= 0;
 
 		#endregion
 
@@ -142,6 +148,7 @@ namespace SAW
 			HighlightStyle.SetDefaults();
 		}
 
+		/// <summary>Creates the scriptable containing the given UI element </summary>
 		public Scriptable(Shape element) : this()
 		{
 			Element = element;
@@ -153,7 +160,7 @@ namespace SAW
 
 		internal override string Description => SAWID + ": " + Element.Description;
 
-		public override void Diagnostic(StringBuilder output)
+		protected internal override void Diagnostic(StringBuilder output)
 		{
 			base.Diagnostic(output);
 			output.Append("SAW ID=").AppendLine(SAWID.ToString());
@@ -171,7 +178,7 @@ namespace SAW
 		public override GeneralFlags Flags
 		{ get { return (Element?.Flags ?? GeneralFlags.None) | GeneralFlags.DoubleClickAfterCreation; } }
 
-		public override string StatusInformation(bool ongoing)
+		protected internal override string StatusInformation(bool ongoing)
 		{
 			StringBuilder output = new StringBuilder();
 			if (!ongoing)
@@ -187,32 +194,32 @@ namespace SAW
 		#endregion
 
 		#region Verbs - just call through to content (creating a SAWItem) except DoubleClick and CompleteRetrospective can be used when created externally
-		public override VerbResult Start(EditableView.ClickPosition position)
+		public override VerbResult Start(ClickPosition position)
 		{
 			Element = new Item { Parent = this };
 			SetUniqueID();
 			return Element.Start(position);
 		}
 
-		public override VerbResult Cancel(EditableView.ClickPosition position)
+		public override VerbResult Cancel(ClickPosition position)
 		{
 			m_Bounds = RectangleF.Empty;
 			return Element.Cancel(position);
 		}
 
-		public override VerbResult Choose(EditableView.ClickPosition position)
+		public override VerbResult Choose(ClickPosition position)
 		{
 			m_Bounds = RectangleF.Empty;
 			return Element.Choose(position);
 		}
 
-		public override VerbResult Float(EditableView.ClickPosition position)
+		public override VerbResult Float(ClickPosition position)
 		{
 			m_Bounds = RectangleF.Empty;
 			return Element.Float(position);
 		}
 
-		public override VerbResult Complete(EditableView.ClickPosition position)
+		public override VerbResult Complete(ClickPosition position)
 		{
 			m_Bounds = RectangleF.Empty;
 			return Element.Complete(position);
@@ -235,7 +242,7 @@ namespace SAW
 			return Strings.Item("SAW_Edit_Scriptable");
 		}
 
-		internal override void DoDoubleClick(EditableView view, EditableView.ClickPosition.Sources source)
+		internal override void DoDoubleClick(EditableView view, ClickPosition.Sources source)
 		{
 			LastDoubleClickResult = frmSAWItem.Display(view) == DialogResult.OK;
 			if (!LastDoubleClickResult)
@@ -255,7 +262,7 @@ namespace SAW
 		}
 
 		/// <summary>Called by editor dialog to force this to discard some cache items and repaint</summary>
-		public void WasEdited()
+		internal void WasEdited()
 		{
 			// editor also calls on each Item, which will do a repaint, so this is redundant IFF the contained Element is Item.
 			// but if it's another graphical object, then this is needed
@@ -266,7 +273,7 @@ namespace SAW
 
 		#region Data
 
-		public override void Save(DataWriter writer)
+		protected internal override void Save(DataWriter writer)
 		{
 			base.Save(writer);
 			writer.Write(Element);
@@ -295,7 +302,7 @@ namespace SAW
 			}
 		}
 
-		public override void Load(DataReader reader)
+		protected internal override void Load(DataReader reader)
 		{
 			base.Load(reader);
 			Element = (Shape)reader.ReadData();
@@ -437,7 +444,7 @@ namespace SAW
 			SAWID = (from p in Globals.Root.CurrentDocument.Pages select p.FindHighestUsedID()).Max() + 1;
 		}
 
-		public override void WriteExportText(IndentStringBuilder output)
+		protected internal override void WriteExportText(IndentStringBuilder output)
 		{
 			output.Append("Item ").AppendLine(SAWID);
 			output.Indent += 2;
@@ -481,14 +488,14 @@ namespace SAW
 			return bounds;
 		}
 
-		public override bool VertexVerbApplicable(Codes code, Target target)
+		protected internal override bool VertexVerbApplicable(Codes code, Target target)
 		{
 			if (target.Shape == Element) // can't call base as it asserts that it is the right shape
 				return Element.VertexVerbApplicable(code, target);
 			return base.VertexVerbApplicable(code, target);
 		}
 
-		public override bool HitTestDetailed(PointF clickPoint, float scale, bool treatAsFilled)
+		protected internal override bool HitTestDetailed(PointF clickPoint, float scale, bool treatAsFilled)
 		{
 			if (!Shown)
 				return false;
@@ -496,7 +503,7 @@ namespace SAW
 		}
 		internal override List<UserSocket> GetPointsWhichSnapWhenMoving() => Element.GetPointsWhichSnapWhenMoving();
 		internal override List<Target> GenerateTargets(UserSocket floating) => Element.GenerateTargets(floating);
-		public override (GrabSpot[], string[]) GetEditableCoords(Target selectedElement) => Element.GetEditableCoords(selectedElement);
+		internal override (GrabSpot[], string[]) GetEditableCoords(Target selectedElement) => Element.GetEditableCoords(selectedElement);
 
 		#endregion
 
@@ -520,7 +527,7 @@ namespace SAW
 			public Color TextColour;
 			public float LineWidth;
 
-			public override int ParameterValue(Parameters parameter)
+			internal override int ParameterValue(Parameters parameter)
 			{
 				switch (parameter)
 				{
@@ -534,7 +541,7 @@ namespace SAW
 				}
 			}
 
-			public override void SetParameterValue(int value, Parameters parameter)
+			internal override void SetParameterValue(int value, Parameters parameter)
 			{
 				switch (parameter)
 				{
@@ -556,7 +563,7 @@ namespace SAW
 				LineWidth = highlight.LineWidth;
 			}
 
-			public override Parameters[] ApplicableParameters()
+			internal override Parameters[] ApplicableParameters()
 			{
 				return new Parameters[] { Parameters.LineWidth, Parameters.LineColour, Parameters.FillColour, Parameters.TextColour };
 			}
@@ -571,7 +578,7 @@ namespace SAW
 			}
 
 			/// <summary>Sets very generic defaults without knowing what the element is </summary>
-			public void SetDefaults()
+			internal void SetDefaults()
 			{
 				LineColour = Color.Red;
 				FillColour = Color.White;
@@ -579,7 +586,7 @@ namespace SAW
 				LineWidth = 2;
 			}
 
-			public static HighlightStyleC Read(DataReader reader)
+			internal static HighlightStyleC Read(DataReader reader)
 			{
 				HighlightStyleC newStyle = new HighlightStyleC();
 				newStyle.FillColour = reader.ReadColour();
@@ -591,7 +598,7 @@ namespace SAW
 				return newStyle;
 			}
 
-			public void Save(DataWriter writer)
+			internal void Save(DataWriter writer)
 			{
 				writer.Write(FillColour);
 				writer.Write(TextColour);
@@ -602,7 +609,7 @@ namespace SAW
 			/// <summary>Creates an instance initialised with the current (non-highlight) styles stored in a shape</summary>
 			public static HighlightStyleC FromShape(Shape shape)
 			{
-				var highlight = new HighlightStyleC();
+				HighlightStyleC highlight = new HighlightStyleC();
 				FillStyleC fill = (FillStyleC)shape.StyleObjectForParameter(Parameters.FillColour);
 				if (fill != null)
 					highlight.FillColour = fill.Colour;
@@ -637,11 +644,12 @@ namespace SAW
 
 		}
 
-		public override StyleBase StyleObjectForParameter(Parameters parameter, bool applyingDefault = false) => Element?.StyleObjectForParameter(parameter, applyingDefault);
+		internal override StyleBase StyleObjectForParameter(Parameters parameter, bool applyingDefault = false) => Element?.StyleObjectForParameter(parameter, applyingDefault);
 
 		#endregion
 
 		#region Graphics
+
 		protected override void InternalDraw(Canvas gr, DrawResources resources)
 		{
 			// this would draw this item itself, which has no representation.  It is the Draw et cetera methods which draw the content item
@@ -679,7 +687,7 @@ namespace SAW
 			Element.InitialiseFreeStanding();
 		}
 
-		public override void NotifyStyleChanged(Parameters parameter, int oldValue, int newValue)
+		internal override void NotifyStyleChanged(Parameters parameter, int oldValue, int newValue)
 		{
 			Element?.NotifyStyleChanged(parameter, oldValue, newValue);
 		}
@@ -697,7 +705,7 @@ namespace SAW
 			Element.GrabMove(move);
 		}
 
-		internal override GrabMovement GetCustomGrabMove(EditableView.ClickPosition current, EditableView.ClickPosition click, Transaction transaction)
+		internal override GrabMovement GetCustomGrabMove(ClickPosition current, ClickPosition click, Transaction transaction)
 			=> Element.GetCustomGrabMove(current, click, transaction);
 
 		internal override bool StartGrabMove(GrabMovement grab)
@@ -716,6 +724,7 @@ namespace SAW
 		#endregion
 
 		#region IShapeParent and related items
+
 		public void NotifyIndirectChange(Shape shape, ChangeAffects affected)
 		{
 			if ((affected & ChangeAffects.Bounds) > 0)
@@ -750,20 +759,20 @@ namespace SAW
 			}
 		}
 
-		public override void Iterate(DatumFunction fn)
+		internal override void Iterate(DatumFunction fn)
 		{
 			base.Iterate(fn);
 			Element?.Iterate(fn); // may be null for default scripts
 		}
 
-		public override void UpdateReferencesObjectsCreated(Document document, DataReader reader)
+		protected internal override void UpdateReferencesObjectsCreated(Document document, DataReader reader)
 		{
 			base.UpdateReferencesObjectsCreated(document, reader);
 			Element?.UpdateReferencesObjectsCreated(document, reader);
 			Sound?.DereferenceOnLoad(document);
 		}
 
-		public override void UpdateReferencesIDsChanged(Mapping mapID, Document document)
+		protected internal override void UpdateReferencesIDsChanged(Mapping mapID, Document document)
 		{
 			base.UpdateReferencesIDsChanged(mapID, document);
 			Element?.UpdateReferencesIDsChanged(mapID, document);
@@ -778,7 +787,7 @@ namespace SAW
 			Element?.NotifyEnvironmentChanged(change);
 		}
 
-		public override void AddRequiredReferences(Action<Datum> fnAdd, Mapping mapID)
+		protected internal override void AddRequiredReferences(Action<Datum> fnAdd, Mapping mapID)
 		{
 			base.AddRequiredReferences(fnAdd, mapID);
 			fnAdd.Invoke(Sound?.Content);
@@ -787,6 +796,7 @@ namespace SAW
 		#endregion
 
 		#region IShapeContainer delegates to Element where it is IShapeContainer
+
 		/// <summary>Empty list that can be returned as needed if Element is not a container</summary>
 		private static readonly List<Shape> EmptyList = new List<Shape>();
 
@@ -806,7 +816,7 @@ namespace SAW
 
 		public IEnumerable<Shape> Reverse => (Element as IShapeContainer)?.Reverse ?? EmptyList;
 
-		public void FinishedModifyingContents(Transaction transaction, GrabMovement move = null)
+		void IShapeContainer.FinishedModifyingContents(Transaction transaction, GrabMovement move = null)
 		{
 			ElementAsContainer?.FinishedModifyingContents(transaction, move);
 		}
@@ -814,26 +824,25 @@ namespace SAW
 		/// <summary>Returns the Item contents if it contains a SAW item, or an empty list </summary>
 		public List<Shape> Contents => (Element as IShapeContainer)?.Contents ?? new List<Shape>();
 
-		public bool MoveWithin(List<Shape> shapes, PointF target, GrabMovement move, Transaction transaction)
+		bool IShapeContainer.MoveWithin(List<Shape> shapes, PointF target, GrabMovement move, Transaction transaction)
 		{
 			if (!(Element is IShapeContainer))
 				return false;
 			return ElementAsContainer.MoveWithin(shapes, target, move, transaction);
 		}
 
-		public bool AllowClick(PointF target) => Container.AllowClick(target);
+		bool IShapeContainer.AllowClick(PointF target) => Container.AllowClick(target);
 
 		public IShapeContainer AsParentContainer => Container;
+
+		protected internal override IShapeContainer AsContainer => Element.AsContainer;
+
+		protected internal override IShapeTarget AsTarget => Element.AsTarget;
 
 		public void CheckZ(Shape shp)
 		{ // function is called on parent of shp - so it should be our element
 			Debug.Assert(shp == Element); // no need to check index really
 		}
-
-		public override IShapeContainer AsContainer => Element.AsContainer;
-
-		public override IShapeTarget AsTarget => Element.AsTarget;
-
 		#endregion
 
 	}

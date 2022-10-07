@@ -5,7 +5,7 @@ using System.Windows.Forms;
 namespace SAW
 {
 	/// <summary>Edits the list of applications in a Desktop, allowing the user to remove unwanted ones </summary>
-	public partial class frmEditDesktop : Form
+	internal partial class frmEditDesktop : Form
 	{
 		private Desktop m_Desktop;
 

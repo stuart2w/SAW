@@ -1,6 +1,6 @@
 ﻿namespace SAW
 {
-	partial class cfgSwitching
+	internal partial class cfgSwitching
 	{
 		/// <summary> 
 		/// Required designer variable.

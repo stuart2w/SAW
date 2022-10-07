@@ -3,7 +3,7 @@ using System.IO;
 
 namespace SAW
 {
-	public static class CRCCalc
+	internal static class CRCCalc
 	{
 		private static readonly uint[] table = new uint[256];
 

@@ -351,7 +351,7 @@ namespace SAW
 		#endregion
 
 		#region Datum
-		public override void Load(DataReader reader)
+		protected internal override void Load(DataReader reader)
 		{
 			base.Load(reader);
 			PaperType = (Papers)reader.ReadByte();
@@ -370,7 +370,7 @@ namespace SAW
 				PrintBackground = true;
 		}
 
-		public override void Save(DataWriter writer)
+		protected internal override void Save(DataWriter writer)
 		{
 			base.Save(writer);
 			writer.WriteByte((byte)PaperType);
@@ -401,10 +401,10 @@ namespace SAW
 			DotSize = objPaper.DotSize;
 		}
 
-		public override byte TypeByte
+		protected internal override byte TypeByte
 		{ get { return (byte)FileMarkers.Paper; } }
 
-		public override void UpdateReferencesObjectsCreated(Document document, DataReader reader)
+		protected internal override void UpdateReferencesObjectsCreated(Document document, DataReader reader)
 		{
 		}
 
@@ -472,8 +472,7 @@ namespace SAW
 			}
 		}
 
-		public override byte TypeByte
-		{ get { return (byte)FileMarkers.GraphPaper; } }
+		protected internal override byte TypeByte => (byte)FileMarkers.GraphPaper;
 
 	}
 }

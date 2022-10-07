@@ -1,7 +1,7 @@
 
 namespace SAW
 {
-	public partial class cfgSpeech : ConfigPage
+	internal partial class cfgSpeech : ConfigPage
 	{
 		
 		//UserControl overrides dispose to clean up the component list.

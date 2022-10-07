@@ -4,7 +4,7 @@ using System.Windows.Forms;
 
 namespace SAW
 {
-	public partial class frmShowErrorReport
+	internal partial class frmShowErrorReport
 	{
 		public frmShowErrorReport()
 		{

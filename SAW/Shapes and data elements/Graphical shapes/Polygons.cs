@@ -1,10 +1,11 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Diagnostics;
+using System.Linq;
 
 // regular, irregular polygons and PolyLines...
 
-namespace SAW
+namespace SAW.Shapes
 {
 	/// <summary>Regular polygon </summary>
 	public class Polygon : Sequential
@@ -16,13 +17,32 @@ namespace SAW
 
 		public static event NullEventHandler CurrentSidesChanged;// Raised when CURRENTSIDES is modified (because it is displayed in one of the buttons)
 
+		public Polygon()
+		{ }
+
+		public Polygon(PointF A, PointF B, bool clockwise, int sides)
+		{
+			m_Sides = sides;
+			//Vertices.Add(A);
+			//Vertices.Add(B);
+			Start(new ClickPosition(A));
+			Choose(new ClickPosition(B));
+			SetLength(m_Sides);
+			PlacePoints(clockwise ? 1 : -1);
+			m_Acceptable = true;
+			Status = StatusValues.Complete;
+			LineStyle.SetDefaults();
+			FillStyle.SetDefaults();
+			FillStyle.Colour = Color.Transparent;
+		}
+
 		#region Basic Information
 
 		public override Shapes ShapeCode => Shapes.Polygon;
 
 		protected override int FixedVerticesLength() => m_Sides;
 
-		public override SnapModes SnapNext(SnapModes requested)
+		protected internal override SnapModes SnapNext(SnapModes requested)
 		{
 			if (m_DefinedVertices >= 2)
 				return SnapModes.Off;
@@ -32,10 +52,9 @@ namespace SAW
 
 		public override PointF Centre => base.CalculateCentreFromPoints();
 
-		public override AllowedActions Allows
-		{ get { return base.Allows & ~AllowedActions.TransformLinearStretch; } }
+		public override AllowedActions Allows => base.Allows & ~AllowedActions.TransformLinearStretch;
 
-		public override bool AllowVerbWhenComplete(Functions.Codes code)
+		protected internal override bool AllowVerbWhenComplete(Functions.Codes code)
 		{
 			switch (code)
 			{
@@ -55,7 +74,7 @@ namespace SAW
 			return list;
 		}
 
-		public override string StatusInformation(bool ongoing)
+		protected internal override string StatusInformation(bool ongoing)
 		{
 			if (ongoing)
 				return base.StatusInformation(true);
@@ -66,7 +85,7 @@ namespace SAW
 
 		#region Verbs and GrabSpots
 
-		public override VerbResult Float(EditableView.ClickPosition position)
+		public override VerbResult Float(ClickPosition position)
 		{
 			if (m_DefinedVertices < 2)
 				return base.Float(position);
@@ -114,12 +133,12 @@ namespace SAW
 			PointF centre = Centre; // because Centre function may not be all that fast
 			for (int index = 0; index <= Vertices.Count - 1; index++)
 			{
-				list.Add(new GrabSpot(this, GrabTypes.Radius, Vertices[index], index) {Focus = centre});
+				list.Add(new GrabSpot(this, GrabTypes.Radius, Vertices[index], index) { Focus = centre });
 			}
 			return list;
 		}
 
-		protected  internal override void DoGrabMove(GrabMovement move)
+		protected internal override void DoGrabMove(GrabMovement move)
 		{
 			if (move.GrabType == GrabTypes.Radius)
 			{
@@ -147,7 +166,7 @@ namespace SAW
 				base.DoGrabAngleSnap(move);
 		}
 
-		public override VerbResult OtherVerb(EditableView.ClickPosition position, Functions.Codes code)
+		protected internal override VerbResult OtherVerb(ClickPosition position, Functions.Codes code)
 		{
 			switch (code)
 			{
@@ -196,7 +215,7 @@ namespace SAW
 
 		#region BinaryData
 		// there is no need to override Save, but we do need to update m_Sides after loading
-		public override void Load(DataReader reader)
+		protected internal override void Load(DataReader reader)
 		{
 			base.Load(reader);
 			m_Sides = Vertices.Count;
@@ -239,20 +258,30 @@ namespace SAW
 		}
 
 		protected override RectangleF CalculateBounds() => base.BoundsOfVertices();
-	}
-	/// <summary>this is basically just a closed (and filled) PolyLine </summary>
 
+	}
+
+	/// <summary>this is basically just a closed (and filled) PolyLine </summary>
 	public class IrregularPolygon : Sequential
 	{
+
+		public IrregularPolygon()
+		{ }
+
+		public IrregularPolygon(IEnumerable<PointF> points)
+		{
+			Vertices = points.ToList();
+			m_DefinedVertices = Vertices.Count();
+			LineStyle.SetDefaults(); // otherwise error reports cannot be loaded
+			FillStyle.SetDefaults();
+			FillStyle.Colour = Color.Transparent;
+		}
 
 		public override Shapes ShapeCode => Shapes.IrregularPolygon;
 
 		protected override bool UseBaseline() => false;
 
-		internal override List<Prompt> GetPrompts()
-		{
-			return GetPolyPointPrompts("IrregularPolygon");
-		}
+		internal override List<Prompt> GetPrompts() => GetPolyPointPrompts("IrregularPolygon");
 
 		public override VerbResult CompleteRetrospective()
 		{
@@ -263,20 +292,17 @@ namespace SAW
 			return VerbResult.Completed;
 		}
 
-		public override LabelModes LabelMode => LabelModes.NotSupported;
+		internal override LabelModes LabelMode => LabelModes.NotSupported;
 
-		public override bool Tidy(SnapModes mode, Page page)
-		{
-			return base.TidyVertices(mode, page, Vertices.Count - 1);
-		}
+		public override bool Tidy(SnapModes mode, Page page) => base.TidyVertices(mode, page, Vertices.Count - 1);
 
-		public override string StatusInformation(bool ongoing)
+		protected internal override string StatusInformation(bool ongoing)
 		{
 			return Strings.Item("Info_Sides") + ": " + m_DefinedVertices + "  " + base.StatusInformation(ongoing);
 			// base does perimeter
 		}
 
-		public override bool VertexVerbApplicable(Functions.Codes code, Target target)
+		protected internal override bool VertexVerbApplicable(Functions.Codes code, Target target)
 		{
 			switch (code)
 			{
@@ -304,7 +330,7 @@ namespace SAW
 
 		internal override List<Target> GenerateTargets(UserSocket floating) => base.GenerateTargetsDefault(floating, Closed());
 
-		public override PointF DoSnapAngle(PointF newPoint)
+		protected internal override PointF DoSnapAngle(PointF newPoint)
 		{
 			if (m_DefinedVertices == 1)
 				return base.DoSnapAngle(newPoint);
@@ -319,17 +345,28 @@ namespace SAW
 	public class PolyLine : Lined
 	{
 
+		public PolyLine()
+		{ }
+
+		public PolyLine(IEnumerable<PointF> points)
+		{
+			Vertices = points.ToList();
+			m_DefinedVertices = Vertices.Count();
+			LineStyle.SetDefaults(); 
+			Status = StatusValues.Complete;
+		}
+
 		#region Information
 
 		public override Shapes ShapeCode => Shapes.PolyLine;
 
 		internal override List<Prompt> GetPrompts() => GetPolyPointPrompts("PolyLine");
 
-		public override LabelModes LabelMode => LabelModes.NotSupported;
+		internal override LabelModes LabelMode => LabelModes.NotSupported;
 
 		public override AllowedActions Allows => base.Allows | AllowedActions.Tidy;
 
-		protected  internal override bool Closed() => false;
+		protected internal override bool Closed() => false;
 
 		#endregion
 
@@ -355,7 +392,7 @@ namespace SAW
 			return VerbResult.Completed;
 		}
 
-		public override VerbResult Cancel(EditableView.ClickPosition position)
+		public override VerbResult Cancel(ClickPosition position)
 		{
 			// unless overridden in a subclass this will remove one DEFINED vertex
 			// and trim the vertex array to contain just the defined ones plus one floating
@@ -366,13 +403,13 @@ namespace SAW
 			return VerbResult.Continuing;
 		}
 
-		public override VerbResult Complete(EditableView.ClickPosition position)
+		public override VerbResult Complete(ClickPosition position)
 		{
 			Choose(position);
 			return CompleteRetrospective();
 		}
 
-		public override VerbResult Choose(EditableView.ClickPosition position)
+		public override VerbResult Choose(ClickPosition position)
 		{
 			PointF point = position.Snapped;
 			if (point.ApproxEqual(LastDefined))
@@ -382,12 +419,12 @@ namespace SAW
 			return VerbResult.Continuing;
 		}
 
-		public override bool VertexVerbApplicable(Functions.Codes code, Target target)
+		protected internal override bool VertexVerbApplicable(Functions.Codes code, Target target)
 		{
 			switch (code)
 			{
-				case Functions.Codes.AddVertex:return true;
-				case Functions.Codes.RemoveVertex:return m_DefinedVertices > 2;
+				case Functions.Codes.AddVertex: return true;
+				case Functions.Codes.RemoveVertex: return m_DefinedVertices > 2;
 			}
 			return base.VertexVerbApplicable(code, target);
 		}

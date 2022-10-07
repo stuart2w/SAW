@@ -5,21 +5,24 @@ using System.Diagnostics;
 using System.Windows.Forms;
 using System.Drawing.Drawing2D;
 
-namespace SAW
+namespace SAW.Shapes
 {
+	/// <summary>Text which is created based upon a baseline.  The base class's Label is used for the text </summary>
 	public class TextLine : Shape
 	{
-		//Text which is created based upon a baseline.  The base class Label is used for the text
 
 		protected PointF[] Vertices = new PointF[2];
 
 		public TextLine()
 		{ }
 
-		public TextLine(RectangleF bounds, string text)
+		public TextLine(RectangleF bounds, string text):this(bounds.Location, bounds.TopRight(), text)
+		{ }
+
+		public TextLine(PointF baseStart, PointF baseEnd, string text)
 		{
-			Vertices[0] = bounds.Location;
-			Vertices[1] = bounds.TopRight();
+			Vertices[0] = baseStart;
+			Vertices[1] = baseEnd;
 			m_BaseLineFixed = true;
 			TextStyle.SetDefaults();
 			Status = StatusValues.Complete;
@@ -29,7 +32,7 @@ namespace SAW
 		#region Basics
 
 		public override Shapes ShapeCode => Shapes.TextLine;
-		public override LabelModes LabelMode => LabelModes.Always;
+		internal override LabelModes LabelMode => LabelModes.Always;
 		protected override LabelPositions LabelPosition => LabelPositions.TextShape;
 		public override AllowedActions Allows => (base.Allows & ~AllowedActions.Merge) | AllowedActions.Tidy;
 
@@ -46,7 +49,7 @@ namespace SAW
 			}
 		}
 
-		public override StyleBase StyleObjectForParameter(Parameters parameter, bool applyingDefault = false)
+		internal override StyleBase StyleObjectForParameter(Parameters parameter, bool applyingDefault = false)
 		{
 			switch (parameter)
 			{
@@ -96,7 +99,7 @@ namespace SAW
 		#region Verbs
 
 		protected bool m_BaseLineFixed = true;
-		public override VerbResult Start(EditableView.ClickPosition position)
+		public override VerbResult Start(ClickPosition position)
 		{
 			PointF pt = position.Snapped;
 			Vertices[0] = pt;
@@ -108,7 +111,7 @@ namespace SAW
 			return VerbResult.Continuing;
 		}
 
-		public override VerbResult Float(EditableView.ClickPosition position)
+		public override VerbResult Float(ClickPosition position)
 		{
 			PointF pt = position.Snapped;
 			if (!m_BaseLineFixed)
@@ -123,7 +126,7 @@ namespace SAW
 			return VerbResult.Continuing;
 		}
 
-		public override VerbResult Cancel(EditableView.ClickPosition position)
+		public override VerbResult Cancel(ClickPosition position)
 		{
 			if (!m_BaseLineFixed)
 				return VerbResult.Destroyed;
@@ -134,7 +137,7 @@ namespace SAW
 			return VerbResult.Continuing;
 		}
 
-		public override VerbResult Choose(EditableView.ClickPosition position)
+		public override VerbResult Choose(ClickPosition position)
 		{
 			if (!m_BaseLineFixed)
 			{
@@ -157,7 +160,7 @@ namespace SAW
 			}
 		}
 
-		public override VerbResult Complete(EditableView.ClickPosition position)
+		public override VerbResult Complete(ClickPosition position)
 		{
 			if (!m_BaseLineFixed)
 				return Choose(position);
@@ -173,7 +176,7 @@ namespace SAW
 			return VerbResult.Completed;
 		}
 
-		public override VerbResult CombinedKey(Keys key, char ch, Page page, bool simulated, EditableView fromView)
+		protected internal override VerbResult CombinedKey(Keys key, char ch, Page page, bool simulated, EditableView fromView)
 		{
 			// ignore the key if we don't have a cursor (otherwise this shape will swallow all sorts of functional keys (e.g. shape selection) whenever it is selected)
 			if (!HasCaret)
@@ -206,7 +209,7 @@ namespace SAW
 			ClearTextCache();
 		}
 
-		public override void Load(DataReader reader)
+		protected internal override void Load(DataReader reader)
 		{
 			base.Load(reader);
 			m_BaseLineFixed = true; // must be in order to store in data
@@ -215,7 +218,7 @@ namespace SAW
 			ClearTextCache();
 		}
 
-		public override void Save(DataWriter writer)
+		protected internal override void Save(DataWriter writer)
 		{
 			base.Save(writer);
 			writer.Write(Vertices);
@@ -223,7 +226,7 @@ namespace SAW
 			writer.Write(8);
 		}
 
-		public override void Diagnostic(System.Text.StringBuilder output)
+		protected internal override void Diagnostic(System.Text.StringBuilder output)
 		{
 			base.Diagnostic(output);
 			output.Append("V0: ");
@@ -232,16 +235,6 @@ namespace SAW
 			PointDiagnostic(output, Vertices[1]);
 		}
 
-		/// <summary>Creates one of these which matches (give or take) the given freetext</summary>
-		public static TextLine FromFreeText(FreeText free)
-		{
-			TextLine create = new TextLine() { m_BaseLineFixed = true, TextStyle = new TextStyleC() };
-			create.Vertices[0] = free.Bounds.Location;
-			create.Vertices[1] = free.Bounds.TopRight();
-			create.TextStyle.CopyFrom(free.StyleObjectForParameter(Parameters.FontSize));
-			create.LabelText = free.LabelText; // must be set after font size
-			return create;
-		}
 		#endregion
 
 		#region Graphics
@@ -315,9 +308,9 @@ namespace SAW
 			}
 		}
 
-		public override bool HitTestDetailed(PointF clickPoint, float scale, bool treatAsFilled) => base.TextHitTest(clickPoint);
+		protected internal override bool HitTestDetailed(PointF clickPoint, float scale, bool treatAsFilled) => base.TextHitTest(clickPoint);
 
-		public override void NotifyStyleChanged(Parameters parameter, int oldValue, int newValue)
+		internal override void NotifyStyleChanged(Parameters parameter, int oldValue, int newValue)
 		{
 			base.NotifyStyleChanged(parameter, oldValue, newValue); // at the moment this call is redundant as all it does is sometimes clear the bounding rectangle
 																	// but for consistency should be included
@@ -334,7 +327,7 @@ namespace SAW
 			}
 		}
 
-		public override PointF DoSnapAngle(PointF newPoint) => Geometry.AngleSnapPoint(newPoint, Vertices[0]);
+		protected internal override PointF DoSnapAngle(PointF newPoint) => Geometry.AngleSnapPoint(newPoint, Vertices[0]);
 
 		public override bool Tidy(SnapModes mode, Page page)
 		{
@@ -412,15 +405,14 @@ namespace SAW
 
 	}
 
-	public class FreeText : Shape
+	internal class FreeText : Shape
 	{
-		// the text from AM4 - just click at a point and start typing.
-		// As usual this uses the Label property in the base class for the text
+		// not really used in SAW at this time.  Left in the code for the moment.
 
 		#region Basics
 
 		public override Shapes ShapeCode => Shapes.FreeText;
-		public override LabelModes LabelMode => LabelModes.Always;
+		internal override LabelModes LabelMode => LabelModes.Always;
 		protected override LabelPositions LabelPosition => LabelPositions.TextShape;
 
 		public override GeneralFlags Flags
@@ -433,7 +425,7 @@ namespace SAW
 			}
 		}
 
-		public override StyleBase StyleObjectForParameter(Parameters parameter, bool applyingDefault = false)
+		internal override StyleBase StyleObjectForParameter(Parameters parameter, bool applyingDefault = false)
 		{
 			switch (parameter)
 			{
@@ -470,10 +462,9 @@ namespace SAW
 			}
 		}
 
-		public override AllowedActions Allows
-		{ get { return base.Allows & ~(AllowedActions.TransformMirror | AllowedActions.TransformRotate); } }
+		public override AllowedActions Allows => base.Allows & ~(AllowedActions.TransformMirror | AllowedActions.TransformRotate);
 
-		public override SnapModes SnapNext(SnapModes requested)
+		protected internal override SnapModes SnapNext(SnapModes requested)
 		{
 			if (requested == SnapModes.Angle)
 				requested = SnapModes.Off;
@@ -509,7 +500,7 @@ namespace SAW
 		#endregion
 
 		#region Verbs
-		public override VerbResult Start(EditableView.ClickPosition position)
+		public override VerbResult Start(ClickPosition position)
 		{
 			m_StartPoint = position.Snapped;
 			if (position.SnapMode == SnapModes.Grid)
@@ -530,7 +521,7 @@ namespace SAW
 			return VerbResult.Continuing;
 		}
 
-		public override VerbResult Cancel(EditableView.ClickPosition position)
+		public override VerbResult Cancel(ClickPosition position)
 		{
 			if (!string.IsNullOrEmpty(m_Label))
 				return Complete(position);
@@ -538,7 +529,7 @@ namespace SAW
 		}
 
 		private FreeText m_Spawn;
-		public override VerbResult Choose(EditableView.ClickPosition position)
+		public override VerbResult Choose(ClickPosition position)
 		{
 			// can be moved if no text yet.  However if the focus was not in the drawing area, we just ignore it
 			// the click will have just moved the focus back into the drawing area
@@ -561,14 +552,14 @@ namespace SAW
 			}
 		}
 
-		public override Shape Spawn()
+		protected internal override Shape Spawn()
 		{
-			var obj = m_Spawn;
+			FreeText obj = m_Spawn;
 			m_Spawn = null;
 			return obj;
 		}
 
-		public override VerbResult Complete(EditableView.ClickPosition position) => CompleteRetrospective();
+		public override VerbResult Complete(ClickPosition position) => CompleteRetrospective();
 
 		public override VerbResult CompleteRetrospective()
 		{
@@ -578,9 +569,9 @@ namespace SAW
 			return VerbResult.Completed;
 		}
 
-		public override VerbResult Float(EditableView.ClickPosition position) => VerbResult.Unchanged;
+		public override VerbResult Float(ClickPosition position) => VerbResult.Unchanged;
 
-		public override VerbResult CombinedKey(Keys key, char ch, Page page, bool simulated, EditableView fromView)
+		protected internal  override VerbResult CombinedKey(Keys key, char ch, Page page, bool simulated, EditableView fromView)
 		{
 			// ignore the key if we don't have a cursor (otherwise this shape will swallow all sorts of functional keys (e.g. shape selection) whenever it is selected)
 			switch (key)
@@ -615,7 +606,7 @@ namespace SAW
 			m_LineHeight = NetCanvas.MeasurementInstance.MeasureString("Ay", m_Font, format: GUIUtilities.StringFormatCentreLeft).Height;
 		}
 
-		public override bool HitTestDetailed(PointF clickPoint, float scale, bool treatAsFilled) => true;  // anything in Bounds rect is a hit
+		protected internal override bool HitTestDetailed(PointF clickPoint, float scale, bool treatAsFilled) => true;  // anything in Bounds rect is a hit
 
 		public override void ApplyTransformation(Transformation transformation)
 		{
@@ -627,7 +618,7 @@ namespace SAW
 				transformation.TransformRectangle(ref m_Bounds); // the second parameter can be ignored; we don't want to invert the text
 		}
 
-		public override void NotifyStyleChanged(Parameters parameter, int oldValue, int newValue)
+		internal override void NotifyStyleChanged(Parameters parameter, int oldValue, int newValue)
 		{
 			base.NotifyStyleChanged(parameter, oldValue, newValue);
 			// at the moment this call is redundant as all it does is sometimes clear the bounding rectangle but for consistency should be included
@@ -706,7 +697,7 @@ namespace SAW
 
 		public override GraphicsPath ConvertToPath()
 		{ // not actually used atm;  not working
-			var path = new GraphicsPath();
+			GraphicsPath path = new GraphicsPath();
 			foreach (var fragment in m_Fragments)
 			{
 				path.AddString(fragment.Text, TextStyle.GetFontFamily(), 0, TextStyle.Size, fragment.Bounds.Location, StringFormat.GenericDefault);
@@ -725,7 +716,7 @@ namespace SAW
 			m_Bounds = freeText.m_Bounds;
 		}
 
-		public override void Load(DataReader reader)
+		protected internal override void Load(DataReader reader)
 		{
 			base.Load(reader);
 			m_StartPoint = reader.ReadPointF();
@@ -734,7 +725,7 @@ namespace SAW
 			ClearTextCache();
 		}
 
-		public override void Save(DataWriter writer)
+		protected internal override void Save(DataWriter writer)
 		{
 			base.Save(writer);
 			writer.Write(m_StartPoint);

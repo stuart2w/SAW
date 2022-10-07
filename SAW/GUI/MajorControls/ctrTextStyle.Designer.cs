@@ -1,6 +1,6 @@
 namespace SAW
 {
-	public partial class ctrTextStyle : System.Windows.Forms.UserControl
+	internal partial class ctrTextStyle : System.Windows.Forms.UserControl
 	{
 		
 		

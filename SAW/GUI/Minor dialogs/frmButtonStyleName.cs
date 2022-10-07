@@ -1,10 +1,10 @@
 using System;
 using System.Windows.Forms;
-
+using SAW.Shapes;
 
 namespace SAW
 {
-	public partial class frmButtonStyleName
+	internal partial class frmButtonStyleName
 	{
 		public frmButtonStyleName()
 		{

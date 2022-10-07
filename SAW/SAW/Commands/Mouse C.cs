@@ -84,7 +84,7 @@ namespace SAW.Commands
 
 		#endregion
 
-		public override void Execute(ExecutionContext context)
+		internal override void Execute(ExecutionContext context)
 		{
 			switch (m_Action)
 			{
@@ -115,7 +115,7 @@ namespace SAW.Commands
 					KeySend.Instance.AddMouseEvent(Windows.MOUSEEVENTF.LEFTUP);
 					break;
 				case Actions.SHCLICK:
-					KeySend.Instance.AddKeyEvent( Keys.LShiftKey, true);
+					KeySend.Instance.AddKeyEvent(Keys.LShiftKey, true);
 					KeySend.Instance.AddMouseEvent(Windows.MOUSEEVENTF.LEFTDOWN);
 					KeySend.Instance.AddMouseEvent(Windows.MOUSEEVENTF.LEFTUP);
 					KeySend.Instance.AddKeyEvent(Keys.LShiftKey, false);
@@ -176,8 +176,8 @@ namespace SAW.Commands
 
 	public class CmdMouseMove : CommandWithIntID, IMoveCommand, IContinuousCommand
 	{// this has both Move and Continuous command features.
-		// movement goes through IMoveCommand, as it can be redirected to keyboard instead
-		// but also command can be continuous effectively executing on the .Iterate
+	 // movement goes through IMoveCommand, as it can be redirected to keyboard instead
+	 // but also command can be continuous effectively executing on the .Iterate
 
 		private short X;
 		private short Y;
@@ -250,9 +250,10 @@ namespace SAW.Commands
 			X = ar.ReadInt16();
 			Y = ar.ReadInt16();
 		}
+
 		#endregion
 
-		public override void Execute(ExecutionContext context)
+		internal override void Execute(ExecutionContext context)
 		{
 			context.View.DoMoveCommand(X, Y);
 			if (Globals.Root.CurrentConfig.ReadBoolean(Config.Mouse_Continuous))
@@ -263,36 +264,40 @@ namespace SAW.Commands
 		}
 
 		#region IMoveCommand
-		public void Move(int deltaX, int deltaY)
+
+		 void IMoveCommand.Move(int deltaX, int deltaY)
 		{
 			Cursor.Position = new Point(Cursor.Position.X + deltaX, Cursor.Position.Y + deltaY);
 		}
 
-		public void End(bool ok)
+		 void IMoveCommand.End(bool ok)
 		{
 			// no need to do anything.  Can't cancel mouse movement
 		}
+
 		#endregion
 
 		#region Continuous
 
 		private RunView m_ContinuousContext;
-		public void Iterate()
+		void IContinuousCommand.Iterate()
 		{
 			m_ContinuousContext.DoMoveCommand(X, Y);
 		}
 
-		public bool Trigger(bool isRepeat)
+		bool IContinuousCommand.Trigger(bool isRepeat)
 		{
 			m_ContinuousContext?.StopContinuous(this);
 			return false;
 		}
 
-		public void Stop()
+		void IContinuousCommand.Stop()
 		{
 			m_ContinuousContext = null;
 		}
+
 		#endregion
+
 	}
 
 	public class CmdMouseMoveTo : ParamBasedCommand
@@ -301,12 +306,12 @@ namespace SAW.Commands
 		{
 		}
 
-		public override ICommandEditor GetEditor()
+		internal override ICommandEditor GetEditor()
 		{
 			return new MoveToEditor();
 		}
 
-		public override void Execute(ExecutionContext context)
+		internal override void Execute(ExecutionContext context)
 		{
 			Cursor.Position = new Point(GetParamAsInt(0), GetParamAsInt(1));
 		}
@@ -318,28 +323,28 @@ namespace SAW.Commands
 	#region Mouse steps and continuous
 	public class CmdSingle : Command
 	{
-		public override void Execute(ExecutionContext context)
+		internal override void Execute(ExecutionContext context)
 		{
 			context.View.MouseStepType = AppliedConfig.MouseSteps.Single;
 		}
 	}
 	public class CmdCoarse : Command
 	{
-		public override void Execute(ExecutionContext context)
+		internal override void Execute(ExecutionContext context)
 		{
 			context.View.MouseStepType = AppliedConfig.MouseSteps.Large;
 		}
 	}
 	public class CmdFine : Command
 	{
-		public override void Execute(ExecutionContext context)
+		internal override void Execute(ExecutionContext context)
 		{
 			context.View.MouseStepType = AppliedConfig.MouseSteps.Small;
 		}
 	}
 	public class CmdNormal : Command
 	{
-		public override void Execute(ExecutionContext context)
+		internal override void Execute(ExecutionContext context)
 		{
 			context.View.MouseStepType = AppliedConfig.MouseSteps.Medium;
 		}
@@ -347,7 +352,7 @@ namespace SAW.Commands
 
 	public class CmdContinuous : Command
 	{
-		public override void Execute(ExecutionContext context)
+		internal override void Execute(ExecutionContext context)
 		{
 			Config.UserUser.Write(Config.Mouse_Continuous, true);
 		}
@@ -355,7 +360,7 @@ namespace SAW.Commands
 
 	public class CmdStep : Command
 	{
-		public override void Execute(ExecutionContext context)
+		internal override void Execute(ExecutionContext context)
 		{
 			Config.UserUser.Write(Config.Mouse_Continuous, false);
 		}
@@ -430,7 +435,7 @@ namespace SAW.Commands
 
 		#endregion
 
-		public override void Execute(ExecutionContext context)
+		internal override void Execute(ExecutionContext context)
 		{
 			AppliedConfig.MouseSteps type = (AppliedConfig.MouseSteps)m_wStepType;
 			int newValue = Globals.Root.CurrentConfig.MouseStep(type);

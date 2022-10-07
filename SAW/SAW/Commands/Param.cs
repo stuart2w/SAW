@@ -18,11 +18,13 @@ namespace SAW.Commands
 		}
 
 		#region Data
+		[System.ComponentModel.EditorBrowsable( System.ComponentModel.EditorBrowsableState.Never)]
 		public abstract void Read(ArchiveReader ar);
+		[System.ComponentModel.EditorBrowsable( System.ComponentModel.EditorBrowsableState.Never)]
 		public abstract void Write(ArchiveWriter ar);
-
+		[System.ComponentModel.EditorBrowsable( System.ComponentModel.EditorBrowsableState.Never)]
 		public abstract void Write(DataWriter writer);
-
+		[System.ComponentModel.EditorBrowsable( System.ComponentModel.EditorBrowsableState.Never)]
 		public static Param FromReader(DataReader reader)
 		{
 			switch (reader.ReadByte()) // param type
@@ -35,6 +37,7 @@ namespace SAW.Commands
 				default: throw new InvalidDataException("Unexpected param type");
 			}
 		}
+
 		#endregion
 
 		public abstract Param Clone();
@@ -64,6 +67,15 @@ namespace SAW.Commands
 		{
 			return ValueAsString();
 		}
+
+		#region Implicit conversions
+
+		public static implicit operator Param(int i) => new IntegerParam(i);
+		public static implicit operator Param(float f) => new FloatParam(f);
+		public static implicit operator Param(string s) => new StringParam(s);
+		public static implicit operator Param(bool b) => new BoolParam(b);
+
+		#endregion
 	}
 
 	public class IntegerParam : Param
@@ -72,7 +84,6 @@ namespace SAW.Commands
 		public IntegerParam(Int16 i) { Value = i; }
 
 		/// <summary>NOTE: can only actually store 16-bit.  32-bit is included for convenience</summary>
-		/// <param name="i"></param>
 		public IntegerParam(int i)
 		{
 			if (i > short.MaxValue || i < short.MinValue)
@@ -87,18 +98,20 @@ namespace SAW.Commands
 				throw new UserException(Strings.Item("Script_Error_ParameterNotInt").Replace("%0", source));
 		}
 
-		public Int16 Value;
+		public short Value;
 
 		#region Data methods
+		[System.ComponentModel.EditorBrowsable( System.ComponentModel.EditorBrowsableState.Never)]
 		public override void Read(ArchiveReader ar)
 		{
 			Value = ar.ReadInt16(); // NB 16 is correct
 		}
+		[System.ComponentModel.EditorBrowsable( System.ComponentModel.EditorBrowsableState.Never)]
 		public override void Write(ArchiveWriter ar)
 		{
 			ar.Write(Value);
 		}
-
+		[System.ComponentModel.EditorBrowsable( System.ComponentModel.EditorBrowsableState.Never)]
 		public override void Write(DataWriter writer)
 		{
 			writer.WriteByte(0);
@@ -160,15 +173,18 @@ namespace SAW.Commands
 		}
 
 		#region Data methods
+		[System.ComponentModel.EditorBrowsable( System.ComponentModel.EditorBrowsableState.Never)]
 		public override void Write(DataWriter writer)
 		{
 			writer.WriteByte(1);
 			writer.Write(Value);
 		}
+		[System.ComponentModel.EditorBrowsable( System.ComponentModel.EditorBrowsableState.Never)]
 		public override void Read(ArchiveReader ar)
 		{
 			Value = ar.ReadSingle();
 		}
+		[System.ComponentModel.EditorBrowsable( System.ComponentModel.EditorBrowsableState.Never)]
 		public override void Write(ArchiveWriter ar)
 		{
 			ar.Write(Value);
@@ -192,6 +208,7 @@ namespace SAW.Commands
 		#endregion
 
 		#region Value reading
+
 		public override string ValueAsString()
 		{
 			return Value.ToString();

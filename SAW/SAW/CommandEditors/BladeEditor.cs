@@ -127,7 +127,7 @@ namespace SAW.CommandEditors
 					output.Append(",");
 				output.Append(key).Append("=").Append(settings[key]);
 			}
-			m_Command.m_ParamList[0] = new StringParam("blade|" + output);
+			m_Command.ParamList[0] = new StringParam("blade|" + output);
 			UserChanged?.Invoke(this, EventArgs.Empty);
 		}
 
@@ -245,7 +245,7 @@ namespace SAW.CommandEditors
 		{
 			if (m_Filling || !(m_Command is CmdWordListSet))
 				return;
-			m_Command.m_ParamList[1] = new IntegerParam(txtItemID.Value);
+			m_Command.ParamList[1] = new IntegerParam(txtItemID.Value);
 		}
 	}
 }

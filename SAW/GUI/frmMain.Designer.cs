@@ -3,7 +3,7 @@ using System.Windows.Forms;
 namespace SAW
 {
 	
-	public partial class frmMain : SAW.KeyForm
+	internal partial class frmMain : SAW.KeyForm
 	{
 
 		//NOTE: The following procedure is required by the Windows Form Designer
@@ -100,7 +100,6 @@ namespace SAW
 			this.verbHideGraphicSelectionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.mnuDoubleClick = new System.Windows.Forms.ToolStripMenuItem();
 			this.verbConvertToPathToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.mnuFreeTextToTextLine = new System.Windows.Forms.ToolStripMenuItem();
 			this.verbCCFUpdateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.mnuMakeMask = new System.Windows.Forms.ToolStripMenuItem();
 			this.mnuRemoveMask = new System.Windows.Forms.ToolStripMenuItem();
@@ -262,38 +261,38 @@ namespace SAW
 			// VerbCopyToolStripMenuItem
 			// 
 			VerbCopyToolStripMenuItem.Name = "VerbCopyToolStripMenuItem";
-			VerbCopyToolStripMenuItem.Size = new System.Drawing.Size(208, 22);
+			VerbCopyToolStripMenuItem.Size = new System.Drawing.Size(204, 22);
 			VerbCopyToolStripMenuItem.Text = "[Verb_Copy]";
 			// 
 			// VerbCutToolStripMenuItem
 			// 
 			VerbCutToolStripMenuItem.Name = "VerbCutToolStripMenuItem";
-			VerbCutToolStripMenuItem.Size = new System.Drawing.Size(208, 22);
+			VerbCutToolStripMenuItem.Size = new System.Drawing.Size(204, 22);
 			VerbCutToolStripMenuItem.Text = "[Verb_Cut]";
 			// 
 			// VerbPasteToolStripMenuItem
 			// 
 			VerbPasteToolStripMenuItem.Name = "VerbPasteToolStripMenuItem";
-			VerbPasteToolStripMenuItem.Size = new System.Drawing.Size(208, 22);
+			VerbPasteToolStripMenuItem.Size = new System.Drawing.Size(204, 22);
 			VerbPasteToolStripMenuItem.Text = "[Verb_Paste]";
 			// 
 			// VerbDeleteToolStripMenuItem1
 			// 
 			VerbDeleteToolStripMenuItem1.Name = "VerbDeleteToolStripMenuItem1";
-			VerbDeleteToolStripMenuItem1.Size = new System.Drawing.Size(208, 22);
+			VerbDeleteToolStripMenuItem1.Size = new System.Drawing.Size(204, 22);
 			VerbDeleteToolStripMenuItem1.Text = "[Verb_Delete]";
 			// 
 			// VerbUndoToolStripMenuItem
 			// 
 			VerbUndoToolStripMenuItem.Name = "VerbUndoToolStripMenuItem";
-			VerbUndoToolStripMenuItem.Size = new System.Drawing.Size(208, 22);
+			VerbUndoToolStripMenuItem.Size = new System.Drawing.Size(204, 22);
 			VerbUndoToolStripMenuItem.Tag = "";
 			VerbUndoToolStripMenuItem.Text = "[Verb_Undo]";
 			// 
 			// VerbRedoToolStripMenuItem
 			// 
 			VerbRedoToolStripMenuItem.Name = "VerbRedoToolStripMenuItem";
-			VerbRedoToolStripMenuItem.Size = new System.Drawing.Size(208, 22);
+			VerbRedoToolStripMenuItem.Size = new System.Drawing.Size(204, 22);
 			VerbRedoToolStripMenuItem.Tag = "";
 			VerbRedoToolStripMenuItem.Text = "[Verb_Redo]";
 			// 
@@ -345,7 +344,7 @@ namespace SAW
 			// ToolStripMenuItem1
 			// 
 			ToolStripMenuItem1.Name = "ToolStripMenuItem1";
-			ToolStripMenuItem1.Size = new System.Drawing.Size(205, 6);
+			ToolStripMenuItem1.Size = new System.Drawing.Size(201, 6);
 			// 
 			// MenuSelectToolStripMenuItem
 			// 
@@ -355,7 +354,7 @@ namespace SAW
             this.VerbSelectAllToolStripMenuItem,
             this.VerbSelectNoneToolStripMenuItem});
 			MenuSelectToolStripMenuItem.Name = "MenuSelectToolStripMenuItem";
-			MenuSelectToolStripMenuItem.Size = new System.Drawing.Size(208, 22);
+			MenuSelectToolStripMenuItem.Size = new System.Drawing.Size(204, 22);
 			MenuSelectToolStripMenuItem.Text = "[Menu_Select]";
 			// 
 			// VerbSelectNextToolStripMenuItem
@@ -426,12 +425,12 @@ namespace SAW
 			// ToolStripSeparator3
 			// 
 			ToolStripSeparator3.Name = "ToolStripSeparator3";
-			ToolStripSeparator3.Size = new System.Drawing.Size(205, 6);
+			ToolStripSeparator3.Size = new System.Drawing.Size(201, 6);
 			// 
 			// ApplyToolStripMenuItem
 			// 
 			ApplyToolStripMenuItem.Name = "ApplyToolStripMenuItem";
-			ApplyToolStripMenuItem.Size = new System.Drawing.Size(208, 22);
+			ApplyToolStripMenuItem.Size = new System.Drawing.Size(204, 22);
 			ApplyToolStripMenuItem.Text = "[Verb_Texture]";
 			// 
 			// ToolStripMenuItem2
@@ -663,7 +662,6 @@ namespace SAW
             this.mnuDoubleClick,
             this.verbConvertToPathToolStripMenuItem,
             ApplyToolStripMenuItem,
-            this.mnuFreeTextToTextLine,
             this.verbCCFUpdateToolStripMenuItem,
             this.mnuMakeMask,
             this.mnuRemoveMask});
@@ -675,30 +673,30 @@ namespace SAW
 			// mnuVerbActive
 			// 
 			this.mnuVerbActive.Name = "mnuVerbActive";
-			this.mnuVerbActive.Size = new System.Drawing.Size(208, 22);
+			this.mnuVerbActive.Size = new System.Drawing.Size(204, 22);
 			this.mnuVerbActive.Text = "[Verb_MakeActive]";
 			// 
 			// mnuVerbInactive
 			// 
 			this.mnuVerbInactive.Name = "mnuVerbInactive";
-			this.mnuVerbInactive.Size = new System.Drawing.Size(208, 22);
+			this.mnuVerbInactive.Size = new System.Drawing.Size(204, 22);
 			this.mnuVerbInactive.Text = "[Verb_MakeInactive]";
 			// 
 			// mnuDividerMakeActive
 			// 
 			this.mnuDividerMakeActive.Name = "mnuDividerMakeActive";
-			this.mnuDividerMakeActive.Size = new System.Drawing.Size(205, 6);
+			this.mnuDividerMakeActive.Size = new System.Drawing.Size(201, 6);
 			// 
 			// verbCopyScriptsToolStripMenuItem
 			// 
 			this.verbCopyScriptsToolStripMenuItem.Name = "verbCopyScriptsToolStripMenuItem";
-			this.verbCopyScriptsToolStripMenuItem.Size = new System.Drawing.Size(208, 22);
+			this.verbCopyScriptsToolStripMenuItem.Size = new System.Drawing.Size(204, 22);
 			this.verbCopyScriptsToolStripMenuItem.Text = "[Verb_CopyScripts]";
 			// 
 			// verbCopyPresentationToolStripMenuItem
 			// 
 			this.verbCopyPresentationToolStripMenuItem.Name = "verbCopyPresentationToolStripMenuItem";
-			this.verbCopyPresentationToolStripMenuItem.Size = new System.Drawing.Size(208, 22);
+			this.verbCopyPresentationToolStripMenuItem.Size = new System.Drawing.Size(204, 22);
 			this.verbCopyPresentationToolStripMenuItem.Text = "[Verb_CopyPresentation]";
 			// 
 			// MenuFrontBackToolStripMenuItem
@@ -709,7 +707,7 @@ namespace SAW
             this.VerbSendBackOneStepToolStripMenuItem,
             this.VerbBringFrontOneStepToolStripMenuItem});
 			this.MenuFrontBackToolStripMenuItem.Name = "MenuFrontBackToolStripMenuItem";
-			this.MenuFrontBackToolStripMenuItem.Size = new System.Drawing.Size(208, 22);
+			this.MenuFrontBackToolStripMenuItem.Size = new System.Drawing.Size(204, 22);
 			this.MenuFrontBackToolStripMenuItem.Text = "[Menu_FrontBack]";
 			// 
 			// VerbSendBackOneStepToolStripMenuItem
@@ -745,7 +743,7 @@ namespace SAW
             this.VerbTidyShapeToolStripMenuItem,
             this.VerbTidyAngleToolStripMenuItem});
 			this.mnuAlignment.Name = "mnuAlignment";
-			this.mnuAlignment.Size = new System.Drawing.Size(208, 22);
+			this.mnuAlignment.Size = new System.Drawing.Size(204, 22);
 			this.mnuAlignment.Text = "[Menu_Alignment]";
 			// 
 			// VerbEqualiseWidthToolStripMenuItem
@@ -810,7 +808,7 @@ namespace SAW
             this.verbShowGraphicSelectionToolStripMenuItem,
             this.verbHideGraphicSelectionToolStripMenuItem});
 			this.menuModifySelectedToolStripMenuItem.Name = "menuModifySelectedToolStripMenuItem";
-			this.menuModifySelectedToolStripMenuItem.Size = new System.Drawing.Size(208, 22);
+			this.menuModifySelectedToolStripMenuItem.Size = new System.Drawing.Size(204, 22);
 			this.menuModifySelectedToolStripMenuItem.Text = "[Menu_ModifySelected]";
 			// 
 			// verbToolStripMenuItem
@@ -840,7 +838,7 @@ namespace SAW
 			// mnuDoubleClick
 			// 
 			this.mnuDoubleClick.Name = "mnuDoubleClick";
-			this.mnuDoubleClick.Size = new System.Drawing.Size(208, 22);
+			this.mnuDoubleClick.Size = new System.Drawing.Size(204, 22);
 			this.mnuDoubleClick.Tag = "Verb/DoubleClick";
 			this.mnuDoubleClick.Text = "DoubleClick";
 			this.mnuDoubleClick.Visible = false;
@@ -849,31 +847,25 @@ namespace SAW
 			// verbConvertToPathToolStripMenuItem
 			// 
 			this.verbConvertToPathToolStripMenuItem.Name = "verbConvertToPathToolStripMenuItem";
-			this.verbConvertToPathToolStripMenuItem.Size = new System.Drawing.Size(208, 22);
+			this.verbConvertToPathToolStripMenuItem.Size = new System.Drawing.Size(204, 22);
 			this.verbConvertToPathToolStripMenuItem.Text = "[Verb_ConvertToPath]";
-			// 
-			// mnuFreeTextToTextLine
-			// 
-			this.mnuFreeTextToTextLine.Name = "mnuFreeTextToTextLine";
-			this.mnuFreeTextToTextLine.Size = new System.Drawing.Size(208, 22);
-			this.mnuFreeTextToTextLine.Text = "[Verb_FreeTextToTextLine]";
 			// 
 			// verbCCFUpdateToolStripMenuItem
 			// 
 			this.verbCCFUpdateToolStripMenuItem.Name = "verbCCFUpdateToolStripMenuItem";
-			this.verbCCFUpdateToolStripMenuItem.Size = new System.Drawing.Size(208, 22);
+			this.verbCCFUpdateToolStripMenuItem.Size = new System.Drawing.Size(204, 22);
 			this.verbCCFUpdateToolStripMenuItem.Text = "[Verb_CCFUpdate]";
 			// 
 			// mnuMakeMask
 			// 
 			this.mnuMakeMask.Name = "mnuMakeMask";
-			this.mnuMakeMask.Size = new System.Drawing.Size(208, 22);
+			this.mnuMakeMask.Size = new System.Drawing.Size(204, 22);
 			this.mnuMakeMask.Text = "[Verb_MakeMask]";
 			// 
 			// mnuRemoveMask
 			// 
 			this.mnuRemoveMask.Name = "mnuRemoveMask";
-			this.mnuRemoveMask.Size = new System.Drawing.Size(208, 22);
+			this.mnuRemoveMask.Size = new System.Drawing.Size(204, 22);
 			this.mnuRemoveMask.Text = "[Verb_RemoveMask]";
 			// 
 			// dlgPrint
@@ -1827,7 +1819,6 @@ namespace SAW
 		private System.Windows.Forms.ToolStripMenuItem mnuPalette100;
 		private System.Windows.Forms.ToolStripMenuItem mnuPalette200;
 		private System.Windows.Forms.ToolStripMenuItem mnuPalette300;
-		private System.Windows.Forms.ToolStripMenuItem mnuFreeTextToTextLine;
 		private System.Windows.Forms.ContextMenuStrip ctxBackground;
 		internal System.Windows.Forms.ToolStripMenuItem mnuPageSizeContext;
 		internal System.Windows.Forms.ToolStripMenuItem VerbExportSVGToolStripMenuItem;

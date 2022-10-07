@@ -8,7 +8,7 @@ namespace SAW
 {
 	/// <summary>Panel that displays a colour and picks a new one when clicked </summary>
 	[System.ComponentModel.DefaultEvent("UserChangedColour")]
-	public sealed partial class ColourPicker : IKeyControl
+	internal sealed partial class ColourPicker : IKeyControl
 	{
 
 		public event EventHandler UserChangedColour;

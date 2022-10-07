@@ -2,7 +2,7 @@
 
 namespace SAW
 {
-	public partial class cfgInput : ConfigPage
+	internal partial class cfgInput : ConfigPage
 	{
 		public cfgInput()
 		{

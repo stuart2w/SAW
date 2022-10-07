@@ -3,12 +3,13 @@ using System.Drawing;
 using System.Diagnostics;
 using System.IO;
 
-namespace SAW
+namespace SAW.Shapes
 {
 	/// <summary>Shared by SharedImage and SharedResource.  Either of these can be stored in document SharedResource list, with CRC detecting duplicates.
 	/// These should be stored in data objects as SharedReference&gt;SharedImage&lt; etc.</summary>
 	public abstract class SharedBase : Datum
 	{
+		/// <summary>Checksum of the media in this object</summary>
 		public int CRC { get; set; }
 	}
 
@@ -70,7 +71,7 @@ namespace SAW
 		#endregion
 
 		#region Datum
-		public override void Load(DataReader reader)
+		protected internal override void Load(DataReader reader)
 		{
 			base.Load(reader);
 			CRC = reader.ReadInt32();
@@ -80,7 +81,7 @@ namespace SAW
 				m_ResourceName = reader.ReadString();
 		}
 
-		public override void Save(DataWriter writer)
+		protected internal override void Save(DataWriter writer)
 		{
 			base.Save(writer);
 			writer.Write(CRC);
@@ -102,8 +103,7 @@ namespace SAW
 				m_Image.Save(writer);
 		}
 
-		public override byte TypeByte
-		{ get { return (byte)FileMarkers.SharedBitmap; } }
+		protected internal override byte TypeByte => (byte)FileMarkers.SharedBitmap;
 
 		public override void CopyFrom(Datum other, CopyDepth depth, Mapping mapID)
 		{
@@ -117,11 +117,12 @@ namespace SAW
 			m_ResourceName = sharedImage.m_ResourceName;
 		}
 
-		public override void UpdateReferencesObjectsCreated(Document document, DataReader reader)
+		protected internal override void UpdateReferencesObjectsCreated(Document document, DataReader reader)
 		{ }
 
 		#endregion
 
+		/// <summary>Returns the .net image object for the contained image.  if the image was a resource it is loaded.  If it was SVG, then it is rendered into a bitmap which is returned</summary>
 		public Image GetNetImage(int sizeIfResource = 32)
 		{
 			// once the image is created it is not disposed at the moment.  If it is being drawn on-screen it will be needed repeatedly
@@ -131,8 +132,7 @@ namespace SAW
 		}
 
 		/// <summary>Returns true if this takes minimal memory (i.e. it is a link to a resource image)</summary>
-		public bool IsLightweight
-		{ get { return !string.IsNullOrEmpty(m_ResourceName); } }
+		public bool IsLightweight => !string.IsNullOrEmpty(m_ResourceName);
 
 		/// <summary>Only permitted if IsLightweight.  Returns the resource name to use</summary>
 		public string ResourceName
@@ -174,12 +174,14 @@ namespace SAW
 	/// This has no understanding of type - it is just a data buffer</summary>
 	public class SharedResource : SharedBase
 	{
-		public byte[] Buffer;
+		internal byte[] Buffer;
 		private MemoryStream m_strm;
+
 		/// <summary>Original filename if known.  The file extension is important even if [filename?] not known</summary>
 		public string Filename { get; private set; }
 
 		#region Creators
+
 		public static SharedResource CreateFromFile(string file, int CRC = 0)
 		{
 			SharedResource resource = new SharedResource();
@@ -220,7 +222,8 @@ namespace SAW
 		#endregion
 
 		#region Datum
-		public override void Load(DataReader reader)
+
+		protected internal override void Load(DataReader reader)
 		{
 			if (reader.Version >= 127)
 				base.Load(reader);
@@ -230,7 +233,7 @@ namespace SAW
 			Filename = reader.ReadString();
 		}
 
-		public override void Save(DataWriter writer)
+		protected internal override void Save(DataWriter writer)
 		{
 			if (writer.Version >= 127)
 				base.Save(writer);
@@ -253,11 +256,12 @@ namespace SAW
 			Filename = otherResource.Filename;
 		}
 
-		public override void UpdateReferencesObjectsCreated(Document document, DataReader reader)
+		protected internal override void UpdateReferencesObjectsCreated(Document document, DataReader reader)
 		{ }
 
 		#endregion
 
+		/// <summary>Saves the raw content bytes to the given file</summary>
 		public void SaveContent(string file)
 		{
 			File.WriteAllBytes(file, Buffer);
@@ -275,7 +279,7 @@ namespace SAW
 			return m_strm;
 		}
 
-		public override byte TypeByte
+		protected internal override byte TypeByte
 		{
 			get { return (byte)FileMarkers.SharedResource; }
 		}

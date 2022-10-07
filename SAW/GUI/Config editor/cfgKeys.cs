@@ -5,7 +5,7 @@ using System.Windows.Forms;
 
 namespace SAW
 {
-	public partial class cfgKeys : ConfigPage
+	internal partial class cfgKeys : ConfigPage
 	{
 		public cfgKeys()
 		{

@@ -5,7 +5,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Drawing.Drawing2D;
 
-namespace SAW
+namespace SAW.Shapes
 {
 	public abstract class Lined : Shape
 	{
@@ -14,9 +14,11 @@ namespace SAW
 		// but the vertices do not necessarily need to be exactly these - they could be something else abstract (e.g. centre of circle)
 		// This now also has significant path support for shapes which create a graphics path representing the shape
 
+		/// <summary>Styling information for the border line</summary>
 		public LineStyleC LineStyle;
 
 		#region Basics
+
 		protected Lined()
 		{
 			// ReSharper disable once VirtualMemberCallInConstructor // should be safe since this function doesn't rely on objects date, so it won't matter that base classes won't be constructed
@@ -32,7 +34,7 @@ namespace SAW
 			}
 		}
 
-		public override StyleBase StyleObjectForParameter(Parameters parameter, bool applyingDefault = false)
+		internal override StyleBase StyleObjectForParameter(Parameters parameter, bool applyingDefault = false)
 		{
 			switch (parameter)
 			{
@@ -51,7 +53,7 @@ namespace SAW
 			}
 		}
 
-		public override void Diagnostic(System.Text.StringBuilder output)
+		protected internal override void Diagnostic(System.Text.StringBuilder output)
 		{
 			base.Diagnostic(output);
 			output.AppendLine("m_intDefinedVertices = " + m_DefinedVertices);
@@ -85,7 +87,7 @@ namespace SAW
 			}
 		}
 
-		public override void NotifyStyleChanged(Parameters parameter, int oldValue, int newValue)
+		internal override void NotifyStyleChanged(Parameters parameter, int oldValue, int newValue)
 		{
 			base.NotifyStyleChanged(parameter, oldValue, newValue);
 			if (StartArrowhead != null && StartArrowhead.Style != ArrowheadC.Styles.None || EndArrowhead != null && EndArrowhead.Style != ArrowheadC.Styles.None)
@@ -133,7 +135,8 @@ namespace SAW
 		#endregion
 
 		#region Default implemention of some base functions based on line list
-		public override VerbResult Start(EditableView.ClickPosition position)
+
+		public override VerbResult Start(ClickPosition position)
 		{
 			PointF pt = position.Snapped;
 			Debug.Assert(m_DefinedVertices == 0);
@@ -153,7 +156,7 @@ namespace SAW
 			return VerbResult.Continuing;
 		}
 
-		public override VerbResult Float(EditableView.ClickPosition position)
+		public override VerbResult Float(ClickPosition position)
 		{
 			// move the "current" point.  Many subclasses which need to do further calculation can call this version first
 			if (m_DefinedVertices >= Vertices.Count)
@@ -224,7 +227,7 @@ namespace SAW
 			return list;
 		}
 
-		public override VerbResult OtherVerb(EditableView.ClickPosition position, Functions.Codes code)
+		protected internal override VerbResult OtherVerb(ClickPosition position, Functions.Codes code)
 		{
 			// Performs basic Add and Remove vertex.  This will only be called however if the derived class has reported that these are applicable (the default is inapplicable)
 			Target target = position.Page.SelectedPath;
@@ -261,16 +264,8 @@ namespace SAW
 			return -1;
 		}
 
-		public PointF LastDefined
-		{
-			// we quite often need to know the last point which has been placed so far
-			get
-			{
-				if (m_DefinedVertices < 0)
-					return PointF.Empty;
-				return Vertices[m_DefinedVertices - 1];
-			}
-		}
+		/// <summary>we quite often need to know the last point which has been placed so far </summary>
+		internal PointF LastDefined => m_DefinedVertices <= 0 ? PointF.Empty : Vertices[m_DefinedVertices - 1];
 
 		protected virtual void FixVertex()
 		{
@@ -331,7 +326,7 @@ namespace SAW
 			}
 		}
 
-		public override PointF DoSnapAngle(PointF newPoint)
+		protected internal override PointF DoSnapAngle(PointF newPoint)
 		{
 			PointF ptOrigin = Vertices[Math.Min(Math.Max(m_DefinedVertices - 1, 0), Vertices.Count - 1)]; // check for Vertices.Count needed for Ellipse (et al?)
 			return Geometry.AngleSnapPoint(newPoint, ptOrigin);
@@ -560,7 +555,7 @@ namespace SAW
 		#region Default implementations which use the path
 		// any shape which did not create a path will need to override all of these
 
-		public override bool HitTestDetailed(PointF clickPoint, float scale, bool treatAsFilled)
+		protected internal override bool HitTestDetailed(PointF clickPoint, float scale, bool treatAsFilled)
 		{
 			// uses a path to check if this point is actually inside the shape
 			EnsurePath(false);
@@ -794,7 +789,7 @@ namespace SAW
 		#region Data and Copy
 		// m_intDefinedVertices is not saved.  The derived classes should be able to set this automatically.  It is usually fixed
 		// once the shape has been completed
-		public override void Load(DataReader reader)
+		protected internal override void Load(DataReader reader)
 		{
 			base.Load(reader);
 			Vertices = reader.ReadListPoints();
@@ -804,7 +799,7 @@ namespace SAW
 			m_DefinedVertices = Vertices.Count;
 		}
 
-		public override void Save(DataWriter writer)
+		protected internal override void Save(DataWriter writer)
 		{
 			base.Save(writer);
 			writer.Write(Vertices);
@@ -888,7 +883,7 @@ namespace SAW
 		#region Targets and grabspots etc
 		// default implemention of targets uses the array of Vertices
 		// Target.ShapeIndex will be the index of the first Vertex forming that side for Line targets
-		protected List<Target> GenerateTargetsDefault(UserSocket floatSocket, bool closed)
+		private protected List<Target> GenerateTargetsDefault(UserSocket floatSocket, bool closed)
 		{
 			// default implemention of GenerateTargets - subclass must specify whether to treat the list of vertices as closed
 			// centre is automatically included if it is not empty
@@ -900,7 +895,7 @@ namespace SAW
 			return targets;
 		}
 
-		public static void AddLineTargets(Shape shp, List<Target> targets, UserSocket floatSocket, PointF[] points, bool closed)
+		internal static void AddLineTargets(Shape shp, List<Target> targets, UserSocket floatSocket, PointF[] points, bool closed)
 		{
 			// adds targets for a set of lines
 			// add all of the vertices
@@ -927,7 +922,7 @@ namespace SAW
 		/// <summary>Generates the target on a given line.  Returns nothing if not appropriate.  Caller must add to list</summary>
 		/// <remarks>the existing targets must be provided, because the one on the line is ignored if it is very close to something else on this shape (especially intersection)
 		/// note that it is best to add the intersections first!</remarks>
-		protected static Target GenerateTargetOnOneLine(Shape shp, UserSocket floatSocket, PointF ptLineA, PointF ptLineB, List<Target> existingTargets, int shapeIndex)
+		private protected static Target GenerateTargetOnOneLine(Shape shp, UserSocket floatSocket, PointF ptLineA, PointF ptLineB, List<Target> existingTargets, int shapeIndex)
 		{
 			PointF closest = Geometry.ClosestPointOnLineLimited(ptLineA, ptLineB, floatSocket.Centre, true);
 			if (!closest.IsEmpty)
@@ -951,7 +946,7 @@ namespace SAW
 			return targets.Any(target => Geometry.DirtyDistance(target.Position, test) < Target.IGNOREOVERLAPPINGTHRESHOLD);
 		}
 
-		protected Target GenerateLineTargetOnOneBezier(UserSocket floatSocket, PointF[] P, List<Target> existingTargets, float maximumError, int shapeIndex)
+		private protected Target GenerateLineTargetOnOneBezier(UserSocket floatSocket, PointF[] P, List<Target> existingTargets, float maximumError, int shapeIndex)
 		{
 			// generates the target on the given Bezier.  Return is nothing if not appropriate
 			// the existing targets must be provided, because the one on the line is ignored if it is very close to something else on this shape (especially intersection)
@@ -1245,7 +1240,7 @@ namespace SAW
 				Points = null;
 			}
 
-			public override int ParameterValue(Parameters parameter)
+			internal override int ParameterValue(Parameters parameter)
 			{
 				switch (parameter)
 				{
@@ -1260,7 +1255,8 @@ namespace SAW
 						return 0;
 				}
 			}
-			public override void SetParameterValue(int value, Parameters parameter)
+
+			internal override void SetParameterValue(int value, Parameters parameter)
 			{
 				switch (parameter)
 				{
@@ -1388,7 +1384,8 @@ namespace SAW
 			}
 
 			private static Parameters[] Applicable = { Parameters.ArrowheadEndSize, Parameters.ArrowheadEndType };
-			public override Parameters[] ApplicableParameters()
+
+			internal override Parameters[] ApplicableParameters()
 			{
 				return Applicable;
 			}

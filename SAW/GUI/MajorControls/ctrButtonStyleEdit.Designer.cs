@@ -1,8 +1,7 @@
 
 namespace SAW
 {
-	
-	public partial class ctrButtonStyleEdit : System.Windows.Forms.UserControl
+	internal partial class ctrButtonStyleEdit : System.Windows.Forms.UserControl
 	{
 
 		//Required by the Windows Form Designer

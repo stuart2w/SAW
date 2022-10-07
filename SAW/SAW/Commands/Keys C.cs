@@ -4,6 +4,7 @@ using SAW.CommandEditors;
 
 namespace SAW.Commands
 {
+	/// <summary>Has a single parameter which is the text to type </summary>
 	public class CmdKey : ParamBasedCommand
 	{
 
@@ -12,50 +13,49 @@ namespace SAW.Commands
 			TreatParametersAsSingleString = true;
 		}
 
-		public override ICommandEditor GetEditor()
-		{
-			return new KeysEditor();
-		}
+		public CmdKey(string text) : this() { ParamList.Add(text); }
 
-		public override void Execute(ExecutionContext context)
+		internal override ICommandEditor GetEditor() => new KeysEditor();
+
+		internal override void Execute(ExecutionContext context)
 		{
 			context.View.SendKeys(GetParamAsString(0, true));
 		}
 
 	}
 
+	/// <summary>Has 2 parameters: the delay in ms between keys and the text to type</summary>
 	public class CmdSlowKeys : ParamBasedCommand
 	{
 		public const int MAXDELAY = 1000; // if this is changed some translations will need changing
-		public CmdSlowKeys() : base(new[] { Param.ParamTypes.Integer, Param.ParamTypes.Float })
-		{
 
+		public CmdSlowKeys(int delay, string text) : this()
+		{
+			ParamList.Add(delay);
+			ParamList.Add(text);
 		}
 
-		public override ICommandEditor GetEditor()
-		{
-			return new KeysEditor();
-		}
+		public CmdSlowKeys() : base(new[] { Param.ParamTypes.Integer, Param.ParamTypes.String }) { }
 
-		public override void Execute(ExecutionContext context)
+		internal override ICommandEditor GetEditor() => new KeysEditor();
+
+		internal override void Execute(ExecutionContext context)
 		{ // keys are now second param, delay is first
 			context.View.SendKeys(GetParamAsString(1, true), GetParamAsInt(0));
 		}
 	}
 
+	/// <summary>Sets the delay in milliseconds (use 0 to clear) for future text output </summary>
 	public class CmdKeyDelay : ParamBasedCommand
 	{
 
-		public CmdKeyDelay() : base(new[] { Param.ParamTypes.Integer })
-		{
-		}
+		public CmdKeyDelay(int delayMS) : this() { ParamList.Add(delayMS); }
 
-		public override ICommandEditor GetEditor()
-		{
-			return new KeyDelayEditor();
-		}
+		public CmdKeyDelay() : base(new[] { Param.ParamTypes.Integer }) { }
 
-		public override void Execute(ExecutionContext context)
+		internal override ICommandEditor GetEditor() => new KeyDelayEditor();
+
+		internal override void Execute(ExecutionContext context)
 		{
 			context.View.KeyDelay = GetParamAsInt(0);
 		}
@@ -63,8 +63,8 @@ namespace SAW.Commands
 	}
 
 
-	/// <summary>Does not let user specify output string.  Instead this implements what appear to be custom commands by means of sending key presses.
-	/// The key strings to send are looked up in translations (since the special key codes are themselves translateable)</summary>
+	/// <summary>One of a set of commands which sends key combinations to perform actions such as displaying a menu.
+	/// Does not let user specify output string. The key strings to send are looked up in translations (since the special key codes are themselves translateable)</summary>
 	public class CmdKeysOut : CommandWithIntID
 	{ // a lot of all caps here, as the definitions were copied from SAW6
 
@@ -97,14 +97,19 @@ namespace SAW.Commands
 			//			KEYPGDN = 20589
 		}
 
+		public CmdKeysOut() : base() { }
+
+		public CmdKeysOut(Combinations sendCombination) : this() { Combination = sendCombination; }
+
 		public const short CURSOR_CONTINUOUS = 1;
 
 		/// <summary>Which key combination is to be used.  Defines what command this really is</summary>
 		public Combinations Combination;
+
 		/// <summary>Only used for CURSOR_CONTINUOUS.  I don't know when/why that is used</summary>
 		public short Modifier;
 
-		public override void Execute(ExecutionContext context)
+		internal override void Execute(ExecutionContext context)
 		{
 			if (Modifier == CURSOR_CONTINUOUS)
 				throw new NotImplementedException();
@@ -117,6 +122,7 @@ namespace SAW.Commands
 		}
 
 		#region Meta stuff
+
 		protected override int[] GetPossibleIntIDs()
 		{
 			return (from Combinations value in Enum.GetValues(typeof(Combinations)) select (int)value).ToArray();
@@ -132,15 +138,9 @@ namespace SAW.Commands
 			}
 		}
 
-		public override string GetCommandName()
-		{
-			return Strings.Item("Script_Command_UsingKeys_" + Combination);
-		}
+		public override string GetCommandName() => Strings.Item("Script_Command_UsingKeys_" + Combination);
 
-		public override string GetDescription()
-		{
-			return Strings.Item("Script_Desc_" + Combination);
-		}
+		public override string GetDescription() => Strings.Item("Script_Desc_" + Combination);
 
 		internal override void CompleteCommandListEntry(CommandList.Entry entry)
 		{ // the commands need to be assigned to different folders in frmAddCommand

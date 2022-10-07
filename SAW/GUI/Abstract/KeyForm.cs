@@ -3,7 +3,7 @@ using System.Windows.Forms;
 
 namespace SAW
 {
-	public class KeyForm : Form // can't be made abstract as that messes up the designer for derived forms
+	internal class KeyForm : Form // can't be made abstract as that messes up the designer for derived forms
 	{
 		// base class for any form which wants to host controls which implement IKeyHandler
 

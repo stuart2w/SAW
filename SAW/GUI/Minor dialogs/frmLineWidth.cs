@@ -5,7 +5,7 @@ using System.Windows.Forms;
 
 namespace SAW
 {
-	public partial class frmLineWidth
+	internal partial class frmLineWidth
 	{
 		public frmLineWidth()
 		{

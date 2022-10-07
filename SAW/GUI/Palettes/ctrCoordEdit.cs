@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using SAW.CommandEditors;
 using System.Diagnostics;
+using SAW.Shapes;
 
 namespace SAW
 {
@@ -115,7 +116,7 @@ namespace SAW
 					point = new PointF(grab.Focus.X, grab.Focus.Y + m_X[index].Value * Math.Sign(grab.Position.Y - grab.Focus.Y)); // correct that this still uses m_x - it's always m_X when just one box is used
 					break;
 			}
-			move.Current = new EditableView.ClickPosition(point, null, 1, Shape.SnapModes.Off, Shape.SnapModes.Off, null, EditableView.ClickPosition.Sources.Irrelevant);
+			move.Current = new ClickPosition(point, null, 1, Shape.SnapModes.Off, Shape.SnapModes.Off, null, ClickPosition.Sources.Irrelevant);
 			move.Transform?.SetGrabTransform(grab.Position, move.Current.Exact);
 
 			move.Shape.GrabMove(move);

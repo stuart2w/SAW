@@ -8,6 +8,7 @@ using System.Drawing.Printing;
 using System.Drawing.Text;
 using System.IO;
 using System.Windows.Forms;
+using SAW.Shapes;
 
 namespace SAW.Functions
 {
@@ -19,7 +20,6 @@ namespace SAW.Functions
 			Verb.Register(Codes.Open, new OpenDocument());
 			Verb.Register(Codes.Save, new SaveDocument());
 			Verb.Register(Codes.SaveAs, new SaveDocument());
-			Verb.Register(Codes.SaveAsWorksheet, new SaveDocument());
 			Verb.Register(Codes.Print, new PrintDocument() { Direct = false });
 			Verb.Register(Codes.PrintDirectly, new PrintDocument() { Direct = true });
 			Verb.Register(Codes.PrintPreview, new PrintDocument() { Preview = true });
@@ -53,15 +53,14 @@ namespace SAW.Functions
 	}
 
 	#region Save
+
 	public class SaveDocument : Verb
 	{
 
-		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
+		public override void Trigger(ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
 		{
 			if (Code == Codes.SaveAs)
-				SaveAs(false, pnlView);
-			else if (Code == Codes.SaveAsWorksheet)
-				SaveAs(true, pnlView);
+				SaveAs( pnlView);
 			else
 				Save(pnlView);
 		}
@@ -76,25 +75,25 @@ namespace SAW.Functions
 			if (pnlView.Visible && pnlView.CurrentPage != null) // second condition essential.  If this is triggered by save question when closing application in run mode, it would be null and GetDocumentScreenCoords would crash
 				CurrentDocument.SAWHeader.SetWindowBounds(pnlView.GetDocumentScreenCoords());
 			if (CurrentDocument.NoSaveOverOriginalFile || string.IsNullOrEmpty(CurrentDocument.Filename)) // NoSaveOverOriginalFile will be true for SAW6 files
-				SaveAs(false, pnlView);
+				SaveAs( pnlView);
 			else
 				SaveFile(pnlView); // so this can only happen for SAW7 format.  SaveAs handles saving in the old format
 
 		}
 
-		public static void SaveAs(bool worksheet, EditableView pnlView)
+		public static void SaveAs( EditableView pnlView)
 		{
-			var strFilename = FileDialog.ShowSave(FileDialog.Context.Document, "SAW 7|*" + Document.StandardExtension + "|SAW 6|*.sss", Path.GetFileName(CurrentDocument.FilenameWithExtension(Document.StandardExtension)));
-			if (string.IsNullOrEmpty(strFilename))
+			string filename = FileDialog.ShowSave(FileDialog.Context.Document, "SAW 7|*" + Document.StandardExtension + "|SAW 6|*.sss", Path.GetFileName(CurrentDocument.FilenameWithExtension(Document.StandardExtension)));
+			if (string.IsNullOrEmpty(filename))
 				return;
 			CurrentDocument.SAWHeader.SetWindowBounds(pnlView.GetDocumentScreenCoords());
-			if (strFilename.ToLower().EndsWith(".sss"))
+			if (filename.ToLower().EndsWith(".sss"))
 			{
-				using (var op = new Globals.Operation("[Save_SAW6]"))
+				using (Globals.Operation op = new Globals.Operation("[Save_SAW6]"))
 				{
-					var oldDoc = new SAW6Doc(CurrentDocument);
+					SAW6Doc oldDoc = new SAW6Doc(CurrentDocument);
 
-					using (var writer = new ArchiveWriter(strFilename, oldDoc.m_Header.Version))
+					using (var writer = new ArchiveWriter(filename, oldDoc.m_Header.Version))
 					{
 						oldDoc.Write(writer);
 					}
@@ -104,7 +103,7 @@ namespace SAW.Functions
 			else
 			{
 				if (!CurrentDocument.IsPaletteWithin)
-					CurrentDocument.Filename = strFilename;
+					CurrentDocument.Filename = filename;
 				CurrentDocument.DisplayName = ""; // otherwise the original worksheet name remains in the title bar, rather than the filename
 				SaveFile(pnlView);
 			}
@@ -113,14 +112,10 @@ namespace SAW.Functions
 
 		public static void SaveFile(EditableView pnlView)
 		{
-			pnlView.ConcludeOngoing();
-			Bitmap thumbnail = CurrentDocument.Page(0).GenerateThumbnail2(Page.FILEDOCUMENTTHUMBNAILSIZE, CurrentDocument.ApproxUnitScale, 96);
+			pnlView?.ConcludeOngoing();
 			try
 			{
-				using (DataWriter writer = new DataWriter(CurrentDocument.Filename, FileMarkers.Splash, thumbnail: thumbnail))
-				{
-					writer.Write(CurrentDocument);
-				}
+				CurrentDocument.Save();
 			}
 			catch (Exception ex) when (!Globals.Root.IsDebug)
 			{
@@ -146,7 +141,7 @@ namespace SAW.Functions
 	#region ExportAsText
 	internal class ExportAsText : Verb
 	{
-		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
+		public override void Trigger(ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
 		{
 			string file = FileDialog.ShowSave(FileDialog.Context.UserExport, "*.txt|*.txt");
 			if (string.IsNullOrEmpty(file))
@@ -162,7 +157,7 @@ namespace SAW.Functions
 	#region User
 	internal class UserUser : Verb
 	{
-		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
+		public override void Trigger(ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
 		{
 			if (CurrentDocument.IsPaletteWithin)
 			{
@@ -178,7 +173,7 @@ namespace SAW.Functions
 
 	internal class UserTeacher : Verb
 	{
-		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
+		public override void Trigger(ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
 		{
 			Globals.Root.User = Users.Editor;
 		}
@@ -188,7 +183,7 @@ namespace SAW.Functions
 	#region New
 	public class NewDocument : Verb
 	{
-		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
+		public override void Trigger(ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
 		{
 			Document document = new Document(false); // must be before IF below for first branch
 			document.Page(0).SetSize(Globals.Root.CurrentConfig.ReadSize(Config.Page_Size, Config.Page_Size_Default));
@@ -197,7 +192,7 @@ namespace SAW.Functions
 				document.ActivityID = CurrentDocument.ActivityID;
 				document.Page(0).SetSize(CurrentDocument.Page(0).PhysicalSize, CurrentDocument.Page(0).Margin);
 			}
-			document.SetDefaultGridAndSnapFromActivity();
+			document.SetDefaultsForNewDocument();
 			if (CurrentDocument.UserSettings != null && (CurrentDocument.UserSettings.Values.Count > 0) ||
 				CurrentDocument.BothSettings != null && (CurrentDocument.BothSettings.Values.Count > 0))
 			{
@@ -230,7 +225,8 @@ namespace SAW.Functions
 	#region Open
 	public class OpenDocument : Verb
 	{
-		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
+
+		public override void Trigger(ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
 		{
 			pnlView.ConcludeOngoing();
 			string path = FileDialog.ShowOpen(FileDialog.Context.Document, Document.LoadFilter());
@@ -255,7 +251,7 @@ namespace SAW.Functions
 		public bool Direct;
 		public bool Preview;
 
-		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
+		public override void Trigger(ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
 		{
 			if (Preview)
 				PrintPreview();
@@ -429,7 +425,7 @@ namespace SAW.Functions
 
 	internal class ExportEMF : Verb
 	{
-		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
+		public override void Trigger(ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
 		{
 			// see:  http://stackoverflow.com/questions/152729/gdi-c-how-to-save-an-image-as-emf
 			string filename = FileDialog.ShowSave(FileDialog.Context.Image, "*.emf|*.emf");
@@ -446,7 +442,7 @@ namespace SAW.Functions
 
 	internal class ExportSVG : Verb
 	{
-		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
+		public override void Trigger(ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
 		{
 			string filename = FileDialog.ShowSave(FileDialog.Context.Image, "*.svg|*.svg");
 			if (string.IsNullOrEmpty(filename))
@@ -479,7 +475,7 @@ namespace SAW.Functions
 	{
 		public string extension;
 		public ImageFormat format;
-		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
+		public override void Trigger(ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
 		{
 			string filename = FileDialog.ShowSave(FileDialog.Context.Image, "*." + extension + "|*." + extension);
 			if (string.IsNullOrEmpty(filename))
@@ -498,7 +494,7 @@ namespace SAW.Functions
 
 	internal class ExportPageAsDocument : Verb
 	{
-		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
+		public override void Trigger(ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
 		{
 			string filename = FileDialog.ShowSave(FileDialog.Context.Document);
 			if (string.IsNullOrEmpty(filename))
@@ -521,7 +517,7 @@ namespace SAW.Functions
 						break;
 				}
 			}
-			using (DataWriter writer = new DataWriter(filename, FileMarkers.Splash))
+			using (DataWriter writer = new DataWriter(filename, FileMarkers.SAW))
 			{
 				writer.Write(document);
 			}
@@ -537,7 +533,7 @@ namespace SAW.Functions
 	#region ImportImage
 	class ImportImage : Verb
 	{
-		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
+		public override void Trigger(ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
 		{
 			pnlView.ConcludeOngoing();
 			string filename = FileDialog.ShowOpen(FileDialog.Context.Image);
@@ -552,7 +548,7 @@ namespace SAW.Functions
 	#region Close
 	class CloseDocument : Verb
 	{
-		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
+		public override void Trigger(ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
 		{
 			if (!Editor.CheckDiscard(CurrentDocument))
 				return;

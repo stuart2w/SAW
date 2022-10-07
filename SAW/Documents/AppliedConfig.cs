@@ -5,13 +5,14 @@ using System.Diagnostics;
 using System.Windows.Forms;
 using System.Linq;
 using Action = SAW.Functions.Action;
+using SAW.Shapes;
 
 
 namespace SAW
 {
 	/// <summary>represents a list of Config objects
 	/// values are locked up in the configs in order until a definition is found</summary>
-	public class AppliedConfig
+	internal class AppliedConfig
 	{
 
 		#region List of configurations, construction

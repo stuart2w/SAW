@@ -4,7 +4,7 @@ using System.Windows.Forms;
 
 namespace SAW
 {
-	public class DocumentTab : Control
+	internal class DocumentTab : Control
 	{
 
 		// tab width is calculated whenever the number of tabs changes or the control is resized

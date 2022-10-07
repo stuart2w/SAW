@@ -6,6 +6,7 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using SAW.CommandEditors;
+using SAW.Shapes;
 
 namespace SAW.Commands
 {
@@ -14,7 +15,7 @@ namespace SAW.Commands
 		// uses its own audio player so it doesn't interrupt any other sounds
 		private static AudioPlayer Player = new AudioPlayer();
 
-		public override void Execute(ExecutionContext context)
+		internal override void Execute(ExecutionContext context)
 		{
 			if (!Globals.Root.CurrentConfig.ReadBoolean(Config.Sound_Click))
 				return;
@@ -26,7 +27,7 @@ namespace SAW.Commands
 
 	public class CmdBeep : Command
 	{
-		public override void Execute(ExecutionContext context)
+		internal override void Execute(ExecutionContext context)
 		{
 			Console.Beep();
 		}
@@ -90,7 +91,7 @@ namespace SAW.Commands
 
 		#endregion
 
-		public override void Execute(ExecutionContext context)
+		internal override void Execute(ExecutionContext context)
 		{
 			string text;
 			switch (m_Source)
@@ -175,12 +176,12 @@ namespace SAW.Commands
 		{
 		}
 
-		public override void Execute(ExecutionContext context)
+		internal override void Execute(ExecutionContext context)
 		{
 			context.View.HideTime = GetParamAsFloat(0);
 		}
 
-		public override ICommandEditor GetEditor()
+		internal override ICommandEditor GetEditor()
 		{
 			return new FloatingTimeEditor();
 		}
@@ -286,7 +287,7 @@ namespace SAW.Commands
 
 		}
 
-		public override void Execute(ExecutionContext context)
+		internal override void Execute(ExecutionContext context)
 		{
 			Windows.GUITHREADINFO info = new Windows.GUITHREADINFO();
 			info.cbSize = Marshal.SizeOf(info);
@@ -325,8 +326,7 @@ namespace SAW.Commands
 
 	public class CmdSpeakClipboard : Command
 	{
-
-		public override void Execute(ExecutionContext context)
+		internal override void Execute(ExecutionContext context)
 		{
 			string text = System.Windows.Forms.Clipboard.GetText();
 			if (string.IsNullOrEmpty(text))
@@ -349,8 +349,7 @@ namespace SAW.Commands
 
 	public class CmdDisplayPromptText : Command
 	{
-
-		public override void Execute(ExecutionContext context)
+		internal override void Execute(ExecutionContext context)
 		{
 			if (!Globals.Root.CurrentConfig.ReadBoolean(Config.SAW_Prompts, true))
 				return;

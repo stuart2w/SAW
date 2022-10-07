@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using SAW;
 using System.Windows.Forms;
+using SAW.Shapes;
 
 namespace Switches.Switching
 {
@@ -16,7 +17,7 @@ namespace Switches.Switching
 
 		/// <summary>The view to work on.  Set as a static property for convenience.  Must be set BEFORE switches initialised (via engine initialisation)
 		/// Changes to this will have no effect unless switches destroyed and recreated at the moment, although that could be changed</summary>
-		public static RunView View { get; set; }
+		internal static RunView View { get; set; }
 
 		public static PhysicalSwitch Create(int param)
 		{

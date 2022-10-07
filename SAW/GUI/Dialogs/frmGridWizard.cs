@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
+using SAW.Shapes;
 
 namespace SAW
 {
-	public partial class frmGridWizard : Form
+	internal partial class frmGridWizard : Form
 	{
 		private int m_Step = 0;
 		private TableLayoutPanel[] m_Panels;

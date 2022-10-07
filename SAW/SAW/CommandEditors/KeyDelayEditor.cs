@@ -58,7 +58,7 @@ namespace SAW.CommandEditors
 			int value;
 			if (!int.TryParse(txtDelay.Text, out value) || value < 0 || value > CmdSlowKeys.MAXDELAY)
 				return;
-			m_Command.m_ParamList[0] = new IntegerParam(value);
+			m_Command.ParamList[0] = new IntegerParam(value);
 			UserChanged?.Invoke(sender, EventArgs.Empty);
 		}
 

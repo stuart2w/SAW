@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Windows.Forms;
+using SAW.Shapes;
 
 namespace SAW
 {
@@ -723,8 +724,8 @@ namespace SAW
 
 		#region Shape/button hover
 		/// <summary>shape currently being hovered over (or the one pressed with a button if mouse held down)</summary>
-		protected ButtonShape m_ShapeHover = null;
-		private ButtonShape m_ShapePressed = null;
+		private protected ButtonShape m_ShapeHover;
+		private ButtonShape m_ShapePressed;
 		// sometimes only one of these is defined (if the user does not release, the pressed shape still remembered even if the  hover is cleared)
 		// at the moment both must be ButtonShapes, but that could maybe change in the future
 

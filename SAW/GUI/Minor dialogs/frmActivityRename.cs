@@ -3,7 +3,7 @@ using System;
 
 namespace SAW
 {
-	public partial class frmActivityRename
+	internal partial class frmActivityRename
 	{
 
 		private Document m_Activity;

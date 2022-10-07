@@ -4,7 +4,7 @@ using System.Windows.Forms;
 
 namespace SAW
 {
-	public class PreviewPanel : Panel
+	internal class PreviewPanel : Panel
 	{
 		// Mainly used to display file previews, but can be used to display any image, especially if NoImageString is cleared
 		

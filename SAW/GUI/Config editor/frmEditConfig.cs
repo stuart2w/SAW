@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace SAW
 {
-	public sealed partial class frmEditConfig
+	internal sealed partial class frmEditConfig
 	{// copied from Splash, but much reduced.
 	 // this maintains the possibility of other config levels by using an AppliedConfig( which also has better read methods)
 	 // but with no subsequent/previous logic, in practice editing should be for 1 level only

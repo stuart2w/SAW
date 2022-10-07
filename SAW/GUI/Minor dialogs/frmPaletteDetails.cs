@@ -6,7 +6,7 @@ using System.Windows.Forms;
 
 namespace SAW
 {
-	public partial class frmPaletteDetails
+	internal partial class frmPaletteDetails
 	{
 
 		private frmPaletteDetails()

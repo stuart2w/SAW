@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using SAW.Shapes;
 
 namespace SAW.Functions
 {
@@ -31,7 +32,7 @@ namespace SAW.Functions
 
 		public override int GetHashCode() => Change.GetHashCode() ^ Value.GetHashCode() ^ CustomRequiresParameter.GetHashCode();
 
-		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
+		public override void Trigger(ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
 		{
 			Editor.SetParameterValue(Value, Change);
 		}
@@ -99,7 +100,7 @@ namespace SAW.Functions
 								gr.DrawString("Ab", objFont, br, 2, 10);
 							break;
 						case Parameters.LineWidth:
-							using (Pen pn = new Pen(Color.Black, Value / 100f * gr.DpiX / Geometry.INCH))
+							using (Pen pn = new Pen(Color.Black, Value / 100f ))
 								gr.DrawLine(pn, 1, 1, 30, 30);
 							break;
 						case Parameters.LinePattern:

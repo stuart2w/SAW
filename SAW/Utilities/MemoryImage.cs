@@ -8,6 +8,7 @@ using Svg;
 
 namespace SAW
 {
+
 	/// <summary>The actual data for an image, buffered in memory.  No Datum or sharing logic (see SharedImage).
 	/// Also supports SVG images now - so base image may not be a .net image at all.</summary>
 	public class MemoryImage
@@ -119,11 +120,13 @@ namespace SAW
 			}
 		}
 
-		///// <summary>Uses  these bytes as the buffer, representing an image file in memory.  Note this uses the parameter array and does not copy it</summary>
-		//public MemoryImage(byte[] objBuffer)
-		//{
-		//	Buffer = objBuffer;
-		//}
+		/// <summary>Uses  these bytes as the buffer, representing an image file in memory.  Note this uses the parameter array and does not copy it</summary>
+		public MemoryImage(byte[] buffer, bool isSVG)
+		{
+			Buffer = buffer;
+			IsNull = (buffer == null);
+			IsSVG = isSVG;
+		}
 
 		#endregion
 
@@ -315,15 +318,6 @@ namespace SAW
 		}
 
 		#endregion
-
-		/// <summary>once the image is created it is not disposed at the moment.  If it is being drawn on-screen it will be needed repeatedly</summary>
-		private MemoryImage(byte[] buffer, bool isSVG)
-		{
-			// Only used for the Clone method
-			Buffer = buffer;
-			IsNull = (buffer == null);
-			IsSVG = isSVG;
-		}
 
 		public MemoryImage Clone()
 		{

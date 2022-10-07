@@ -1,6 +1,6 @@
 ﻿namespace SAW
 {
-	partial class cfgInput
+	internal partial class cfgInput
 	{
 		/// <summary> 
 		/// Required designer variable.

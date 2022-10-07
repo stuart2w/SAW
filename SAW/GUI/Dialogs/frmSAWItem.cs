@@ -4,13 +4,14 @@ using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 using Timer = System.Windows.Forms.Timer;
+using SAW.Shapes;
 
 // I get this when editing text alignment: https://stackoverflow.com/questions/50417999/how-to-opt-in-to-accessibility-improvements
 // can't see how it's relevant
 
 namespace SAW
 {
-	public partial class frmSAWItem : Form
+	internal partial class frmSAWItem : Form
 	{
 
 		private bool m_Filling;
@@ -274,14 +275,14 @@ namespace SAW
 			if (!clrNormalBack.Enabled)
 				lblBackColourHeader.Text += " " + Strings.Item("SAW_Edit_NA");
 
-			ButtonShape.Layouts? arrangement = MergeStates(from i in m_Items select i.Arrangement);
+			ButtonLayouts? arrangement = MergeStates(from i in m_Items select i.Arrangement);
 			if (arrangement.HasValue) // if not, then no item is selected
 				switch (arrangement.Value)
 				{ // note sense is different: Layouts enum references graphic position
-					case ButtonShape.Layouts.Below: rdoTextAbove.Checked = true; break;
-					case ButtonShape.Layouts.Left: rdoTextRight.Checked = true; break;
-					case ButtonShape.Layouts.Right: rdoTextLeft.Checked = true; break;
-					case ButtonShape.Layouts.CentreBoth: rdoTextOverlay.Checked = true; break;
+					case ButtonLayouts.Below: rdoTextAbove.Checked = true; break;
+					case ButtonLayouts.Left: rdoTextRight.Checked = true; break;
+					case ButtonLayouts.Right: rdoTextLeft.Checked = true; break;
+					case ButtonLayouts.CentreBoth: rdoTextOverlay.Checked = true; break;
 					//case ButtonShape.Layouts.Above:
 					default: rdoTextBelow.Checked = true; break;
 				}
@@ -360,10 +361,8 @@ namespace SAW
 			return result;
 		}
 
-		private static int IntegerThickness(float thickness)
-		{ // converts to int safely, rounding off (in case non-SAW precise values were used)
-			return (int)Math.Floor(thickness + 0.5f);
-		}
+		/// <summary>converts to int safely, rounding off (in case non-SAW precise values were used)</summary>
+		private static int IntegerThickness(float thickness) => (int)Math.Floor(thickness + 0.5f);
 
 		/// <summary>Called when user makes any UI changes</summary>
 		private void Updated()
@@ -859,15 +858,15 @@ namespace SAW
 			foreach (Item i in m_Items)
 			{
 				if (r == rdoTextAbove)
-					i.Arrangement = ButtonShape.Layouts.Below;
+					i.Arrangement = ButtonLayouts.Below;
 				else if (r == rdoTextBelow)
-					i.Arrangement = ButtonShape.Layouts.Above;
+					i.Arrangement = ButtonLayouts.Above;
 				else if (r == rdoTextLeft)
-					i.Arrangement = ButtonShape.Layouts.Right;
+					i.Arrangement = ButtonLayouts.Right;
 				else if (r == rdoTextRight)
-					i.Arrangement = ButtonShape.Layouts.Left;
+					i.Arrangement = ButtonLayouts.Left;
 				else if (r == rdoTextOverlay)
-					i.Arrangement = ButtonShape.Layouts.CentreBoth;
+					i.Arrangement = ButtonLayouts.CentreBoth;
 			}
 			Updated();
 		}

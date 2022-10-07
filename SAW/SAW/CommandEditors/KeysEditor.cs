@@ -92,7 +92,7 @@ namespace SAW.CommandEditors
 				return;
 			if (!txtDelay.IsValid || txtDelay.Value < 0 || txtDelay.Value > CmdSlowKeys.MAXDELAY)
 				return;
-			m_Command.m_ParamList[0] = new IntegerParam(txtDelay.Value);
+			m_Command.ParamList[0] = new IntegerParam(txtDelay.Value);
 			UserChanged?.Invoke(this, EventArgs.Empty);
 		}
 
@@ -139,7 +139,7 @@ namespace SAW.CommandEditors
 			string param = txtKeys.Text;
 			if (!chkGIDEI.Checked)
 				param = "'" + param + "'";
-			m_Command.m_ParamList[m_TextParam] = new StringParam(param);
+			m_Command.ParamList[m_TextParam] = new StringParam(param);
 			UserChanged?.Invoke(this, EventArgs.Empty);
 			tmrCheckScript.Enabled = true;
 		}

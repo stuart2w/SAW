@@ -56,7 +56,7 @@ namespace SAW.CommandEditors
 		{
 			if (m_Filling)
 				return;
-			m_Command.m_ParamList[0] = new Commands.StringParam(txtFilename.Text); // array must contain [0] as FillUI used the create option
+			m_Command.ParamList[0] = new Commands.StringParam(txtFilename.Text); // array must contain [0] as FillUI used the create option
 			UserChanged?.Invoke(this, EventArgs.Empty);
 		}
 

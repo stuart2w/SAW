@@ -1,6 +1,6 @@
 ﻿namespace SAW
 {
-	partial class frmSAWItem
+	internal partial class frmSAWItem
 	{
 		/// <summary>
 		/// Required designer variable.

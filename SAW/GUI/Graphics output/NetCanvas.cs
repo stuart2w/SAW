@@ -4,13 +4,12 @@ using System.Drawing;
 using System.Diagnostics;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
-
+using SAW.Shapes;
 
 namespace SAW
 {
 	/// <summary>Disposing this does not expose the underlying graphics.  It is not essential that this class is disposed</summary>
-	/// <remarks></remarks>
-	public class NetCanvas : Canvas
+	internal class NetCanvas : Canvas
 	{
 
 		private Graphics gr;
@@ -37,8 +36,7 @@ namespace SAW
 
 			public  Pen Pen;
 
-			public override Color Color
-			{ get { return Pen.Color; } }
+			public override Color Color => Pen.Color;
 
 			public override DashStyle DashStyle
 			{
@@ -113,15 +111,9 @@ namespace SAW
 		}
 
 		/// <summary>Static version of the usual Canvas.CreateFill</summary>
-		public static Fill CreateSolidFill(Color col)
-		{
-			return new NetFill(new SolidBrush(col));
-		}
+		public static Fill CreateSolidFill(Color col) => new NetFill(new SolidBrush(col));
 
-		public override Fill CreateLinearGradientFill(PointF A, PointF B, Color colA, Color colB)
-		{
-			return new NetFill(new LinearGradientBrush(A, B, colA, colB));
-		}
+		public override Fill CreateLinearGradientFill(PointF A, PointF B, Color colA, Color colB) => new NetFill(new LinearGradientBrush(A, B, colA, colB));
 
 		public override Fill CreateTextureBrush(SharedImage image, float scale)
 		{
@@ -163,16 +155,10 @@ namespace SAW
 		}
 
 
-		public override Stroke CreateStroke(Color col, float width = 1)
-		{
-			return new NetStroke() { Pen = new Pen(col, width) };
-		}
+		public override Stroke CreateStroke(Color col, float width = 1) => new NetStroke() { Pen = new Pen(col, width) };
 
 		/// <summary>Version (.net only) which can use any brush.  Not available in other outputs</summary>
-		public Stroke CreateStroke(Brush br, float width = 1)
-		{
-			return new NetStroke() { Pen = new Pen(br, width) };
-		}
+		public Stroke CreateStroke(Brush br, float width = 1) => new NetStroke() { Pen = new Pen(br, width) };
 
 		private static NetFill White = new NetFill(Brushes.White);
 		private static NetFill Black = new NetFill(Brushes.Black);
@@ -184,6 +170,7 @@ namespace SAW
 		#endregion
 
 		#region Information
+
 		public override float DpiX
 		{
 			get { return gr.DpiX; }
@@ -268,17 +255,13 @@ namespace SAW
 		public override SizeF MeasureString(string text, Font font, float width = 100000.0F, StringFormat format = null)
 		{
 			if (format != null)
-			{
-				return gr.MeasureString(text, font, (int)width, format);
-			}
+				return gr.MeasureString(text, font, (int) width, format);
 			return gr.MeasureString(text, font, (int)width);
 		}
 
 		/// <summary>Returns the exact rectangle in which the text would be drawn.  Note that it usually will not start at 0, 0 even if drawn top left, the graphics engine usually leaves a pixel or so space</summary>
-		public override RectangleF MeasureTextExact(string text, Font font, RectangleF bounds, StringFormat format, int includeCharacters = int.MaxValue)
-		{
-			return MeasureTextExact(gr, text, font, bounds, format, includeCharacters);
-		}
+		public override RectangleF MeasureTextExact(string text, Font font, RectangleF bounds, StringFormat format, int includeCharacters = int.MaxValue) 
+			=> MeasureTextExact(gr, text, font, bounds, format, includeCharacters);
 
 		public override void DrawString(string text, Font font, Fill fill, PointF start, StringFormat format = null)
 		{
@@ -307,8 +290,6 @@ namespace SAW
 			{
 				return region.GetBounds(gr);
 			}
-
-			//End If
 		}
 
 		#endregion
@@ -320,7 +301,7 @@ namespace SAW
 		static NetCanvas()
 		{
 			// must be after SystemDPI set (currently in frmMenu.Load)
-			Debug.Assert(GUIUtilities.SystemDPI > 0);
+			Debug.Assert(GUIUtilities.SystemDPI > 0, "GUIUtilities not initialised");
 			m_bmp = new Bitmap(1, 1); //, Imaging.PixelFormat.Format32bppArgb)
 			m_bmp.SetResolution(GUIUtilities.SystemDPI, GUIUtilities.SystemDPI);
 			MeasurementInstance = new NetCanvas(CreateGraphics(true));

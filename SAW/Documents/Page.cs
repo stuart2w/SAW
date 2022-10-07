@@ -6,6 +6,7 @@ using System.Collections;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
 using System.Linq;
+using SAW.Shapes;
 
 // ReSharper disable IsExpressionAlwaysFalse
 
@@ -113,11 +114,11 @@ namespace SAW
 			PossibleSizeNames.Add("ScreenWorksheet_PaperSize");
 		}
 
-		public static bool IdentifySize(SizeF sz, out int listIndex, out bool landscape)
+		/// <summary>Checks if the given size exists in PossibleSizes (either way round)
+		/// returns true if found, in which case the out parameters are defined.  IntListIndex is the index of this size in PossibleSizes
+		/// (but note that sz will not match PossibleSizes(intListIndex) if it is landscape)</summary>
+		internal static bool IdentifySize(SizeF sz, out int listIndex, out bool landscape)
 		{
-			// Checks of the given size exists in PossibleSizes (either way round)
-			// returns true if found, in which case the out parameters are defined.  IntListIndex is the index of this size in PossibleSizes
-			// (but note that sz will not match PossibleSizes(intListIndex) if it is landscape)
 			SizeF invert = sz.Flip();
 			landscape = false;
 			for (int index = 0; index <= PossibleSizes.Count - 1; index++)
@@ -140,7 +141,7 @@ namespace SAW
 			return false;
 		}
 
-		public void BringShapesWithinPage(Transaction transaction)
+		internal void BringShapesWithinPage(Transaction transaction)
 		{
 			// this is called after the page size has been changed.  It moves all shapes back within the page
 			// measures are always ignored when doing this
@@ -206,8 +207,7 @@ namespace SAW
 				bool landscape;
 				if (IdentifySize(Size, out listIndex, out landscape))         // it is a named size
 					return PossibleSizeNames[listIndex] + (landscape ? Strings.Item("PageSize_Landscape") : Strings.Item("PageSize_Portrait"));
-				else
-					return Size.Width.ToString("0") + " x " + Size.Height.ToString("0") + Strings.Item("mm");
+				return Size.Width.ToString("0") + " x " + Size.Height.ToString("0") + Strings.Item("px");
 			}
 		}
 
@@ -228,10 +228,11 @@ namespace SAW
 
 		internal event RequestRefreshEventHandler RequestRefresh;
 
-		internal float AssumeRefreshScale = 1; // where critical is passed to each function (especially drawing).
-											   // this can be used for some things which do auto refresh - and scale not always easily available
+		/// <summary>where critical Scale is passed to each function (especially drawing).
+		/// this can be used for some things which do auto refresh - and scale not always easily available</summary>
+		internal float AssumeRefreshScale = 1;
 
-		public void DrawBackground(Canvas gr, float scale, bool background = true, bool grid = true, bool origin = true)
+		internal void DrawBackground(Canvas gr, float scale, bool background = true, bool grid = true, bool origin = true)
 		{
 			RectangleF bounds = new RectangleF(0, -Size.Height, Size.Width, Size.Height + 1); // +1 needed to stop some artifacts at bottom of page when zooming out (between page and grey, when zooming from being large enough there is no grey).  Not sure if it affects the image
 			gr.StartGroup();
@@ -270,7 +271,7 @@ namespace SAW
 			gr.EndGroup();
 		}
 
-		public static void DrawBackgroundImage(Canvas gr, SharedImage image, BackgroundImageModes mode, RectangleF bounds, float scale)
+		internal static void DrawBackgroundImage(Canvas gr, SharedImage image, BackgroundImageModes mode, RectangleF bounds, float scale)
 		{
 			// This is shared because it might be useful for backgrounds within shapes, although textures do the brush creation in Shape.PrepareDraw
 			var sz = image.GetSize();
@@ -312,7 +313,7 @@ namespace SAW
 
 		private static readonly Fill ErrorBrush = NetCanvas.CreateSolidFill(Color.FromArgb(100, Color.Tomato));
 
-		public void DrawShapes(Canvas gr, float scale, float coordScale, StaticView view, bool omitMeasures = false, StaticView.InvalidationBuffer buffer = StaticView.InvalidationBuffer.Base)
+		internal void DrawShapes(Canvas gr, float scale, float coordScale, StaticView view, bool omitMeasures = false, StaticView.InvalidationBuffer buffer = StaticView.InvalidationBuffer.Base)
 		{
 			//foreach (Shape shp in m_Shapes)
 			foreach (Shape shape in (ReverseRenderOrder ? (m_Shapes as IEnumerable<Shape>).Reverse() : m_Shapes)) // must cast to Enumerable to avoid the List.Reverse which edits the actual list
@@ -346,7 +347,7 @@ namespace SAW
 			}
 		}
 
-		public void DrawSelected(Canvas gr, StaticView view, float scale, float coordScale, bool print)
+		internal void DrawSelected(Canvas gr, StaticView view, float scale, float coordScale, bool print)
 		{
 			// if bolPrint then this draws the shapes pretty much as normal, just filters to the selected ones
 			// note this is not called when a transform is moving the selected shapes - they draw within current buffer as part of transform
@@ -387,7 +388,7 @@ namespace SAW
 			}
 		}
 
-		public void DrawSelectionBoundary(RectangleF bounds, Canvas gr)
+		internal void DrawSelectionBoundary(RectangleF bounds, Canvas gr)
 		{
 			if (bounds.IsEmpty)
 				return;
@@ -697,21 +698,6 @@ namespace SAW
 			return null;
 		}
 
-		public Shape FindSingleActivity()
-		{
-			// If there is just one activity on the page, or just one selected this is returned
-			var col = this.Where(x => (x.Flags & Shape.GeneralFlags.Activity) > 0);
-			if (!col.Any())
-				return null;
-			if (col.Count() >= 2)
-			{
-				col = SelectedShapes.Where(x => (x.Flags & Shape.GeneralFlags.Activity) > 0);
-				if (col.Count() != 1)
-					return null; // either multiple selected, or none selected but not all non-selected; either way no unambiguous single one to select
-			}
-			return col.First(); // Is now just one, either from the first search, or once we restrict to only selected ones
-		}
-
 		public bool Contains(Shape shape) => this.Any(shp => shp == shape);
 
 		/// <summary>excludes measures, because it probably doesn't matter these stick off the edges when printing
@@ -741,16 +727,17 @@ namespace SAW
 		}
 
 		public List<Shape> Contents => m_Shapes;
+
 		// The page doesn't adjust the positions of shapes at all
 		bool IShapeContainer.MoveWithin(List<Shape> shapes, PointF target, Shape.GrabMovement move, Transaction transaction) => false;
+
 		public bool AllowClick(PointF target) => true;
 
 		public IShapeContainer AsParentContainer => this;
 
-
 		/// <summary>Returns true if this contains a single shape which is IAutoSize</summary>
 		/// <remarks>Used to detect palettes which should flow</remarks>
-		public bool IsSingleAutoSize => m_Shapes.Count == 1 && m_Shapes[0] is IAutoSize;
+		internal bool IsSingleAutoSize => m_Shapes.Count == 1 && m_Shapes[0] is IAutoSize;
 
 #if DEBUG
 		public void CheckZ(Shape shp) => Debug.Assert(shp == null || shp.GetClass() == Shape.Classes.Measure || shp.Z == m_Shapes.IndexOf(shp), "Shape Z-index wrong");
@@ -765,7 +752,6 @@ namespace SAW
 
 #endif
 
-#if SAW
 		public Scriptable FindScriptableByID(int searchID)
 		{
 			Scriptable found = null;
@@ -782,13 +768,12 @@ namespace SAW
 			int highest = 0;
 			Iterate(element =>
 			{
-				if (element is Scriptable)
-					highest = Math.Max((element as Scriptable).SAWID, highest);
+				if (element is Scriptable scriptable)
+					highest = Math.Max(scriptable.SAWID, highest);
 			});
 			return highest;
 		}
 
-#endif
 		#endregion
 
 		#region Custom enumerators
@@ -973,7 +958,7 @@ namespace SAW
 		}
 
 		/// <summary>Updates which part of the shape is selected.  Shape is provided, but should be the (single) currently selected shape.  If not, this is ignored</summary>
-		public void SelectPathOnShape(Shape shape, Target selectPath)
+		internal void SelectPathOnShape(Shape shape, Target selectPath)
 		{
 			if (SelectedShapes.Count != 1)
 				return;
@@ -1127,15 +1112,9 @@ namespace SAW
 		}
 
 		/// <summary>returns true if it is selected.  Returns false without error if param is null</summary>
-		public bool IsShapeSelected(Shape shape)
-		{
-			return shape != null && SelectedShapes.Contains(shape);
-		}
+		public bool IsShapeSelected(Shape shape) => shape != null && SelectedShapes.Contains(shape);
 
-		internal RectangleF SelectedBounds(bool ignore)
-		{
-			return Geometry.UnionRectangles(from shape in SelectedShapes select shape.Bounds);
-		}
+		internal RectangleF SelectedBounds(bool ignore) => Geometry.UnionRectangles(from shape in SelectedShapes select shape.Bounds);
 
 		internal bool MovingSelection
 		{
@@ -1151,17 +1130,11 @@ namespace SAW
 
 		/// <summary>returns true if one or more shapes in the selection list allows all of the flags in eRequired</summary>
 		/// <remarks>always returns false if nothing selected</remarks>
-		internal bool SelectionAnyAllows(Shape.AllowedActions required)
-		{
-			return SelectedShapes.Any(shape => (shape.Allows & required) == required);
-		}
+		internal bool SelectionAnyAllows(Shape.AllowedActions required) => SelectedShapes.Any(shape => (shape.Allows & required) == required);
 
 		/// <summary>returns true if all shapes in the selection list allows all of the flags in eRequired</summary>
 		/// <remarks>always returns false if nothing selected</remarks>
-		internal bool SelectionAllAllow(Shape.AllowedActions required)
-		{
-			return SelectedShapes.All(shape => (shape.Allows & required) == required);
-		}
+		internal bool SelectionAllAllow(Shape.AllowedActions required) => SelectedShapes.All(shape => (shape.Allows & required) == required);
 
 		internal void FilterSelectionByAllows(Shape.AllowedActions required)
 		{
@@ -1227,7 +1200,7 @@ namespace SAW
 		/// <param name="front">Direction to move</param>
 		/// <param name="transaction">Transaction object to use.  This will call Edit as necessary</param>
 		/// <remarks>Ignores measures.  Ignored if nothing else if selected.  Ignored, with user message if selection are in different containers.</remarks>
-		public void SendToFrontBack(bool front, Transaction transaction)
+		public void SendToFrontBack(bool front, Transaction transaction = null)
 		{
 			// extract them from the main list, and then put them back in again
 			if (SelectedShapes.Count == 0)
@@ -1238,7 +1211,7 @@ namespace SAW
 				MessageBox.Show(Strings.Item("Container_Mismatch"));
 				return;
 			}
-			transaction.Edit((Datum)container);
+			transaction?.Edit((Datum)container);
 			foreach (Shape shape in SelectedShapes)
 				container.Contents.Remove(shape);
 			if (front)
@@ -1249,7 +1222,7 @@ namespace SAW
 			RefreshSelection?.Invoke(SelectedRefreshBoundary(), true, false);
 		}
 
-		public void SendToFrontBackOneStep(bool front, Transaction transaction)
+		public void SendToFrontBackOneStep(bool front, Transaction transaction = null)
 		{
 			// sends a single shape forwards or backwards one step
 			if (SelectedShapes.Count != 1)
@@ -1257,7 +1230,7 @@ namespace SAW
 				Utilities.LogSubError("SendToFrontBackOneStep: " + SelectedShapes.Count + " selected");
 				return;
 			}
-			transaction.Edit(SelectedShapes[0].Container as Datum);
+			transaction?.Edit(SelectedShapes[0].Container as Datum);
 			int index = SelectedShapes[0].Z;
 			List<Shape> col = SelectedShapes[0].Container.Contents;
 			if (front)
@@ -1284,29 +1257,35 @@ namespace SAW
 			RefreshSelection?.Invoke(SelectedRefreshBoundary(), true, false);
 		}
 
-		public void AddNew(Shape newShape, Transaction transaction)
+		/// <summary>Adds a new shape to the page.  transaction can be nothing if this is not a transactional change (e.g. loading file)
+		/// the object itself to be added to the transaction by the calling code</summary>
+		public void AddNew(Shape newShape, Transaction transaction = null)
 		{
-			// adds a shape that the user has just finished drawing
-			// objTransaction can be nothing if this is not a transactional change (e.g. loading old file version)
-			// the object itself to be added to the transaction by the calling code
 			if (transaction != null)
 			{
 				transaction.Edit(this);
 				Debug.Assert(transaction.Contains(newShape), "Object to be added to the page is not in the transaction.  Has it been forgotten?");
 			}
 			newShape.Parent = this;
+			if (newShape is Scriptable S) // fill in any IDs which are not set
 			{
-				if ((newShape.Flags & Shape.GeneralFlags.AddAtBack) > 0)
+				int nextID = Globals.Root.CurrentDocument.NextUniqueID;
+				S.Iterate(sub =>
 				{
-					newShape.Z = 0;
-					m_Shapes.Insert(0, newShape);
-					ResetZ();
-				}
-				else
-				{
-					newShape.Z = m_Shapes.Count;
-					m_Shapes.Add(newShape);
-				}
+					if (sub is Scriptable S2 && S2.SAWID == 0)
+						S2.SAWID = nextID++;
+				});
+			}
+			if ((newShape.Flags & Shape.GeneralFlags.AddAtBack) > 0)
+			{
+				newShape.Z = 0;
+				m_Shapes.Insert(0, newShape);
+				ResetZ();
+			}
+			else
+			{
+				newShape.Z = m_Shapes.Count;
+				m_Shapes.Add(newShape);
 			}
 			RequestRefresh?.Invoke(newShape.RefreshBounds());
 		}
@@ -1319,7 +1298,7 @@ namespace SAW
 		/// NOTE: this requires that shapes which we link to do not themselves have further links; this function will not correctly cascade
 		/// such cascading changes will only work at the moment if the shapes are stored in the correct order
 		/// </remarks>
-		public void PerformLinkedChanges(Transaction transaction, frmMain editor)
+		internal void PerformLinkedChanges(Transaction transaction, frmMain editor)
 		{
 			foreach (Shape shape in this)
 			{
@@ -1343,9 +1322,9 @@ namespace SAW
 		}
 #endif
 
+		/// <summary>transaction can be nothing if this is not a transactional change</summary>
 		public void Delete(Shape shape, Transaction transaction)
 		{
-			// objTransaction can be nothing if this is not a transactional change (e.g. loading old file version)
 			Debug.Assert(!shape.HasCaret);
 			transaction?.Edit((Datum)shape.Container);
 			shape.Container.Contents.Remove(shape);
@@ -1359,6 +1338,7 @@ namespace SAW
 			}
 		}
 
+		/// <summary>Deletes all selected shapes from the page </summary>
 		public void DeleteSelected(Transaction transaction)
 		{
 			if (SelectedShapes.Count == 0)
@@ -1393,7 +1373,8 @@ namespace SAW
 		#endregion
 
 		#region Datum -load, save, etc
-		public override void Load(DataReader reader)
+
+		protected internal override void Load(DataReader reader)
 		{
 			base.Load(reader);
 			PhysicalSize = reader.ReadSizeF();
@@ -1431,7 +1412,7 @@ namespace SAW
 			}
 		}
 
-		public override void Save(DataWriter writer)
+		protected internal override void Save(DataWriter writer)
 		{
 			base.Save(writer);
 			writer.Write(PhysicalSize);
@@ -1461,7 +1442,7 @@ namespace SAW
 			}
 		}
 
-		public override byte TypeByte
+		protected internal override byte TypeByte
 		{ get { return (byte)FileMarkers.Page; } }
 
 		public override void CopyFrom(Datum other, CopyDepth depth, Mapping mapID)
@@ -1497,7 +1478,7 @@ namespace SAW
 			}
 		}
 
-		public override void UpdateReferencesObjectsCreated(Document document, DataReader reader)
+		protected internal override void UpdateReferencesObjectsCreated(Document document, DataReader reader)
 		{
 			Paper.UpdateReferencesObjectsCreated(document, reader);
 			foreach (Shape shape in m_Shapes)
@@ -1508,7 +1489,7 @@ namespace SAW
 			Debug.Assert(!(m_Background?.Failed ?? false));
 		}
 
-		public override void UpdateReferencesIDsChanged(Mapping mapID, Document document)
+		protected internal override void UpdateReferencesIDsChanged(Mapping mapID, Document document)
 		{
 			base.UpdateReferencesIDsChanged(mapID, document);
 			Paper.UpdateReferencesIDsChanged(mapID, document);
@@ -1519,12 +1500,12 @@ namespace SAW
 			m_Background?.UpdateIDsReferencesChanged();
 		}
 
-		public override void AddRequiredReferences(Action<Datum> fnAdd, Mapping mapID)
+		protected internal override void AddRequiredReferences(Action<Datum> fnAdd, Mapping mapID)
 		{
 			fnAdd.Invoke(m_Background?.Content);
 		}
 
-		public override void Iterate(DatumFunction fn)
+		internal override void Iterate(DatumFunction fn)
 		{
 			base.Iterate(fn);
 			if (Paper == null || m_Shapes == null)
@@ -1569,7 +1550,7 @@ namespace SAW
 			return true;
 		}
 
-		public void WriteExportText(IndentStringBuilder output)
+		internal void WriteExportText(IndentStringBuilder output)
 		{ // in this caseThe start and end of page written by the container, if needed
 			if (m_Background != null)
 			{
@@ -1580,13 +1561,12 @@ namespace SAW
 				shape.WriteExportText(output);
 		}
 
-
 		#endregion
 
 		#region Targets (shape snapping) and rotation points
 		private List<Target> m_Targets = new List<Target>(); // GenerateTargets will only generate a single target; but when snapping a moving shape we might want to draw several intersections
 
-		public void ClearTargets()
+		internal void ClearTargets()
 		{
 			m_Targets.Clear();
 		}
@@ -1594,7 +1574,7 @@ namespace SAW
 		/// <summary>all targets are generated from a (probably dummy) UserSocket.  For mouse UserSocket.Centre is the mouse position,
 		/// and other values are default.  But this does allow us to specify angular or class/gender constraints (mostly used by Group when generating targets)</summary>
 		/// <remarks>will only actually generate a single target - the one closest to the mouse</remarks>
-		public void GenerateTargets(UserSocket moving, float scale)
+		internal void GenerateTargets(UserSocket moving, float scale)
 		{
 			m_Targets.Clear();
 			m_Targets = GenerateIndependentTargets(moving, scale);
@@ -1612,7 +1592,7 @@ namespace SAW
 		}
 
 		/// <summary>Does not update the targets stored on the page; instead simply returns a list of targets near the area of interest</summary>
-		public List<Target> GenerateIndependentTargets(UserSocket moving, float scale)
+		internal List<Target> GenerateIndependentTargets(UserSocket moving, float scale)
 		{
 			List<Target> targets = new List<Target>();
 			try
@@ -1660,12 +1640,12 @@ namespace SAW
 			return targets;
 		}
 
-		public void SetDrawnTargets(List<Target> targets)
+		internal void SetDrawnTargets(List<Target> targets)
 		{
 			m_Targets = targets;
 		}
 
-		public void DrawTargets(Graphics gr, int activePhase, float scale)
+		internal void DrawTargets(Graphics gr, int activePhase, float scale)
 		{
 			// intActivePhase ranges from 0 to Target.ACTIVEMAXIMUMPHASE
 			Debug.Assert(activePhase >= 0 && activePhase <= Target.ACTIVEMAXIMUMPHASE);
@@ -1677,13 +1657,13 @@ namespace SAW
 			}
 		}
 
-		public bool HasTargets
+		internal bool HasTargets
 		{ get { return m_Targets.Count > 0; } }
 
-		public bool HasActiveTarget
+		internal bool HasActiveTarget
 		{ get { return m_Targets.Count > 0; } }
 
-		public Target ActiveTarget
+		internal Target ActiveTarget
 		{
 			get
 			{
@@ -1694,7 +1674,7 @@ namespace SAW
 			}
 		}
 
-		public RectangleF TargetRefreshBoundary(float scale)
+		internal RectangleF TargetRefreshBoundary(float scale)
 		{
 			// area which needs to be refreshed for current targets.  These are drawn in 'current' buffer of view
 			if (!HasActiveTarget)
@@ -1758,7 +1738,7 @@ namespace SAW
 		}
 
 		/// <summary>Returns all areas which need to be invalidated due to rotation points</summary>
-		public IEnumerable<RectangleF> GetRotationPointInvalidationAreas(float scale)
+		internal IEnumerable<RectangleF> GetRotationPointInvalidationAreas(float scale)
 		{
 			// include pen width (which is the 1+)
 			float size = (float)(GUIUtilities.MillimetreSize * (1 + 4 * Math.Sqrt(scale)));
@@ -1869,15 +1849,13 @@ namespace SAW
 		public bool IsDisposed
 		{
 			[DebuggerStepThrough()]
-			get
-			{
-				return m_Shapes == null;
-			}
+			get => m_Shapes == null;
 		}
 
 		#endregion
 
 		#region Shape parent
+
 		public void NotifyIndirectChange(Shape shape, ChangeAffects affected)
 		{
 			Debug.Assert(affected != ChangeAffects.SetPaletteExclusion, "SetPaletteExclusion requires a rectangle to be specified, even if it is empty (to clear)");
@@ -1894,7 +1872,6 @@ namespace SAW
 		}
 
 		#endregion
-
 
 	}
 

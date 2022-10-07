@@ -9,7 +9,7 @@ using Switches.Switching;
 
 namespace SAW
 {
-	public partial class frmRun : Form
+	internal partial class frmRun : Form
 	{
 		private Document m_Document;
 		private Page m_Page;

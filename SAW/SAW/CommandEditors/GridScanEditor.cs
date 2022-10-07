@@ -63,7 +63,7 @@ namespace SAW.CommandEditors
 				return;
 			if (!txtRows.IsValid || txtRows.Value <= 0)
 				return;
-			m_Command.m_ParamList[1] = new IntegerParam(txtRows.Value);
+			m_Command.ParamList[1] = new IntegerParam(txtRows.Value);
 			UserChanged?.Invoke(this, EventArgs.Empty);
 		}
 
@@ -73,7 +73,7 @@ namespace SAW.CommandEditors
 				return;
 			if (!txtColumns.IsValid || txtColumns.Value <= 0)
 				return;
-			m_Command.m_ParamList[0] = new IntegerParam(txtColumns.Value);
+			m_Command.ParamList[0] = new IntegerParam(txtColumns.Value);
 			UserChanged?.Invoke(this, EventArgs.Empty);
 		}
 

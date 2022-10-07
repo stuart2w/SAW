@@ -8,7 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Web.Services.Description;
 
-namespace SAW
+namespace SAW.Shapes
 {
 	public class MaskedImage : Shape, IShapeParent
 	{
@@ -37,12 +37,12 @@ namespace SAW
 
 		#region Verbs - not applicable is it can't be drawn directly
 
-		public override VerbResult Choose(EditableView.ClickPosition position) => throw new InvalidOperationException();
-		public override VerbResult Start(EditableView.ClickPosition position) => throw new InvalidOperationException();
-		public override VerbResult Complete(EditableView.ClickPosition position) => throw new InvalidOperationException();
+		public override VerbResult Choose(ClickPosition position) => throw new InvalidOperationException();
+		public override VerbResult Start(ClickPosition position) => throw new InvalidOperationException();
+		public override VerbResult Complete(ClickPosition position) => throw new InvalidOperationException();
 		public override VerbResult CompleteRetrospective() => throw new InvalidOperationException();
-		public override VerbResult Cancel(EditableView.ClickPosition position) => throw new InvalidOperationException();
-		public override VerbResult Float(EditableView.ClickPosition position) => throw new InvalidOperationException();
+		public override VerbResult Cancel(ClickPosition position) => throw new InvalidOperationException();
+		public override VerbResult Float(ClickPosition position) => throw new InvalidOperationException();
 
 		#endregion
 
@@ -81,14 +81,14 @@ namespace SAW
 			m_Bounds = RectangleF.Empty;
 		}
 
-		public override void Save(DataWriter writer)
+		protected internal override void Save(DataWriter writer)
 		{
 			base.Save(writer);
 			writer.Write(Image);
 			writer.Write(MaskShape);
 		}
 
-		public override void Load(DataReader reader)
+		protected internal override void Load(DataReader reader)
 		{
 			base.Load(reader);
 			Image = (ImportedImage)reader.ReadData();
@@ -106,7 +106,7 @@ namespace SAW
 			return MaskShape.Bounds;
 		}
 
-		public override bool HitTestDetailed(PointF clickPoint, float scale, bool treatAsFilled)
+		protected internal  override bool HitTestDetailed(PointF clickPoint, float scale, bool treatAsFilled)
 		{
 			return MaskShape.HitTestDetailed(clickPoint, scale, true);
 		}
@@ -191,7 +191,7 @@ namespace SAW
 		{// not used as main functions replaced entirely
 		}
 
-		public override StyleBase StyleObjectForParameter(Parameters parameter, bool applyingDefault = false)
+		internal override StyleBase StyleObjectForParameter(Parameters parameter, bool applyingDefault = false)
 		{ // basically returns style for the shape, but inhibits fill styles as these won't work
 			switch (parameter)
 			{
@@ -232,21 +232,21 @@ namespace SAW
 			Image.NotifyEnvironmentChanged(change);
 		}
 
-		public override void UpdateReferencesObjectsCreated(Document document, DataReader reader)
+		protected internal override void UpdateReferencesObjectsCreated(Document document, DataReader reader)
 		{
 			base.UpdateReferencesObjectsCreated(document, reader);
 			Image.UpdateReferencesObjectsCreated(document, reader);
 			MaskShape.UpdateReferencesObjectsCreated(document, reader);
 		}
 
-		public override void UpdateReferencesIDsChanged(Mapping mapID, Document document)
+		protected internal override void UpdateReferencesIDsChanged(Mapping mapID, Document document)
 		{
 			base.UpdateReferencesIDsChanged(mapID, document);
 			Image.UpdateReferencesIDsChanged(mapID, document);
 			MaskShape.UpdateReferencesIDsChanged(mapID, document);
 		}
 
-		public override void Iterate(DatumFunction fn)
+		internal override void Iterate(DatumFunction fn)
 		{
 			base.Iterate(fn);
 			MaskShape.Iterate(fn);

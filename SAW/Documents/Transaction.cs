@@ -3,11 +3,11 @@ using System;
 using System.Drawing;
 using System.Diagnostics;
 using System.Collections;
-
+using SAW.Shapes;
 
 namespace SAW
 {
-	public sealed class Change
+	internal sealed class Change
 	{
 		// Represents a change to a single object within a transaction
 		// if the change is a deletion then the 'current' object reference is kept in Previous (allowing the same reference to be restored on undo - this is crucial

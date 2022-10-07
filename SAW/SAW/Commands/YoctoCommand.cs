@@ -38,7 +38,7 @@ namespace SAW.Commands
 
 		#region Script and editing
 
-		public override void InitialiseDefaultsForCreation()
+		internal override void InitialiseDefaultsForCreation()
 		{
 			base.InitialiseDefaultsForCreation();
 			Command = Commands.Pulse;
@@ -52,36 +52,36 @@ namespace SAW.Commands
 				throw new UserException(Strings.Item("Script_Error_TooFewParameters").Replace("%0", GetCommandName()));
 			if (possibleParams.Count > 3)
 				throw new UserException(Strings.Item("Script_Error_TooManyParameters").Replace("%0", GetCommandName()));
-			m_ParamList.Add(new StringParam(possibleParams[0]));
-			m_ParamList.Add(new StringParam(possibleParams[1], false));
+			ParamList.Add(new StringParam(possibleParams[0]));
+			ParamList.Add(new StringParam(possibleParams[1], false));
 			if (possibleParams.Count == 3 && int.TryParse(possibleParams[2], out _))
-				m_ParamList.Add(new IntegerParam(int.Parse(possibleParams[2])));
+				ParamList.Add(new IntegerParam(int.Parse(possibleParams[2])));
 			ParseParams();
 		}
 
 		/// <summary>Reads the member fields from the params</summary>
 		private void ParseParams()
 		{
-			if (m_ParamList.Count > 1) // conditions shouldn't really be needed, but safer with (and it happened during dev)
-				RelayID = m_ParamList[0].ValueAsString();
-			if (m_ParamList.Count >= 2)
-				switch (m_ParamList[1].ValueAsString().ToLowerInvariant())
+			if (ParamList.Count > 1) // conditions shouldn't really be needed, but safer with (and it happened during dev)
+				RelayID = ParamList[0].ValueAsString();
+			if (ParamList.Count >= 2)
+				switch (ParamList[1].ValueAsString().ToLowerInvariant())
 				{
 					case "on": Command = Commands.On; break;
 					case "off": Command = Commands.Off; break;
 					case "toggle": Command = Commands.Toggle; break;
 					case "?":
 						Command = Commands.Query;
-						if (m_ParamList.Count == 3)
+						if (ParamList.Count == 3)
 						{
-							if (!int.TryParse(m_ParamList[2].ValueAsString(), out Millisecond) || Millisecond < 0) // note Millisecond set by first part of condition
+							if (!int.TryParse(ParamList[2].ValueAsString(), out Millisecond) || Millisecond < 0) // note Millisecond set by first part of condition
 								throw new UserException("[Script_Error_BadYoctoTime]");
 						}
 						else
 							Millisecond = 5000;
 						break;
 					default:
-						if (!int.TryParse(m_ParamList[1].ValueAsString(), out Millisecond))
+						if (!int.TryParse(ParamList[1].ValueAsString(), out Millisecond))
 							throw new UserException("[Script_Error_UnknownYocto]");
 						if (Millisecond <= 0)
 							throw new UserException("[Script_Error_BadYoctoTime]");
@@ -90,26 +90,26 @@ namespace SAW.Commands
 				}
 		}
 
-		public override ICommandEditor GetEditor() => new YoctoEditor();
+		internal override ICommandEditor GetEditor() => new YoctoEditor();
 
 		/// <summary>Resets the param list based on the properties of this object </summary>
 		public void UpdateParams()
 		{
-			m_ParamList.Clear(); //simplest just to delete and recreate.  Efficiency is irrelevant as this will only be used in response to UI events for one command
-			m_ParamList.Add(new StringParam(RelayID));
+			ParamList.Clear(); //simplest just to delete and recreate.  Efficiency is irrelevant as this will only be used in response to UI events for one command
+			ParamList.Add(new StringParam(RelayID));
 			switch (Command)
 			{
 				case Commands.Pulse:
-					m_ParamList.Add(new IntegerParam(Millisecond));
+					ParamList.Add(new IntegerParam(Millisecond));
 					break;
 				case Commands.On:
 				case Commands.Off:
 				case Commands.Toggle:
-					m_ParamList.Add(new StringParam(Command.ToString().ToLowerInvariant(), false));
+					ParamList.Add(new StringParam(Command.ToString().ToLowerInvariant(), false));
 					break;
 				case Commands.Query:
-					m_ParamList.Add(new StringParam("?", false));
-					m_ParamList.Add(new IntegerParam(Millisecond));
+					ParamList.Add(new StringParam("?", false));
+					ParamList.Add(new IntegerParam(Millisecond));
 					break;
 				default:
 					throw new ArgumentOutOfRangeException();
@@ -137,7 +137,7 @@ namespace SAW.Commands
 
 		#endregion
 
-		public override void Execute(ExecutionContext context)
+		internal override void Execute(ExecutionContext context)
 		{
 			RegisterYocto(false); // at run time this is the first place a relay would have been referenced, so this would not have been done yet
 			IEnumerable<YRelay> relays = FindRelay(RelayID);

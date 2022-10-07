@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 
-namespace SAW
+namespace SAW.Shapes
 {
 	public abstract class Filled : Lined
 	{
@@ -13,13 +13,14 @@ namespace SAW
 			FillStyle = new FillStyleC();
 		}
 
-		public override VerbResult Start(EditableView.ClickPosition position)
+		public override VerbResult Start(ClickPosition position)
 		{
 			FillStyle.SetDefaults();
 			return base.Start(position);
 		}
 
 		#region Drawing
+
 		protected override void PrepareDraw(DrawResources resources)
 		{
 			base.PrepareDraw(resources);
@@ -64,11 +65,14 @@ namespace SAW
 		#endregion
 
 		#region Basic information
-		public FillStyleC FillStyle;
-		public override bool IsFilled
-		{ get { return FillStyle.Colour.A > 0; } }
 
-		public override StyleBase StyleObjectForParameter(Parameters parameter, bool applyingDefault = false)
+		/// <summary>Styling information for the background of the shape - mainly the colour, although patterns or textures may be supported</summary>
+		public FillStyleC FillStyle;
+
+		/// <summary>True if shape actually draws a non-transparent background (can vary)</summary>
+		public override bool IsFilled => FillStyle.Colour.A > 0;
+
+		internal override StyleBase StyleObjectForParameter(Parameters parameter, bool applyingDefault = false)
 		{
 			switch (parameter)
 			{
@@ -80,8 +84,7 @@ namespace SAW
 			}
 		}
 
-		public override AllowedActions Allows
-		{ get { return (base.Allows & ~AllowedActions.Arrowheads) | AllowedActions.PermittedArea; } }
+		public override AllowedActions Allows => (base.Allows & ~AllowedActions.Arrowheads) | AllowedActions.PermittedArea;
 
 		internal override void AddToFlatList(List<Shape> list, FlatListPurpose purpose)
 		{
@@ -98,13 +101,13 @@ namespace SAW
 		#endregion
 
 		#region Datum and Copy
-		public override void Load(DataReader reader)
+		protected internal override void Load(DataReader reader)
 		{
 			base.Load(reader);
 			FillStyle = FillStyleC.Read(reader);
 		}
 
-		public override void Save(DataWriter writer)
+		protected internal override void Save(DataWriter writer)
 		{
 			base.Save(writer);
 			FillStyle.Write(writer);
@@ -128,13 +131,13 @@ namespace SAW
 		}
 
 		// note similar stuff in ButtonStyle
-		public override void AddRequiredReferences(Action<Datum> fnAdd, Mapping mapID)
+		protected internal override void AddRequiredReferences(Action<Datum> fnAdd, Mapping mapID)
 		{
 			base.AddRequiredReferences(fnAdd, mapID);
 			FillStyle?.AddReferences(fnAdd, mapID);
 		}
 
-		public override void UpdateReferencesObjectsCreated(Document document, DataReader reader)
+		protected internal override void UpdateReferencesObjectsCreated(Document document, DataReader reader)
 		{
 			base.UpdateReferencesObjectsCreated(document, reader);
 			FillStyle?.UpdateReferencesObjectsCreated(document, reader);

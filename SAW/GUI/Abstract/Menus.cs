@@ -3,7 +3,7 @@ using System.Windows.Forms;
 
 namespace SAW
 {
-	public static class Menus
+	internal static class Menus
 	{
 		// Support for creating the Menus which can be shared between the user menu screen and the main screen
 

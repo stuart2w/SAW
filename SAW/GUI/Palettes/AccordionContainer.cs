@@ -8,7 +8,7 @@ namespace SAW
 {
 	/// <summary>Control which can stack several collapsible Accordion controls vertically - collapsing them automatically when needed for space</summary>
 	[System.ComponentModel.ToolboxItem(false)]
-	public class AccordionContainer : ContainerControl, IComparable<AccordionContainer>
+	internal class AccordionContainer : ContainerControl, IComparable<AccordionContainer>
 	{
 
 		// these are now added at run time, and none are included at design time

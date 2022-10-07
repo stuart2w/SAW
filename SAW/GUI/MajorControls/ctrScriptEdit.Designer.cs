@@ -1,6 +1,6 @@
 ﻿namespace SAW
 {
-	partial class ctrScriptEdit
+	internal partial class ctrScriptEdit
 	{
 		/// <summary> 
 		/// Required designer variable.

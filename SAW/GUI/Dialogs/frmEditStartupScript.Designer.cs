@@ -1,6 +1,6 @@
 ﻿namespace SAW
 {
-	partial class frmEditStartupScript
+	internal partial class frmEditStartupScript
 	{
 		/// <summary>
 		/// Required designer variable.

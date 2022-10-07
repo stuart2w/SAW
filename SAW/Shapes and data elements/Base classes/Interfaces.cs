@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 
-namespace SAW
+namespace SAW.Shapes
 {
 	/// <summary>Each shape has a parent property, which should point to one of these.  At the moment it will be a page or a group.
 	/// Was "IShapeContainer", which may now be used for dynamic containers</summary>

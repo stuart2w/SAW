@@ -13,7 +13,7 @@ using System.Linq;
 
 namespace SAW
 {
-	public partial class frmDeltas : System.Windows.Forms.Form
+	internal partial class frmDeltas : System.Windows.Forms.Form
 	{
 		
 		//Form overrides dispose to clean up the component list.

@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Linq;
 using System.Windows.Forms;
+using SAW.Shapes;
 
 namespace SAW
 {
-	public partial class frmEditStartupScript : Form
+	internal partial class frmEditStartupScript : Form
 	{
 		public frmEditStartupScript(Script script, Page page)
 		{

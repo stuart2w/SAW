@@ -4,9 +4,9 @@ using System.Diagnostics;
 using System.Drawing.Drawing2D;
 using System.Linq;
 
-namespace SAW
+namespace SAW.Shapes
 {
-	public class SelectionBox : Shape
+	internal class SelectionBox : Shape
 	{
 		// this is the "rubber band" box which can be used to select multiple shapes
 		// it is never added to the page, by Canonbie m_shpCurrent within pnlView
@@ -18,7 +18,7 @@ namespace SAW
 
 		#region Information
 		public override Shapes ShapeCode => Shapes.SelectionBox;
-		public override SnapModes SnapNext(SnapModes requested) => SnapModes.Off;
+		protected internal override SnapModes SnapNext(SnapModes requested) => SnapModes.Off;
 		public override GeneralFlags Flags => base.Flags | GeneralFlags.NotWithinContainer;
 		public override AllowedActions Allows => AllowedActions.None; // not actually used?
 
@@ -26,7 +26,7 @@ namespace SAW
 
 		#region Verbs
 
-		public override VerbResult Cancel(EditableView.ClickPosition position)
+		public override VerbResult Cancel(ClickPosition position)
 		{
 			if (!MultiMode)
 				position.Page.DeselectAll();
@@ -36,11 +36,11 @@ namespace SAW
 		}
 
 		// the selection is done continuously as the box is floated; therefore as soon as the user clicks Choose or Complete the box is removed
-		public override VerbResult Choose(EditableView.ClickPosition position) => VerbResult.Destroyed;
-		public override VerbResult Complete(EditableView.ClickPosition position) => VerbResult.Destroyed;
+		public override VerbResult Choose(ClickPosition position) => VerbResult.Destroyed;
+		public override VerbResult Complete(ClickPosition position) => VerbResult.Destroyed;
 		public override VerbResult CompleteRetrospective() => VerbResult.Destroyed;
 
-		public override VerbResult Float(EditableView.ClickPosition position)
+		public override VerbResult Float(ClickPosition position)
 		{
 			m_End = position.Snapped;
 			m_Bounds = RectangleF.Empty;
@@ -52,7 +52,7 @@ namespace SAW
 			return VerbResult.Continuing;
 		}
 
-		public override VerbResult Start(EditableView.ClickPosition position)
+		public override VerbResult Start(ClickPosition position)
 		{
 			m_Start = position.Snapped;
 			m_End = m_Start;
@@ -79,7 +79,7 @@ namespace SAW
 			Debug.Fail("there is no reason to be using SelectionBox.CopyFrom");
 		}
 
-		public override bool HitTestDetailed(PointF clickPoint, float scale, bool treatAsFilled)
+		protected internal  override bool HitTestDetailed(PointF clickPoint, float scale, bool treatAsFilled)
 		{
 			Debug.Fail("There is no reason to be using SelectionBox.HitTestDetailed");
 			return false; // there is no reason to be testing for this

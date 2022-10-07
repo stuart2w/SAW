@@ -1,6 +1,6 @@
 ﻿namespace SAW
 {
-	partial class ctrRotation
+	internal partial class ctrRotation
 	{
 		/// <summary> 
 		/// Required designer variable.

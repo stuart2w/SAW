@@ -54,8 +54,8 @@ namespace SAW.CommandEditors
 		{
 			if (m_Filling)
 				return;
-			m_Command.m_ParamList.Clear();
-			m_Command.m_ParamList.Add(new IntegerParam(txtID.Value));
+			m_Command.ParamList.Clear();
+			m_Command.ParamList.Add(new IntegerParam(txtID.Value));
 			UserChanged?.Invoke(this, EventArgs.Empty);
 		}
 

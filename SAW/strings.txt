@@ -23,6 +23,7 @@ Empty_Text = (Start typing...)
 mm = mm
 cm = cm
 pt = pt
+px = px
 # next 2 are short forms for Width and Height, when showing rectangle (X=... Y=... W=... H=...)
 Width_Abbrev = W
 Height_Abbrev = H

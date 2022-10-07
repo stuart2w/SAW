@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using SAW.Shapes;
 
 namespace SAW.Functions
 {
@@ -29,7 +30,7 @@ namespace SAW.Functions
 
 	internal class Undo : Verb
 	{
-		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
+		public override void Trigger(ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
 		{
 			bool ongoing = pnlView.OngoingShape != null;
 			pnlView.ConcludeOngoing();
@@ -65,7 +66,7 @@ namespace SAW.Functions
 
 	internal class Redo : Verb
 	{
-		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
+		public override void Trigger(ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
 		{
 			if (CurrentDocument.RedoTransactions.Count == 0)
 				return;
@@ -91,7 +92,7 @@ namespace SAW.Functions
 
 	internal class Paste : Verb
 	{
-		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
+		public override void Trigger(ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
 		{
 			try
 			{
@@ -344,7 +345,7 @@ namespace SAW.Functions
 	{
 		public bool IsCut;
 
-		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
+		public override void Trigger(ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
 		{
 			if (CurrentPage == null || CurrentPage.SelectedCount == 0)
 				return;
@@ -423,7 +424,7 @@ namespace SAW.Functions
 
 	internal class Delete : Verb
 	{
-		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
+		public override void Trigger(ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
 		{
 			CurrentPage.DeleteSelected(transaction);
 		}

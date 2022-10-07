@@ -1,6 +1,6 @@
 ﻿namespace SAW
 {
-	partial class ctrDocumentOutline
+	internal partial class ctrDocumentOutline
 	{
 		/// <summary> 
 		/// Required designer variable.

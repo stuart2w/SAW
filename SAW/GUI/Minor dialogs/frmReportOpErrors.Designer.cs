@@ -1,6 +1,6 @@
 ﻿namespace SAW
 {
-	partial class frmReportOpErrors
+	internal partial class frmReportOpErrors
 	{
 		/// <summary>
 		/// Required designer variable.

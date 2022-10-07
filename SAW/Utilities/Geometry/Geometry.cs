@@ -14,24 +14,25 @@ namespace SAW
 		public const float MILLIMETRE = 1; //= 96 / 25.4 ' number of data units in 1 mm
 		public const float THINLINE = 0.2f;
 		public const float SINGLELINE = 0.4f; // now using 0.4 as this is default in AM4 // 0.25 ' the thickness of a single thickness line in millimetres (i.e. roughly 1 pixel)
-		public const float TRANSPARENTLINE = 0.8f; // width of a transparent line, e.g. transformation focus
-												   /// <summary>length of 1 inch in data units (this is the exact value used by .net)</summary>
+		/// <summary>width of a transparent line, e.g. transformation focus</summary>
+		internal const float TRANSPARENTLINE = 0.8f;
+		/// <summary>length of 1 inch in mm (this is the exact value used by .net)</summary>
 		public const float INCH = 25.4f;
-		/// <summary>Points size in data unit/mm (ie mm per point)</summary>
+		/// <summary>Points size in mm (ie mm per point)</summary>
 		public const float POINTUNIT = INCH / 72; // expressed as data units, as above.
-		public readonly static Matrix IdentityMatrix = new Matrix(); // automatically creates the identity one; this instance is only stored to avoid creating loads of pointless objects
+		public static readonly Matrix IdentityMatrix = new Matrix(); // automatically creates the identity one; this instance is only stored to avoid creating loads of pointless objects
 
 		public const float PI = (float)Math.PI;
 
 		#region Rectangles
-			/// <summary>extends the rectangle to include this point (like RectangleF.Union, but using a PointF as the second parameter)
+		/// <summary>extends the rectangle to include this point (like RectangleF.Union, but using a PointF as the second parameter)
 		/// modifies the rectangle it is applied to</summary>
 		internal static void Extend(ref RectangleF rct, PointF pt)
 		{
 			if (rct.Equals(RectangleF.Empty)) // checking IsEmpty is not sufficient, because this returned rectangle is actually empty
 			{
 				if (pt.IsEmpty) // must give this some nominal size, because if we return rectangle (0, 0, 0, 0) it will be ignored next time this function is called
-					// and treated as the empty rectangle
+								// and treated as the empty rectangle
 					rct = new RectangleF(pt, new SizeF(NEGLIGIBLE, NEGLIGIBLE));
 				else
 					rct = new RectangleF(pt, new SizeF(0, 0));
@@ -85,11 +86,11 @@ namespace SAW
 				update = Rectangle.Union(update, add);
 		}
 
-		internal static RectangleF UnionRectangles(IEnumerable<RectangleF> rectangles)
+		public static RectangleF UnionRectangles(IEnumerable<RectangleF> rectangles)
 		{
 			return UnionRectangles(rectangles, RectangleF.Empty);
 		}
-		internal static RectangleF UnionRectangles(IEnumerable<RectangleF> rectangles, RectangleF initial)
+		public static RectangleF UnionRectangles(IEnumerable<RectangleF> rectangles, RectangleF initial)
 		{
 			foreach (RectangleF rct in rectangles)
 				Extend(ref initial, rct);
@@ -102,7 +103,7 @@ namespace SAW
 			return new RectangleF(centre.X - radius, centre.Y - radius, radius * 2, radius * 2);
 		}
 
-		internal static bool ContainsApprox(this RectangleF outer, RectangleF inner)
+		public static bool ContainsApprox(this RectangleF outer, RectangleF inner)
 		{
 			if (inner.X < outer.X - NEGLIGIBLE || inner.Y < outer.Y - NEGLIGIBLE)
 				return false;
@@ -115,7 +116,7 @@ namespace SAW
 			return true;
 		}
 
-		internal static bool ContainsApprox(this RectangleF outer, PointF pt)
+		public static bool ContainsApprox(this RectangleF outer, PointF pt)
 		{
 			if (pt.X < outer.X - NEGLIGIBLE || pt.X > outer.Right + NEGLIGIBLE)
 				return false;
@@ -125,10 +126,10 @@ namespace SAW
 		}
 
 		/// <summary>this is (almost) simply RectangleF.Intersect (rctA, rctB).IsEmpty
-			/// however it is presumably faster as we do not actually need to calculate the intersection, just check if there is one
-			/// in fact this is required to detect intersections if one rectangle has 0 width or height (used in Connector.PrimaryVectorConflicts)
-			/// as that would return an empty rectangle</summary>
-		internal static bool Intersects(this RectangleF A, RectangleF B)
+		/// however it is presumably faster as we do not actually need to calculate the intersection, just check if there is one
+		/// in fact this is required to detect intersections if one rectangle has 0 width or height (used in Connector.PrimaryVectorConflicts)
+		/// as that would return an empty rectangle</summary>
+		public static bool Intersects(this RectangleF A, RectangleF B)
 		{
 			if (A.Right < B.X)
 				return false;
@@ -179,7 +180,7 @@ namespace SAW
 			return new[] { rct.Location, new PointF(rct.Right, rct.Top), new PointF(rct.Left, rct.Bottom) };
 		}
 
-		internal static RectangleF ToRectangleF(this Rectangle rct)
+		public static RectangleF ToRectangleF(this Rectangle rct)
 		{
 			return new RectangleF(rct.X, rct.Y, rct.Width, rct.Height);
 		}
@@ -200,6 +201,9 @@ namespace SAW
 				Y += rct.Height;
 			return new RectangleF(X, Y, Math.Abs(rct.Width), Math.Abs(rct.Height));
 		}
+
+		/// <summary>Returns the matrix which transforms from one rect to another </summary>
+		internal static Matrix TransformFromRects(RectangleF source, RectangleF dest) => new Matrix(source,dest.GetThreePoints());
 
 		#endregion
 
@@ -232,7 +236,7 @@ namespace SAW
 		}
 
 		/// <summary>Returns the diagonal length of the vector</summary>
-		internal static float Length(this SizeF vector)
+		public static float Length(this SizeF vector)
 		{
 			return (float)Math.Sqrt(vector.Width * vector.Width + vector.Height * vector.Height);
 		}
@@ -255,16 +259,15 @@ namespace SAW
 			return new SizeF(vector.Width * multiply, vector.Height * multiply);
 		}
 
-		internal static SizeF ToSizeF(this Size sz)
+		public static SizeF ToSizeF(this Size sz)
 		{
 			return new SizeF(sz.Width, sz.Height);
 		}
 
-		internal static Size ToSize(this Point pt)
+		public static Size ToSize(this Point pt)
 		{
-			return new Size(pt.X,pt.Y);
+			return new Size(pt.X, pt.Y);
 		}
-
 
 		/// <summary>Flips between landscape and horizontal</summary>
 		public static SizeF Flip(this SizeF sz)
@@ -280,17 +283,17 @@ namespace SAW
 
 		// older
 
-		internal static float DistanceBetween(PointF pt1, PointF pt2)
+		public static float DistanceBetween(PointF pt1, PointF pt2)
 		{
 			return (float)Math.Sqrt(Math.Pow(pt2.X - pt1.X, 2) + Math.Pow(pt2.Y - pt1.Y, 2));
 		}
 
-		internal static PointF MidPoint(PointF ptA, PointF ptB)
+		public static PointF MidPoint(PointF ptA, PointF ptB)
 		{
 			return new PointF((ptA.X + ptB.X) / 2, (ptA.Y + ptB.Y) / 2);
 		}
 
-		internal static PointF Interpolate(PointF ptA, PointF ptB, float T)
+		public static PointF Interpolate(PointF ptA, PointF ptB, float T)
 		{
 			// gets the point a given fraction of the distance along the line from ptA to ptB, for T=0 to T=1
 			return new PointF(ptA.X * (1 - T) + ptB.X * T, ptA.Y * (1 - T) + ptB.Y * T);
@@ -348,6 +351,7 @@ namespace SAW
 		#endregion
 
 		#region More complex vector stuff
+
 		internal static float DotProduct(this SizeF szA, SizeF szB)
 		{
 			// calculates the DotProduct of the two vectors (length A * length B * cos angle between)
@@ -389,7 +393,7 @@ namespace SAW
 			return ontoDirection.MultiplyBy(multiply);
 		}
 
-		internal static float DistancePointToLine(PointF lineA, PointF lineB, PointF test)
+		public static float DistancePointToLine(PointF lineA, PointF lineB, PointF test)
 		{
 			// returns distance between ptTest and the line which passes through the other two parameters
 			// see http://mathworld.wolfram.com/Point-LineDistance2-Dimensional.html (second part)
@@ -441,7 +445,7 @@ namespace SAW
 			}
 		}
 
-		internal static PointF ClosestPointOnLine(PointF lineA, PointF lineB, PointF start)
+		public static PointF ClosestPointOnLine(PointF lineA, PointF lineB, PointF start)
 		{
 			// returns the point on the line described by the first two parameters which is closest to ptStart
 			// the returned point may be off the end of the line
@@ -451,7 +455,7 @@ namespace SAW
 			return PointF.Add(start, vector);
 		}
 
-		internal static PointF ClosestPointOnLineLimited(PointF lineA, PointF lineB, PointF start, bool emptyIfOutside)
+		public static PointF ClosestPointOnLineLimited(PointF lineA, PointF lineB, PointF start, bool emptyIfOutside)
 		{
 			// as above but only returns points between A and B
 			// if the last parameter is true it returns PointF.Empty if the closest point is off the line
@@ -489,26 +493,27 @@ namespace SAW
 			else
 				return (test.Y > lineA.Y - NEGLIGIBLE || test.Y > lineB.Y - NEGLIGIBLE) && (test.Y < lineA.Y + NEGLIGIBLE || test.Y < lineB.Y + NEGLIGIBLE);
 		}
+
 		#endregion
 
 		#region Angles
-		internal const float ANGLEUP = 0;
-		internal const float ANGLERIGHT = PI / 2;
-		internal const float ANGLEDOWN = PI;
-		internal const float ANGLELEFT = 3 * PI / 2;
-		internal const float ANGLE360 = 2 * PI;
-		internal const float ANGLE180 = PI;
-		internal const float ANGLE90 = PI / 2;
-		internal const float ANGLE45 = PI / 4;
+		public const float ANGLEUP = 0;
+		public const float ANGLERIGHT = PI / 2;
+		public const float ANGLEDOWN = PI;
+		public const float ANGLELEFT = 3 * PI / 2;
+		public const float ANGLE360 = 2 * PI;
+		public const float ANGLE180 = PI;
+		public const float ANGLE90 = PI / 2;
+		public const float ANGLE45 = PI / 4;
 		internal const float ANGLESTEPDEFAULT = PI / 12; // 15 deg angle to snap to when angle snapping
 
 		/// <summary>returns the direction of the vector measured clockwise from vertically up (we need to use this baseline because the isometric paper)</summary>
-		internal static float VectorAngle(this SizeF vector)
+		public static float VectorAngle(this SizeF vector)
 		{
 			Debug.Assert(vector.Width != 0 || vector.Height != 0);
 			//float angle = (float)Math.Atan(vector.Width / -vector.Height);
 			// the above started giving problems in SAW ?!? when height=0
-			float angle = (float)Math.Atan2(vector.Width , -vector.Height);
+			float angle = (float)Math.Atan2(vector.Width, -vector.Height);
 			//Debug.WriteLine($"Initial VectorAngle({vector.Width},{vector.Height}={angle}");
 			//if (vector.Height > 0) // was >=0 with Math.Atan
 			//	angle += PI;
@@ -528,14 +533,14 @@ namespace SAW
 			return new SizeF(X, Y);
 		}
 
-		internal static float Degrees(float radians)
+		public static float Degrees(float radians)
 		{
 			// all internal work is done in radians (because that is what System.Math uses)
 			// however, degrees may be needed for displayspace (both to the user and the .net graphics uses degrees sometimes)
 			return radians * 180 / PI;
 		}
 
-		internal static SizeF RotateBy(this SizeF vector, float angle)
+		public static SizeF RotateBy(this SizeF vector, float angle)
 		{
 			// rotates the given vector by angle radians. CLOCKWISE
 			float cos = (float)Math.Cos(angle);
@@ -560,7 +565,7 @@ namespace SAW
 		}
 
 		/// <summary>Returns the angle between two angles; the order of the parameters does not matter. The answer is always between the 0 and pi (0° and 180°)</summary>
-		internal static float AbsoluteAngularDifference(float A, float B)
+		public static float AbsoluteAngularDifference(float A, float B)
 		{
 			float difference = Math.Abs(A - B);
 			while (difference > ANGLE360)
@@ -574,7 +579,7 @@ namespace SAW
 		{
 			// returns the angle sweeping from A to B, always as a positive number
 			// IE A = 355° and B = 5° then the answer is 10°
-			// if bolPrefer360 and A and B are the same it returns 360°
+			// if prefer360 and A and B are the same it returns 360°
 			Debug.Assert(A >= 0 && B >= 0 && A <= ANGLE360 && B <= ANGLE360); // I think this is assumed by the logic below; the function could be rewritten to cope with other values
 			float difference = B - A;
 			if (Math.Abs(difference) < NEGLIGIBLEANGLE && prefer360)
@@ -585,7 +590,7 @@ namespace SAW
 		}
 
 		/// <summary>returns the angle restated as a positive number less than 360° (although in radians still)</summary>
-		internal static float NormaliseAngle(float angle)
+		public static float NormaliseAngle(float angle)
 		{
 			while (angle < 0)
 				angle += ANGLE360;
@@ -594,8 +599,8 @@ namespace SAW
 			return angle;
 		}
 
-		/// <summary>As NormaliseAngle but from -180 to +180</summary>
-		internal static float NormaliseAnglePlusMinus180(float angle)
+		/// <summary>As NormaliseAngle but from -180 to +180 (but in radians)</summary>
+		public static float NormaliseAnglePlusMinus180(float angle)
 		{
 			while (angle < -ANGLE180)
 				angle += ANGLE360;
@@ -604,14 +609,14 @@ namespace SAW
 			return angle;
 		}
 
-		internal static float Radians(float degrees)
+		public static float Radians(float degrees)
 		{
 			return degrees * PI / 180;
 		}
 
 		/// <summary>returns a direction (1 clockwise, -1 anticlockwise) based upon going from A to B
-			/// the only complication arises when the angles are each side of 0 (e.g. A = 355° and B = 5°, in this case B > A and direction = 1)
-			/// rather than returning the angle the long way round, this assumes that they must span</summary>
+		/// the only complication arises when the angles are each side of 0 (e.g. A = 355° and B = 5°, in this case B > A and direction = 1)
+		/// rather than returning the angle the long way round, this assumes that they must span</summary>
 		internal static int DirectionFromSimilarAngles(float A, float B)
 		{
 			Debug.Assert(A >= 0 && B >= 0);
@@ -622,7 +627,7 @@ namespace SAW
 		}
 
 		/// <summary>converts the angle (counting clockwise from vertically up) to an angle used by .net graphics IN DEGREES (e.g. DrawArc)</summary>
-		internal static float DotNetAngle(float angle)
+		public static float DotNetAngle(float angle)
 		{
 			return Degrees(NormaliseAngle(angle - PI / 2));
 		}
@@ -666,7 +671,7 @@ namespace SAW
 		}
 
 		/// <summary>as AngleSnap, but doesn't make angle a multiple of 15;  instead difference between current vector and vector ptOrigin->ptRelative
-			/// must be a multiple of 15</summary>
+		/// must be a multiple of 15</summary>
 		internal static PointF AngleSnapPointRelative(PointF pt, PointF origin, PointF relative)
 		{
 			Debug.Assert(!origin.IsEmpty); // usually means dont want snap
@@ -679,7 +684,7 @@ namespace SAW
 		}
 
 		/// <summary>like AngleSnap, but can use two origins, trying to find an intersection 15 degrees from each
-			/// first origin has priority.  If bolSecondOnlyIfClose then second only used if quite close to snapping angle - ignored if angle needs a lot of adjusting</summary>
+		/// first origin has priority.  If bolSecondOnlyIfClose then second only used if quite close to snapping angle - ignored if angle needs a lot of adjusting</summary>
 		internal static PointF AngleSnapFromTwoPoints(PointF pt, PointF origin, PointF secondOrigin, bool secondOnlyIfClose)
 		{
 			Debug.Assert(!origin.IsEmpty); // usually means dont want snap
@@ -716,8 +721,8 @@ namespace SAW
 		internal const float NEGLIGIBLEANGLESMALL = 0.0005f; // for angles where we want derived points to be approx equal
 
 		/// <summary>this is not a particularly accurate check (treats X and Y separately)- this is used to check that the points are not effectively the same one
-			/// especially when creating a shape.  It is dangerous to just check equality, because they could be fractionally different due to rounding errors</summary>
-		internal static bool ApproxEqual(this PointF pt1, PointF pt2)
+		/// especially when creating a shape.  It is dangerous to just check equality, because they could be fractionally different due to rounding errors</summary>
+		public static bool ApproxEqual(this PointF pt1, PointF pt2)
 		{
 			return Math.Abs(pt1.X - pt2.X) < NEGLIGIBLE && Math.Abs(pt1.Y - pt2.Y) < NEGLIGIBLE;
 			// this assumes that we are using data coordinates
@@ -747,7 +752,7 @@ namespace SAW
 		#endregion
 
 		#region Normalised lines
-		public class NormalisedLine
+		internal class NormalisedLine
 		{
 			// represents line expressed as Ax+By + C = 0, where (A^2 + B^2) = 1
 			// Distance from line of a point (X,Y) is always then AX+BY+C; this returns a signed value with opposite signs for opposite sides of the line
@@ -789,16 +794,16 @@ namespace SAW
 		}
 
 		/// <summary>represents a line, and a record of a distance away from the line in each direction</summary>
-		public class FatLine : NormalisedLine
+		internal class FatLine : NormalisedLine
 		{
 			public float Dmax = 0;
 			public float Dmin = 0;
 
 			public FatLine(PointF pt1, PointF pt2) : base(pt1, pt2)
-			{}
+			{ }
 
 			/// <summary>creates a FatLine through the points in the first two parameters, with the distance limits set so that the other two points are included
-				/// (this version is used in Bezier intersection analysis)</summary>
+			/// (this version is used in Bezier intersection analysis)</summary>
 			public FatLine(PointF start, PointF end, PointF include1, PointF include2) : base(start, end)
 			{
 				float D1 = DistanceTo(include1);
@@ -851,14 +856,22 @@ namespace SAW
 			return Math.Max(rct.Width, rct.Height);
 		}
 
-		internal static Rectangle ToRectangle(this RectangleF rct)
+		public static Rectangle ToRectangle(this RectangleF rct)
 		{
 			return new Rectangle((int)rct.X, (int)rct.Y, (int)rct.Width, (int)rct.Height);
 		}
 
-		internal static Point ToPoint(this PointF pt)
+		public static Point ToPoint(this PointF pt)
 		{
 			return new Point((int)pt.X, (int)pt.Y);
+		}
+
+		/// <summary>Convenience method which calls TransformPoints for a single point</summary>
+		public static PointF TransformPoint(this Matrix transform, PointF pt)
+		{
+			PointF[] pts = { pt };
+			transform.TransformPoints(pts);
+			return pts[0];
 		}
 
 		/// <summary>assumes no rotation or shearing; this is mainly used with our graphics which can be scaled and offset</summary>
@@ -879,7 +892,7 @@ namespace SAW
 		}
 
 		/// <summary>Extracts 4 points representing a Bezier segment from a longer array of points (eg for an entire path)</summary>
-		public static PointF[] ExtractBezierSegment(this PointF[] points, int initialIndex)
+		internal static PointF[] ExtractBezierSegment(this PointF[] points, int initialIndex)
 		{
 			PointF[] segment = new PointF[4];
 			for (int index = 0; index <= 3; index++)
@@ -888,7 +901,7 @@ namespace SAW
 		}
 
 		/// <summary>Extracts 4 points representing a Bezier segment from a longer array of points (eg for an entire path)</summary>
-		public static PointF[] ExtractBezierSegment(this List<PointF> points, int initialIndex)
+		internal static PointF[] ExtractBezierSegment(this List<PointF> points, int initialIndex)
 		{
 			return points.GetRange(initialIndex, 4).ToArray();
 		}

@@ -3,10 +3,11 @@ using System.Drawing;
 using System.Diagnostics;
 using System.Windows.Forms;
 using SAW.Functions;
+using SAW.Shapes;
 
 namespace SAW
 {
-	public abstract class SharedButton : Control, ILinearAnimated, IInvokeable, IKeyControl
+	internal abstract class SharedButton : Control, ILinearAnimated, IInvokeable, IKeyControl
 	{
 		// shared between RoundButton and CustomButton.  New version which uses Button styles
 

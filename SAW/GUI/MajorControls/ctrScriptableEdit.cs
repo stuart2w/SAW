@@ -2,10 +2,11 @@
 using System.Drawing;
 using System.Diagnostics;
 using System.Windows.Forms;
+using SAW.Shapes;
 
 namespace SAW
 {
-	public partial class ctrScriptableEdit : UserControl
+	internal partial class ctrScriptableEdit : UserControl
 	{
 		private Scriptable m_Scriptable;
 		private bool m_Filling;

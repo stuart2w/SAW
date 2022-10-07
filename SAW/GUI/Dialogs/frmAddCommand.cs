@@ -5,7 +5,7 @@ using System.Windows.Forms;
 
 namespace SAW
 {
-	public partial class frmAddCommand : Form
+	internal partial class frmAddCommand : Form
 	{
 
 		#region Initialise

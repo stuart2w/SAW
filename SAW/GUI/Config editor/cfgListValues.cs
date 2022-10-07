@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace SAW
 {
-	public partial class cfgListValues
+	internal partial class cfgListValues
 	{
 		public cfgListValues()
 		{

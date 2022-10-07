@@ -3,10 +3,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace SAW
+namespace SAW.Shapes
 {
 	/// <summary>Curve drawn freehand</summary>
 	public class Pencil : Curve
@@ -22,9 +20,10 @@ namespace SAW
 		}
 
 		#region Information
+
 		public override Shapes ShapeCode => Shapes.Pencil;
 
-		public override SnapModes SnapNext(SnapModes requested)
+		protected internal override SnapModes SnapNext(SnapModes requested)
 		{
 			if (requested != SnapModes.Shape)
 				return SnapModes.Off;
@@ -52,7 +51,7 @@ namespace SAW
 													 //I.e. giving a minimum physical separation of TARGETSEPARATION - MAXIMUMTIMEDISTANCE
 		private const float ADDMMPERDEGREE = 0.05f; // ie 90deg = 4.5 extra (90° is the maximum considered)
 
-		public override VerbResult Start(EditableView.ClickPosition position)
+		public override VerbResult Start(ClickPosition position)
 		{
 			m_Targets = new List<PointF>();
 			m_Targets.Add(position.Snapped);
@@ -64,7 +63,7 @@ namespace SAW
 			return VerbResult.Continuing;
 		}
 
-		public override VerbResult Float(EditableView.ClickPosition pt)
+		public override VerbResult Float(ClickPosition pt)
 		{
 			float distance = (float)DateTime.Now.Subtract(g_dtLastTargetAdded).TotalMilliseconds * ADDMMPERSECOND / 1000;
 			distance = Math.Max(0, Math.Min(distance, MAXIMUMTIMEDISTANCE)); // this is now the time component.  Above could give <0 as cancel sets ref time in future
@@ -97,9 +96,9 @@ namespace SAW
 				return VerbResult.Unchanged;
 		}
 
-		public override VerbResult Choose(EditableView.ClickPosition position) => Complete(position);
+		public override VerbResult Choose(ClickPosition position) => Complete(position);
 
-		public override VerbResult Complete(EditableView.ClickPosition position)
+		public override VerbResult Complete(ClickPosition position)
 		{
 			// we don't use Float, because we want to force this last point to be added even if it is a bit close to the previous point
 			// (if we use the minimum distance logic than the line can noticeably fall short of where the user stopped)
@@ -123,7 +122,7 @@ namespace SAW
 			return VerbResult.Completed;
 		}
 
-		public override VerbResult Cancel(EditableView.ClickPosition position)
+		public override VerbResult Cancel(ClickPosition position)
 		{
 			if (m_Targets.Count < 2)
 				return VerbResult.Destroyed;
@@ -628,13 +627,13 @@ namespace SAW
 		#region Data
 		// This is needed because in the base class closure is implicit in the shape type
 
-		public override void Load(DataReader reader)
+		protected internal override void Load(DataReader reader)
 		{
 			m_Closed = reader.ReadBoolean();
 			base.Load(reader);
 		}
 
-		public override void Save(DataWriter writer)
+		protected internal override void Save(DataWriter writer)
 		{
 			writer.Write(m_Closed);
 			base.Save(writer);

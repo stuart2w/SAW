@@ -1,7 +1,7 @@
 
 namespace SAW
 {
-	public partial class frmUserButtonStyle : System.Windows.Forms.Form
+	internal partial class frmUserButtonStyle : System.Windows.Forms.Form
 	{
 		
 		//Required by the Windows Form Designer

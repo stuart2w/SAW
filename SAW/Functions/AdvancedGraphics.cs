@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using SAW.Shapes;
 
 namespace SAW.Functions
 {
@@ -28,7 +29,7 @@ namespace SAW.Functions
 	#region Convert to path
 	internal class ConvertToPath : Verb
 	{
-		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
+		public override void Trigger(ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
 		{
 			if (CurrentPage.SelectedCount != 1)
 				return;
@@ -69,11 +70,11 @@ namespace SAW.Functions
 	/// <summary>Various vertex verbs which are all actually done in the shape </summary>
 	internal class VertexChange : Verb
 	{
-		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
+		public override void Trigger(ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
 		{
 			Shape shape = CurrentPage.SelectedShapes.First();
 			transaction.Edit(shape);
-			Shape.VerbResult result = shape.OtherVerb(new EditableView.ClickPosition(CurrentPage.SelectedPath.Position, CurrentPage, pnlView.Zoom, Shape.SnapModes.Off, Shape.SnapModes.Off, pnlView, source), Code);
+			Shape.VerbResult result = shape.OtherVerb(new ClickPosition(CurrentPage.SelectedPath.Position, CurrentPage, pnlView.Zoom, Shape.SnapModes.Off, Shape.SnapModes.Off, pnlView, source), Code);
 			if (result == Shape.VerbResult.Unexpected || result == Shape.VerbResult.Unchanged || result == Shape.VerbResult.Rejected)
 				transaction.Cancel();
 			pnlView.ForceUpdateGrabSpots();
@@ -110,7 +111,7 @@ namespace SAW.Functions
 	/// <summary>Makes a masked image from an image and a polygon </summary>
 	internal class MakeMask : Verb
 	{
-		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
+		public override void Trigger(ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
 		{
 			IShapeContainer container = CurrentPage.SelectionContainer();
 			if (container == null)
@@ -167,7 +168,7 @@ namespace SAW.Functions
 	/// <summary>Reverses the process of MakeMask, turning a MaskedImage back into a simple shape and image</summary>
 	internal class RemoveMask : Verb
 	{
-		public override void Trigger(EditableView.ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
+		public override void Trigger(ClickPosition.Sources source, EditableView pnlView, Transaction transaction)
 		{
 
 			MaskedImage masked = (MaskedImage)CurrentPage.SelectedShapes.First();

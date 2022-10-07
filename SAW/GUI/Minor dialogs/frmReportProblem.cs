@@ -3,7 +3,7 @@ using System.Windows.Forms;
 
 namespace SAW
 {
-	public partial class frmReportProblem
+	internal partial class frmReportProblem
 	{
 		public frmReportProblem()
 		{

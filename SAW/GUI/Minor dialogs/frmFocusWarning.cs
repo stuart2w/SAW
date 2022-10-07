@@ -4,7 +4,7 @@ using System.Windows.Forms;
 
 namespace SAW
 {
-	public partial class frmFocusWarning : Form
+	internal partial class frmFocusWarning : Form
 	{
 		private const int DURATION = 10;
 		private DateTime m_StartTime;

@@ -1,17 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace SAW
 {
 	/// <summary>Used to report a message to the user during scanning.  Only displayed from RunView </summary>
-	public partial class frmUserReport : Form
+	internal partial class frmUserReport : Form
 	{
 		private DateTime m_EndTime;
 		private Action m_WhenClosed;

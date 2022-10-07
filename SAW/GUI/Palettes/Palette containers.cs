@@ -14,7 +14,7 @@ namespace SAW
 	/// ie each control implementing this is an entire, single, palette</summary>
 	/// <remarks>the control should raise FocusChanged on Gotfocus/LostFocus - including within any sub controls
 	/// (which don't trigger the containing controls normal GotFocus, LostFocus events)</remarks>
-	public interface IPalette
+	internal interface IPalette
 	{
 		void Initialise(); // called when the accordion is initialised; let some of the controls do some further set up which is guaranteed to be after the normal initialisation
 		void SetToolTips(ToolTip tt); // control must add all tooltips to the given controller.  Usually called once for frmMain and once for the tear-off form
@@ -34,14 +34,14 @@ namespace SAW
 	}
 
 	/// <summary>must be implemented by the controls which can contain palette controls; i.e. Accordion and frmPalette</summary>
-	public interface IPaletteContainer
+	internal interface IPaletteContainer
 	{
 		void PaletteVerb(Codes code); // frmMain calls this to trigger some actions within a palette
 
 	}
 
 	/// <summary>Implements a heading with a single control underneath, which can be collapsed</summary>
-	public sealed class Accordion : ContainerControl, ILinearAnimated, IAnimationNotifyComplete, IInvokeable, IComparable<Accordion>, IPaletteContainer, IKeyControl
+	internal sealed class Accordion : ContainerControl, ILinearAnimated, IAnimationNotifyComplete, IInvokeable, IComparable<Accordion>, IPaletteContainer, IKeyControl
 	{
 		// on the mac once collapsed the contained panel doesn't seem to be correctly clipped.  It's also slow, so best to just hide and not slide open/closed
 
@@ -451,7 +451,7 @@ namespace SAW
 
 	/// <summary>Can be placed as the one control in an Accordion.  Used as the base class for most of the custom control palettes
 	/// Requires that MinimumSize is set in designer</summary>
-	public class PalettePanel : UserControl, IPalette
+	internal class PalettePanel : UserControl, IPalette
 	{
 
 		//public event EventHandler Accessed;
@@ -624,7 +624,7 @@ namespace SAW
 
 	/// <summary>Container for a single control representing a palette, when not docked</summary>
 	/// <remarks></remarks>
-	public sealed class frmPalette : Form, IPaletteContainer, IKeyControl
+	internal sealed class frmPalette : Form, IPaletteContainer, IKeyControl
 	{
 		// IKeyControl only used when resizing
 

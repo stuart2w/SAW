@@ -2,7 +2,7 @@
 
 namespace SAW
 {
-	public partial class cfgEditing : ConfigPage
+	internal partial class cfgEditing : ConfigPage
 	{
 
 		public cfgEditing()

@@ -1,6 +1,6 @@
 ﻿namespace SAW
 {
-	partial class frmGridWizard
+	internal partial class frmGridWizard
 	{
 		/// <summary>
 		/// Required designer variable.

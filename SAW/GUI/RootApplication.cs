@@ -7,23 +7,23 @@ using System.Media;
 using System.Threading.Tasks;
 using Microsoft.Win32;
 using SAW.Repo2;
+using SAW.Shapes;
 
 namespace SAW
 {
 
-	internal class RootApplication
+	public class RootApplication
 	{
 
 		/// <summary>main editing screen; only created when it is first opened</summary>
-		public frmMain Editor { get; private set; }
+		internal frmMain Editor { get; private set; }
 		/// <summary>the menu screen, which opens first when the application is created</summary>
 		internal frmMenu Menu;
 		/// <summary>The run time, switching screen</summary>
 		internal frmRun Run;
 
 		/// <summary>must be suitable for use as a folder name, so some characters cannot be used</summary>
-		public const string AppName = "SAW7";// "SAWPROTOTYPE"; // 
-											 // TODO: put this back
+		public const string AppName = "SAW7";
 
 		/// <summary>true if #DEBUG (easier to use in Catch When)</summary>
 		public bool IsDebug = false;
@@ -33,9 +33,9 @@ namespace SAW
 		/// <summary>Semi-permanent log.  Don't write too much to this.</summary>
 		internal ILogger LogPermanent = new NullLogger();
 		internal SoundPlayer Sound = new SoundPlayer();
-		public Speech Speech;
+		internal Speech Speech;
 
-		public RootApplication(frmMenu frm)
+		internal RootApplication(frmMenu frm, string internalPath = "")
 		{
 #if DEBUG
 			IsDebug = true;
@@ -44,7 +44,10 @@ namespace SAW
 			m_Documents.Add(null); // because the editor will just assign the current document into the current index
 
 			// folders...
-			EXEFolder = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+			if (string.IsNullOrWhiteSpace(internalPath))
+				EXEFolder = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+			else
+				EXEFolder = internalPath;
 			InternalFolder = EXEFolder;
 
 			SharedFolder = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), AppName);
@@ -73,17 +76,21 @@ namespace SAW
 			}
 
 #if DEBUG
-			EXEFolder = "d:\\data\\ace\\SAW\\Installer\\installer files";
-			InternalFolder = EXEFolder;
-			// config certainly needs to write back to the installation folder
-			ConfigFolder = "d:\\data\\ace\\SAW\\test data";
-			SharedFolder = "d:\\data\\ace\\SAW\\test data";
+			if (!Globals.IsEmbedded)
+			{
+				EXEFolder = "d:\\data\\ace\\SAW\\Installer\\installer files";
+				InternalFolder = EXEFolder;
+				// config certainly needs to write back to the installation folder
+				ConfigFolder = "d:\\data\\ace\\SAW\\test data";
+				SharedFolder = "d:\\data\\ace\\SAW\\test data";
+			}
 #else
 			// Temporary version using folder location for everything
 			//SharedFolder = EXEFolder + System.IO.Path.DirectorySeparatorChar + "Data";
 			//ConfigFolder = SharedFolder;
 #endif
 
+			Debug.WriteLine("InternalFolder = " + InternalFolder);
 			Globals.Root = this;
 			try
 			{
@@ -127,8 +134,8 @@ namespace SAW
 #if !DEBUG
 			AppDomain.CurrentDomain.UnhandledException += frmErrorReport.UnhandledException;
 			Application.ThreadException += frmErrorReport.ThreadException;
-#else
-			Config.Delta.ApplyV8Changes();
+//#else
+//			Config.Delta.ApplyV8Changes();
 #endif
 			CurrentConfig = new AppliedConfig();
 			CurrentConfig.AddConfigAtEnd(Config.SystemConfig);
@@ -164,14 +171,14 @@ namespace SAW
 
 		#region Folders
 		/// <summary>where the EXE is.  No trailing \.  Must be assumed to be readonly.  "Installer files" folder in DEBUG builds</summary>
-		public string InternalFolder;
+		internal string InternalFolder;
 		/// <summary>shared data folder, writable by all users</summary>
 		public string SharedFolder;
 		/// <summary>folder where the configuration is stored.  Equals SharedFolder after installation, just different on a development machine (= "Installer Files")</summary>
 		public string ConfigFolder;
 		/// <summary>where other EXEs can be launched from. = InternalFolder on release.  = c:\program files... in development</summary>
-		public string EXEFolder;
-		public string ManualFolder
+		internal string EXEFolder;
+		internal string ManualFolder
 		{
 			get
 			{
@@ -182,13 +189,15 @@ namespace SAW
 #endif
 			}
 		}
+
 		#endregion
 
 		#region Screens and transferring
 		private Timer m_tmrRefocus;
+
 		/// <summary>if bolForceRefocus is used a timer checks the main window is actually focussed a second later
 		/// this is needed if this is called during frmMenu_Load when it tends to end up with neither window focused</summary>
-		public void ShowEditScreen(Document document, bool forceRefocus = false)
+		internal void ShowEditScreen(Document document, bool forceRefocus = false)
 		{
 			try
 			{
@@ -219,7 +228,7 @@ namespace SAW
 			}
 		}
 
-		public void ShowRunScreen()
+		internal void ShowRunScreen()
 		{
 			Editor?.Hide();
 			Menu.Hide();
@@ -229,7 +238,7 @@ namespace SAW
 			Run.Start(CurrentDocument);
 		}
 
-		public void ShowMenu()
+		internal void ShowMenu()
 		{
 			// caller should check that it was OK to discard any current document first
 			Globals.StoreEvent("ShowMenu");
@@ -257,7 +266,7 @@ namespace SAW
 		}
 
 		[System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
-		public void ReopenMainScreen(Document document)
+		internal void ReopenMainScreen(Document document)
 		{
 			if (Editor != null)
 			{
@@ -268,7 +277,7 @@ namespace SAW
 			ShowEditScreen(document);
 		}
 
-		public void MatchScreenSizes(Form old, Form newForm)
+		internal void MatchScreenSizes(Form old, Form newForm)
 		{
 			newForm.WindowState = old.WindowState;
 			if (newForm.WindowState == FormWindowState.Minimized)
@@ -280,7 +289,8 @@ namespace SAW
 			}
 		}
 
-		public bool Closing;
+		public bool Closing { get; private set; }
+
 		public void CloseApplication()
 		{
 			// NOTE: this may be called more than once (once by Editor, again in frmMenu close event)
@@ -289,7 +299,7 @@ namespace SAW
 			Application.Exit();
 		}
 
-		public Form CurrentMainScreen()
+		internal Form CurrentMainScreen()
 		{
 			if (Run?.Visible == true)
 				return Run;
@@ -298,7 +308,7 @@ namespace SAW
 			return Menu;
 		}
 
-		public void StartUpgrade()
+		internal void StartUpgrade()
 		{
 			// Called either from the link in the menu, or the menu on the main screen
 			// caller should check first if it is OK to discard current documents (if any)
@@ -310,9 +320,11 @@ namespace SAW
 		#endregion
 
 		#region Configurations and Users
-		public AppliedConfig CurrentConfig;
+
+		internal AppliedConfig CurrentConfig { get; set; }
+
 		/// <summary>Defined if the user has explicitly loaded/saved a settings file.  Must be null otherwise (not empty string)</summary>
-		public string ManualSettingsFile;
+		internal string ManualSettingsFile;
 
 		internal Config LoadConfig(string file, Config.Levels level, string defaultFile = "")
 		{
@@ -403,7 +415,7 @@ namespace SAW
 			}
 		}
 
-		public AppliedConfig GenerateAppliedConfig(Users user, Document document)
+		internal AppliedConfig GenerateAppliedConfig(Users user, Document document)
 		{
 			AppliedConfig create = new AppliedConfig();
 			for (Config.Levels level = Config.Levels._First; level <= Config.Levels._Last; level++)
@@ -414,12 +426,12 @@ namespace SAW
 			return create;
 		}
 
-		public void SaveSystemConfig()
+		internal void SaveSystemConfig()
 		{
 			Config.SystemConfig.SaveTo(ConfigFolder + System.IO.Path.DirectorySeparatorChar + "system" + Config.Extension);
 		}
 
-		public void SaveUserConfigs()
+		internal void SaveUserConfigs()
 		{
 			// Saves all of the user configurations.
 			// ignores config if .AutoCreated - this indicates it was loaded by error report display (not actually auto-generated)
@@ -438,7 +450,7 @@ namespace SAW
 			}
 		}
 
-		public void SaveActivityConfig()
+		internal void SaveActivityConfig()
 		{
 			// this should be saved on exit from the config editing screen if it is changed
 			Guid ID = Activities.ActivityID;
@@ -457,7 +469,7 @@ namespace SAW
 			Config.ActivityConfig(ID).UserSettings.SaveTo(ConfigFolder + System.IO.Path.DirectorySeparatorChar + "Activities" + System.IO.Path.DirectorySeparatorChar + ID + Config.Extension);
 		}
 
-		public void SaveAllActivityConfigs()
+		internal void SaveAllActivityConfigs()
 		{
 			foreach (Document config in Config.ActivityConfigs)
 			{
@@ -465,17 +477,17 @@ namespace SAW
 			}
 		}
 
-		public void AddNewActivity(Document newDoc)
+		internal void AddNewActivity(Document newDoc)
 		{
 			Config.AddActivity(newDoc);
 			newDoc.UserSettings.SaveTo(ConfigFolder + System.IO.Path.DirectorySeparatorChar + "Activities" + System.IO.Path.DirectorySeparatorChar + newDoc.ID + Config.Extension);
 		}
 
 		/// <summary>Where the user settings is stored - internally initially, but changed if the user explicitly opens/saves a file</summary>
-		public string UserConfigPath
+		internal string UserConfigPath
 		{ get { return ManualSettingsFile ?? System.IO.Path.Combine(ConfigFolder, "User" + Config.Extension); } }
 
-		public string CurrentUserDisplayname
+		internal string CurrentUserDisplayname
 		{ get { return Strings.Item("User"); } }
 
 		#endregion
@@ -542,9 +554,9 @@ namespace SAW
 			}
 		}
 
-		public void AddNewDocument(Document document)
+		/// <summary>adds a document to the loaded list and makes it the current one</summary>
+		internal void AddNewDocument(Document document)
 		{
-			// adds a document to list and makes it the current one
 			Debug.Assert(Globals.Root.CurrentConfig.ReadBoolean(Config.Multiple_Documents));
 			if (m_CurrentDocument != null)
 				m_CurrentDocument.CurrentPage = CurrentPageIndex; // remember current page in current doc
@@ -612,7 +624,7 @@ namespace SAW
 				GUIUtilities.MillimetreSize = GUIUtilities.SystemDPI * Geometry.MILLIMETRE / Geometry.INCH / document.ApproxUnitScale;
 		}
 
-		/// <summary>Opens the given Splash file either into a new slot, or in the current index.  Use ShellOpen for other files.
+		/// <summary>Opens the given file either into a new slot, or in the current index.  Use ShellOpen for other files.
 		/// See also Document.FromFile which does the actual loading</summary>
 		public void OpenFile(string file, bool remember = true, bool noErrorUI = false)
 		{
@@ -620,7 +632,24 @@ namespace SAW
 			Editor?.pnlView.ConcludeOngoing();
 			try
 			{
-				var loaded = Document.FromFile(file, remember, noErrorUI);
+				string extension = System.IO.Path.GetExtension(file).ToLowerInvariant();
+				Document loaded;
+				if (extension == ".svg")
+				{
+					using (var op = new Globals.Operation("SVG import"))
+					{
+						SVGImporter importer = new SVGImporter();
+						loaded = importer.LoadSVG(file);
+						if (!op.ConfirmSuccess(true))
+							return;
+					}
+				}
+				else
+				{
+					loaded = Document.FromFile(file, remember, noErrorUI);
+					if (loaded.SAWHeader == null)
+						throw new InvalidOperationException("File is not valid for use as a selection set - Header not defined");
+				}
 				SelectDocument(loaded);
 			}
 			catch (Exception ex) when (!Globals.Root.IsDebug)
@@ -691,10 +720,7 @@ namespace SAW
 			}
 		}
 
-		public bool DocumentIsOpen(Document document)
-		{
-			return m_Documents.Contains(document);
-		}
+		public bool DocumentIsOpen(Document document) => m_Documents.Contains(document);
 
 		/// <summary>Always fires after CurrentDocumentChanged (if applicable)</summary>
 		public event NullEventHandler CurrentPageChanged;
@@ -717,7 +743,7 @@ namespace SAW
 
 		#endregion
 
-		public void RequestDelayedCall(Action fn)
+		internal void RequestDelayedCall(Action fn)
 		{
 			// Any part of the application can use this to queue a method to be called imminently (usually because it cannot be called a
 			// from the current location, e.g. during an iterator)
@@ -725,6 +751,7 @@ namespace SAW
 		}
 
 		#region User/Editor mode
+
 		private Users m_eUser = Users.Editor;
 
 		public Users User
@@ -755,7 +782,7 @@ namespace SAW
 			Editor.StoreNewTransaction(transaction, autoRefresh);
 		}
 
-		public void PerformAction(Functions.Action action, EditableView.ClickPosition.Sources source = EditableView.ClickPosition.Sources.Irrelevant)
+		public void PerformAction(Functions.Action action, ClickPosition.Sources source = ClickPosition.Sources.Irrelevant)
 		{
 			Editor.PerformAction(action, source);
 		}

@@ -3,9 +3,9 @@ using System;
 using System.Drawing;
 using System.Diagnostics;
 
-namespace SAW
+namespace SAW.Shapes
 {
-	public class UserSocket : Shape
+	internal class UserSocket : Shape
 	{
 
 		private PointF m_Centre;
@@ -40,10 +40,10 @@ namespace SAW
 
 		public override Shapes ShapeCode => Shapes.UserSocket;
 		public bool Grouped => Parent is Group; // returns true once this is inside a group
-		public override LabelModes LabelMode => LabelModes.NotSupported;
+		internal override LabelModes LabelMode => LabelModes.NotSupported;
 		public override AllowedActions Allows => (base.Allows | AllowedActions.Tidy) & ~(AllowedActions.Merge | AllowedActions.Typing | AllowedActions.MoveToPixels);
 
-		public override string StatusInformation(bool ongoing)
+		protected internal override string StatusInformation(bool ongoing)
 		{
 			if (ongoing)
 				return ""; // shouldn't be ongoing
@@ -66,18 +66,18 @@ namespace SAW
 
 		#region Verbs - mostly irrelevant
 
-		public override VerbResult Start(EditableView.ClickPosition position)
+		public override VerbResult Start(ClickPosition position)
 		{
 			m_Centre = position.Snapped;
 			m_Exit = SizeF.Empty;
 			return VerbResult.Completed;
 		}
 
-		public override VerbResult Cancel(EditableView.ClickPosition position) => VerbResult.Unexpected;
-		public override VerbResult Choose(EditableView.ClickPosition position) => VerbResult.Unexpected;
-		public override VerbResult Complete(EditableView.ClickPosition position) => VerbResult.Unexpected;
+		public override VerbResult Cancel(ClickPosition position) => VerbResult.Unexpected;
+		public override VerbResult Choose(ClickPosition position) => VerbResult.Unexpected;
+		public override VerbResult Complete(ClickPosition position) => VerbResult.Unexpected;
 		public override VerbResult CompleteRetrospective() => VerbResult.Unexpected;
-		public override VerbResult Float(EditableView.ClickPosition position) => VerbResult.Unexpected;
+		public override VerbResult Float(ClickPosition position) => VerbResult.Unexpected;
 
 		#endregion
 
@@ -108,7 +108,7 @@ namespace SAW
 
 		public override RectangleF MinimalBounds => Geometry.RectangleFromPoint(m_Centre, 0);
 
-		public override bool HitTestDetailed(PointF clickPoint, float scale, bool treatAsFilled) => !Grouped;
+		protected internal override bool HitTestDetailed(PointF clickPoint, float scale, bool treatAsFilled) => !Grouped;
 		// don't think this is actually called when grouped anyway
 
 		internal override List<GrabSpot> GetGrabSpots(float scale)
@@ -276,7 +276,7 @@ namespace SAW
 		#endregion
 
 		#region Data
-		public override void Load(DataReader reader)
+		protected internal override void Load(DataReader reader)
 		{
 			base.Load(reader);
 			m_Centre = reader.ReadPointF();
@@ -287,7 +287,7 @@ namespace SAW
 			Classification = reader.ReadString();
 		}
 
-		public override void Save(DataWriter writer)
+		protected internal override void Save(DataWriter writer)
 		{
 			base.Save(writer);
 			writer.Write(m_Centre);

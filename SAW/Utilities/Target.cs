@@ -1,6 +1,7 @@
 using System;
 using System.Drawing;
 using System.Diagnostics;
+using SAW.Shapes;
 
 namespace SAW
 {
@@ -56,7 +57,7 @@ namespace SAW
 
 		// a more convenient constructor for shapes when generating targets:
 		// might also want to store the source socket eventually
-		public Target(Shape shape, PointF position, Types type, UserSocket source, Priorities priority = Priorities.Standard, float intersectionCertainty = Geometry.PI / 2, int shapeIndex = -1)
+		internal Target(Shape shape, PointF position, Types type, UserSocket source, Priorities priority = Priorities.Standard, float intersectionCertainty = Geometry.PI / 2, int shapeIndex = -1)
 		{
 			// ObjSource if the moving item for which targets have been requested
 			// -1 is used as the default shape index to make it obvious when it was not defined (0 is usually valid)
@@ -204,10 +205,7 @@ namespace SAW
 
 		#endregion
 
-		public override string ToString()
-		{
-			return $"{Type} target in {Shape} at {Position} index = {ShapeIndex}";
-		}
+		public override string ToString() => $"{Type} target in {Shape} at {Position} index = {ShapeIndex}";
 
 		/// <summary>True if these refer to the same thing (can be different target objects).  Doesn't check coordinates match - only that they are targetting the same part of the same shape</summary>
 		/// <remarks>Doesn't override Equals because that requires GetHashCode is replaced, which is all a pain</remarks>

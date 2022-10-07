@@ -42,6 +42,8 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <Prefer32Bit>true</Prefer32Bit>
+    <DocumentationFile>bin\x86\Debug\SAW.xml</DocumentationFile>
+    <NoWarn>1591</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
     <OutputPath>bin\x86\Release\</OutputPath>
@@ -52,6 +54,8 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <Prefer32Bit>true</Prefer32Bit>
+    <DocumentationFile>bin\x86\Release\SAW.xml</DocumentationFile>
+    <NoWarn>1591</NoWarn>
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationIcon>icon.ico</ApplicationIcon>
@@ -115,6 +119,7 @@
     <Compile Include="Documents\Transaction.cs" />
     <Compile Include="Functions\AdvancedGraphics.cs" />
     <Compile Include="Functions\IRM.cs" />
+    <Compile Include="Functions\SVGImporter.cs" />
     <Compile Include="GUI\Controls\WrappingCheckBox.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -129,12 +134,6 @@
     </Compile>
     <Compile Include="GUI\Dialogs\frmYocto.Designer.cs">
       <DependentUpon>frmYocto.cs</DependentUpon>
-    </Compile>
-    <Compile Include="GUI\frmTest.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="GUI\frmTest.Designer.cs">
-      <DependentUpon>frmTest.cs</DependentUpon>
     </Compile>
     <Compile Include="GUI\Minor dialogs\frmUserReport.cs">
       <SubType>Form</SubType>
@@ -186,6 +185,7 @@
     <Compile Include="Shapes and data elements\Graphical shapes\MaskedImage.cs" />
     <Compile Include="Shapes and data elements\Graphical shapes\Pencil.cs" />
     <Compile Include="Shapes and data elements\Virtual\SetRotation.cs" />
+    <Compile Include="Utilities\Generator.cs" />
     <Compile Include="Utilities\Geometry\Bezier.cs" />
     <Compile Include="Utilities\Geometry\Geometry.cs" />
     <Compile Include="Utilities\Geometry\Intersection.cs" />
@@ -524,9 +524,7 @@
       <DependentUpon>frmShowErrorReport.cs</DependentUpon>
     </Compile>
     <Compile Include="Functions\SAWVerbs.cs" />
-    <Compile Include="GUI\EditableView.cs">
-      <SubType>Component</SubType>
-    </Compile>
+    <Compile Include="GUI\EditableView.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SAW\CCF\Connection.cs" />
@@ -926,9 +924,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="GUI\frmRun.resx">
       <DependentUpon>frmRun.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="GUI\frmTest.resx">
-      <DependentUpon>frmTest.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="GUI\MajorControls\ctrActionSelect.resx">
       <DependentUpon>ctrActionSelect.cs</DependentUpon>

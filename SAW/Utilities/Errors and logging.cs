@@ -69,7 +69,7 @@ namespace SAW
 
 	}
 
-	public class CLogFile : ILogger, IDisposable
+	internal class CLogFile : ILogger, IDisposable
 	{
 
 		private int m_Indent;

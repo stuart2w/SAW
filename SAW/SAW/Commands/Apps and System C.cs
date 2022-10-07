@@ -5,6 +5,7 @@ using System.Drawing;
 using System.Windows.Forms;
 using Microsoft.Win32;
 using SAW.CommandEditors;
+using SAW.Shapes;
 
 namespace SAW.Commands
 {
@@ -15,9 +16,9 @@ namespace SAW.Commands
 		public CmdOpenApp() : base(new[] { Param.ParamTypes.String })
 		{ }
 
-		public override void Execute(ExecutionContext context)
+		internal override void Execute(ExecutionContext context)
 		{
-			string target = m_ParamList[0].ValueAsString();
+			string target = ParamList[0].ValueAsString();
 			ProcessOutputDirective(ref target, context);
 			try
 			{
@@ -38,19 +39,19 @@ namespace SAW.Commands
 		/// <summary>If the app is this, then the item output field is used instead</summary>
 		public const string USEOUTPUT = ":output";
 
-		public override ICommandEditor GetEditor() => new AppCommandEditor();
+		internal override ICommandEditor GetEditor() => new AppCommandEditor();
 	}
 
 	public class CmdParamApp : ParamBasedCommand
 	{
 		public CmdParamApp() : base(new[] { Param.ParamTypes.String, Param.ParamTypes.String })
-		{}
+		{ }
 
-		public override void Execute(ExecutionContext context)
+		internal override void Execute(ExecutionContext context)
 		{
-			string target = m_ParamList[0].ValueAsString();
+			string target = ParamList[0].ValueAsString();
 			CmdOpenApp.ProcessOutputDirective(ref target, context);
-			string param = m_ParamList[1].ValueAsString();
+			string param = ParamList[1].ValueAsString();
 			try
 			{
 				Process.Start(target, param);
@@ -59,7 +60,7 @@ namespace SAW.Commands
 			{ context.View.OnError(e.Message); }
 		}
 
-		public override ICommandEditor GetEditor() => new AppCommandEditor();
+		internal override ICommandEditor GetEditor() => new AppCommandEditor();
 	}
 
 	public class CmdAlternateApp : ParamBasedCommand
@@ -67,11 +68,11 @@ namespace SAW.Commands
 		public CmdAlternateApp() : base(new[] { Param.ParamTypes.String, Param.ParamTypes.String, Param.ParamTypes.String, Param.ParamTypes.String })
 		{ }
 
-		public override void Execute(ExecutionContext context)
+		internal override void Execute(ExecutionContext context)
 		{
-			string target = m_ParamList[0].ValueAsString();
+			string target = ParamList[0].ValueAsString();
 			CmdOpenApp.ProcessOutputDirective(ref target, context);
-			string ID = m_ParamList[1].ValueAsString();
+			string ID = ParamList[1].ValueAsString();
 			int state = 0; // 1 if THIS item is alternate
 			try
 			{
@@ -84,7 +85,7 @@ namespace SAW.Commands
 				context.View.OnError(Strings.Item("Script_Fail_Alternation").Replace("%0", e.Message));
 			}
 			Debug.Assert(state == 0 || state == 1);
-			string param = m_ParamList[2 + state].ValueAsString();
+			string param = ParamList[2 + state].ValueAsString();
 			try
 			{
 				Process.Start(target, param);
@@ -93,7 +94,7 @@ namespace SAW.Commands
 			{ context.View.OnError(e.Message); }
 		}
 
-		public override ICommandEditor GetEditor() => new AppCommandEditor();
+		internal override ICommandEditor GetEditor() => new AppCommandEditor();
 	}
 
 	public class CmdSwitchToApp : ParamBasedCommand
@@ -101,11 +102,11 @@ namespace SAW.Commands
 		public CmdSwitchToApp() : base(new[] { Param.ParamTypes.String })
 		{ }
 
-		public override ICommandEditor GetEditor() => new AppCommandEditor();
+		internal override ICommandEditor GetEditor() => new AppCommandEditor();
 
-		public override void Execute(ExecutionContext context)
+		internal override void Execute(ExecutionContext context)
 		{
-			string application = m_ParamList[0].ValueAsString().ToLower();
+			string application = ParamList[0].ValueAsString().ToLower();
 			CmdOpenApp.ProcessOutputDirective(ref application, context);
 			// it looks like this should work, without all the P/Invoke stuff.  But it doesn't seem to
 			// (it doesn't access some processes.  And the SetForegroundWindow seems to do nothing on the rest
@@ -152,7 +153,7 @@ namespace SAW.Commands
 
 	public class CmdCloseApp : Command
 	{
-		public override void Execute(ExecutionContext context)
+		internal override void Execute(ExecutionContext context)
 		{
 			context.View.SendKeys("'<ALT><F4>'");
 		}
@@ -167,11 +168,11 @@ namespace SAW.Commands
 		{
 		}
 
-		public override void Execute(ExecutionContext context)
+		internal override void Execute(ExecutionContext context)
 		{
 			try
 			{
-				string file = m_ParamList[0].ValueAsString();
+				string file = ParamList[0].ValueAsString();
 				CmdOpenApp.ProcessOutputDirective(ref file, context);
 				Desktop desktop = Desktop.LoadFrom(file);
 				desktop.OpenApplications();
@@ -182,7 +183,7 @@ namespace SAW.Commands
 			}
 		}
 
-		public override ICommandEditor GetEditor()
+		internal override ICommandEditor GetEditor()
 		{
 			return new DesktopCommandEditor();
 		}
@@ -194,11 +195,11 @@ namespace SAW.Commands
 		{
 		}
 
-		public override void Execute(ExecutionContext context)
+		internal override void Execute(ExecutionContext context)
 		{
 			try
 			{
-				string file = m_ParamList[0].ValueAsString();
+				string file = ParamList[0].ValueAsString();
 				Desktop desktop = new Desktop();
 				desktop.PopulateFromWindows();
 				desktop.Save(file);
@@ -209,7 +210,7 @@ namespace SAW.Commands
 			}
 		}
 
-		public override ICommandEditor GetEditor()
+		internal override ICommandEditor GetEditor()
 		{
 			return new DesktopCommandEditor();
 		}
@@ -229,7 +230,7 @@ namespace SAW.Commands
 
 		private Point m_Current;
 
-		public override void Execute(ExecutionContext context)
+		internal override void Execute(ExecutionContext context)
 		{
 			m_HWND = Windows.GetForegroundWindow();
 			if (m_HWND.IsZero())
@@ -245,7 +246,7 @@ namespace SAW.Commands
 			}
 		}
 
-		public void Move(int deltaX, int deltaY)
+		void IMoveCommand.Move(int deltaX, int deltaY)
 		{
 			m_Current.X += deltaX;
 			m_Current.Y += deltaY;
@@ -253,7 +254,7 @@ namespace SAW.Commands
 			Cursor.Position = new Point(Cursor.Position.X + deltaX, Cursor.Position.Y + deltaY);
 		}
 
-		public void End(bool ok)
+		void IMoveCommand.End(bool ok)
 		{
 			if (!ok)
 				Windows.SetWindowPos(m_HWND, 0, m_StartPosition.X, m_StartPosition.Y, 0, 0, Windows.SWP_NOSIZE | Windows.SWP_NOACTIVATE);
@@ -271,7 +272,7 @@ namespace SAW.Commands
 
 		private Size m_Current;
 
-		public override void Execute(ExecutionContext context)
+		internal override void Execute(ExecutionContext context)
 		{
 			m_HWND = Windows.GetForegroundWindow();
 			if (m_HWND.IsZero())
@@ -321,15 +322,15 @@ namespace SAW.Commands
 		{
 			get
 			{
-				if (m_Direction == Directions.Unknown && m_ParamList.Count == 1)
+				if (m_Direction == Directions.Unknown && ParamList.Count == 1)
 					m_Direction = ParseDirectionText(GetParamAsString(0));
 				return m_Direction;
 			}
 			set
 			{
 				m_Direction = value;
-				m_ParamList.Clear();
-				m_ParamList.Add(new StringParam(Strings.Item("Script_CommandPart_" + value)));
+				ParamList.Clear();
+				ParamList.Add(new StringParam(Strings.Item("Script_CommandPart_" + value)));
 			}
 		}
 
@@ -349,7 +350,7 @@ namespace SAW.Commands
 
 		#region Meta
 
-		public override void InitialiseDefaultsForCreation()
+		internal override void InitialiseDefaultsForCreation()
 		{
 			base.InitialiseDefaultsForCreation();
 			Direction = Directions.Above;
@@ -361,10 +362,7 @@ namespace SAW.Commands
 				Direction = ParseDirectionText(possibleParams[0]); // by assigning the property this sets both the value and the parameter
 		}
 
-		public override ICommandEditor GetEditor()
-		{
-			return new DockEditor();
-		}
+		internal override ICommandEditor GetEditor() => new DockEditor();
 
 		#endregion
 
@@ -397,7 +395,7 @@ namespace SAW.Commands
 
 		#endregion
 
-		public override void Execute(ExecutionContext context)
+		internal override void Execute(ExecutionContext context)
 		{
 			Rectangle sawBounds = context.View.FindForm().Bounds;
 			Rectangle screen = Screen.FromPoint(sawBounds.Centre()).Bounds; // screen containing our window
@@ -437,9 +435,9 @@ namespace SAW.Commands
 		{
 		}
 
-		public override void Execute(ExecutionContext context)
+		internal override void Execute(ExecutionContext context)
 		{
-			string application = m_ParamList[0].ValueAsString().ToLower();
+			string application = ParamList[0].ValueAsString().ToLower();
 			CmdOpenApp.ProcessOutputDirective(ref application, context);
 
 			int processID = Desktop.GetProcessID(application);
@@ -451,7 +449,7 @@ namespace SAW.Commands
 				context.View.OnError(errorMessage);
 		}
 
-		public override ICommandEditor GetEditor()
+		internal override ICommandEditor GetEditor()
 		{
 			return new MoveWindowEditor();
 		}

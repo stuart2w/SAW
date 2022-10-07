@@ -1,7 +1,7 @@
 
 namespace SAW
 {
-	public partial class frmLineWidth : System.Windows.Forms.Form
+	internal partial class frmLineWidth : System.Windows.Forms.Form
 	{
 		
 		//Form overrides dispose to clean up the component list.

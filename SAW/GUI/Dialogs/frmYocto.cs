@@ -11,7 +11,7 @@ using SAW.Commands;
 
 namespace SAW.GUI.Dialogs
 {
-	public partial class frmYocto : Form
+	internal partial class frmYocto : Form
 	{
 
 		private List<YRelay> m_Relays;

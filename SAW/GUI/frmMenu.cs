@@ -6,7 +6,7 @@ using System.Windows.Forms;
 
 namespace SAW
 {
-	public partial class frmMenu : Form
+	internal partial class frmMenu : Form
 	{
 		private string m_InitialFile = "";
 		/// <summary>Whether initial file is opened in run mode (correct for Release builds, but helpful to go to design for development)</summary>
@@ -209,7 +209,7 @@ namespace SAW
 			SizeF sz = Globals.Root.CurrentConfig.ReadSize(Config.Page_Size, Config.Page_Size_Default);
 			document.Page(0).SetSize(sz);
 			document.ActivityID = Activities.SAW6;
-			document.SetDefaultGridAndSnapFromActivity(); // calls InitialiseForSAW
+			document.SetDefaultsForNewDocument(); // calls InitialiseForSAW
 			Point screenCentre = Screen.PrimaryScreen.WorkingArea.Centre();
 			document.SAWHeader.SetWindowBounds(new RectangleF(screenCentre.X - sz.Width / 2, screenCentre.Y - sz.Height / 2, sz.Width, sz.Height).ToRectangle()); // easier to construct as a float rect then convert than to cast every single field
 			Globals.Root.SelectDocument(document);

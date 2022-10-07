@@ -17,12 +17,12 @@ namespace SAW.Repo2 {
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
     [System.Runtime.Serialization.CollectionDataContractAttribute(Name="ArrayOfString", Namespace="http://tempuri.org/", ItemName="string")]
     [System.SerializableAttribute()]
-    public class ArrayOfString : System.Collections.Generic.List<string> {
+    internal class ArrayOfString : System.Collections.Generic.List<string> {
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     [System.ServiceModel.ServiceContractAttribute(ConfigurationName="Repo2.Repo2Soap")]
-    public interface Repo2Soap {
+    internal interface Repo2Soap {
         
         // CODEGEN: Generating message contract since element name strSoftware from namespace http://tempuri.org/ is not marked nillable
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/Check", ReplyAction="*")]
@@ -113,7 +113,7 @@ namespace SAW.Repo2 {
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
     [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
-    public partial class CheckRequest {
+    internal partial class CheckRequest {
         
         [System.ServiceModel.MessageBodyMemberAttribute(Name="Check", Namespace="http://tempuri.org/", Order=0)]
         public SAW.Repo2.CheckRequestBody Body;
@@ -130,7 +130,7 @@ namespace SAW.Repo2 {
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
     [System.Runtime.Serialization.DataContractAttribute(Namespace="http://tempuri.org/")]
-    public partial class CheckRequestBody {
+    internal partial class CheckRequestBody {
         
         [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
         public string strSoftware;
@@ -151,7 +151,7 @@ namespace SAW.Repo2 {
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
     [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
-    public partial class CheckResponse {
+    internal partial class CheckResponse {
         
         [System.ServiceModel.MessageBodyMemberAttribute(Name="CheckResponse", Namespace="http://tempuri.org/", Order=0)]
         public SAW.Repo2.CheckResponseBody Body;
@@ -168,7 +168,7 @@ namespace SAW.Repo2 {
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
     [System.Runtime.Serialization.DataContractAttribute(Namespace="http://tempuri.org/")]
-    public partial class CheckResponseBody {
+    internal partial class CheckResponseBody {
         
         [System.Runtime.Serialization.DataMemberAttribute(Order=0)]
         public bool CheckResult;
@@ -185,7 +185,7 @@ namespace SAW.Repo2 {
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
     [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
-    public partial class ProductsRequest {
+    internal partial class ProductsRequest {
         
         [System.ServiceModel.MessageBodyMemberAttribute(Name="Products", Namespace="http://tempuri.org/", Order=0)]
         public SAW.Repo2.ProductsRequestBody Body;
@@ -202,7 +202,7 @@ namespace SAW.Repo2 {
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
     [System.Runtime.Serialization.DataContractAttribute(Namespace="http://tempuri.org/")]
-    public partial class ProductsRequestBody {
+    internal partial class ProductsRequestBody {
         
         [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
         public string strSoftware;
@@ -219,7 +219,7 @@ namespace SAW.Repo2 {
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
     [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
-    public partial class ProductsResponse {
+    internal partial class ProductsResponse {
         
         [System.ServiceModel.MessageBodyMemberAttribute(Name="ProductsResponse", Namespace="http://tempuri.org/", Order=0)]
         public SAW.Repo2.ProductsResponseBody Body;
@@ -236,7 +236,7 @@ namespace SAW.Repo2 {
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
     [System.Runtime.Serialization.DataContractAttribute(Namespace="http://tempuri.org/")]
-    public partial class ProductsResponseBody {
+    internal partial class ProductsResponseBody {
         
         [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
         public SAW.Repo2.ArrayOfString ProductsResult;
@@ -253,7 +253,7 @@ namespace SAW.Repo2 {
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
     [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
-    public partial class VersionsRequest {
+    internal partial class VersionsRequest {
         
         [System.ServiceModel.MessageBodyMemberAttribute(Name="Versions", Namespace="http://tempuri.org/", Order=0)]
         public SAW.Repo2.VersionsRequestBody Body;
@@ -270,7 +270,7 @@ namespace SAW.Repo2 {
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
     [System.Runtime.Serialization.DataContractAttribute(Namespace="http://tempuri.org/")]
-    public partial class VersionsRequestBody {
+    internal partial class VersionsRequestBody {
         
         [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
         public string strSoftware;
@@ -291,7 +291,7 @@ namespace SAW.Repo2 {
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
     [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
-    public partial class VersionsResponse {
+    internal partial class VersionsResponse {
         
         [System.ServiceModel.MessageBodyMemberAttribute(Name="VersionsResponse", Namespace="http://tempuri.org/", Order=0)]
         public SAW.Repo2.VersionsResponseBody Body;
@@ -308,7 +308,7 @@ namespace SAW.Repo2 {
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
     [System.Runtime.Serialization.DataContractAttribute(Namespace="http://tempuri.org/")]
-    public partial class VersionsResponseBody {
+    internal partial class VersionsResponseBody {
         
         [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
         public SAW.Repo2.ArrayOfString VersionsResult;
@@ -325,7 +325,7 @@ namespace SAW.Repo2 {
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
     [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
-    public partial class LastVersionBRequest {
+    internal partial class LastVersionBRequest {
         
         [System.ServiceModel.MessageBodyMemberAttribute(Name="LastVersionB", Namespace="http://tempuri.org/", Order=0)]
         public SAW.Repo2.LastVersionBRequestBody Body;
@@ -342,7 +342,7 @@ namespace SAW.Repo2 {
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
     [System.Runtime.Serialization.DataContractAttribute(Namespace="http://tempuri.org/")]
-    public partial class LastVersionBRequestBody {
+    internal partial class LastVersionBRequestBody {
         
         [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
         public string strSoftware;
@@ -387,7 +387,7 @@ namespace SAW.Repo2 {
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
     [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
-    public partial class LastVersionBResponse {
+    internal partial class LastVersionBResponse {
         
         [System.ServiceModel.MessageBodyMemberAttribute(Name="LastVersionBResponse", Namespace="http://tempuri.org/", Order=0)]
         public SAW.Repo2.LastVersionBResponseBody Body;
@@ -404,7 +404,7 @@ namespace SAW.Repo2 {
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
     [System.Runtime.Serialization.DataContractAttribute(Namespace="http://tempuri.org/")]
-    public partial class LastVersionBResponseBody {
+    internal partial class LastVersionBResponseBody {
         
         [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
         public string LastVersionBResult;
@@ -421,7 +421,7 @@ namespace SAW.Repo2 {
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
     [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
-    public partial class VersionNeedsRequest {
+    internal partial class VersionNeedsRequest {
         
         [System.ServiceModel.MessageBodyMemberAttribute(Name="VersionNeeds", Namespace="http://tempuri.org/", Order=0)]
         public SAW.Repo2.VersionNeedsRequestBody Body;
@@ -438,7 +438,7 @@ namespace SAW.Repo2 {
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
     [System.Runtime.Serialization.DataContractAttribute(Namespace="http://tempuri.org/")]
-    public partial class VersionNeedsRequestBody {
+    internal partial class VersionNeedsRequestBody {
         
         [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
         public string software;
@@ -463,7 +463,7 @@ namespace SAW.Repo2 {
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
     [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
-    public partial class VersionNeedsResponse {
+    internal partial class VersionNeedsResponse {
         
         [System.ServiceModel.MessageBodyMemberAttribute(Name="VersionNeedsResponse", Namespace="http://tempuri.org/", Order=0)]
         public SAW.Repo2.VersionNeedsResponseBody Body;
@@ -480,7 +480,7 @@ namespace SAW.Repo2 {
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
     [System.Runtime.Serialization.DataContractAttribute(Namespace="http://tempuri.org/")]
-    public partial class VersionNeedsResponseBody {
+    internal partial class VersionNeedsResponseBody {
         
         [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
         public SAW.Repo2.ArrayOfString VersionNeedsResult;
@@ -497,7 +497,7 @@ namespace SAW.Repo2 {
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
     [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
-    public partial class StoreErrorRequest {
+    internal partial class StoreErrorRequest {
         
         [System.ServiceModel.MessageBodyMemberAttribute(Name="StoreError", Namespace="http://tempuri.org/", Order=0)]
         public SAW.Repo2.StoreErrorRequestBody Body;
@@ -514,7 +514,7 @@ namespace SAW.Repo2 {
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
     [System.Runtime.Serialization.DataContractAttribute(Namespace="http://tempuri.org/")]
-    public partial class StoreErrorRequestBody {
+    internal partial class StoreErrorRequestBody {
         
         [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
         public string software;
@@ -535,7 +535,7 @@ namespace SAW.Repo2 {
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
     [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
-    public partial class StoreErrorResponse {
+    internal partial class StoreErrorResponse {
         
         [System.ServiceModel.MessageBodyMemberAttribute(Name="StoreErrorResponse", Namespace="http://tempuri.org/", Order=0)]
         public SAW.Repo2.StoreErrorResponseBody Body;
@@ -552,7 +552,7 @@ namespace SAW.Repo2 {
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
     [System.Runtime.Serialization.DataContractAttribute()]
-    public partial class StoreErrorResponseBody {
+    internal partial class StoreErrorResponseBody {
         
         public StoreErrorResponseBody() {
         }
@@ -562,7 +562,7 @@ namespace SAW.Repo2 {
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
     [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
-    public partial class StoreRequest {
+    internal partial class StoreRequest {
         
         [System.ServiceModel.MessageBodyMemberAttribute(Name="Store", Namespace="http://tempuri.org/", Order=0)]
         public SAW.Repo2.StoreRequestBody Body;
@@ -579,7 +579,7 @@ namespace SAW.Repo2 {
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
     [System.Runtime.Serialization.DataContractAttribute(Namespace="http://tempuri.org/")]
-    public partial class StoreRequestBody {
+    internal partial class StoreRequestBody {
         
         [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
         public string software;
@@ -604,7 +604,7 @@ namespace SAW.Repo2 {
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
     [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
-    public partial class StoreResponse {
+    internal partial class StoreResponse {
         
         [System.ServiceModel.MessageBodyMemberAttribute(Name="StoreResponse", Namespace="http://tempuri.org/", Order=0)]
         public SAW.Repo2.StoreResponseBody Body;
@@ -621,7 +621,7 @@ namespace SAW.Repo2 {
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
     [System.Runtime.Serialization.DataContractAttribute(Namespace="http://tempuri.org/")]
-    public partial class StoreResponseBody {
+    internal partial class StoreResponseBody {
         
         [System.Runtime.Serialization.DataMemberAttribute(Order=0)]
         public bool StoreResult;
@@ -638,7 +638,7 @@ namespace SAW.Repo2 {
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
     [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
-    public partial class MergeRequest {
+    internal partial class MergeRequest {
         
         [System.ServiceModel.MessageBodyMemberAttribute(Name="Merge", Namespace="http://tempuri.org/", Order=0)]
         public SAW.Repo2.MergeRequestBody Body;
@@ -655,7 +655,7 @@ namespace SAW.Repo2 {
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
     [System.Runtime.Serialization.DataContractAttribute(Namespace="http://tempuri.org/")]
-    public partial class MergeRequestBody {
+    internal partial class MergeRequestBody {
         
         [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
         public string software;
@@ -676,7 +676,7 @@ namespace SAW.Repo2 {
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
     [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
-    public partial class MergeResponse {
+    internal partial class MergeResponse {
         
         [System.ServiceModel.MessageBodyMemberAttribute(Name="MergeResponse", Namespace="http://tempuri.org/", Order=0)]
         public SAW.Repo2.MergeResponseBody Body;
@@ -693,7 +693,7 @@ namespace SAW.Repo2 {
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
     [System.Runtime.Serialization.DataContractAttribute()]
-    public partial class MergeResponseBody {
+    internal partial class MergeResponseBody {
         
         public MergeResponseBody() {
         }
@@ -703,7 +703,7 @@ namespace SAW.Repo2 {
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
     [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
-    public partial class VerifyVersionRequest {
+    internal partial class VerifyVersionRequest {
         
         [System.ServiceModel.MessageBodyMemberAttribute(Name="VerifyVersion", Namespace="http://tempuri.org/", Order=0)]
         public SAW.Repo2.VerifyVersionRequestBody Body;
@@ -720,7 +720,7 @@ namespace SAW.Repo2 {
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
     [System.Runtime.Serialization.DataContractAttribute(Namespace="http://tempuri.org/")]
-    public partial class VerifyVersionRequestBody {
+    internal partial class VerifyVersionRequestBody {
         
         [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
         public string software;
@@ -749,7 +749,7 @@ namespace SAW.Repo2 {
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
     [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
-    public partial class VerifyVersionResponse {
+    internal partial class VerifyVersionResponse {
         
         [System.ServiceModel.MessageBodyMemberAttribute(Name="VerifyVersionResponse", Namespace="http://tempuri.org/", Order=0)]
         public SAW.Repo2.VerifyVersionResponseBody Body;
@@ -766,7 +766,7 @@ namespace SAW.Repo2 {
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
     [System.Runtime.Serialization.DataContractAttribute(Namespace="http://tempuri.org/")]
-    public partial class VerifyVersionResponseBody {
+    internal partial class VerifyVersionResponseBody {
         
         [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
         public string VerifyVersionResult;
@@ -783,7 +783,7 @@ namespace SAW.Repo2 {
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
     [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
-    public partial class DeleteRequest {
+    internal partial class DeleteRequest {
         
         [System.ServiceModel.MessageBodyMemberAttribute(Name="Delete", Namespace="http://tempuri.org/", Order=0)]
         public SAW.Repo2.DeleteRequestBody Body;
@@ -800,7 +800,7 @@ namespace SAW.Repo2 {
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
     [System.Runtime.Serialization.DataContractAttribute(Namespace="http://tempuri.org/")]
-    public partial class DeleteRequestBody {
+    internal partial class DeleteRequestBody {
         
         [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
         public string strSoftware;
@@ -821,7 +821,7 @@ namespace SAW.Repo2 {
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
     [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
-    public partial class DeleteResponse {
+    internal partial class DeleteResponse {
         
         [System.ServiceModel.MessageBodyMemberAttribute(Name="DeleteResponse", Namespace="http://tempuri.org/", Order=0)]
         public SAW.Repo2.DeleteResponseBody Body;
@@ -838,7 +838,7 @@ namespace SAW.Repo2 {
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
     [System.Runtime.Serialization.DataContractAttribute()]
-    public partial class DeleteResponseBody {
+    internal partial class DeleteResponseBody {
         
         public DeleteResponseBody() {
         }
@@ -848,7 +848,7 @@ namespace SAW.Repo2 {
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
     [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
-    public partial class FetchRequest {
+    internal partial class FetchRequest {
         
         [System.ServiceModel.MessageBodyMemberAttribute(Name="Fetch", Namespace="http://tempuri.org/", Order=0)]
         public SAW.Repo2.FetchRequestBody Body;
@@ -865,7 +865,7 @@ namespace SAW.Repo2 {
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
     [System.Runtime.Serialization.DataContractAttribute(Namespace="http://tempuri.org/")]
-    public partial class FetchRequestBody {
+    internal partial class FetchRequestBody {
         
         [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
         public string strSoftware;
@@ -886,7 +886,7 @@ namespace SAW.Repo2 {
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
     [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
-    public partial class FetchResponse {
+    internal partial class FetchResponse {
         
         [System.ServiceModel.MessageBodyMemberAttribute(Name="FetchResponse", Namespace="http://tempuri.org/", Order=0)]
         public SAW.Repo2.FetchResponseBody Body;
@@ -903,7 +903,7 @@ namespace SAW.Repo2 {
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
     [System.Runtime.Serialization.DataContractAttribute(Namespace="http://tempuri.org/")]
-    public partial class FetchResponseBody {
+    internal partial class FetchResponseBody {
         
         [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
         public byte[] FetchResult;
@@ -920,7 +920,7 @@ namespace SAW.Repo2 {
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
     [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
-    public partial class FetchChunkRequest {
+    internal partial class FetchChunkRequest {
         
         [System.ServiceModel.MessageBodyMemberAttribute(Name="FetchChunk", Namespace="http://tempuri.org/", Order=0)]
         public SAW.Repo2.FetchChunkRequestBody Body;
@@ -937,7 +937,7 @@ namespace SAW.Repo2 {
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
     [System.Runtime.Serialization.DataContractAttribute(Namespace="http://tempuri.org/")]
-    public partial class FetchChunkRequestBody {
+    internal partial class FetchChunkRequestBody {
         
         [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
         public string strSoftware;
@@ -966,7 +966,7 @@ namespace SAW.Repo2 {
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
     [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
-    public partial class FetchChunkResponse {
+    internal partial class FetchChunkResponse {
         
         [System.ServiceModel.MessageBodyMemberAttribute(Name="FetchChunkResponse", Namespace="http://tempuri.org/", Order=0)]
         public SAW.Repo2.FetchChunkResponseBody Body;
@@ -983,7 +983,7 @@ namespace SAW.Repo2 {
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
     [System.Runtime.Serialization.DataContractAttribute(Namespace="http://tempuri.org/")]
-    public partial class FetchChunkResponseBody {
+    internal partial class FetchChunkResponseBody {
         
         [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
         public byte[] FetchChunkResult;
@@ -997,12 +997,12 @@ namespace SAW.Repo2 {
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    public interface Repo2SoapChannel : SAW.Repo2.Repo2Soap, System.ServiceModel.IClientChannel {
+    internal interface Repo2SoapChannel : SAW.Repo2.Repo2Soap, System.ServiceModel.IClientChannel {
     }
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    public partial class Repo2SoapClient : System.ServiceModel.ClientBase<SAW.Repo2.Repo2Soap>, SAW.Repo2.Repo2Soap {
+    internal partial class Repo2SoapClient : System.ServiceModel.ClientBase<SAW.Repo2.Repo2Soap>, SAW.Repo2.Repo2Soap {
         
         public Repo2SoapClient() {
         }

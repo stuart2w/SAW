@@ -86,6 +86,7 @@ NetCheckDone:
   ; Put files there
   File "Installer Files\*.*"
   File "..\SAW\bin\x86\release\SAW.exe"
+  File "..\SAW\bin\x86\release\SAW.xml"
   File "..\SAW\bin\x86\Release\SAW.exe.config"
   File "..\SAW\bin\x86\Release\SwitchCPP.dll"
   File "..\SAW\bin\x86\Release\NAudio.dll"

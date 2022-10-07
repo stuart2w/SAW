@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Windows.Forms;
 using SAW.Commands;
+using SAW.Shapes;
 
 namespace SAW.CommandEditors
 {
@@ -41,7 +42,7 @@ namespace SAW.CommandEditors
 					cmbPopups.DisplayMember = "Text";
 					cmbPopups.DataSource = comboEntries;
 				}
-				cmbPopups.SelectedValue = m_Command.m_ParamList.Count == 0 ? -1 : m_Command.GetParamAsInt(0);
+				cmbPopups.SelectedValue = m_Command.ParamList.Count == 0 ? -1 : m_Command.GetParamAsInt(0);
 			}
 			finally { m_Filling = false; }
 		}
@@ -72,9 +73,9 @@ namespace SAW.CommandEditors
 		{
 			if (m_Filling)
 				return;
-			m_Command.m_ParamList.Clear(); // we need to leave it empty for "this" and fill in the param otherwise
+			m_Command.ParamList.Clear(); // we need to leave it empty for "this" and fill in the param otherwise
 			if ((int) cmbPopups.SelectedValue >= 0)
-				m_Command.m_ParamList.Add(new IntegerParam((int) cmbPopups.SelectedValue));
+				m_Command.ParamList.Add(new IntegerParam((int) cmbPopups.SelectedValue));
 			UserChanged?.Invoke(this, EventArgs.Empty);
 		}
 

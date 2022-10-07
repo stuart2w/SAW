@@ -7,7 +7,7 @@ using System.Windows.Forms;
 using System.Linq;
 
 
-namespace SAW
+namespace SAW.Shapes
 {
 	/// <summary>A shape which contains other shapes that are still movable and independent - but will move with the container (and be deleted if the container is deleted) </summary>
 	public class Container : Filled, IShapeContainer, IShapeTarget
@@ -26,7 +26,7 @@ namespace SAW
 		#region Information
 
 		public override Shapes ShapeCode => Shapes.Container;
-		public override LabelModes LabelMode => LabelModes.NotSupported;
+		internal override LabelModes LabelMode => LabelModes.NotSupported;
 		public override GeneralFlags Flags => base.Flags | GeneralFlags.ProtectBounds;
 		protected override LineLogics LineLogic => BorderShape == Borders.Rectangle ? LineLogics.Custom : LineLogics.UsePath;
 
@@ -50,7 +50,7 @@ namespace SAW
 			}
 		}
 
-		public override SnapModes SnapNext(SnapModes requested)
+		protected internal override SnapModes SnapNext(SnapModes requested)
 		{
 			if (requested == SnapModes.Angle)
 				return SnapModes.Off;
@@ -64,7 +64,7 @@ namespace SAW
 		// most of this is copied from Button (puppy class cannot inherit; it is easier to inherit this from Filled to get all the styling)
 		private static PointF g_StartPoint; // in order to allow drawing out any corner first
 		private const float MINSIZE = 5;
-		public override VerbResult Start(EditableView.ClickPosition position)
+		public override VerbResult Start(ClickPosition position)
 		{
 			g_StartPoint = position.Snapped;
 			Debug.Assert(LineStyle != null);
@@ -74,9 +74,9 @@ namespace SAW
 			return VerbResult.Continuing;
 		}
 
-		public override VerbResult Cancel(EditableView.ClickPosition position) => VerbResult.Destroyed;
+		public override VerbResult Cancel(ClickPosition position) => VerbResult.Destroyed;
 
-		public override VerbResult Float(EditableView.ClickPosition position)
+		public override VerbResult Float(ClickPosition position)
 		{
 			RectangleF rct = Geometry.RectangleFromPoints(g_StartPoint, position.Snapped);
 			if (rct.Width < MINSIZE || rct.Height < MINSIZE)
@@ -87,9 +87,9 @@ namespace SAW
 			return VerbResult.Continuing;
 		}
 
-		public override VerbResult Choose(EditableView.ClickPosition position) => Complete(position);
+		public override VerbResult Choose(ClickPosition position) => Complete(position);
 
-		public override VerbResult Complete(EditableView.ClickPosition position)
+		public override VerbResult Complete(ClickPosition position)
 		{
 			VerbResult result = Float(position);
 			if (result == VerbResult.Rejected)
@@ -160,7 +160,7 @@ namespace SAW
 			}
 		}
 
-		public override void Load(DataReader reader)
+		protected internal override void Load(DataReader reader)
 		{
 			base.Load(reader);
 			m_Bounds = reader.ReadRectangleF();
@@ -181,7 +181,7 @@ namespace SAW
 			// (It cannot safely be done here, because Flow rearranges the contents which won't work until the Flow data is loaded)
 		}
 
-		public override void Save(DataWriter writer)
+		protected internal override void Save(DataWriter writer)
 		{
 			base.Save(writer);
 			writer.Write(m_Bounds);
@@ -193,7 +193,7 @@ namespace SAW
 			writer.WriteDatumList(m_Shapes);
 		}
 
-		public override void UpdateReferencesObjectsCreated(Document document, DataReader reader)
+		protected internal override void UpdateReferencesObjectsCreated(Document document, DataReader reader)
 		{
 			base.UpdateReferencesObjectsCreated(document, reader);
 			foreach (Shape shape in m_Shapes)
@@ -202,7 +202,7 @@ namespace SAW
 			}
 		}
 
-		public override void UpdateReferencesIDsChanged(Mapping mapID, Document document)
+		protected internal override void UpdateReferencesIDsChanged(Mapping mapID, Document document)
 		{
 			base.UpdateReferencesIDsChanged(mapID, document);
 			foreach (Shape shape in m_Shapes)
@@ -211,7 +211,7 @@ namespace SAW
 			}
 		}
 
-		public override void Iterate(DatumFunction fn)
+		internal override void Iterate(DatumFunction fn)
 		{
 			base.Iterate(fn);
 			foreach (Shape shape in m_Shapes)
@@ -237,17 +237,19 @@ namespace SAW
 			return true;
 		}
 
-		public override void WriteExportText(IndentStringBuilder output)
+		protected internal override void WriteExportText(IndentStringBuilder output)
 		{
 			base.WriteExportText(output);
 			foreach (Shape shape in Contents)
 				shape.WriteExportText(output);
 		}
+
 		#endregion
 
 		#region Coordinates
 		protected RectangleF m_Refresh; // because the refresh bounds can be quite slow to calculate, they are cached
 
+		/// <summary>Sets the bounding box for this item.  Transaction is optional and should be provided only if you want other affected shapes included in the transaction</summary>
 		public virtual void SetBounds(RectangleF bounds, Transaction transaction = null)
 		{
 			if (bounds.Width <= 0 || bounds.Height <= 0)
@@ -256,7 +258,7 @@ namespace SAW
 			m_Refresh = RectangleF.Empty;
 		}
 
-		protected override RectangleF CalculateBounds() => throw new InvalidOperationException();
+		protected override RectangleF CalculateBounds() => throw new InvalidOperationException($"Bounds of {this} not set");
 
 		internal override List<UserSocket> GetPointsWhichSnapWhenMoving()
 		{
@@ -332,7 +334,7 @@ namespace SAW
 			m_Refresh = RectangleF.Empty;
 		}
 
-		public override bool HitTestDetailed(PointF clickPoint, float scale, bool treatAsFilled)
+		protected internal override bool HitTestDetailed(PointF clickPoint, float scale, bool treatAsFilled)
 		{
 			if (LineLogic == LineLogics.UsePath)
 				return base.HitTestDetailed(clickPoint, scale, true);
@@ -399,7 +401,7 @@ namespace SAW
 		}
 
 		/// <summary>Moves the child element to be within this one, if it protrudes out to any side</summary>
-		public void BringChildWithinBounds(Shape child, Transaction transaction)
+		internal void BringChildWithinBounds(Shape child, Transaction transaction)
 		{
 			float X = 0;
 			float Y = 0;
@@ -710,7 +712,7 @@ namespace SAW
 
 		internal override string DoubleClickText() => Strings.Item("Flow_Settings");
 
-		internal override void DoDoubleClick(EditableView view, EditableView.ClickPosition.Sources source)
+		internal override void DoDoubleClick(EditableView view, ClickPosition.Sources source)
 		{
 			Transaction transaction = new Transaction();
 			transaction.Edit(this);
@@ -809,7 +811,7 @@ namespace SAW
 
 		public override void FinishedModifyingContents(Transaction transaction, GrabMovement move = null)
 		{
-			// objTransaction does not need to be provided
+			// transaction does not need to be provided
 			DoPositioning(transaction, move, null);
 		}
 
@@ -817,7 +819,7 @@ namespace SAW
 		/// <param name="move"></param>
 		/// <param name="fnOverallPosition">Specifies an optional function which returns a vector translation to apply to all of the calculated sizes.
 		/// (Used by AutoSize which may need to move this object at the end, and doesn't want to have to translate all of the shapes a second time)</param>
-		/// <param name="transaction"></param>
+		/// <param name="transaction">Optional - can be null</param>
 		private void DoPositioning(Transaction transaction, GrabMovement move, GetOverallTranslation fnOverallPosition)
 		{
 			m_Lines.Clear();
@@ -1090,7 +1092,7 @@ namespace SAW
 		#endregion
 
 		#region Data
-		public override void Save(DataWriter writer)
+		protected internal override void Save(DataWriter writer)
 		{
 			base.Save(writer);
 			writer.WriteByte((byte)Direction);
@@ -1103,7 +1105,7 @@ namespace SAW
 			writer.Write(ShapeSeparation);
 		}
 
-		public override void Load(DataReader reader)
+		protected internal override void Load(DataReader reader)
 		{
 			base.Load(reader);
 			Direction = (Directions)reader.ReadByte();
@@ -1242,3 +1244,4 @@ namespace SAW
 
 	}
 }
+ 

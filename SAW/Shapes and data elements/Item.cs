@@ -9,12 +9,25 @@ using System.Linq;
 using System.Windows.Forms;
 using SAW.Commands;
 
-namespace SAW
+namespace SAW.Shapes
 {
 	/// <summary>The standard SAW button.  This implements the graphical parts.  It is usually contained in a scriptable which does the active bits - and can contain other shapes instead of this.
 	/// An Item may contain other scriptables</summary>
 	public class Item : Container
 	{
+
+		public Item()
+		{
+			TextStyle.SetDefaults();
+			LineStyle.SetDefaults();
+			FillStyle.SetDefaults();
+		}
+
+		public Item(RectangleF bounds, string text = "") : this()
+		{
+			m_Bounds = bounds;
+			m_Label = text;
+		}
 
 		#region Enums and constants
 		/// <summary>User can only change between Item and Escape.  These are largely ignored in SAW7</summary>
@@ -42,16 +55,20 @@ namespace SAW
 		public enum Alignment : uint
 		{
 			Left = 0,
+			/// <summary>Centred horizontally </summary>
 			Centre = 1,
 			Right = 2,
+			/// <summary>Used to select just the horizontal component of a value</summary>
 			HorizontalMask = 0xf, // actually ff in SAW
 			Top = 0,
+			/// <summary>Centred vertically</summary>
 			Middle = 0x100,
 			Bottom = 0x200,
+			/// <summary>Used to select just the vertical component of a value</summary>
 			VerticalMask = 0xf00
 		}
 
-		public static ItemDisplayTypes DefaultItemDisplayTypeForType(ItemTypes type)
+		internal static ItemDisplayTypes DefaultItemDisplayTypeForType(ItemTypes type)
 		{
 			switch (type)
 			{
@@ -72,26 +89,33 @@ namespace SAW
 
 		#region Properties
 
-		// content...
+		/// <summary>The image displayed on the button.  Use Document.AddImageFromFile to load the media and generate the object which can be assigned here.
+		/// A SharedImage object can be assigned directly - the SharedReference&lt;&gt; is automatic.
+		/// NOTE: only used if GraphicShown = true</summary>
 		public SharedReference<SharedImage> Image;
 
-		/// <summary>Only defined if loaded from an old SAW file.  Will be leaf filename</summary>
-		public string ImageName;
+		/// <summary>ONLY defined if loaded from an old SAW file.  Will be leaf filename.
+		/// Should be left null for all new files</summary>
+		internal string ImageName;
 
+		/// <summary>Extra spacing to use between lines of text, default 0.  1 is approx half a pixel (?)</summary>
 		public uint LineSpace;
 
 		// logic...
 		public ItemTypes ItemType = ItemTypes.IT_Item;
 
-		// other appearance... (some in styling section)
-		//public FillStyleC HighlightFillStyle;
-		//public LineStyleC HighlightLineStyle;
-		//public TextStyleC HighlightTextStyle;
-
 		/// <summary>SAW 7.02.x - image only renders when highlighted </summary>
 		public bool GraphicOnlyOnHighlight;
 
+		/// <summary>ID used for CCF coding.</summary>
 		public string ConceptID;
+
+		/// <summary>The text on the button.  Uses the LabelText in the base class </summary>
+		public string Title
+		{
+			get => base.LabelText;
+			set => base.LabelText = value;
+		}
 
 		#endregion
 
@@ -104,14 +128,15 @@ namespace SAW
 		/// Irrelevant unless DisplayType = Item</summary>
 		private Guid m_idStyle;
 
-		/// <summary>-1 means use auto (not in SAW).  SAW worked the same way round - this is % which is text</summary>
-		public float TextRatio = -1;
+		/// <summary>Proportion of the button which should be text.  Must be >0 and &lt;1</summary>
+		public float TextRatio = DEFAULTTEXTRATIO;
 		private const float DEFAULTTEXTRATIO = 0.25f;
 		/// <summary>Position of graphic relative to text;  although SAW only used 0-3</summary>
-		public ButtonShape.Layouts Arrangement = ButtonShape.Layouts.Above;
+		public ButtonLayouts Arrangement = ButtonLayouts.Above;
+		/// <summary>Alignment of the graphic within its box.  A horizontal and vertical flag should be ORed together, eg: Alignment.Centre | Alignment.Middle </summary>
 		public Alignment GraphicAlign = Alignment.Centre | Alignment.Middle;
 		public bool TextShown = true;
-		public bool GraphicShown;
+		public bool GraphicShown = true;
 
 		private RectangleF GetTextArea()
 		{
@@ -174,10 +199,8 @@ namespace SAW
 				if (TextRatio < 0)
 					switch (Arrangement)
 					{ // auto text ratio leaves enough space for text, but text engine works in superimpose mode.  Must top/bottom align it to get in right place if it is working vertically
-						case ButtonShape.Layouts.Above:
-							return StringAlignment.Far;
-						case ButtonShape.Layouts.Below:
-							return StringAlignment.Near;
+						case ButtonLayouts.Above: return StringAlignment.Far;
+						case ButtonLayouts.Below: return StringAlignment.Near;
 					}
 				return base.EffectiveTextVerticalAlignment;
 			}
@@ -205,13 +228,6 @@ namespace SAW
 		#region Data
 		// parts maintaining Style are just copied from Button
 
-		public Item()
-		{
-			TextStyle.SetDefaults();
-			LineStyle.SetDefaults();
-			FillStyle.SetDefaults();
-		}
-
 		/// <summary>Only defined when loading as SAW7 file - this is the highlight style data that was stored in the Item in SAW7 but has now moved to the Scriptable.
 		/// Scriptable will use this and clear it after calling Load</summary>
 		internal V7Fields LoadedV7Data;
@@ -227,7 +243,7 @@ namespace SAW
 			public string PromptText;
 		}
 
-		public override void Load(DataReader reader)
+		protected internal override void Load(DataReader reader)
 		{
 			base.Load(reader);
 			Image = SharedReference<SharedImage>.FromGUID(reader.ReadGuid());
@@ -260,7 +276,7 @@ namespace SAW
 			StyleType = (ItemDisplayTypes)reader.ReadInt32();
 			m_idStyle = reader.ReadGuid();
 			TextRatio = reader.ReadSingle();
-			Arrangement = (ButtonShape.Layouts)reader.ReadInt32();
+			Arrangement = (ButtonLayouts)reader.ReadInt32();
 			GraphicAlign = (Alignment)reader.ReadInt32();
 			TextShown = reader.ReadBoolean();
 			GraphicShown = reader.ReadBoolean();
@@ -270,7 +286,7 @@ namespace SAW
 				GraphicOnlyOnHighlight = reader.ReadBoolean();
 		}
 
-		public override void Save(DataWriter writer)
+		protected internal override void Save(DataWriter writer)
 		{
 			base.Save(writer);
 			writer.Write(Image?.ID ?? Guid.Empty);
@@ -347,7 +363,7 @@ namespace SAW
 			BorderShape = item.BorderShape;
 		}
 
-		public override void UpdateReferencesObjectsCreated(Document document, DataReader reader)
+		protected internal override void UpdateReferencesObjectsCreated(Document document, DataReader reader)
 		{
 			base.UpdateReferencesObjectsCreated(document, reader);
 			Image?.DereferenceOnLoad(document);
@@ -372,7 +388,7 @@ namespace SAW
 			}
 		}
 
-		public override void UpdateReferencesIDsChanged(Mapping mapID, Document document)
+		protected internal override void UpdateReferencesIDsChanged(Mapping mapID, Document document)
 		{
 			base.UpdateReferencesIDsChanged(mapID, document);
 			if (mapID.ContainsKey(m_idStyle))
@@ -388,7 +404,7 @@ namespace SAW
 			Image?.UpdateIDsReferencesChanged();
 		}
 
-		public override void AddRequiredReferences(Action<Datum> fnAdd, Mapping mapID)
+		protected internal override void AddRequiredReferences(Action<Datum> fnAdd, Mapping mapID)
 		{
 			base.AddRequiredReferences(fnAdd, mapID);
 			if (m_Style != null && m_Style.IsShared && !m_Style.IsUserDefault)
@@ -400,7 +416,7 @@ namespace SAW
 		}
 
 		// The image and style are not contained, it is only a shared reference - unless style is not shared
-		public override void Iterate(DatumFunction fn)
+		internal override void Iterate(DatumFunction fn)
 		{
 			base.Iterate(fn);
 			if (m_Style != null && !m_Style.IsShared)
@@ -418,7 +434,7 @@ namespace SAW
 			}
 		}
 
-		public override void WriteExportText(IndentStringBuilder output)
+		protected internal override void WriteExportText(IndentStringBuilder output)
 		{
 			base.WriteExportText(output);
 			// this is not like the item number header since the Scriptable will already have done that
@@ -451,7 +467,7 @@ namespace SAW
 		#region Info
 		public override Shapes ShapeCode => Shapes.SAWItem;
 
-		public override LabelModes LabelMode => LabelModes.Always;
+		internal override LabelModes LabelMode => LabelModes.Always;
 
 		protected override LabelPositions LabelPosition => LabelPositions.RotatedRectangle;
 		// not actually rotated, but easier to just use this than create a new CustomRect value
@@ -475,7 +491,7 @@ namespace SAW
 
 		internal override string DoubleClickText() => Strings.Item("SAW_Edit_Item");
 
-		internal override void DoDoubleClick(EditableView view, EditableView.ClickPosition.Sources source)
+		internal override void DoDoubleClick(EditableView view, ClickPosition.Sources source)
 		{
 			// Scriptable can also be passed to editor, but can be null if not present
 			// note that scriptable does its own version of this
@@ -504,10 +520,7 @@ namespace SAW
 			base.SetBounds(bounds, transaction);
 			base.ClearTextCache();
 			if (Parent is Scriptable scriptable) // it will reset it's own bounds, but doesn't add itself to the tx as it doesn't have it
-			{
-				Debug.Assert(transaction != null);
 				transaction?.Edit(scriptable);
-			}
 			Parent?.NotifyIndirectChange(this, ChangeAffects.Bounds);
 		}
 
@@ -523,7 +536,7 @@ namespace SAW
 			base.CheckTextVerticalPositions(bolVerticalAlignChanged, LineSpace / 2f);
 		}
 
-		public override (GrabSpot[], string[]) GetEditableCoords(Target selectedElement)
+		internal override (GrabSpot[], string[]) GetEditableCoords(Target selectedElement)
 		{
 			float midX = Bounds.X + Bounds.Width / 2;
 			float midY = Bounds.Y + Bounds.Height / 2;
@@ -643,11 +656,11 @@ namespace SAW
 			}
 		}
 
-		protected override void DrawLabel(Canvas gr, DrawResources objResources)
+		protected override void DrawLabel(Canvas gr, DrawResources resources)
 		{
 			if (!TextShown)
 				return;
-			base.DrawLabel(gr, objResources);
+			base.DrawLabel(gr, resources);
 		}
 
 		public override RectangleF RefreshBounds(bool withShadow = false)
@@ -665,7 +678,6 @@ namespace SAW
 				m_Refresh = refreshBounds;
 			return refreshBounds;
 		}
-
 
 		#endregion
 
@@ -857,8 +869,8 @@ namespace SAW
 					Main.LineStyle.Width = ar.ReadUInt32(); // 0-4
 				}
 				Scripting.HighlightStyle.LineWidth = ar.ReadUInt32();
-				Main.Arrangement = (ButtonShape.Layouts)ar.ReadUInt32(); // luckily seems to use same values (at least 0-3)
-				Debug.Assert(Main.Arrangement >= 0 && Main.Arrangement <= (ButtonShape.Layouts)3);
+				Main.Arrangement = (ButtonLayouts)ar.ReadUInt32(); // luckily seems to use same values (at least 0-3)
+				Debug.Assert(Main.Arrangement >= 0 && Main.Arrangement <= (ButtonLayouts)3);
 				Main.TextAlign = (Alignment)ar.ReadUInt32();
 				Main.GraphicAlign = (Alignment)ar.ReadUInt32();
 				//Main.m_nTextArea = ar.ReadInt32();

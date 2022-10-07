@@ -36,12 +36,12 @@ namespace SAW.CommandEditors
 				btnRunningApps.Visible = m_Command is CmdSwitchToApp;
 				if (m_Command is CmdAlternateApp)
 				{
-					txtAlternateID.Text = m_Command.m_ParamList[3].ValueAsString();
-					txtParams2.Text = m_Command.m_ParamList[2].ValueAsString();
+					txtAlternateID.Text = m_Command.ParamList[3].ValueAsString();
+					txtParams2.Text = m_Command.ParamList[2].ValueAsString();
 				}
 				if (m_Command is CmdParamApp || m_Command is CmdAlternateApp)
-					txtParams2.Text = m_Command.m_ParamList[1].ValueAsString();
-				txtApplication.Text = m_Command.m_ParamList[0].ValueAsString();
+					txtParams2.Text = m_Command.ParamList[1].ValueAsString();
+				txtApplication.Text = m_Command.ParamList[0].ValueAsString();
 				chkUseOutput.Checked = (txtApplication.Text == CmdOpenApp.USEOUTPUT);
 				if (chkUseOutput.Checked)
 					txtApplication.Text = "";
@@ -80,9 +80,9 @@ namespace SAW.CommandEditors
 			if (m_Filling)
 				return;
 			if (chkUseOutput.Checked)
-				m_Command.m_ParamList[0] = new StringParam(CmdOpenApp.USEOUTPUT);
+				m_Command.ParamList[0] = new StringParam(CmdOpenApp.USEOUTPUT);
 			else
-				m_Command.m_ParamList[0] = new StringParam(txtApplication.Text);
+				m_Command.ParamList[0] = new StringParam(txtApplication.Text);
 			UserChanged?.Invoke(this, EventArgs.Empty);
 		}
 
@@ -90,7 +90,7 @@ namespace SAW.CommandEditors
 		{
 			if (m_Filling)
 				return;
-			m_Command.m_ParamList[3] = new StringParam(txtAlternateID.Text);
+			m_Command.ParamList[3] = new StringParam(txtAlternateID.Text);
 			UserChanged?.Invoke(this, EventArgs.Empty);
 		}
 
@@ -98,7 +98,7 @@ namespace SAW.CommandEditors
 		{
 			if (m_Filling)
 				return;
-			m_Command.m_ParamList[2] = new StringParam(txtParams2.Text);
+			m_Command.ParamList[2] = new StringParam(txtParams2.Text);
 			UserChanged?.Invoke(this, EventArgs.Empty);
 		}
 
@@ -106,7 +106,7 @@ namespace SAW.CommandEditors
 		{
 			if (m_Filling)
 				return;
-			m_Command.m_ParamList[1] = new StringParam(txtParams.Text);
+			m_Command.ParamList[1] = new StringParam(txtParams.Text);
 			UserChanged?.Invoke(this, EventArgs.Empty);
 		}
 
@@ -114,7 +114,7 @@ namespace SAW.CommandEditors
 		{
 			if (m_Filling)
 				return;
-			m_Command.m_ParamList[0] = new StringParam(txtApplication.Text);
+			m_Command.ParamList[0] = new StringParam(txtApplication.Text);
 			UserChanged?.Invoke(this, EventArgs.Empty);
 		}
 

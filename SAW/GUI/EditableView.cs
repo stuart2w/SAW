@@ -5,9 +5,113 @@ using System.Diagnostics;
 using System.Windows.Forms;
 using System.Linq;
 using SAW.Functions;
+using SAW.Shapes;
 
 namespace SAW
 {
+
+	#region ClickPosition
+
+	/// <summary>Data about a click.  All coords are in data coordinates </summary>
+	public class ClickPosition
+	{
+		/// <summary>we need to keep this, because some tools might use snapping, but use the exact coordinates in certain circumstances
+		/// (e.g. transformation tool selecting a different shape on start)</summary>
+		public PointF Exact;
+
+		public PointF Snapped; // but will be the same as Exact if the current tool does not need snapping.
+		public Shape.SnapModes SnapMode; // actual snap applied to .Snapped
+		public Shape.SnapModes RequestedSnap; // current user config
+		public Page Page; // the page on which we are working
+		/// <summary>the scale factor of the editing window where the click occurred.  Only occasionally used; can adjust tolerances slightly</summary>
+		public float Zoom;
+		/// <summary>The view the click was within.  Not defined in some other uses of this</summary>
+		internal StaticView View;
+		/// <summary>only created sometimes</summary>
+		public Transaction Transaction;
+		public bool WasFocused = true;
+
+		/// <summary>only needed occasionally (to sort out, eg, space in numbergrid which can choose or toggle the 10s)
+		/// and not really needed if this is just a move</summary>
+		public Sources Source;
+
+		/// <summary>true only for mouse clicks, and if the click is fast enough that it could be the second click of a double-click</summary>
+		/// <remarks>Not actually used at the moment</remarks>
+		public bool PossibleDoubleClick;
+
+		public enum Sources
+		{
+			Mouse,
+			Keyboard,
+			VerbButton, // one of the buttons on the toolbar which triggers any action - probably mouse in effect
+			Pad, // popup numberpad or similar
+			Deferred, // probably keyboard - but action has been deferred and triggered from a timer later (to avoid Modal handling during keyboard)
+
+			Irrelevant // can be used when (eg) moving cursors - since it isn't going to be needed, no point tracking the source of the move
+					   // any function which needs Source should assert/check against Irrelevant
+		}
+
+		internal ClickPosition(PointF pt, Page page, float zoom, Shape.SnapModes snapMode, Shape.SnapModes requestedSnap, StaticView view, Sources source)
+		{
+			Exact = pt;
+			Snapped = pt;
+			SnapMode = snapMode;
+			Page = page;
+			Zoom = zoom;
+			View = view;
+			RequestedSnap = requestedSnap;
+			Source = source;
+		}
+
+		/// <summary>Constructor for dummy position for internal code use.  Page and View will be null and snapping Off</summary>
+		public ClickPosition(PointF pt)
+		{
+			Exact = pt;
+			Snapped = pt;
+			SnapMode = Shape.SnapModes.Off;
+			Zoom = 1;
+			RequestedSnap = Shape.SnapModes.Off;
+			Source = Sources.Irrelevant;
+		}
+
+		public float ScalarSnapStep(float indicativeAngle)
+		{
+			return SnapMode == Shape.SnapModes.Grid ? Page.Paper.ScalarSnapStep(indicativeAngle) : 0;
+		}
+
+		/// <summary>Only valid until next update - this is deduced from the page</summary>
+		internal Target SnapTarget
+		{
+			get
+			{
+				if (SnapMode != Shape.SnapModes.Shape)
+					return null;
+				if (Page.ActiveTarget == null || !Page.ActiveTarget.Position.Equals(Snapped))
+					return null;
+				return Page.ActiveTarget;
+			}
+		}
+
+		/// <summary>Returns Snapped, unless grid snap and Snapped coincides with the parameter, in which case it jumps one grid space</summary>
+		/// <remarks>This is usually used for the first line in a shape so that something is drawn right away</remarks>
+		public PointF SnappedExcluding(PointF exclude)
+		{
+			if (SnapMode != Shape.SnapModes.Grid || !exclude.ApproxEqual(Snapped))
+				return Snapped;
+			float X = Page.Paper.XInterval;
+			return new PointF(Snapped.X + X, Snapped.Y);
+		}
+
+		public override string ToString()
+		{
+			// Only used for diagnostic events
+			return Exact + " from " + Source;
+		}
+
+	}
+
+	#endregion
+
 	public sealed class EditableView : StaticView, IShapeParent, IKeyControl
 	{
 		// the complete document view class which supports all editing
@@ -193,23 +297,23 @@ namespace SAW
 		{
 			if (DesignMode)
 				return;
-			Shape shp = TypingShape();
-			Debug.Assert(shp == null || shp.Parent != null, "TypingShape.Parent = Nothing;  CombinedKey may fail");
+			Shape shape = TypingShape();
+			Debug.Assert(shape == null || shape.Parent != null, "TypingShape.Parent = Nothing;  CombinedKey may fail");
 			Shape.VerbResult result = Shape.VerbResult.Unexpected;
 			Transaction newTransaction = null; // only to be used for actual typing, not activities
 			RectangleF refresh = RectangleF.Empty;
-			if (shp != null && (shp.Allows & Shape.AllowedActions.Typing) > 0)
+			if (shape != null && (shape.Allows & Shape.AllowedActions.Typing) > 0)
 			{
 				if (m_CurrentShape == null && m_TypingTransaction == null)
 				{
 					// if any changes are made we will need to store this transaction
 					newTransaction = new Transaction();
-					newTransaction.Edit(shp);
+					newTransaction.Edit(shape);
 					m_KeystrokesInTransaction = 0;
 					Shape.StoreCaretState(newTransaction);
 				}
-				refresh = shp.RefreshBounds();
-				result = shp.CombinedKey(e.KeyData, e.Character, m_Page, e.Simulated, this);
+				refresh = shape.RefreshBounds();
+				result = shape.CombinedKey(e.KeyData, e.Character, m_Page, e.Simulated, this);
 				// check that the control does have the caret (if appropriate)
 			}
 			else if (e.KeyCode == Keys.ControlKey && IsSingleSelector)
@@ -222,24 +326,10 @@ namespace SAW
 				var target = new ClickPosition(MouseToData(CursorPositionLocal), m_Page, m_Zoom, EffectiveSnap(), m_SnapMode, this, ClickPosition.Sources.Keyboard);
 				TriggerContextMenu(target, CursorPositionLocal);
 			}
-			if (result == Shape.VerbResult.Unexpected && EffectiveTool == Shape.Shapes.Selector)
-			{
-				// try doing an activity... (if none of the above set a result code)
-				shp = m_Page.FindSingleActivity();
-				if (shp != null)
-				{
-					newTransaction = new Transaction(); // will be cleared if result in unexpected or unchanged (which are pretty much the defaults)
-					newTransaction.Edit(shp);
-					m_KeystrokesInTransaction = 0;
-					refresh = shp.RefreshBounds();
-					result = shp.CombinedKey(e.KeyData, e.Character, m_Page, e.Simulated, this); // never actually makes any changes to the activity that would need to be stored in the data
-																								 // but might need a refresh
-				}
-			}
 			Debug.Assert(result > 0, "Shape.CombinedKey: did not set return value"); // 0 is not used by any of the return codes
 			if (result == Shape.VerbResult.Unchanged)
 				Debug.WriteLine("pnlView swallowing key on Unchanged result - behaviour change.  Shapes should return Unexpected for unhandled keys");
-			e.Handled = e.Handled || ProcessKeyVerbResult(shp, result, newTransaction, refresh);
+			e.Handled = e.Handled || ProcessKeyVerbResult(shape, result, newTransaction, refresh);
 			if (m_TypingTransaction != null && m_KeystrokesInTransaction > 5)
 			{
 				Globals.Root.StoreNewTransaction(m_TypingTransaction);
@@ -730,94 +820,6 @@ namespace SAW
 			UpdateDiagnostic();
 		}
 
-		#region ClickPosition
-
-		/// <summary>Data about a click.  All coords are in data coordinates </summary>
-		public class ClickPosition
-		{
-			/// <summary>we need to keep this, because some tools might use snapping, but use the exact coordinates in certain circumstances
-			/// (e.g. transformation tool selecting a different shape on start)</summary>
-			public PointF Exact;
-
-			public PointF Snapped; // but will be the same as Exact if the current tool does not need snapping.
-			public Shape.SnapModes SnapMode; // actual snap applied to .Snapped
-			public Shape.SnapModes RequestedSnap; // current user config
-			public Page Page; // the page on which we are working
-			public float Zoom; // the scale factor of the editing window where the click occurred.  Only occasionally used; can adjust tolerances slightly
-			/// <summary>The view the click was within.  Not defined in some other uses of this</summary>
-			public StaticView View;
-			public Transaction Transaction; // only created sometimes
-			public bool WasFocused = true;
-
-			/// <summary>only needed occasionally (to sort out, eg, space in numbergrid which can choose or toggle the 10s)
-			/// and not really needed if this is just a move</summary>
-			public Sources Source;
-
-			/// <summary>true only for mouse clicks, and if the click is fast enough that it could be the second click of a double-click</summary>
-			/// <remarks>Not actually used at the moment</remarks>
-			public bool PossibleDoubleClick;
-
-			public enum Sources
-			{
-				Mouse,
-				Keyboard,
-				VerbButton, // one of the buttons on the toolbar which triggers any action - probably mouse in effect
-				Pad, // popup numberpad or similar
-				Deferred, // probably keyboard - but action has been deferred and triggered from a timer later (to avoid Modal handling during keyboard)
-
-				Irrelevant // can be used when (eg) moving cursors - since it isn't going to be needed, no point tracking the source of the move
-						   // any function which needs Source should assert/check against Irrelevant
-			}
-
-			public ClickPosition(PointF pt, Page page, float zoom, Shape.SnapModes snapMode, Shape.SnapModes requestedSnap, StaticView view, Sources source)
-			{
-				Exact = pt;
-				Snapped = pt;
-				SnapMode = snapMode;
-				Page = page;
-				Zoom = zoom;
-				View = view;
-				RequestedSnap = requestedSnap;
-				Source = source;
-			}
-
-			public float ScalarSnapStep(float indicativeAngle)
-			{
-				return SnapMode == Shape.SnapModes.Grid ? Page.Paper.ScalarSnapStep(indicativeAngle) : 0;
-			}
-
-			/// <summary>Only valid until next update - this is deduced from the page</summary>
-			public Target SnapTarget
-			{
-				get
-				{
-					if (SnapMode != Shape.SnapModes.Shape)
-						return null;
-					if (Page.ActiveTarget == null || !Page.ActiveTarget.Position.Equals(Snapped))
-						return null;
-					return Page.ActiveTarget;
-				}
-			}
-
-			/// <summary>Returns Snapped, unless grid snap and Snapped coincides with the parameter, in which case it jumps one grid space</summary>
-			/// <remarks>This is usually used for the first line in a shape so that something is drawn right away</remarks>
-			public PointF SnappedExcluding(PointF exclude)
-			{
-				if (SnapMode != Shape.SnapModes.Grid || !exclude.ApproxEqual(Snapped))
-					return Snapped;
-				float X = Page.Paper.XInterval;
-				return new PointF(Snapped.X + X, Snapped.Y);
-			}
-
-			public override string ToString()
-			{
-				// Only used for diagnostic events
-				return Exact + " from " + Source;
-			}
-
-		}
-
-		#endregion
 
 		private ClickPosition MouseEventCoordinates(int X, int Y, ClickPosition.Sources source)
 		{
@@ -861,8 +863,9 @@ namespace SAW
 
 		internal bool Dragging => m_DragMode;
 
-		/// <summary>Changes m_shpContainerHover.  Forces repaint within the current layer internally</summary>
+		/// <summary>Changes m_TargetHover.  Forces repaint within the current layer internally</summary>
 		/// <param name="pt">The reference point - usually the mouse position, but is the middle of the shape if it is being newly created.</param>
+		/// <param name="forShape">If provided hover targets are generated only on this shape, otherwise on any selected shapes</param>
 		/// <remarks>Caller is probably doing its own invalidation, but seems more efficient to make a separate Invalidate call here, because this is probably affecting fewer buffers</remarks>
 		private void UpdateTargetHover(PointF pt, Shape forShape = null)
 		{
@@ -1707,7 +1710,7 @@ namespace SAW
 			switch (shape.ShapeCode)
 			{
 				case Shape.Shapes.SetOrigin:
-					m_Page.Origin = ((SetOrigin)shape).Origin;
+					m_Page.Origin = ((Shapes.SetOrigin)shape).Origin;
 					InvalidateData(shape.Bounds, InvalidationBuffer.Current);
 					if (Globals.Root.CurrentConfig.ReadBoolean(Config.Display_Origin))
 						InvalidateAll(InvalidationBuffer.Base); // fills width and height if drawn

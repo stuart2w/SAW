@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace SAW
 {
-	public partial class frmDeltas
+	internal partial class frmDeltas
 	{
 
 		private readonly Dictionary<string, Config.Delta> m_hashDeltas;
