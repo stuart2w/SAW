@@ -27,6 +27,7 @@ namespace SAW.Commands
 
 	public class CmdBeep : Command
 	{
+
 		internal override void Execute(ExecutionContext context)
 		{
 			Console.Beep();
@@ -74,15 +75,10 @@ namespace SAW.Commands
 		}
 
 		#region Other meta
-		public override string GetCommandName()
-		{
-			return Strings.Item("Script_CommandPart_" + m_Action) + " " + Strings.Item("Script_CommandPart_" + m_Source);
-		}
 
-		public override string GetDescription()
-		{
-			return Strings.Item("Script_Desc_" + m_Action.ToString().ToUpper() + "_" + m_Source.ToString().ToUpper());
-		}
+		public override string GetCommandName() => Strings.Item("Script_CommandPart_" + m_Action) + " " + Strings.Item("Script_CommandPart_" + m_Source);
+
+		public override string GetDescription() => Strings.Item("Script_Desc_" + m_Action.ToString().ToUpper() + "_" + m_Source.ToString().ToUpper());
 
 		protected override int[] GetPossibleIntIDs()
 		{
@@ -181,11 +177,7 @@ namespace SAW.Commands
 			context.View.HideTime = GetParamAsFloat(0);
 		}
 
-		internal override ICommandEditor GetEditor()
-		{
-			return new FloatingTimeEditor();
-		}
-
+		internal override ICommandEditor GetEditor() => new FloatingTimeEditor();
 	}
 
 
@@ -326,6 +318,7 @@ namespace SAW.Commands
 
 	public class CmdSpeakClipboard : Command
 	{
+
 		internal override void Execute(ExecutionContext context)
 		{
 			string text = System.Windows.Forms.Clipboard.GetText();

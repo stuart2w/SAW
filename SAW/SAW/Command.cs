@@ -513,7 +513,7 @@ namespace SAW
 			}
 		}
 
-		internal sealed override void InitialiseDefaultsForCreation()
+		internal override void InitialiseDefaultsForCreation()
 		{
 			EnsureParams(ExpectedParams.Length);
 		}

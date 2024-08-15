@@ -47,7 +47,7 @@ namespace Switches.Switching
 			{
 				SendAll(false);
 			}
-			catch (Exception)
+			catch (Exception ex)
 			{
 				OnError("Keyboard switching unavailable: did not connect to SwitchCpp.dll");
 			}

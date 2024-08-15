@@ -96,6 +96,7 @@ NetCheckDone:
   File "..\SAW\bin\x86\Release\Microsoft.DirectX.DirectInput.dll"
   File "..\SAW\bin\x86\Release\System.ValueTuple.dll"
   File "..\SAW\bin\x86\Release\yapi.dll"
+  File "..\SAW\bin\x86\Release\RedRat.dll"
   File "..\SAW\strings.txt"
   File "Update.exe"
   ; copied here so that we can keep a signed one, rather than continuallyy resign it

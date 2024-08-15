@@ -13,6 +13,7 @@ namespace SAW.CommandEditors
 {
 	public partial class YoctoEditor : UserControl, ICommandEditor
 	{
+
 		private bool m_Filling;
 
 		public YoctoEditor()

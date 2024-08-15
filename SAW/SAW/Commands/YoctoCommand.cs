@@ -47,7 +47,7 @@ namespace SAW.Commands
 
 		protected override void InitialiseFromParams(List<string> possibleParams, string commandUsed)
 		{ // generally ID, command.  But ? command can also have an optional time
-			base.InitialiseFromParams(possibleParams, commandUsed);
+			//base.InitialiseFromParams(possibleParams, commandUsed);
 			if (possibleParams.Count < 2)
 				throw new UserException(Strings.Item("Script_Error_TooFewParameters").Replace("%0", GetCommandName()));
 			if (possibleParams.Count > 3)

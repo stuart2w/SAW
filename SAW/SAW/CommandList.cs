@@ -113,6 +113,9 @@ namespace SAW
 			Add("GotoPage", typeof(CmdGotoPage), "SAW").SAW6 = false;
 			Add("YoctoRelay", typeof(CmdYocto), "SAW").SAW6 = false;
 			Add("OutText", typeof(CmdOutText), "SAW/Output");
+			Add("RedRatSend", typeof(CmdRedRatSend), "SAW/RedRat").SAW6 = false;
+			Add("RedRatStrength", typeof(CmdRedRatStrength), "SAW/RedRat").SAW6 = false;
+			Add("RedRatColour", typeof(CmdRedRatColour), "SAW/RedRat").SAW6 = false;
 			Add("SAWMoveToEdge", typeof(CmdSawMoveToEdge), "SAW/SAWWindow");
 			Add("ShowSAW", typeof(CmdShowSAW), "SAW/SAWWindow");
 			Add("SAWMove", typeof(CmdSawMove), "SAW/SAWWindow");
@@ -162,7 +165,7 @@ namespace SAW
 		{
 			if (!instanceClass.IsSubclassOf(typeof(Command)))
 				throw new ArgumentException(instanceClass + " is not a CommandObj");
-			var entry = new Entry(code, instanceClass, addGUIPath);
+			Entry entry = new Entry(code, instanceClass, addGUIPath);
 			Entries.Add(code, entry);
 			TypeLookup.Add(instanceClass, entry);
 

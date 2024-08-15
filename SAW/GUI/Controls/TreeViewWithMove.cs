@@ -117,7 +117,7 @@ namespace SAW
 		{
 			base.OnDragEnter(e);
 			TreeNode movingNode = (TreeNode)e.Data.GetData(typeof(TreeNode));
-			if (movingNode.TreeView != this)
+			if (movingNode?.TreeView != this)
 				movingNode = null;
 			if (movingNode != null)
 			{

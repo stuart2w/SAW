@@ -9,10 +9,12 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>SAW</RootNamespace>
     <AssemblyName>SAW</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <TargetFrameworkProfile />
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -64,6 +66,9 @@
     <Reference Include="Blade">
       <HintPath>.\Blade.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.Bcl.AsyncInterfaces, Version=7.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Bcl.AsyncInterfaces.7.0.0\lib\net462\Microsoft.Bcl.AsyncInterfaces.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.DirectX, Version=1.0.2902.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>C:\Windows\Microsoft.NET\DirectX for Managed Code\1.0.2902.0\Microsoft.DirectX.dll</HintPath>
@@ -80,6 +85,9 @@
       <HintPath>..\packages\Newtonsoft.Json.12.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="RedRat">
+      <HintPath>.\RedRat.dll</HintPath>
+    </Reference>
     <Reference Include="RepoB">
       <HintPath>..\RepoB.dll</HintPath>
     </Reference>
@@ -88,16 +96,31 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Buffers, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Buffers.4.5.1\lib\net461\System.Buffers.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Memory, Version=4.0.1.2, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Memory.4.5.5\lib\net461\System.Memory.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Numerics" />
+    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.6.0.0\lib\net461\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+    </Reference>
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.Speech" />
-    <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.ValueTuple.4.5.0\lib\netstandard1.0\System.ValueTuple.dll</HintPath>
+    <Reference Include="System.Text.Encodings.Web, Version=7.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Text.Encodings.Web.7.0.0\lib\net462\System.Text.Encodings.Web.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Text.Json, Version=7.0.0.2, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Text.Json.7.0.2\lib\net462\System.Text.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Threading.Tasks.Extensions, Version=4.2.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Threading.Tasks.Extensions.4.5.4\lib\net461\System.Threading.Tasks.Extensions.dll</HintPath>
     </Reference>
     <Reference Include="System.Web" />
     <Reference Include="System.Web.Services" />
     <Reference Include="System.Xml.Linq" />
-    <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Deployment" />
     <Reference Include="System.Drawing" />
@@ -168,12 +191,31 @@
     <Compile Include="SAW\CommandEditors\GotoPageEditor.Designer.cs">
       <DependentUpon>GotoPageEditor.cs</DependentUpon>
     </Compile>
+    <Compile Include="SAW\CommandEditors\RedRatColourEditor.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="SAW\CommandEditors\RedRatColourEditor.Designer.cs">
+      <DependentUpon>RedRatColourEditor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SAW\CommandEditors\RedRatSendEditor.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="SAW\CommandEditors\RedRatSendEditor.Designer.cs">
+      <DependentUpon>RedRatSendEditor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SAW\CommandEditors\RedRatStrengthEditor.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="SAW\CommandEditors\RedRatStrengthEditor.Designer.cs">
+      <DependentUpon>RedRatStrengthEditor.cs</DependentUpon>
+    </Compile>
     <Compile Include="SAW\CommandEditors\YoctoEditor.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="SAW\CommandEditors\YoctoEditor.Designer.cs">
       <DependentUpon>YoctoEditor.cs</DependentUpon>
     </Compile>
+    <Compile Include="SAW\Commands\RedRat.cs" />
     <Compile Include="SAW\Commands\YoctoCommand.cs" />
     <Compile Include="SAW\SAW6 Compatibility\Header.cs" />
     <Compile Include="Shapes and data elements\Base classes\Filled.cs" />
@@ -1060,6 +1102,15 @@
     </EmbeddedResource>
     <EmbeddedResource Include="SAW\CommandEditors\FloatingTimeEditor.resx">
       <DependentUpon>FloatingTimeEditor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SAW\CommandEditors\RedRatColourEditor.resx">
+      <DependentUpon>RedRatColourEditor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SAW\CommandEditors\RedRatSendEditor.resx">
+      <DependentUpon>RedRatSendEditor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SAW\CommandEditors\RedRatStrengthEditor.resx">
+      <DependentUpon>RedRatStrengthEditor.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="SAW\CommandEditors\WordListScrollEditor.resx">
       <DependentUpon>WordListScrollEditor.cs</DependentUpon>

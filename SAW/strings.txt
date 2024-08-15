@@ -1522,9 +1522,15 @@ SAW_CommandEdit_Yocto_Toggle = Toggle
 SAW_CommandEdit_Yocto_Pulse = Pulse
 SAW_CommandEdit_Yocto_Query = Show status
 SAW_CommandEdit_Yocto_NotFound = Note: This ID does not match any relay currently connected.  The command will work correctly only if a matching relay is connected before use.
+SAW_CommandEdit_RedRat_Device = Device:
+SAW_CommandEdit_RedRat_Signal = Signal:
+SAW_CommandEdit_RedRat_Strength1 = Signal strength on the front channel (0-100)
+SAW_CommandEdit_RedRat_Strength2 = Signal strength on the rear channel (0-100)
+SAW_CommandEdit_RedRat_Colour = Colour of the LED
+SAW_CommandEdit_RedRat_Test = Test now
 
 #######################################
-# script commands as used in editor
+# script commands as used in editor.  Last part of name is command code as defined in CommandList
 Script_Command_NormalItem = normal item
 Script_Command_HighlightItem = highlight item
 Script_Command_FlashItem = flash item
@@ -1656,6 +1662,9 @@ Script_Command_PreviousSet = previous set
 Script_Command_DDEExe = dde exe
 Script_Command_GotoPage = Goto page
 Script_Command_YoctoRelay = yocto relay
+Script_Command_RedRatSend = zigir send
+Script_Command_RedRatStrength = zigir strength
+Script_Command_RedRatColour = zigir colour
 
 # command names for CmdKeysOut
 Script_Command_UsingKeys_SELECT_PREV = select previous application
@@ -1721,6 +1730,7 @@ Script_Group_Scroll = Scroll scripts
 Script_Group_Window = Window scripts
 Script_Group_Prediction = Word prediction scripts
 Script_Group_SelectionSets = Selection sets
+Script_Group_RedRat = Redrat ZigIR
 
 
 ############### per-script strings - errors, descriptions, etc...
@@ -1741,6 +1751,9 @@ Script_Error_UnknownYocto = Yocto relay command not recognised: relay ID must be
 Script_Error_BadYoctoTime = Time not recognised.  Must be an integer greater than 0
 Script_Error_YoctoIDEmpty = Relay ID not provided.  Must be "All" or the logical ID of a relay.
 Script_Error_YoctoNotFound = Could not find yocto relay "%0"
+Script_Error_RedRatSignalNotFound = Could not find the RedRat/ZigIR signal "%0"
+Script_Error_RedRatNotDefined = Selections must be made for both Device and Signal
+Script_Error_RedRatNoDevice = No Pico RR/AigIR device found.  If a device is attached you must restart SAW to search for it again.
 
 # these were copied from SAW6.  The quotes aren't actually wanted, but are an artefact of the C++ code.  They are stripped out before these items are displayed
 Script_Desc_NORMALITEM = "Unhighlight an item."
@@ -1860,6 +1873,9 @@ Script_Desc_EDITPREDICTIONWORDS = "View and edit word prediction words"
 Script_Desc_WORDLISTSCROLL = This command scrolls the displayed word predictions if there are more predictions available than can be displayed at once.
 Script_Desc_GOTOPAGE = If the file has more than one page this changes the view to a specified page number.
 Script_Desc_YOCTORELAY = Changes (or queries) the state of a Yoctopuce USB relay.  The default is to turn it on for a stated number of milliseconds.
+Script_Desc_REDRATSEND = Sends a signal using a ZigIR device
+Script_Desc_REDRATSTRENGTH = Changes the output strength of (one of the 2 channels on) the ZigIR device
+Script_Desc_REDRATCOLOUR = Changes the colour of the LED on the ZigIR device
 
 #CmdKeysOut based:
 Script_Desc_CLOSE = "This will close the current window that has focus."

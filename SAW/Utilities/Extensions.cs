@@ -89,6 +89,12 @@ namespace SAW
 			return dict.Aggregate((l, r) => l.Value > r.Value ? l : r).Key;
 		}
 
+		/// <summary>Returns i constrained to the given range, inclusive </summary>
+		public static int LimitTo(this int i, int min, int max) => Math.Min(Math.Max(i, min), max);
+
+		/// <summary>Returns i constrained to the given range, inclusive </summary>
+		public static int LimitTo(this short i, short min, short max) => Math.Min(Math.Max(i, min), max);
+
 		#region Keycode conversion
 		// an alternative to these will be needed if not under Windows.  They are needed in frmMain.SimulateKey; other uses might be avoidable
 
